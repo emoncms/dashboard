@@ -63,8 +63,10 @@ class Dashboard
         $qB = ""; $qC = "";
         if ($public==true) $qB = " and public=1";
         if ($published==true) $qC = " and published=1";
-        $result = $this->mysqli->query("SELECT id, name, alias, description, main, published, public, showdescription FROM dashboard WHERE userid='$userid'".$qB.$qC);
-
+        if (!$result = $this->mysqli->query("SELECT id, name, alias, description, main, published, public, showdescription FROM dashboard WHERE userid='$userid'".$qB.$qC)) {
+          return array();
+        }
+        
         $list = array();
         while ($row = $result->fetch_object())
         {
