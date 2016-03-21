@@ -17,9 +17,9 @@ function curl_widgetlist()
     {
       "offsetx":-60,"offsety":-20,"width":120,"height":40,
       "menu":"Widgets",
-      "options":["IP","port","url","payload","colour","caption"],
-      "optionsname":["IP-adress","port","url","payload","colour","caption"],
-      "optionshint":[_Tr("IP-adress of server"),_Tr("Listen-Port of server"),_Tr("Url"),_Tr("SendString"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Caption")]
+      "options":["ip","port","url","payload","colour","caption"],
+      "optionsname":["IP-adress","Port","URL","Payload","Colour","Caption"],
+      "optionshint":[_Tr("IP-adress of server"),_Tr("Listen-Port of server"),_Tr("URL example: node/param"),_Tr("Data to send"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Button Text")]
     }
   };
 
@@ -32,7 +32,7 @@ function curl_events()
 {
   $('.curl').on("click", function(event) {
 
-    $.ajax({type:'GET', url:'http://'+$(this).attr("IP")+':'+$(this).attr("port")+'/'+$(this).attr("url"), data: {"action": $(this).attr("payload")}, timeout: 1000 });		
+    $.ajax({type:'GET', url:'http://'+$(this).attr("ip")+':'+$(this).attr("port")+'/'+$(this).attr("url"), data: {"data": $(this).attr("payload")}, timeout: 1000 });		
 
   });
 }
