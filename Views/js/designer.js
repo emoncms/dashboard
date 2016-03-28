@@ -482,7 +482,7 @@ var designer = {
                 if ($(this).attr("id")=="html"){
                     $("#"+designer.selected_box).html($(this).val());
                 }
-                else if ($(this).attr("id")=="colour"){
+                else if ($(this).attr("id").substring(0,6)=="colour"){
                     // Since colour values are generally prefixed with "#", and "#" isn't valid in URLs, we strip out the "#".
                     // It will be replaced by the value-checking in the actual plot function, so this won't cause issues.
                     var colour = $(this).val();
