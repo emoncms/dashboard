@@ -17,9 +17,9 @@ function curl_widgetlist()
     {
       "offsetx":-60,"offsety":-20,"width":120,"height":40,
       "menu":"Widgets",
-      "options":["ip","port","url","payload","colour","caption","confirm"],
-      "optionsname":["IP-adress","Port","URL","Payload","Colour","Caption", "Confirmation"],
-      "optionshint":[_Tr("IP-adress of server"),_Tr("Listen-Port of server"),_Tr("URL example: node/param"),_Tr("Data to send"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Button Text"),_Tr("Confirm Box: yes/no")]
+      "options":["ip","port","url","payload","colour","caption"],
+      "optionsname":["IP-address","Port","URL","Payload","Colour","Caption"],
+      "optionshint":[_Tr("IP-address of server"),_Tr("Listen-Port of server"),_Tr("URL example: node/param"),_Tr("Data to send"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Button Text")]
     }
   };
 
