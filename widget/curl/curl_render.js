@@ -17,9 +17,9 @@ function curl_widgetlist()
     {
       "offsetx":-60,"offsety":-20,"width":120,"height":40,
       "menu":"Widgets",
-      "options":["ip","port","url","payload","colour","caption"],
-      "optionsname":["IP-adress","Port","URL","Payload","Colour","Caption"],
-      "optionshint":[_Tr("IP-adress of server"),_Tr("Listen-Port of server"),_Tr("URL example: node/param"),_Tr("Data to send"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Button Text")]
+      "options":["ip","port","url","payload","colour","caption","confirm"],
+      "optionsname":["IP-adress","Port","URL","Payload","Colour","Caption", "Confirmation"],
+      "optionshint":[_Tr("IP-adress of server"),_Tr("Listen-Port of server"),_Tr("URL example: node/param"),_Tr("Data to send"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Button Text"),_Tr("Confirm Box: yes/no")]
     }
   };
 
@@ -32,7 +32,18 @@ function curl_events()
 {
   $('.curl').on("click", function(event) {
 
-    $.ajax({type:'GET', url:'http://'+$(this).attr("ip")+':'+$(this).attr("port")+'/'+$(this).attr("url"), data: {"data": $(this).attr("payload")}, timeout: 1000 });		
+    if($(this).attr("confirm")=="yes"){
+        
+            var r = confirm("Do you want to continue?");
+            if (r == true) {
+                $.ajax({type:'GET', url:'http://'+$(this).attr("ip")+':'+$(this).attr("port")+'/'+$(this).attr("url"), data: {"data": $(this).attr("payload")}, timeout: 1000 });
+            } else {
+                // Nothing to do
+            }
+        
+    }else{
+        $.ajax({type:'GET', url:'http://'+$(this).attr("ip")+':'+$(this).attr("port")+'/'+$(this).attr("url"), data: {"data": $(this).attr("payload")}, timeout: 1000 });
+    }		
 
   });
 }
@@ -47,9 +58,9 @@ function curl_draw()
   $('.curl').each(function(index)
   {
     var id = "can-"+$(this).attr("id");
-    var col = $(this).attr("colour");
+    var colour = $(this).attr("colour");
     var caption = $(this).attr("caption");
-	draw_curl(widgetcanvas[id], col, caption);
+	draw_curl(widgetcanvas[id], colour, caption);
   });
 }
 
@@ -62,17 +73,16 @@ function curl_fastupdate()
 {
 }
 
-
-function draw_curl(mybutton,status,text)
+function draw_curl(button,status,text)
 {
-  if (!mybutton) return;
-  mybutton.clearRect(0,0,120,40);
+  if (!button) return;
+  button.clearRect(0,0,120,40);
 
-  mybutton.fillStyle = "#8F8F8F";
-  mybutton.beginPath();
-  mybutton.rect(0, 0, 120, 40);
-  mybutton.closePath();
-  mybutton.fill();
+  button.fillStyle = "#8F8F8F";
+  button.beginPath();
+  button.rect(0, 0, 120, 40);
+  button.closePath();
+  button.fill();
 
   var mycolour;
   var mycoltxt;
@@ -95,18 +105,18 @@ function draw_curl(mybutton,status,text)
   } else if (status>4 && status <=5)   {        // 5=yellow
     mycolour = '#FFFF00';
     mycoltxt = '#000000';
-  } else {					                    // >6=black
+  } else {                                      // >6=black
     mycolour = '#000000';
     mycoltxt = '#FFFFFF';
   }
 
   // draw shapes
-  mybutton.fillStyle = mycolour;
-  mybutton.fillRect(3,3,114,34);
-  mybutton.font = '16pt Arial';
-  mybutton.textAlign = 'center'
-  mybutton.textBaseline = 'middle';
-  mybutton.fillStyle = mycoltxt; 
-  mybutton.fillText(text, 60, 20, 110)
+  button.fillStyle = mycolour;
+  button.fillRect(3,3,114,34);
+  button.font = '16pt Arial';
+  button.textAlign = 'center';
+  button.textBaseline = 'middle';
+  button.fillStyle = mycoltxt; 
+  button.fillText(text, 60, 20, 110);
 }
 
