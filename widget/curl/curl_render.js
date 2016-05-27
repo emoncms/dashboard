@@ -60,7 +60,7 @@ function curl_draw()
     var id = "can-"+$(this).attr("id");
     var colour = $(this).attr("colour");
     var caption = $(this).attr("caption");
-	draw_curl(widgetcanvas[id], colour, caption);
+    draw_curl(widgetcanvas[id], colour, caption);
   });
 }
 
@@ -85,29 +85,29 @@ function draw_curl(button,status,text)
   button.fill();
 
   var mycolour;
-  var mycoltxt;
+  var mycolourtxt;
   
   if (status==0) {                              // 0=red
     mycolour = '#FF6347';
-    mycoltxt = '#000000';
+    mycolourtxt = '#000000';
   } else if (status>0 && status <=1) {          // 1=green
     mycolour = '#7FFF00';
-    mycoltxt = '#000000';
+    mycolourtxt = '#000000';
   } else if (status>1 && status <=2) {          // 2=grey
     mycolour = '#CCCCCC';
-    mycoltxt = '#000000';
+    mycolourtxt = '#000000';
   } else if (status>2 && status <=3) {          // 3=blue
     mycolour = '#87CEFF';
-    mycoltxt = '#000000';
+    mycolourtxt = '#000000';
   } else if (status>3 && status <=4) {          // 4=purple
     mycolour = '#9B30FF';
-    mycoltxt = '#FFFFFF';
+    mycolourtxt = '#FFFFFF';
   } else if (status>4 && status <=5)   {        // 5=yellow
     mycolour = '#FFFF00';
-    mycoltxt = '#000000';
+    mycolourtxt = '#000000';
   } else {                                      // >6=black
     mycolour = '#000000';
-    mycoltxt = '#FFFFFF';
+    mycolourtxt = '#FFFFFF';
   }
 
   // draw shapes
@@ -116,7 +116,7 @@ function draw_curl(button,status,text)
   button.font = '16pt Arial';
   button.textAlign = 'center';
   button.textBaseline = 'middle';
-  button.fillStyle = mycoltxt; 
+  button.fillStyle = mycolourtxt; 
   button.fillText(text, 60, 20, 110);
 }
 
