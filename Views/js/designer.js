@@ -483,6 +483,9 @@ var designer = {
             if (keyCode >= 37 && keyCode <= 40) {
                 if (!designer.selected_box) return;
 
+                var targetTagName = e.target.tagName.toLowerCase();
+                if (targetTagName === 'input' || targetTagName === 'textarea') return;
+
                 var left_shift = 0;
                 var top_shift = 0;
 
