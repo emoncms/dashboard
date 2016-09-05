@@ -477,7 +477,7 @@ var designer = {
         });
 
         // Key events
-        window.addEventListener('keydown', function(e) {
+        $(window).keydown(function(e) {
             var keyCode = e.keyCode;
 
             if (keyCode >= 37 && keyCode <= 40) {
