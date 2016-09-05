@@ -66,7 +66,10 @@
         fields['alias']  = $("input[name=alias]").val();
         fields['description']  = $("textarea[name=description]").val();
         fields['backgroundcolor']  = $("input[name=backgroundcolor]").val().replace('#','');
-        fields['gridsize'] = $("input[name=gridsize]").val();
+
+        var gridsize = parseInt($("input[name=gridsize]").val());
+        gridsize = Math.max(gridsize, 0);
+        fields['gridsize'] = gridsize;
 
         if ($("#chk_main").is(":checked")) fields['main'] = true; else fields['main'] = false;
             if ($("#chk_public").is(":checked")) fields['public'] = true; else fields['public'] = false;
@@ -85,7 +88,7 @@
 
         $('#page-container').css("background-color","#"+fields['backgroundcolor']);
 
-        designer.grid_size = fields['gridsize'];
+        designer.grid_size = gridsize;
         designer.draw();
     });
 </script>
