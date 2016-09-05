@@ -482,6 +482,49 @@ var designer = {
             }
         });
 
+        // Key events
+        $(window).keydown(function(e) {
+            var keyCode = e.keyCode;
+
+            if (keyCode >= 37 && keyCode <= 40) {
+                if (!designer.selected_box) return;
+
+                var targetTagName = e.target.tagName.toLowerCase();
+                if (targetTagName === 'input' || targetTagName === 'textarea') return;
+
+                var left_shift = 0;
+                var top_shift = 0;
+
+                switch(keyCode) {
+                    case 37: // Left
+                      left_shift = -1;
+                      break;
+                    case 38: // Up
+                      top_shift = -1;
+                      break;
+                    case 39: // Right
+                      left_shift = 1;
+                      break;
+                    case 40: // Down
+                      top_shift = 1;
+                      break;
+                    default:
+                      // Unhandled
+                      break;
+                }
+
+                var snap_amount = Math.max(designer.grid_size, 1);
+
+                designer.boxlist[designer.selected_box]['left'] = designer.boxlist[designer.selected_box]['left'] + (left_shift * snap_amount);
+                designer.boxlist[designer.selected_box]['top'] = designer.boxlist[designer.selected_box]['top'] + (top_shift * snap_amount);
+
+                designer.draw();
+                designer.modified();
+
+                e.preventDefault();
+            }
+        });
+
         // On save click
         $("#options-save").click(function(){
             $(".options").each(function() {
