@@ -50,7 +50,13 @@ var designer = {
     },
 
 
-    'snap': function(pos) {return Math.round(pos/designer.grid_size)*designer.grid_size;},
+    'snap': function(pos) {
+        if (designer.grid_size > 0) {
+            return Math.round(pos/designer.grid_size)*designer.grid_size;
+        } else {
+            return Math.round(pos);
+        }
+    },
 
     'modified': function(){
         $("#save-dashboard").attr('class','btn btn-warning').text(_Tr("Changed, press to save"));
