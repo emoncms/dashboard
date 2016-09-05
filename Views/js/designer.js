@@ -511,6 +511,8 @@ var designer = {
 
                 designer.draw();
                 designer.modified();
+
+                e.preventDefault();
             }
         });
 
