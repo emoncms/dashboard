@@ -69,7 +69,7 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     render_widgets_init(widget); // populate widgets variable 
 
     designer.canvas = "#can";
-    designer.grid_size = 20; // change default here
+    designer.grid_size = <?php echo $dashboard['gridsize']; ?>;
     designer.widgets = widgets;
     designer.init();
 
