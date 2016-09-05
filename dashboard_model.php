@@ -122,6 +122,8 @@ class Dashboard
 
         if (isset($fields->backgroundcolor)) $array[] = "`backgroundcolor` = '".preg_replace('/[^0-9a-f]/','', strtolower($fields->backgroundcolor))."'";
 
+        if (isset($fields->gridsize)) $array[] = "`gridsize` = '".preg_replace('/[^0-9]/','', $fields->gridsize)."'";
+
         if (isset($fields->main))
         {
             $main = (bool)$fields->main;
