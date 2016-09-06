@@ -65,11 +65,20 @@ var designer = {
     'onbox': function(x,y){
         var box = null;
         for (z in designer.boxlist) {
-        if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4)) {
-            if (y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4)) {
-            box = z;
+            if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4) &&
+                y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4))
+            {
+                if (box === null) {
+                    box = z;
+                } else {
+                    var z_element = $("#"+z);
+                    var box_element = $("#"+box);
+                    // Only set new box if this box is higher than the existing found element
+                    if (z_element.index() > box_element.index()) {
+                        box = z;
+                    }
+                }
             }
-        }
         }
         return box;
     },
