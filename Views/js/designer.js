@@ -65,11 +65,20 @@ var designer = {
     'onbox': function(x,y){
         var box = null;
         for (z in designer.boxlist) {
-        if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4)) {
-            if (y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4)) {
-            box = z;
+            if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4) &&
+                y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4))
+            {
+                if (box === null) {
+                    box = z;
+                } else {
+                    var z_element = $("#"+z);
+                    var box_element = $("#"+box);
+                    // Only set new box if this box is higher than the existing found element
+                    if (z_element.index() > box_element.index()) {
+                        box = z;
+                    }
+                }
             }
-        }
         }
         return box;
     },
@@ -586,6 +595,30 @@ var designer = {
         $("#options-button").click(function(event){
             if (designer.selected_box){
                 designer.draw_options($("#"+designer.selected_box).attr("class"));
+            }
+        });
+
+        $("#move-forward-button").click(function(event){
+            if (designer.selected_box){
+                var selected_box_element = $("#"+designer.selected_box);
+                var next_element = selected_box_element.next();
+                if (next_element.length > 0) {
+                    selected_box_element.insertAfter(next_element);
+                    designer.draw();
+                    designer.modified();
+                }
+            }
+        });
+
+        $("#move-backward-button").click(function(event){
+            if (designer.selected_box){
+                var selected_box_element = $("#"+designer.selected_box);
+                var prev_element = selected_box_element.prev();
+                if (prev_element.length > 0) {
+                    selected_box_element.insertBefore(prev_element);
+                    designer.draw();
+                    designer.modified();
+                }
             }
         });
     }
