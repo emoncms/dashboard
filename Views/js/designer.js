@@ -515,8 +515,27 @@ var designer = {
 
                 var snap_amount = Math.max(designer.grid_size, 1);
 
+                // Check that the element doesn't go off the page
+                var newCenterX = designer.boxlist[designer.selected_box]['left'] + (designer.boxlist[designer.selected_box]['width'] / 2) + (left_shift * snap_amount);
+                if (newCenterX < 0 || newCenterX > designer.page_width) {
+                    // If this method ever did left_shift other than 1/-1, we would need to change the logic here.
+                    left_shift = 0;
+                }
+
+                var newCenterY = designer.boxlist[designer.selected_box]['top'] + (designer.boxlist[designer.selected_box]['height'] / 2) + (top_shift * snap_amount);
+                if (newCenterY < 0) {
+                    // If this method ever did top_shift other than 1/-1, we would need to change the logic here.
+                    top_shift = 0;
+                }
+
                 designer.boxlist[designer.selected_box]['left'] = designer.boxlist[designer.selected_box]['left'] + (left_shift * snap_amount);
                 designer.boxlist[designer.selected_box]['top'] = designer.boxlist[designer.selected_box]['top'] + (top_shift * snap_amount);
+
+                // Increase the page height if we need to
+                var bottom = designer.boxlist[designer.selected_box]['top'] + designer.boxlist[designer.selected_box]['height'];
+                if (bottom > designer.page_height - designer.grid_size) {
+                    designer.page_height = bottom + designer.grid_size;
+                }
 
                 designer.draw();
                 designer.modified();
