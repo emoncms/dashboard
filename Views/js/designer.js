@@ -569,5 +569,29 @@ var designer = {
                 designer.draw_options($("#"+designer.selected_box).attr("class"));
             }
         });
+
+        $("#move-forward-button").click(function(event){
+            if (designer.selected_box){
+                var selected_box_element = $("#"+designer.selected_box);
+                var next_element = selected_box_element.next();
+                if (next_element.length > 0) {
+                    selected_box_element.insertAfter(next_element);
+                    designer.draw();
+                    designer.modified();
+                }
+            }
+        });
+
+        $("#move-backward-button").click(function(event){
+            if (designer.selected_box){
+                var selected_box_element = $("#"+designer.selected_box);
+                var prev_element = selected_box_element.prev();
+                if (prev_element.length > 0) {
+                    selected_box_element.insertBefore(prev_element);
+                    designer.draw();
+                    designer.modified();
+                }
+            }
+        });
     }
 }
