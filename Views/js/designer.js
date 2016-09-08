@@ -435,6 +435,9 @@ var designer = {
     },
     
     'handle_delete_key_event': function(e){
+        var targetTagName = e.target.tagName.toLowerCase();
+        if (targetTagName === 'input' || targetTagName === 'textarea') return false;
+
         if (designer.selected_box) {
             designer.delete_selected_boxes();
             return true;
