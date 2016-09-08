@@ -150,16 +150,12 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
   if (type == 0){ // Standard dial from 0 to maxvalue if offset is not set.
     // TODO: seperate between needle position at maximum/minimum and the value displayed.
     // TODO: Do we need to limit the value being displayed? Only needle position should be limited.
-    if (position<0)
-      position = 0;
   }
   else if (type == 1){
     angleOffset = -0.75;
     segment = ["#e61703","#ff6254","#ffa29a","#70ac21","#378d42","#046b34"];
   }
   else if (type == 2){
-    if (position<0)
-      position = 0;
     segment = ["#046b34","#378d42","#87c03f","#f8a01b","#f46722","#bf2025"];
   }
   else if (type == 3){
@@ -167,8 +163,6 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     segment = ["#046b34","#378d42","#87c03f","#f8a01b","#f46722","#bf2025"];
   }
   else if (type == 4){
-    if (position<0)
-      position = 0;
     segment = ["#bf2025","#f46722","#f8a01b","#87c03f","#378d42","#046b34"];
   }
   else if (type == 5){
@@ -180,8 +174,6 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     segment = ["#f46722","#f8a01b","#87c03f","#87c03f","#f8a01b","#f46722"];
   }
   else if (type == 7){
-    if (position<0)
-      position = 0;
     segment = ["#a7cbe2","#68b7eb","#0d97f3","#0f81d0","#0c6dae","#08578e"];
   }
   else if (type == 8){  //temperature dial blue-red, first segment blue should mean below freezing C
@@ -193,16 +185,12 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     segment = ["#e94937","#da4130","#c43626","#ad2b1c","#992113","#86170a"];
   }
   else if (type == 10){ //light: from dark grey to white
-    if (position<0)
-      position = 0;
     segment = ["#202020","#4D4D4D","#7D7D7D","#EEF0F3","#F7F7F7", "#FFFFFF"];
   }
   else if (type == 11){  //temperature dial blue-red, first 2 segments blue should mean below freezing C
     angleOffset = -0.5;
     segment = ["#0d97f3","#a7cbe2","#ffbebe","#ff8383","#ff6464","#ff3d3d"];
   }
-  
-  if (position>maxvalue) position = maxvalue;
 
   // needle values and their corresponding direction
   // South West (limit start) a = 1.75
@@ -212,7 +200,15 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
   // North East: ............ a = 0.75
   // East: .................. a = 0.5
   // South East (limit stop)  a = 0.25
+  //
+  // Calculation explanation:
+  // Total needle space = 1.75 - 0.25 = 1.5 (from above).
+  // (1.5 + angleOffset) = needle space from 0 to maxvalue (because angleOffset is negative).
+  // (position / maxvalue) = fraction of how far round the needle space from 0 to maxvalue we need to be.
+  // The rest follows from these.
   var needle = 1.75 - ((position/maxvalue) * (1.5+angleOffset)) + angleOffset;
+  needle = Math.min(needle, 1.75);
+  needle = Math.max(needle, 0.25);
   
   width = 0.785;
   var c=3*0.785;
@@ -293,7 +289,9 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     ctx.rotate(deg_to_radians(-45));
    
     // graduation text - start limit
-    ctx.fillText(""+round1decimal( (2*angleOffset/3*1.5*maxvalue)+offset )+units, 0, 0);        // Since we've translated the entire context, the coords we want to draw at are now at [0,0]  
+    // Calculation similar to the `needle` calculation above
+    var start_limit = round1decimal((angleOffset * (maxvalue / (1.5 + angleOffset))) + offset);
+    ctx.fillText(""+start_limit+units, 0, 0); // Since we've translated the entire context, the coords we want to draw at are now at [0,0]  
     ctx.restore();
     
     ctx.save(); // each ctx.save is only good for one restore, apparently.
@@ -301,7 +299,8 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     ctx.rotate(deg_to_radians(45));
     
     // graduation text - end limit
-    ctx.fillText(""+round1decimal(offset+maxvalue)+units, 0, 0);  
+    var end_limit = round1decimal(offset+maxvalue);
+    ctx.fillText(""+end_limit+units, 0, 0);  
     ctx.restore();
   }
   
