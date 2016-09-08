@@ -47,9 +47,15 @@ function feedvalue_widgetlist()
         [6,    "6"]
     ];
 
-  addOption(widgets["feedvalue"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
-  addOption(widgets["feedvalue"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
-  addOption(widgets["feedvalue"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
+  var unitEndOptions = [
+        [0, "Back"],
+        [1, "Front"]
+    ];
+
+  addOption(widgets["feedvalue"], "feedid",   "feedid",  _Tr("Feed"),          _Tr("Feed value"),      []);
+  addOption(widgets["feedvalue"], "units",    "value",   _Tr("Units"),         _Tr("Units to show"),   []);
+  addOption(widgets["feedvalue"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
+  addOption(widgets["feedvalue"], "decimals", "dropbox", _Tr("Decimals"),      _Tr("Decimals to show"),    decimalsDropBoxOptions);
 
   return widgets;
 }
@@ -74,6 +80,9 @@ function feedvalue_draw()
     
     var decimals = $(this).attr("decimals");
     if (decimals==undefined) decimals = -1;
+
+    var unitend = $(this).attr("unitend");
+    if (unitend==undefined) unitend = 0;
     
    
     if (decimals<0)
@@ -95,7 +104,14 @@ function feedvalue_draw()
       val = val.toFixed(decimals);
     }
 
-    $(this).html(val+units);
+    if (unitend == 0)
+    {
+      $(this).html(val+units);
+    }
+    else
+    {
+      $(this).html(units+val);
+    }
   });
 }
 
