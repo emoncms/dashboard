@@ -355,6 +355,17 @@ var designer = {
         designer.modified();
         designer.edit_mode = true;
     },
+    
+    'delete_selected_boxes': function(){
+        if (designer.selected_box) {
+            delete designer.boxlist[designer.selected_box];
+            $("#"+designer.selected_box).remove();
+            designer.selected_box = 0;
+            designer.draw();
+            designer.modified();
+            $("#when-selected").hide();
+        }
+    },
 
     'get_unified_event': function(e){
         var coors;
@@ -364,6 +375,71 @@ var designer = {
             coors = e;
         }
         return coors;
+    },
+
+    'handle_arrow_key_event': function(e){
+        if (!designer.selected_box) return false;
+
+        var targetTagName = e.target.tagName.toLowerCase();
+        if (targetTagName === 'input' || targetTagName === 'textarea') return false;
+
+        var left_shift = 0;
+        var top_shift = 0;
+
+        switch(e.keyCode) {
+            case 37: // Left
+              left_shift = -1;
+              break;
+            case 38: // Up
+              top_shift = -1;
+              break;
+            case 39: // Right
+              left_shift = 1;
+              break;
+            case 40: // Down
+              top_shift = 1;
+              break;
+            default:
+              // Unhandled
+              break;
+        }
+
+        var snap_amount = Math.max(designer.grid_size, 1);
+
+        // Check that the element doesn't go off the page
+        var newCenterX = designer.boxlist[designer.selected_box]['left'] + (designer.boxlist[designer.selected_box]['width'] / 2) + (left_shift * snap_amount);
+        if (newCenterX < 0 || newCenterX > designer.page_width) {
+            // If this method ever did left_shift other than 1/-1, we would need to change the logic here.
+            left_shift = 0;
+        }
+
+        var newCenterY = designer.boxlist[designer.selected_box]['top'] + (designer.boxlist[designer.selected_box]['height'] / 2) + (top_shift * snap_amount);
+        if (newCenterY < 0) {
+            // If this method ever did top_shift other than 1/-1, we would need to change the logic here.
+            top_shift = 0;
+        }
+
+        designer.boxlist[designer.selected_box]['left'] = designer.boxlist[designer.selected_box]['left'] + (left_shift * snap_amount);
+        designer.boxlist[designer.selected_box]['top'] = designer.boxlist[designer.selected_box]['top'] + (top_shift * snap_amount);
+
+        // Increase the page height if we need to
+        var bottom = designer.boxlist[designer.selected_box]['top'] + designer.boxlist[designer.selected_box]['height'];
+        if (bottom > designer.page_height - designer.grid_size) {
+            designer.page_height = bottom + designer.grid_size;
+        }
+
+        designer.draw();
+        designer.modified();
+        
+        return true;
+    },
+    
+    'handle_delete_key_event': function(e){
+        if (designer.selected_box) {
+            designer.delete_selected_boxes();
+            return true;
+        }
+        return false;
     },
 
     'add_events': function(){
@@ -494,62 +570,27 @@ var designer = {
         // Key events
         $(window).keydown(function(e) {
             var keyCode = e.keyCode;
-
-            if (keyCode >= 37 && keyCode <= 40) {
-                if (!designer.selected_box) return;
-
-                var targetTagName = e.target.tagName.toLowerCase();
-                if (targetTagName === 'input' || targetTagName === 'textarea') return;
-
-                var left_shift = 0;
-                var top_shift = 0;
-
-                switch(keyCode) {
-                    case 37: // Left
-                      left_shift = -1;
-                      break;
-                    case 38: // Up
-                      top_shift = -1;
-                      break;
-                    case 39: // Right
-                      left_shift = 1;
-                      break;
-                    case 40: // Down
-                      top_shift = 1;
-                      break;
-                    default:
-                      // Unhandled
-                      break;
-                }
-
-                var snap_amount = Math.max(designer.grid_size, 1);
-
-                // Check that the element doesn't go off the page
-                var newCenterX = designer.boxlist[designer.selected_box]['left'] + (designer.boxlist[designer.selected_box]['width'] / 2) + (left_shift * snap_amount);
-                if (newCenterX < 0 || newCenterX > designer.page_width) {
-                    // If this method ever did left_shift other than 1/-1, we would need to change the logic here.
-                    left_shift = 0;
-                }
-
-                var newCenterY = designer.boxlist[designer.selected_box]['top'] + (designer.boxlist[designer.selected_box]['height'] / 2) + (top_shift * snap_amount);
-                if (newCenterY < 0) {
-                    // If this method ever did top_shift other than 1/-1, we would need to change the logic here.
-                    top_shift = 0;
-                }
-
-                designer.boxlist[designer.selected_box]['left'] = designer.boxlist[designer.selected_box]['left'] + (left_shift * snap_amount);
-                designer.boxlist[designer.selected_box]['top'] = designer.boxlist[designer.selected_box]['top'] + (top_shift * snap_amount);
-
-                // Increase the page height if we need to
-                var bottom = designer.boxlist[designer.selected_box]['top'] + designer.boxlist[designer.selected_box]['height'];
-                if (bottom > designer.page_height - designer.grid_size) {
-                    designer.page_height = bottom + designer.grid_size;
-                }
-
-                designer.draw();
-                designer.modified();
-
-                e.preventDefault();
+            switch (keyCode) {
+                case 37:
+                case 38:
+                case 39:
+                case 40: // Arrow keys
+                    if (designer.handle_arrow_key_event(e)) {
+                        e.preventDefault();
+                    }
+                    break;
+                case 16: // Shift
+                    designer.shiftdown = true;
+                    break;
+                case 8:
+                case 46: // Backspace & delete
+                    if (designer.handle_delete_key_event(e)) {
+                        e.preventDefault();
+                    }
+                    break;
+                default:
+                    // Key not handled
+                    break;
             }
         });
 
@@ -581,15 +622,7 @@ var designer = {
         });
 
          $("#delete-button").click(function(event){
-            if (designer.selected_box)
-            {
-                delete designer.boxlist[designer.selected_box];
-                $("#"+designer.selected_box).remove();
-                designer.selected_box = 0;
-                designer.draw();
-                designer.modified();
-                $("#when-selected").hide();
-            }
+             designer.delete_selected_boxes();
         });
 
         $("#options-button").click(function(event){
