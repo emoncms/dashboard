@@ -3,6 +3,8 @@
    See COPYRIGHT.txt and LICENSE.txt.
    Part of the OpenEnergyMonitor project:  http://openenergymonitor.org
  */
+ 
+// Created by Andreas Messerli (firefox7518@gmail.com) - Swiss-solar-log.ch
 
 // Global variables
 var img = null,
