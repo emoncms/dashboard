@@ -53,15 +53,15 @@ LANG_JS["Starting value"] = '<?php echo addslashes(_("Starting value")); ?>';
 LANG_JS["Value"] = '<?php echo addslashes(_("Value")); ?>';
 
 // curl_render.js
-LANG_JS["IP"] = '<?php echo addslashes(_("IP")); ?>';
+LANG_JS["IP-address"] = '<?php echo addslashes(_("IP-address")); ?>';
 LANG_JS["Port"] = '<?php echo addslashes(_("Port")); ?>';
 LANG_JS["URL"] = '<?php echo addslashes(_("URL")); ?>';
 LANG_JS["Payload"] = '<?php echo addslashes(_("Payload")); ?>';
 LANG_JS["Colour"] = '<?php echo addslashes(_("Colour")); ?>';
 LANG_JS["Caption"] = '<?php echo addslashes(_("Caption")); ?>';
 LANG_JS["Confirmation"] = '<?php echo addslashes(_("Confirmation")); ?>';
-LANG_JS["IP address of server"] = '<?php echo addslashes(_("IP address of server")); ?>';
-LANG_JS["Listen port of server"] = '<?php echo addslashes(_("Listen port of server")); ?>';
+LANG_JS["IP-address of server"] = '<?php echo addslashes(_("IP-address of server")); ?>';
+LANG_JS["Listen-Port of server"] = '<?php echo addslashes(_("Listen-Port of server")); ?>';
 LANG_JS["URL example: node/param"] = '<?php echo addslashes(_("URL example: node/param")); ?>';
 LANG_JS["Data to send"] = '<?php echo addslashes(_("Data to send")); ?>';
 LANG_JS["0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"] = '<?php echo addslashes(_("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk")); ?>';
