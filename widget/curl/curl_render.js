@@ -18,7 +18,7 @@ function curl_widgetlist()
       "offsetx":-60,"offsety":-20,"width":120,"height":40,
       "menu":"Widgets",
       "options":["ip","port","url","payload","colour","caption","confirm"],
-      "optionsname":["IP-address","Port","URL","Payload","Colour","Caption","Confirmation"],
+      "optionsname":[_Tr("IP-address"),_Tr("Port"),_Tr("URL"),_Tr("Payload"),_Tr("Colour"),_Tr("Caption"),_Tr("Confirmation")],
       "optionshint":[_Tr("IP-address of server"),_Tr("Listen-Port of server"),_Tr("URL example: node/param"),_Tr("Data to send"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Button Text"),_Tr("Confirmation Box: yes/no")]
     }
   };
@@ -34,7 +34,7 @@ function curl_events()
 
     if($(this).attr("confirm")=="yes"){
         
-            var r = confirm("Do you want to continue?");
+            var r = confirm(_Tr("Do you want to continue?"));
             if (r == true) {
                 $.ajax({type:'GET', url:'http://'+$(this).attr("ip")+':'+$(this).attr("port")+'/'+$(this).attr("url"), data: {"data": $(this).attr("payload")}, timeout: 1000 });
             } else {
