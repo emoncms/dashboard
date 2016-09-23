@@ -18,9 +18,9 @@ function led_widgetlist()
     {
       "offsetx":-40,"offsety":-40,"width":80,"height":80,
       "menu":"Widgets",
-      "options":["feedid"],
-      "optionstype":["feedid"],
-      "optionsname":[_Tr("Feed")],
+      "options":["feedid", "size"],
+      "optionstype":["feedid", "value"],
+      "optionsname":[_Tr("Feed"),_Tr("Size")],
       "optionshint":[_Tr("Feed value")]
     }
   }
@@ -40,9 +40,9 @@ function led_draw() {
     var val = associd[feedid]['value'] * 1;
     var id = "can-"+$(this).attr("id");
     if (browserVersion < 9)
-      draw_led_ie8(widgetcanvas[id], val);
+      draw_led_ie8(widgetcanvas[id], val,$(this).attr("size"));
     else
-      draw_led(widgetcanvas[id], val);
+      draw_led(widgetcanvas[id], val,$(this).attr("size"));
   });
 }
 
@@ -52,11 +52,11 @@ function led_slowupdate() {
 
 function led_fastupdate() {}
 
-function draw_led(circle,status){
+function draw_led(circle,status,size){
   if (!circle) return;
   circle.clearRect(0,0,80,80);
 
-  var radgrad = circle.createRadialGradient(40,40,0,40,40,20);
+  var radgrad = circle.createRadialGradient(40,40,0,40,40,size);
 
   if (status==0) {                   // red
     radgrad.addColorStop(0, '#F75D59');
