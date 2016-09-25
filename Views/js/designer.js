@@ -50,13 +50,7 @@ var designer = {
     },
 
 
-    'snap': function(pos) {
-        if (designer.grid_size > 0) {
-            return Math.round(pos/designer.grid_size)*designer.grid_size;
-        } else {
-            return Math.round(pos);
-        }
-    },
+    'snap': function(pos) {return Math.round(pos/designer.grid_size)*designer.grid_size;},
 
     'modified': function(){
         $("#save-dashboard").attr('class','btn btn-warning').text(_Tr("Changed, press to save"));
@@ -65,20 +59,11 @@ var designer = {
     'onbox': function(x,y){
         var box = null;
         for (z in designer.boxlist) {
-            if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4) &&
-                y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4))
-            {
-                if (box === null) {
-                    box = z;
-                } else {
-                    var z_element = $("#"+z);
-                    var box_element = $("#"+box);
-                    // Only set new box if this box is higher than the existing found element
-                    if (z_element.index() > box_element.index()) {
-                        box = z;
-                    }
-                }
+        if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4)) {
+            if (y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4)) {
+            box = z;
             }
+        }
         }
         return box;
     },
@@ -213,6 +198,10 @@ var designer = {
                 options_html += designer.select_feed(box_options[z],feedlist,0,val);
             }
             
+			else if (options_type && options_type[z] == "feedid2"){
+                options_html += designer.select_feed(box_options[z],feedlist,0,val);
+            }
+			
             // realtime feeds only
             else if (options_type && options_type[z] == "feedid_realtime"){
                 options_html += designer.select_feed(box_options[z],feedlist,1,val);
@@ -355,17 +344,6 @@ var designer = {
         designer.modified();
         designer.edit_mode = true;
     },
-    
-    'delete_selected_boxes': function(){
-        if (designer.selected_box) {
-            delete designer.boxlist[designer.selected_box];
-            $("#"+designer.selected_box).remove();
-            designer.selected_box = 0;
-            designer.draw();
-            designer.modified();
-            $("#when-selected").hide();
-        }
-    },
 
     'get_unified_event': function(e){
         var coors;
@@ -375,74 +353,6 @@ var designer = {
             coors = e;
         }
         return coors;
-    },
-
-    'handle_arrow_key_event': function(e){
-        if (!designer.selected_box) return false;
-
-        var targetTagName = e.target.tagName.toLowerCase();
-        if (targetTagName === 'input' || targetTagName === 'textarea') return false;
-
-        var left_shift = 0;
-        var top_shift = 0;
-
-        switch(e.keyCode) {
-            case 37: // Left
-              left_shift = -1;
-              break;
-            case 38: // Up
-              top_shift = -1;
-              break;
-            case 39: // Right
-              left_shift = 1;
-              break;
-            case 40: // Down
-              top_shift = 1;
-              break;
-            default:
-              // Unhandled
-              break;
-        }
-
-        var snap_amount = Math.max(designer.grid_size, 1);
-
-        // Check that the element doesn't go off the page
-        var newCenterX = designer.boxlist[designer.selected_box]['left'] + (designer.boxlist[designer.selected_box]['width'] / 2) + (left_shift * snap_amount);
-        if (newCenterX < 0 || newCenterX > designer.page_width) {
-            // If this method ever did left_shift other than 1/-1, we would need to change the logic here.
-            left_shift = 0;
-        }
-
-        var newCenterY = designer.boxlist[designer.selected_box]['top'] + (designer.boxlist[designer.selected_box]['height'] / 2) + (top_shift * snap_amount);
-        if (newCenterY < 0) {
-            // If this method ever did top_shift other than 1/-1, we would need to change the logic here.
-            top_shift = 0;
-        }
-
-        designer.boxlist[designer.selected_box]['left'] = designer.boxlist[designer.selected_box]['left'] + (left_shift * snap_amount);
-        designer.boxlist[designer.selected_box]['top'] = designer.boxlist[designer.selected_box]['top'] + (top_shift * snap_amount);
-
-        // Increase the page height if we need to
-        var bottom = designer.boxlist[designer.selected_box]['top'] + designer.boxlist[designer.selected_box]['height'];
-        if (bottom > designer.page_height - designer.grid_size) {
-            designer.page_height = bottom + designer.grid_size;
-        }
-
-        designer.draw();
-        designer.modified();
-        
-        return true;
-    },
-    
-    'handle_delete_key_event': function(e){
-        var targetTagName = e.target.tagName.toLowerCase();
-        if (targetTagName === 'input' || targetTagName === 'textarea') return false;
-
-        if (designer.selected_box) {
-            designer.delete_selected_boxes();
-            return true;
-        }
-        return false;
     },
 
     'add_events': function(){
@@ -570,45 +480,25 @@ var designer = {
             }
         });
 
-        // Key events
-        $(window).keydown(function(e) {
-            var keyCode = e.keyCode;
-            switch (keyCode) {
-                case 37:
-                case 38:
-                case 39:
-                case 40: // Arrow keys
-                    if (designer.handle_arrow_key_event(e)) {
-                        e.preventDefault();
-                    }
-                    break;
-                case 16: // Shift
-                    designer.shiftdown = true;
-                    break;
-                case 8:
-                case 46: // Backspace & delete
-                    if (designer.handle_delete_key_event(e)) {
-                        e.preventDefault();
-                    }
-                    break;
-                default:
-                    // Key not handled
-                    break;
-            }
-        });
-
         // On save click
         $("#options-save").click(function(){
             $(".options").each(function() {
                 if ($(this).attr("id")=="html"){
                     $("#"+designer.selected_box).html($(this).val());
                 }
-                else if ($(this).attr("id").substring(0,6)=="colour"){
+                else if ($(this).attr("id")=="colour"){
                     // Since colour values are generally prefixed with "#", and "#" isn't valid in URLs, we strip out the "#".
                     // It will be replaced by the value-checking in the actual plot function, so this won't cause issues.
                     var colour = $(this).val();
                     colour = colour.replace("#","");
                     $("#"+designer.selected_box).attr($(this).attr("id"), colour);
+                }
+				else if ($(this).attr("id")=="title_colour"){
+                    // Since colour values are generally prefixed with "#", and "#" isn't valid in URLs, we strip out the "#".
+                    // It will be replaced by the value-checking in the actual plot function, so this won't cause issues.
+                    var colour = $(this).val();
+                    title_colour = colour.replace("#","");
+                    $("#"+designer.selected_box).attr($(this).attr("id"), title_colour);
                 }
                 else if ($(this).attr("id").indexOf("styleUnit") == 0){
                     //Get styleUnit* options and set it to boxlist array
@@ -625,36 +515,20 @@ var designer = {
         });
 
          $("#delete-button").click(function(event){
-             designer.delete_selected_boxes();
+            if (designer.selected_box)
+            {
+                delete designer.boxlist[designer.selected_box];
+                $("#"+designer.selected_box).remove();
+                designer.selected_box = 0;
+                designer.draw();
+                designer.modified();
+                $("#when-selected").hide();
+            }
         });
 
         $("#options-button").click(function(event){
             if (designer.selected_box){
                 designer.draw_options($("#"+designer.selected_box).attr("class"));
-            }
-        });
-
-        $("#move-forward-button").click(function(event){
-            if (designer.selected_box){
-                var selected_box_element = $("#"+designer.selected_box);
-                var next_element = selected_box_element.next();
-                if (next_element.length > 0) {
-                    selected_box_element.insertAfter(next_element);
-                    designer.draw();
-                    designer.modified();
-                }
-            }
-        });
-
-        $("#move-backward-button").click(function(event){
-            if (designer.selected_box){
-                var selected_box_element = $("#"+designer.selected_box);
-                var prev_element = selected_box_element.prev();
-                if (prev_element.length > 0) {
-                    selected_box_element.insertBefore(prev_element);
-                    designer.draw();
-                    designer.modified();
-                }
             }
         });
     }
