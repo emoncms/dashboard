@@ -11,10 +11,8 @@
 		http://openenergymonitor.org/emon/forum
  */
 
-// widget enhanced to be able to add a title, title colour, font for the bar widget
-// Enhanced by Andreas Messerli (firefox7518@gmail.com) - Swiss-solar-log.ch
-
-
+// Convenience function for shoving things into the widget object
+// I'm not sure about calling optionKey "optionKey", but I don't want to just use "options" (because that's what this whole function returns), and it's confusing enough as it is.
 function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
 {
 
@@ -32,7 +30,7 @@ function bar2_widgetlist()
 	{
 		"bar2":
 		{
-			"offsetx":-80,"offsety":-80,"width":160,"height":160,
+			"offsetx":-80,"offsety":-80,"width":160,"height":200,
 			"menu":"Widgets",
 			"options":    [],
 			"optionstype":[],
@@ -54,9 +52,9 @@ function bar2_widgetlist()
 	
 	
 	var graduationDropBoxOptions = [
-					[1, "On"],
-					[0, "Off"]
-				];
+					[0, "Off"],
+					[1, "On"]
+					];
 
 	addOption(widgets["bar2"], "title",			"value",			_Tr("Title"),			_Tr("Title of bar"),                                                                []);
 	addOption(widgets["bar2"], "title_colour",	"colour_picker",	_Tr("Title Colour"),	_Tr("Colour of title"), 					                                        []);
@@ -244,11 +242,6 @@ function draw_bar2(context,
 if (title_colour.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 	title_colour = "#" + title_colour;
 
-	context.fillStyle = title_colour;
-//	context.fillStyle = "#FFFFF";
-	context.textAlign    = "center";
-	context.font = ((size*0.25)+"px "+ fontname);
-	context.fillText(title, half_width, height/7 + (size *0.1));					
 					
 					
 	if (graduationBool == 1)
@@ -278,7 +271,7 @@ if (title_colour.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 
 			context.fillStyle = "#000";
 			context.textAlign    = "start";
-			context.font = ((size*0.25)+"px "+ fontname);
+			context.font = ((size*0.15)+"px "+ fontname);
 
 			var step = (height-border_space*2)/(Number(graduationQuant)+1);
 			var curY;
@@ -306,9 +299,7 @@ if (title_colour.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 	}
 
 
-	context.fillStyle = "#000";
-	context.textAlign    = "center";
-	context.font = ((size*0.25)+"px "+ fontname);
+
 	if (raw_value>100)
 	{
 		raw_value = raw_value.toFixed(0);
@@ -326,12 +317,28 @@ if (title_colour.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 	if (graduationBool == 1)
 	{
 		if (raw_value > 1000)		// Add additional offset to make alignment work for HUGE numbers
-			half_width += (size*0.20)
-		context.fillText(raw_value+units_string, half_width+(size*0.25), height + (size*0.45));
+		half_width += (size*0.20)
+		context.fillStyle = "#000";
+		context.textAlign    = "center";
+		context.font = ((size*0.25)+"px "+ fontname);
+		context.fillText(raw_value+units_string, half_width+(size*0.5), height + (size*0.49));
+		context.fillStyle = title_colour;
+		context.font = ((size*0.2)+"px "+ fontname);
+		context.textAlign    = "center";
+		context.fillText(title+":", half_width + (size * 0.5), height/100 + (size * 3.3));					
 	}
 	else
 	{
+		context.fillStyle = "#000";
+		context.textAlign    = "center";
+		context.font = ((size*0.5)+"px "+ fontname);
 		context.fillText(raw_value+units_string, half_width, height/2 + (size*0.2));
+		context.fillStyle = title_colour;
+		context.textAlign    = "center";
+		context.font = ((size*0.2)+"px "+ fontname);
+		context.fillText(title, half_width, height/7 + (size *0.1));
+		
+
 	}
 
 
