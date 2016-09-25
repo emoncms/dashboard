@@ -321,11 +321,11 @@ if (title_colour.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 		context.fillStyle = "#000";
 		context.textAlign    = "center";
 		context.font = ((size*0.25)+"px "+ fontname);
-		context.fillText(raw_value+units_string, half_width+(size*0.5), height + (size*0.49));
+		context.fillText(raw_value+units_string, half_width+(size*0.5), height + (size*0.48));
 		context.fillStyle = title_colour;
 		context.font = ((size*0.2)+"px "+ fontname);
 		context.textAlign    = "center";
-		context.fillText(title+":", half_width + (size * 0.5), height/100 + (size * 3.3));					
+		context.fillText(title+":", half_width + (size * 0.5), height + (size * 0.2));					
 	}
 	else
 	{
