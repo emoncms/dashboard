@@ -6,9 +6,12 @@
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
 
-    Author: Trystan Lea: trystan.lea@googlemail.com
+    Base widget Author: Trystan Lea: trystan.lea@googlemail.com
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
+	
+	Feedvalue_custom created by Andreas Messerli: firefox7518@gmail.com
+	
  */
 
 
