@@ -67,6 +67,7 @@ var designer = {
         for (z in designer.boxlist) {
             if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4) &&
                 y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4))
+
             {
                 if (box === null) {
                     box = z;
@@ -80,6 +81,7 @@ var designer = {
                 }
             }
         }
+
         return box;
     },
 
@@ -213,6 +215,10 @@ var designer = {
                 options_html += designer.select_feed(box_options[z],feedlist,0,val);
             }
             
+
+
+
+
             // realtime feeds only
             else if (options_type && options_type[z] == "feedid_realtime"){
                 options_html += designer.select_feed(box_options[z],feedlist,1,val);
@@ -333,8 +339,8 @@ var designer = {
         }
 
         for (z in select){
-            widget_html += "<div class='btn-group'><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown'>"+z+"&nbsp<span class='caret'></span></button>";
-            widget_html += "<ul class='dropdown-menu' name='d'>"+select[z]+"</ul>";
+            widget_html += "<div class='btn-group' style='white-space:normal'><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown'  style='width:100%'>"+z+"&nbsp<span class='caret'></span></button>";
+            widget_html += "<ul class='dropdown-menu'  style='top:30px' name='d'>"+select[z]+"</ul>";
         }
         $("#widget-buttons").html(widget_html);
 
@@ -610,6 +616,13 @@ var designer = {
                     colour = colour.replace("#","");
                     $("#"+designer.selected_box).attr($(this).attr("id"), colour);
                 }
+				else if ($(this).attr("id")=="label_colour"){
+                    // Since colour values are generally prefixed with "#", and "#" isn't valid in URLs, we strip out the "#".
+                    // It will be replaced by the value-checking in the actual plot function, so this won't cause issues.
+                    var colour = $(this).val();
+                    label_colour = colour.replace("#","");
+                    $("#"+designer.selected_box).attr($(this).attr("id"), label_colour);
+                }
                 else if ($(this).attr("id").indexOf("styleUnit") == 0){
                     //Get styleUnit* options and set it to boxlist array
                     designer.boxlist[designer.selected_box][$(this).attr("id")]=parseInt($(this).val());
@@ -625,6 +638,15 @@ var designer = {
         });
 
          $("#delete-button").click(function(event){
+
+
+
+
+
+
+
+
+
              designer.delete_selected_boxes();
         });
 
