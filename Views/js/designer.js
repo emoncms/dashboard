@@ -38,6 +38,10 @@ var designer = {
 
     'mousedown': false,
 
+	'undostack': [],
+    'redostack': [],
+    'nextundostate': null,
+	
     'init': function(){
         designer.cnvs = document.getElementById("can");
         designer.ctx = designer.cnvs.getContext("2d");
@@ -47,6 +51,7 @@ var designer = {
         designer.draw();
         designer.widget_buttons();
         designer.add_events();
+		designer.check_undo_state();
     },
 
 
@@ -61,12 +66,85 @@ var designer = {
     'modified': function(){
         $("#save-dashboard").attr('class','btn btn-warning').text(_Tr("Changed, press to save"));
     },
+	
+	'start_save_undo_state': function(){
+        if (designer.nextundostate !== null) {
+            console.log("Imbalanced undo state save start/end!");
+        }
+        var newstate = $("#page").html();
+        designer.nextundostate = newstate;
+    },
 
+    'end_save_undo_state': function(){
+        if (designer.nextundostate === null) {
+            console.log("No undo state to save!");
+            return;
+        }
+        var currentstate = $("#page").html();
+        if (currentstate === designer.nextundostate) {
+            designer.cancel_save_undo_state();
+        } else {
+            designer.undostack.push(designer.nextundostate);
+            designer.redostack = [];
+            designer.nextundostate = null;
+            designer.check_undo_state();
+        }
+    },
+
+    'cancel_save_undo_state': function(){
+        designer.nextundostate = null;
+    },
+
+    'undo': function(){
+        if (designer.undostack.length == 0) return;
+
+        var currentstate = $("#page").html();
+        var laststate = designer.undostack.pop();
+
+        designer.redostack.push(currentstate);
+
+        $("#page").html(laststate);
+        designer.selected_box = 0;
+        designer.scan();
+        designer.draw();
+        designer.check_undo_state();
+    },
+
+    'redo': function(){
+        if (designer.redostack.length == 0) return;
+
+        var currentstate = $("#page").html();
+        var laststate = designer.redostack.pop();
+
+        designer.undostack.push(currentstate);
+
+        $("#page").html(laststate);
+        designer.selected_box = 0;
+        designer.scan();
+        designer.draw();
+        designer.check_undo_state();
+    },
+
+    'check_undo_state': function(){
+        if (designer.undostack.length > 0) {
+            $("#undo-button").prop('disabled', false);
+        } else {
+            $("#undo-button").prop('disabled', true);
+        }
+
+        if (designer.redostack.length > 0) {
+            $("#redo-button").prop('disabled', false);
+        } else {
+            $("#redo-button").prop('disabled', true);
+        }
+    },
+	
     'onbox': function(x,y){
         var box = null;
         for (z in designer.boxlist) {
             if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4) &&
                 y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4))
+
             {
                 if (box === null) {
                     box = z;
@@ -80,13 +158,16 @@ var designer = {
                 }
             }
         }
+
         return box;
     },
 
     'scan': function(){
-        for (z in widgets){
+        var seenboxes = [];
+		for (z in widgets){
             $("."+z).each(function(){
                 var id = 1*($(this).attr("id"));
+				seenboxes.push(id);
                 if (id>designer.boxi) designer.boxi = id;
                 designer.boxlist[id] = {
                     'top':parseInt($(this).css("top")),
@@ -103,7 +184,14 @@ var designer = {
                 if ((designer.boxlist[id]['top'] + designer.boxlist[id]['height'])>designer.page_height) designer.page_height = (designer.boxlist[id]['top'] + designer.boxlist[id]['height']);
             });
         }
-    },
+        var allboxes = Object.keys(designer.boxlist);
+        $.each(allboxes, function(i, box){
+            box = 1 * box;
+            if ($.inArray(box, seenboxes) < 0) {
+                delete designer.boxlist[box];
+            }
+        });    
+	},
     
     // given an element and a style name, returns the exact style value
     'getStyle':function(element,style){
@@ -213,6 +301,10 @@ var designer = {
                 options_html += designer.select_feed(box_options[z],feedlist,0,val);
             }
             
+
+
+
+
             // realtime feeds only
             else if (options_type && options_type[z] == "feedid_realtime"){
                 options_html += designer.select_feed(box_options[z],feedlist,1,val);
@@ -333,8 +425,8 @@ var designer = {
         }
 
         for (z in select){
-            widget_html += "<div class='btn-group'><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown'>"+z+"&nbsp<span class='caret'></span></button>";
-            widget_html += "<ul class='dropdown-menu' name='d'>"+select[z]+"</ul>";
+            widget_html += "<div class='btn-group' style='white-space:normal; width:130px'><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown'  style='width:100%'>"+z+"&nbsp<span class='caret'></span></button>";
+            widget_html += "<ul class='dropdown-menu'  style='top:30px' name='d'>"+select[z]+"</ul>";
         }
         $("#widget-buttons").html(widget_html);
 
@@ -345,12 +437,14 @@ var designer = {
     },
 
     'add_widget': function(mx,my,type){
-        designer.boxi++;
+        designer.start_save_undo_state();
+		designer.boxi++;
         var html = widgets[type]['html'];
         if (html == undefined) html = "";
         $("#page").append('<div id="'+designer.boxi+'" class="'+type+'" style="position:absolute; margin: 0; top:'+designer.snap(my+widgets[type]['offsety'])+'px; left:'+designer.snap(mx+widgets[type]['offsetx'])+'px; width:'+widgets[type]['width']+'px; height:'+widgets[type]['height']+'px;" >'+html+'</div>');
 
-        designer.scan();
+        designer.end_save_undo_state();
+		designer.scan();
         designer.draw();
         designer.modified();
         designer.edit_mode = true;
@@ -358,7 +452,8 @@ var designer = {
     
     'delete_selected_boxes': function(){
         if (designer.selected_box) {
-            delete designer.boxlist[designer.selected_box];
+            designer.start_save_undo_state();
+			delete designer.boxlist[designer.selected_box];
             $("#"+designer.selected_box).remove();
             designer.selected_box = 0;
             designer.draw();
@@ -382,6 +477,8 @@ var designer = {
 
         var targetTagName = e.target.tagName.toLowerCase();
         if (targetTagName === 'input' || targetTagName === 'textarea') return false;
+		
+		designer.start_save_undo_state();
 
         var left_shift = 0;
         var top_shift = 0;
@@ -430,6 +527,7 @@ var designer = {
 
         designer.draw();
         designer.modified();
+		designer.end_save_undo_state();
         
         return true;
     },
@@ -480,6 +578,8 @@ var designer = {
 
                 if (designer.selected_box){
                     $("#when-selected").show();
+					designer.start_save_undo_state();
+					
                     resize = designer.boxlist[designer.selected_box];
 
                     var rightedge = resize['left']+resize['width'];
@@ -512,7 +612,8 @@ var designer = {
         });
 
         $(this.canvas).bind('touchend touchcancel mouseup', function(event){
-            designer.mousedown = false;
+            designer.end_save_undo_state();
+			designer.mousedown = false;
             selected_edge = selected_edges.none;
             designer.draw();
         });
@@ -599,6 +700,7 @@ var designer = {
 
         // On save click
         $("#options-save").click(function(){
+			designer.start_save_undo_state();
             $(".options").each(function() {
                 if ($(this).attr("id")=="html"){
                     $("#"+designer.selected_box).html($(this).val());
@@ -610,6 +712,13 @@ var designer = {
                     colour = colour.replace("#","");
                     $("#"+designer.selected_box).attr($(this).attr("id"), colour);
                 }
+				else if ($(this).attr("id")=="label_colour"){
+                    // Since colour values are generally prefixed with "#", and "#" isn't valid in URLs, we strip out the "#".
+                    // It will be replaced by the value-checking in the actual plot function, so this won't cause issues.
+                    var colour = $(this).val();
+                    label_colour = colour.replace("#","");
+                    $("#"+designer.selected_box).attr($(this).attr("id"), label_colour);
+                }
                 else if ($(this).attr("id").indexOf("styleUnit") == 0){
                     //Get styleUnit* options and set it to boxlist array
                     designer.boxlist[designer.selected_box][$(this).attr("id")]=parseInt($(this).val());
@@ -619,12 +728,22 @@ var designer = {
                 }
             });
             $('#widget_options').modal('hide')
+			designer.end_save_undo_state();
             designer.draw();
             designer.modified();
             reloadiframe = designer.selected_box;
         });
+		
+        $("#undo-button").click(function(event){
+             designer.undo();
+         });
+ 
+         $("#redo-button").click(function(event){
+             designer.redo();
+         });		
 
-         $("#delete-button").click(function(event){
+		$("#delete-button").click(function(event){
+
              designer.delete_selected_boxes();
         });
 
@@ -636,24 +755,32 @@ var designer = {
 
         $("#move-forward-button").click(function(event){
             if (designer.selected_box){
+			designer.start_save_undo_state();
                 var selected_box_element = $("#"+designer.selected_box);
                 var next_element = selected_box_element.next();
                 if (next_element.length > 0) {
                     selected_box_element.insertAfter(next_element);
                     designer.draw();
                     designer.modified();
+					designer.end_save_undo_state();
+                 } else {
+                    designer.cancel_save_undo_state();
                 }
             }
         });
 
         $("#move-backward-button").click(function(event){
             if (designer.selected_box){
+				designer.start_save_undo_state();
                 var selected_box_element = $("#"+designer.selected_box);
                 var prev_element = selected_box_element.prev();
                 if (prev_element.length > 0) {
                     selected_box_element.insertBefore(prev_element);
                     designer.draw();
                     designer.modified();
+					designer.end_save_undo_state();
+                } else {
+                    designer.cancel_save_undo_state();
                 }
             }
         });
