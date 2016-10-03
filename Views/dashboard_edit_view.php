@@ -41,6 +41,10 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
 
 <div style="background-color:#ddd; padding:4px;">
     <span id="widget-buttons"></span>
+    <span id="undo-buttons">
+        <button id="undo-button" class="btn"><i class="icon-backward"></i> <?php echo _('Undo'); ?></button>
+        <button id="redo-button" class="btn"><i class="icon-forward"></i> <?php echo _('Redo'); ?></button>
+    </span>
     <span id="when-selected">
         <button id="options-button" class="btn" data-toggle="modal" data-target="#widget_options"><i class="icon-wrench"></i> <?php echo _('Configure'); ?></button>
         <button id="move-forward-button" class="btn"><i class="icon-arrow-up"></i> <?php echo _('Forward'); ?></button>

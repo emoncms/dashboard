@@ -38,6 +38,10 @@ var designer = {
 
     'mousedown': false,
 
+    'undostack': [],
+    'redostack': [],
+    'nextundostate': null,
+
     'init': function(){
         designer.cnvs = document.getElementById("can");
         designer.ctx = designer.cnvs.getContext("2d");
@@ -47,6 +51,7 @@ var designer = {
         designer.draw();
         designer.widget_buttons();
         designer.add_events();
+        designer.check_undo_state();
     },
 
 
@@ -60,6 +65,78 @@ var designer = {
 
     'modified': function(){
         $("#save-dashboard").attr('class','btn btn-warning').text(_Tr("Changed, press to save"));
+    },
+
+    'start_save_undo_state': function(){
+        if (designer.nextundostate !== null) {
+            console.log("Imbalanced undo state save start/end!");
+        }
+        var newstate = $("#page").html();
+        designer.nextundostate = newstate;
+    },
+
+    'end_save_undo_state': function(){
+        if (designer.nextundostate === null) {
+            console.log("No undo state to save!");
+            return;
+        }
+        var currentstate = $("#page").html();
+        if (currentstate === designer.nextundostate) {
+            designer.cancel_save_undo_state();
+        } else {
+            designer.undostack.push(designer.nextundostate);
+            designer.redostack = [];
+            designer.nextundostate = null;
+            designer.check_undo_state();
+        }
+    },
+
+    'cancel_save_undo_state': function(){
+        designer.nextundostate = null;
+    },
+
+    'undo': function(){
+        if (designer.undostack.length == 0) return;
+
+        var currentstate = $("#page").html();
+        var laststate = designer.undostack.pop();
+
+        designer.redostack.push(currentstate);
+
+        $("#page").html(laststate);
+        designer.selected_box = 0;
+        designer.scan();
+        designer.draw();
+        designer.check_undo_state();
+    },
+
+    'redo': function(){
+        if (designer.redostack.length == 0) return;
+
+        var currentstate = $("#page").html();
+        var laststate = designer.redostack.pop();
+
+        designer.undostack.push(currentstate);
+
+        $("#page").html(laststate);
+        designer.selected_box = 0;
+        designer.scan();
+        designer.draw();
+        designer.check_undo_state();
+    },
+
+    'check_undo_state': function(){
+        if (designer.undostack.length > 0) {
+            $("#undo-button").prop('disabled', false);
+        } else {
+            $("#undo-button").prop('disabled', true);
+        }
+
+        if (designer.redostack.length > 0) {
+            $("#redo-button").prop('disabled', false);
+        } else {
+            $("#redo-button").prop('disabled', true);
+        }
     },
 
     'onbox': function(x,y){
@@ -84,10 +161,12 @@ var designer = {
     },
 
     'scan': function(){
+        var seenboxes = [];
         for (z in widgets){
             $("."+z).each(function(){
                 var id = 1*($(this).attr("id"));
                 if (id>designer.boxi) designer.boxi = id;
+                seenboxes.push(id);
                 designer.boxlist[id] = {
                     'top':parseInt($(this).css("top")),
                     'left':parseInt($(this).css("left")),
@@ -103,6 +182,14 @@ var designer = {
                 if ((designer.boxlist[id]['top'] + designer.boxlist[id]['height'])>designer.page_height) designer.page_height = (designer.boxlist[id]['top'] + designer.boxlist[id]['height']);
             });
         }
+
+        var allboxes = Object.keys(designer.boxlist);
+        $.each(allboxes, function(i, box){
+            box = 1 * box;
+            if ($.inArray(box, seenboxes) < 0) {
+                delete designer.boxlist[box];
+            }
+        });
     },
     
     // given an element and a style name, returns the exact style value
@@ -345,11 +432,13 @@ var designer = {
     },
 
     'add_widget': function(mx,my,type){
+        designer.start_save_undo_state();
         designer.boxi++;
         var html = widgets[type]['html'];
         if (html == undefined) html = "";
         $("#page").append('<div id="'+designer.boxi+'" class="'+type+'" style="position:absolute; margin: 0; top:'+designer.snap(my+widgets[type]['offsety'])+'px; left:'+designer.snap(mx+widgets[type]['offsetx'])+'px; width:'+widgets[type]['width']+'px; height:'+widgets[type]['height']+'px;" >'+html+'</div>');
 
+        designer.end_save_undo_state();
         designer.scan();
         designer.draw();
         designer.modified();
@@ -358,6 +447,7 @@ var designer = {
     
     'delete_selected_boxes': function(){
         if (designer.selected_box) {
+            designer.start_save_undo_state();
             delete designer.boxlist[designer.selected_box];
             $("#"+designer.selected_box).remove();
             designer.selected_box = 0;
@@ -382,6 +472,8 @@ var designer = {
 
         var targetTagName = e.target.tagName.toLowerCase();
         if (targetTagName === 'input' || targetTagName === 'textarea') return false;
+
+        designer.start_save_undo_state();
 
         var left_shift = 0;
         var top_shift = 0;
@@ -430,6 +522,7 @@ var designer = {
 
         designer.draw();
         designer.modified();
+        designer.end_save_undo_state();
         
         return true;
     },
@@ -479,6 +572,8 @@ var designer = {
                 if (!designer.selected_box) designer.selected_box = designer.onbox(mx,my);
 
                 if (designer.selected_box){
+                    designer.start_save_undo_state();
+
                     $("#when-selected").show();
                     resize = designer.boxlist[designer.selected_box];
 
@@ -512,6 +607,7 @@ var designer = {
         });
 
         $(this.canvas).bind('touchend touchcancel mouseup', function(event){
+            designer.end_save_undo_state();
             designer.mousedown = false;
             selected_edge = selected_edges.none;
             designer.draw();
@@ -599,6 +695,7 @@ var designer = {
 
         // On save click
         $("#options-save").click(function(){
+            designer.start_save_undo_state();
             $(".options").each(function() {
                 if ($(this).attr("id")=="html"){
                     $("#"+designer.selected_box).html($(this).val());
@@ -619,9 +716,18 @@ var designer = {
                 }
             });
             $('#widget_options').modal('hide')
+            designer.end_save_undo_state();
             designer.draw();
             designer.modified();
             reloadiframe = designer.selected_box;
+        });
+
+        $("#undo-button").click(function(event){
+            designer.undo();
+        });
+
+        $("#redo-button").click(function(event){
+            designer.redo();
         });
 
          $("#delete-button").click(function(event){
@@ -636,24 +742,32 @@ var designer = {
 
         $("#move-forward-button").click(function(event){
             if (designer.selected_box){
+                designer.start_save_undo_state();
                 var selected_box_element = $("#"+designer.selected_box);
                 var next_element = selected_box_element.next();
                 if (next_element.length > 0) {
                     selected_box_element.insertAfter(next_element);
                     designer.draw();
                     designer.modified();
+                    designer.end_save_undo_state();
+                } else {
+                    designer.cancel_save_undo_state();
                 }
             }
         });
 
         $("#move-backward-button").click(function(event){
             if (designer.selected_box){
+                designer.start_save_undo_state();
                 var selected_box_element = $("#"+designer.selected_box);
                 var prev_element = selected_box_element.prev();
                 if (prev_element.length > 0) {
                     selected_box_element.insertBefore(prev_element);
                     designer.draw();
                     designer.modified();
+                    designer.end_save_undo_state();
+                } else {
+                    designer.cancel_save_undo_state();
                 }
             }
         });
