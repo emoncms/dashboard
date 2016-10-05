@@ -337,6 +337,13 @@ var designer = {
                  options_html += "<input  type='color' class='options' id='"+box_options[z]+"'  value='#"+val+"'/ >"
             }
 
+            else if (options_type && options_type[z] == "boolean"){
+                options_html += "<select class='options' id='"+box_options[z]+"'>";
+                options_html += "<option value='0'" + (val == 0 ? " selected" : "") + ">"+_Tr("Off")+"</option>";
+                options_html += "<option value='1'" + (val == 1 ? " selected" : "") + ">"+_Tr("On")+"</option>";
+                options_html += "</select>";
+            }
+
 /*
             // Radio-buttons for selecting options
             // It was a bit confusing to use, so it's disabled until I get a change to revisit and style it better (Fake-name)
