@@ -25,6 +25,8 @@
         <input type="color" name="backgroundcolor" value="#<?php echo $dashboard['backgroundcolor']; ?>" />
         <label><?php echo _('Description: '); ?></label>
         <textarea name="description"><?php echo $dashboard['description']; ?></textarea>
+        <label><?php echo _('Grid size: '); ?></label>
+        <input type="text" name="gridsize" value="<?php echo $dashboard['gridsize']; ?>" />
 
         <label class="checkbox">
             <input type="checkbox" name="main" id="chk_main" value="1" <?php if ($dashboard['main'] == true) echo 'checked'; ?> />
@@ -65,6 +67,10 @@
         fields['description']  = $("textarea[name=description]").val();
         fields['backgroundcolor']  = $("input[name=backgroundcolor]").val().replace('#','');
 
+        var gridsize = parseInt($("input[name=gridsize]").val());
+        gridsize = Math.max(gridsize, 0);
+        fields['gridsize'] = gridsize;
+
         if ($("#chk_main").is(":checked")) fields['main'] = true; else fields['main'] = false;
             if ($("#chk_public").is(":checked")) fields['public'] = true; else fields['public'] = false;
         if ($("#chk_published").is(":checked")) fields['published'] = true; else fields['published'] = false;
@@ -81,6 +87,9 @@
         $('#dashConfigModal').modal('hide');
 
         $('#page-container').css("background-color","#"+fields['backgroundcolor']);
+
+        designer.grid_size = gridsize;
+        designer.draw();
     });
 </script>
 

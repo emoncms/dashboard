@@ -43,6 +43,8 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     <span id="widget-buttons"></span>
     <span id="when-selected">
         <button id="options-button" class="btn" data-toggle="modal" data-target="#widget_options"><i class="icon-wrench"></i> <?php echo _('Configure'); ?></button>
+        <button id="move-forward-button" class="btn"><i class="icon-arrow-up"></i> <?php echo _('Forward'); ?></button>
+        <button id="move-backward-button" class="btn"><i class="icon-arrow-down"></i> <?php echo _('Backward'); ?></button>
         <button id="delete-button" class="btn btn-danger"><i class="icon-trash"></i> <?php echo _('Delete'); ?></button>
     </span>
     <span><button id="save-dashboard" class="btn btn-success" style="float:right"><?php echo _('Not modified'); ?></button></span>
@@ -69,7 +71,7 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     render_widgets_init(widget); // populate widgets variable 
 
     designer.canvas = "#can";
-    designer.grid_size = 20; // change default here
+    designer.grid_size = <?php echo $dashboard['gridsize']; ?>;
     designer.widgets = widgets;
     designer.init();
 
