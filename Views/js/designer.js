@@ -15,6 +15,50 @@
 
 var selected_edges = {none : 0, left : 1, right : 2, top : 3, bottom : 4, center : 5};
 
+$(document).ready(function() {
+		    
+		    var $body = $('body');
+		    var $target = null;
+		    var isDraggEnabled = false;
+
+		    $body.on("mousedown", "div", function(e) {
+		       
+		    	$this = $(this);
+		       	isDraggEnabled = $this.data("draggable");
+
+		       	if (isDraggEnabled) {
+		       		if(e.offsetX==undefined){
+						x = e.pageX-$(this).offset().left;
+						y = e.pageY-$(this).offset().top;
+					}else{
+						x = e.offsetX;
+						y = e.offsetY;
+					};
+
+					$this.addClass('draggable');
+		        	$body.addClass('noselect');
+		        	$target = $(e.target);
+		       	};
+   
+		    });
+		    
+		     $body.on("mouseup", function(e) {
+		        $target = null;
+		        $body.find(".draggable").removeClass('draggable');
+		        $body.removeClass('noselect');
+		    });
+		    
+		     $body.on("mousemove", function(e) {
+	            if ($target) {
+	                $target.offset({
+	                    top: e.pageY  - y,
+	                    left: e.pageX - x
+	                });
+	            };     
+		     });
+
+		});
+
 var designer = {
 
     'grid_size':20,
