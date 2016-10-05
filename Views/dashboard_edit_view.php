@@ -15,7 +15,6 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
 ?>
     <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
     <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css" rel="stylesheet">
-	<script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/byrei-dyndiv_1.0rc1.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Lib/flot/jquery.flot.min.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/dashboard.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/widgetlist.js"></script>
@@ -40,7 +39,7 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     </div>
 </div>
 
-<div class="dynDiv_moveDiv dynDiv_bodyLimit" style="background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; width: 130px; height: 330px; top:110px; right: 50px;">
+<div data-draggable="true" class="toolbox" style="cursor:move; background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; width: 130px; height: 330px; top:110px; right: 50px;">
 	<span id="undo-buttons">
 	<button id="undo-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-left"></i> <?php echo _('Undo'); ?></button>
 	<button id="redo-button" class="btn"  style="float:left; width:65px"><i class="icon-arrow-right"></i> <?php echo _('Redo'); ?></button>
