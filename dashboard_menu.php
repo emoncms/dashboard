@@ -29,7 +29,7 @@
         }
     }
 
-    // If not all dashboards are published, show a dropdown menu with all
+    // show a dropdown menu with all
     if (count($listmenu)){
         $menu_left[] = array('name'=> dgettext($domain, "Dashboards"), 'icon'=>'icon-th-large icon-white', 'path'=>$dashpath , 'session'=>$sess, 'order'=>0, 'dropdown'=>$listmenu);
     }
