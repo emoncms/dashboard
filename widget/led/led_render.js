@@ -54,9 +54,18 @@ function led_fastupdate() {}
 
 function draw_led(circle,status){
   if (!circle) return;
-  circle.clearRect(0,0,80,80);
 
-  var radgrad = circle.createRadialGradient(40,40,0,40,40,20);
+  var width = circle.canvas.width;
+  var height = circle.canvas.height;
+  var borderx = Math.min(40, Math.floor(width/2));
+  var bordery = Math.min(40, Math.floor(height/2));
+  var dimension = Math.max(10, Math.min(width-borderx, height-bordery));
+  var offsetx = Math.floor((width - dimension) / 2.0);
+  var offsety = Math.floor((height - dimension) / 2.0);
+
+  circle.clearRect(0,0,width,height);
+
+  var radgrad = circle.createRadialGradient(width/2,height/2,0,width/2,height/2,dimension/2);
 
   if (status==0) {                   // red
     radgrad.addColorStop(0, '#F75D59');
@@ -84,7 +93,7 @@ function draw_led(circle,status){
   radgrad.addColorStop(1, 'rgba(1,159,98,0)');
   // draw shapes
   circle.fillStyle = radgrad;
-  circle.fillRect(20,20,60,60);
+  circle.fillRect(offsetx,offsety,dimension,dimension);
 }
 
 
