@@ -41,6 +41,7 @@ var designer = {
     'undostack': [],
     'redostack': [],
     'nextundostate': null,
+    'lastundoidentifier': null,
 
     'init': function(){
         designer.cnvs = document.getElementById("can");
@@ -75,7 +76,7 @@ var designer = {
         designer.nextundostate = newstate;
     },
 
-    'end_save_undo_state': function(){
+    'end_save_undo_state': function(identifier){
         if (designer.nextundostate === null) {
             console.log("No undo state to save!");
             return;
@@ -83,10 +84,14 @@ var designer = {
         var currentstate = $("#page").html();
         if (currentstate === designer.nextundostate) {
             designer.cancel_save_undo_state();
+        } else if (identifier && designer.lastundoidentifier === identifier) {
+            // If it's the same kind of state change, then ignore this one
+            designer.cancel_save_undo_state();
         } else {
             designer.undostack.push(designer.nextundostate);
             designer.redostack = [];
             designer.nextundostate = null;
+            designer.lastundoidentifier = identifier;
             designer.check_undo_state();
         }
     },
@@ -100,6 +105,7 @@ var designer = {
 
         var currentstate = $("#page").html();
         var laststate = designer.undostack.pop();
+        designer.lastundoidentifier = null;
 
         designer.redostack.push(currentstate);
 
@@ -115,6 +121,7 @@ var designer = {
 
         var currentstate = $("#page").html();
         var laststate = designer.redostack.pop();
+        designer.lastundoidentifier = null;
 
         designer.undostack.push(currentstate);
 
@@ -529,7 +536,7 @@ var designer = {
 
         designer.draw();
         designer.modified();
-        designer.end_save_undo_state();
+        designer.end_save_undo_state('key'+e.keyCode);
         
         return true;
     },
@@ -756,7 +763,7 @@ var designer = {
                     selected_box_element.insertAfter(next_element);
                     designer.draw();
                     designer.modified();
-                    designer.end_save_undo_state();
+                    designer.end_save_undo_state('moveforward');
                 } else {
                     designer.cancel_save_undo_state();
                 }
@@ -772,7 +779,7 @@ var designer = {
                     selected_box_element.insertBefore(prev_element);
                     designer.draw();
                     designer.modified();
-                    designer.end_save_undo_state();
+                    designer.end_save_undo_state('movebackward');
                 } else {
                     designer.cancel_save_undo_state();
                 }
