@@ -81,16 +81,29 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
 
     render_widgets_start(); // start widgets refresh
 
+    var lastsavecontent = $("#page").html();
+
     $("#save-dashboard").click(function (){
-        //recalculate the height so the page_height is shrunk to the minimum but still wrapping all components
-        //otherwise a user can drag a component far down then up again and a too high value will be stored to db.
-        designer.page_height = 0;
-        designer.scan();
-        designer.draw();
-        console.log("Dashboard HTML content: " + $("#page").html());
-        var result=dashboard.setcontent(dashid,$("#page").html(),designer.page_height)
-        if (result.success) {
-            $("#save-dashboard").attr('class','btn btn-success').text('<?php echo _("Saved") ?>'); 
+        var currentcontent = $("#page").html();
+
+        var success = false;
+        if (currentcontent === lastsavecontent) {
+            // If it's not changed, just bypass actual saving and assume success
+            success = true;
+        } else {
+            //recalculate the height so the page_height is shrunk to the minimum but still wrapping all components
+            //otherwise a user can drag a component far down then up again and a too high value will be stored to db.
+            designer.page_height = 0;
+            designer.scan();
+            designer.draw();
+            console.log("Dashboard HTML content: " + currentcontent);
+            var result=dashboard.setcontent(dashid,currentcontent,designer.page_height)
+            success = result.success;
+        }
+
+        if (success) {
+            $("#save-dashboard").attr('class','btn btn-success').text('<?php echo _("Saved") ?>');
+            lastsavecontent = currentcontent;
         } else {
             alert('ERROR: Could not save Dashboard. '+result.message);
         }
