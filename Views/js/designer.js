@@ -113,6 +113,7 @@ var designer = {
         designer.selected_box = 0;
         designer.scan();
         designer.draw();
+        designer.modified();
         designer.check_undo_state();
     },
 
@@ -129,6 +130,7 @@ var designer = {
         designer.selected_box = 0;
         designer.scan();
         designer.draw();
+        designer.modified();
         designer.check_undo_state();
     },
 
