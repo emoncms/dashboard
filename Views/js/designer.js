@@ -528,58 +528,62 @@ var designer = {
 
         designer.start_save_undo_state();
 
+        var left_shift = 0;
+        var top_shift = 0;
+        var snap_amount = Math.max(designer.grid_size, 1);
+        switch(e.keyCode) {
+            case 37: // Left
+              left_shift = -snap_amount;
+              break;
+            case 38: // Up
+              top_shift = -snap_amount;
+              break;
+            case 39: // Right
+              left_shift = snap_amount;
+              break;
+            case 40: // Down
+              top_shift = snap_amount;
+              break;
+            default:
+              // Unhandled
+              break;
+        }
+
+        // First pass - see if anything is going to go off the edge if we do this move
         designer.selected_boxes.forEach(function(selected_box) {
-            var left_shift = 0;
-            var top_shift = 0;
-
-            switch(e.keyCode) {
-                case 37: // Left
-                  left_shift = -1;
-                  break;
-                case 38: // Up
-                  top_shift = -1;
-                  break;
-                case 39: // Right
-                  left_shift = 1;
-                  break;
-                case 40: // Down
-                  top_shift = 1;
-                  break;
-                default:
-                  // Unhandled
-                  break;
-            }
-
-            var snap_amount = Math.max(designer.grid_size, 1);
-
-            // Check that the element doesn't go off the page
-            var newCenterX = designer.boxlist[selected_box]['left'] + (designer.boxlist[selected_box]['width'] / 2) + (left_shift * snap_amount);
+            var newCenterX = designer.boxlist[selected_box]['left'] + (designer.boxlist[selected_box]['width'] / 2) + left_shift;
             if (newCenterX < 0 || newCenterX > designer.page_width) {
-                // If this method ever did left_shift other than 1/-1, we would need to change the logic here.
                 left_shift = 0;
             }
 
-            var newCenterY = designer.boxlist[selected_box]['top'] + (designer.boxlist[selected_box]['height'] / 2) + (top_shift * snap_amount);
+            var newCenterY = designer.boxlist[selected_box]['top'] + (designer.boxlist[selected_box]['height'] / 2) + top_shift;
             if (newCenterY < 0) {
-                // If this method ever did top_shift other than 1/-1, we would need to change the logic here.
                 top_shift = 0;
-            }
-
-            designer.boxlist[selected_box]['left'] = designer.boxlist[selected_box]['left'] + (left_shift * snap_amount);
-            designer.boxlist[selected_box]['top'] = designer.boxlist[selected_box]['top'] + (top_shift * snap_amount);
-
-            // Increase the page height if we need to
-            var bottom = designer.boxlist[selected_box]['top'] + designer.boxlist[selected_box]['height'];
-            if (bottom > designer.page_height - designer.grid_size) {
-                designer.page_height = bottom + designer.grid_size;
             }
         });
 
-        designer.draw();
-        designer.modified();
-        designer.end_save_undo_state('key'+e.keyCode);
+        // Second pass - apply the changes, assuming we should actually move anything
+        if (left_shift != 0 || top_shift != 0) {
+            designer.selected_boxes.forEach(function(selected_box) {
+                designer.boxlist[selected_box]['left'] = designer.boxlist[selected_box]['left'] + left_shift;
+                designer.boxlist[selected_box]['top'] = designer.boxlist[selected_box]['top'] + top_shift;
+    
+                // Increase the page height if we need to
+                var bottom = designer.boxlist[selected_box]['top'] + designer.boxlist[selected_box]['height'];
+                if (bottom > designer.page_height - designer.grid_size) {
+                    designer.page_height = bottom + designer.grid_size;
+                }
+            });
+
+            designer.draw();
+            designer.modified();
+            designer.end_save_undo_state('key'+e.keyCode);
         
-        return true;
+            return true;
+        } else {
+            designer.cancel_save_undo_state();
+            return false;
+        }
     },
     
     'handle_delete_key_event': function(e){
