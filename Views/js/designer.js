@@ -29,7 +29,7 @@ var designer = {
     'boxlist': {},
     'resize': {},
 
-    'selected_box': null,
+    'selected_boxes': [],
     'selected_edge': selected_edges.none,
     'edit_mode': true,
     'create': null,
@@ -37,6 +37,7 @@ var designer = {
     'boxi': 0,
 
     'mousedown': false,
+    'shiftdown': false,
 
     'undostack': [],
     'redostack': [],
@@ -110,7 +111,7 @@ var designer = {
         designer.redostack.push(currentstate);
 
         $("#page").html(laststate);
-        designer.selected_box = 0;
+        designer.selected_boxes = [];
         designer.scan();
         designer.draw();
         designer.modified();
@@ -127,7 +128,7 @@ var designer = {
         designer.undostack.push(currentstate);
 
         $("#page").html(laststate);
-        designer.selected_box = 0;
+        designer.selected_boxes = [];
         designer.scan();
         designer.draw();
         designer.modified();
@@ -167,6 +168,36 @@ var designer = {
             }
         }
         return box;
+    },
+
+    'selectbox': function(box){
+        if (box === null) {
+            designer.selected_boxes = [];
+        } else {
+            if (designer.shiftdown) {
+                var index = $.inArray(box, designer.selected_boxes);
+                if (index > -1) {
+                    designer.selected_boxes.splice(index, 1);
+                } else {
+                    designer.selected_boxes.push(box);
+                }
+            } else {
+                designer.selected_boxes = [box];
+            }
+        }
+
+        // Show/hide the buttons as appropriate
+        var selected_boxes_count = designer.selected_boxes.length;
+        if (selected_boxes_count > 0){
+            $("#when-selected").show();
+            if (selected_boxes_count == 1) {
+                $("#options-button").prop('disabled', false);
+            } else {
+                $("#options-button").prop('disabled', true);
+            }
+        } else {
+            $("#when-selected").hide();
+        }
     },
 
     'scan': function(){
@@ -235,33 +266,35 @@ var designer = {
         }
 
         // Draw selected box points
-        if (designer.selected_box){
-            var strokeColor = "rgba(140, 179, 255, 0.9)";
-            var selectedColor = "rgba(255, 0, 0, 0.9)";
+        if (designer.selected_boxes.length > 0){
+            designer.selected_boxes.forEach(function(selected_box) {
+                var strokeColor = "rgba(140, 179, 255, 0.9)";
+                var selectedColor = "rgba(255, 0, 0, 0.9)";
 
-            var top = designer.boxlist[designer.selected_box]['top'];
-            var left = designer.boxlist[designer.selected_box]['left'];
-            var width = designer.boxlist[designer.selected_box]['width'];
-            var height = designer.boxlist[designer.selected_box]['height'];
+                var top = designer.boxlist[selected_box]['top'];
+                var left = designer.boxlist[selected_box]['left'];
+                var width = designer.boxlist[selected_box]['width'];
+                var height = designer.boxlist[selected_box]['height'];
 
-            designer.ctx.strokeStyle = (selected_edge == selected_edges.left ? selectedColor : strokeColor );
-            designer.ctx.strokeRect(left-4,top+(height/2)-4,8,8);
+                designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.left ? selectedColor : strokeColor );
+                designer.ctx.strokeRect(left-4,top+(height/2)-4,8,8);
 
-            designer.ctx.strokeStyle = (selected_edge == selected_edges.right ? selectedColor : strokeColor );
-            designer.ctx.strokeRect(left+width-4,top+(height/2)-4,8,8);
+                designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.right ? selectedColor : strokeColor );
+                designer.ctx.strokeRect(left+width-4,top+(height/2)-4,8,8);
 
-            designer.ctx.strokeStyle = (selected_edge == selected_edges.top ? selectedColor : strokeColor );
-            designer.ctx.strokeRect(left+(width/2)-4,top-4,8,8);
+                designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.top ? selectedColor : strokeColor );
+                designer.ctx.strokeRect(left+(width/2)-4,top-4,8,8);
 
-            designer.ctx.strokeStyle = (selected_edge == selected_edges.bottom ? selectedColor : strokeColor );
-            designer.ctx.strokeRect(left+(width/2)-4,top+height-4,8,8);
+                designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.bottom ? selectedColor : strokeColor );
+                designer.ctx.strokeRect(left+(width/2)-4,top+height-4,8,8);
 
-            designer.ctx.strokeStyle = (selected_edge == selected_edges.center ? selectedColor : strokeColor );
-            designer.ctx.strokeRect(left+(width/2)-4,top+(height/2)-4,8,8);
+                designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.center ? selectedColor : strokeColor );
+                designer.ctx.strokeRect(left+(width/2)-4,top+(height/2)-4,8,8);
 
-            designer.ctx.strokeStyle  = strokeColor;
-            designer.ctx.setLineDash([3]);
-            designer.ctx.strokeRect(left,top,width,height);
+                designer.ctx.strokeStyle  = strokeColor;
+                designer.ctx.setLineDash([3]);
+                designer.ctx.strokeRect(left,top,width,height);
+            });
         }
 
         // Update position and dimentions of elements
@@ -292,11 +325,14 @@ var designer = {
         var optionshint = widgets[widget]["optionshint"];
         var optionsdata = widgets[widget]["optionsdata"];
 
+        // You can only configure if there's one selected box, so just select the first
+        var selected_box = designer.selected_boxes[0];
+
         // Build options table html
         var options_html = '<div id="box-options">';
         for (z in box_options){
             // look into the designer DOM to extract the div parameters from the selected widget.
-            var val = $("#"+designer.selected_box).attr(box_options[z]);
+            var val = $("#"+selected_box).attr(box_options[z]);
 
             if (val == undefined) val="";
 
@@ -325,7 +361,7 @@ var designer = {
             }
 
             else if (options_type && options_type[z] == "html"){
-                val = $("#"+designer.selected_box).html();
+                val = $("#"+selected_box).html();
                 options_html += "<textarea class='options' id='"+box_options[z]+"' >"+val+"</textarea>"
             }
 
@@ -379,14 +415,14 @@ var designer = {
         }
 
         // Generic sizing options for all widgets (an hack so we dont add new options to all widgets)
-        var selPixel = (designer.boxlist[designer.selected_box]['styleUnitWidth'] == 0 ? "selected" : "");
-        var selPercent = (designer.boxlist[designer.selected_box]['styleUnitWidth'] == 1 ? "selected" : "");
+        var selPixel = (designer.boxlist[selected_box]['styleUnitWidth'] == 0 ? "selected" : "");
+        var selPercent = (designer.boxlist[selected_box]['styleUnitWidth'] == 1 ? "selected" : "");
         options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:80px; text-align: right;" class="add-on">'+_Tr("Width")+'</span>';
         options_html += '<select class="options" id="styleUnitWidth"><option value="0" '+selPixel+'>'+_Tr("Pixels")+'</option><option value="1" '+selPercent+'>'+_Tr("Percentage")+'</option></select>';
         options_html += '</div><span class="help-inline"><small class="muted">'+_Tr("Choose width unit")+'</small></span></div></div>';
 
-        var selPixel = (designer.boxlist[designer.selected_box]['styleUnitHeight'] == 0 ? "selected" : "");
-        var selPercent = (designer.boxlist[designer.selected_box]['styleUnitHeight'] == 1 ? "selected" : "");
+        var selPixel = (designer.boxlist[selected_box]['styleUnitHeight'] == 0 ? "selected" : "");
+        var selPercent = (designer.boxlist[selected_box]['styleUnitHeight'] == 1 ? "selected" : "");
         options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:80px; text-align: right;" class="add-on">'+_Tr("Height")+'</span>';
         options_html += '<select class="options" id="styleUnitHeight"><option value="0" '+selPixel+'>'+_Tr("Pixels")+'</option><option value="1" '+selPercent+'>'+_Tr("Percentage")+'</option></select>';
         options_html += '</div><span class="help-inline"><small class="muted">'+_Tr("Choose height unit")+'</small></span></div></div>';
@@ -455,6 +491,7 @@ var designer = {
         $("#page").append('<div id="'+designer.boxi+'" class="'+type+'" style="position:absolute; margin: 0; top:'+designer.snap(my+widgets[type]['offsety'])+'px; left:'+designer.snap(mx+widgets[type]['offsetx'])+'px; width:'+widgets[type]['width']+'px; height:'+widgets[type]['height']+'px;" >'+html+'</div>');
 
         designer.end_save_undo_state();
+        designer.selected_boxes = [designer.boxi];
         designer.scan();
         designer.draw();
         designer.modified();
@@ -462,11 +499,13 @@ var designer = {
     },
     
     'delete_selected_boxes': function(){
-        if (designer.selected_box) {
+        if (designer.selected_boxes.length > 0) {
             designer.start_save_undo_state();
-            delete designer.boxlist[designer.selected_box];
-            $("#"+designer.selected_box).remove();
-            designer.selected_box = 0;
+            designer.selected_boxes.forEach(function(selected_box) {
+                delete designer.boxlist[selected_box];
+                $("#"+selected_box).remove();
+            });
+            designer.selected_boxes = [];
             designer.draw();
             designer.modified();
             $("#when-selected").hide();
@@ -484,7 +523,7 @@ var designer = {
     },
 
     'handle_arrow_key_event': function(e){
-        if (!designer.selected_box) return false;
+        if (designer.selected_boxes.length == 0) return false;
 
         var targetTagName = e.target.tagName.toLowerCase();
         if (targetTagName === 'input' || targetTagName === 'textarea') return false;
@@ -493,61 +532,67 @@ var designer = {
 
         var left_shift = 0;
         var top_shift = 0;
-
+        var snap_amount = Math.max(designer.grid_size, 1);
         switch(e.keyCode) {
             case 37: // Left
-              left_shift = -1;
+              left_shift = -snap_amount;
               break;
             case 38: // Up
-              top_shift = -1;
+              top_shift = -snap_amount;
               break;
             case 39: // Right
-              left_shift = 1;
+              left_shift = snap_amount;
               break;
             case 40: // Down
-              top_shift = 1;
+              top_shift = snap_amount;
               break;
             default:
               // Unhandled
               break;
         }
 
-        var snap_amount = Math.max(designer.grid_size, 1);
+        // First pass - see if anything is going to go off the edge if we do this move
+        designer.selected_boxes.forEach(function(selected_box) {
+            var newCenterX = designer.boxlist[selected_box]['left'] + (designer.boxlist[selected_box]['width'] / 2) + left_shift;
+            if (newCenterX < 0 || newCenterX > designer.page_width) {
+                left_shift = 0;
+            }
 
-        // Check that the element doesn't go off the page
-        var newCenterX = designer.boxlist[designer.selected_box]['left'] + (designer.boxlist[designer.selected_box]['width'] / 2) + (left_shift * snap_amount);
-        if (newCenterX < 0 || newCenterX > designer.page_width) {
-            // If this method ever did left_shift other than 1/-1, we would need to change the logic here.
-            left_shift = 0;
-        }
+            var newCenterY = designer.boxlist[selected_box]['top'] + (designer.boxlist[selected_box]['height'] / 2) + top_shift;
+            if (newCenterY < 0) {
+                top_shift = 0;
+            }
+        });
 
-        var newCenterY = designer.boxlist[designer.selected_box]['top'] + (designer.boxlist[designer.selected_box]['height'] / 2) + (top_shift * snap_amount);
-        if (newCenterY < 0) {
-            // If this method ever did top_shift other than 1/-1, we would need to change the logic here.
-            top_shift = 0;
-        }
+        // Second pass - apply the changes, assuming we should actually move anything
+        if (left_shift != 0 || top_shift != 0) {
+            designer.selected_boxes.forEach(function(selected_box) {
+                designer.boxlist[selected_box]['left'] = designer.boxlist[selected_box]['left'] + left_shift;
+                designer.boxlist[selected_box]['top'] = designer.boxlist[selected_box]['top'] + top_shift;
+    
+                // Increase the page height if we need to
+                var bottom = designer.boxlist[selected_box]['top'] + designer.boxlist[selected_box]['height'];
+                if (bottom > designer.page_height - designer.grid_size) {
+                    designer.page_height = bottom + designer.grid_size;
+                }
+            });
 
-        designer.boxlist[designer.selected_box]['left'] = designer.boxlist[designer.selected_box]['left'] + (left_shift * snap_amount);
-        designer.boxlist[designer.selected_box]['top'] = designer.boxlist[designer.selected_box]['top'] + (top_shift * snap_amount);
-
-        // Increase the page height if we need to
-        var bottom = designer.boxlist[designer.selected_box]['top'] + designer.boxlist[designer.selected_box]['height'];
-        if (bottom > designer.page_height - designer.grid_size) {
-            designer.page_height = bottom + designer.grid_size;
-        }
-
-        designer.draw();
-        designer.modified();
-        designer.end_save_undo_state('key'+e.keyCode);
+            designer.draw();
+            designer.modified();
+            designer.end_save_undo_state('key'+e.keyCode);
         
-        return true;
+            return true;
+        } else {
+            designer.cancel_save_undo_state();
+            return false;
+        }
     },
     
     'handle_delete_key_event': function(e){
         var targetTagName = e.target.tagName.toLowerCase();
         if (targetTagName === 'input' || targetTagName === 'textarea') return false;
 
-        if (designer.selected_box) {
+        if (designer.selected_boxes.length > 0) {
             designer.delete_selected_boxes();
             return true;
         }
@@ -557,17 +602,23 @@ var designer = {
     'add_events': function(){
         // Click to select
         $(this.canvas).click(function(event){
-            var mx = 0, my = 0;
-            if(event.offsetX==undefined){
-                mx = (event.pageX - $(event.target).offset().left);
-                my = (event.pageY - $(event.target).offset().top);
-            } else {
-                mx = event.offsetX;
-                my = event.offsetY;
+            if (designer.edit_mode) {
+                var mx = 0, my = 0;
+                if(event.offsetX==undefined){
+                    mx = (event.pageX - $(event.target).offset().left);
+                    my = (event.pageY - $(event.target).offset().top);
+                } else {
+                    mx = event.offsetX;
+                    my = event.offsetY;
+                }
+                var selected_box = designer.onbox(mx,my);
+                if (selected_box == null) {
+                    // This handles when the click is outside any box to
+                    // deselect all boxes.
+                    designer.selectbox(null);
+                    designer.draw()
+                }
             }
-            if (designer.edit_mode) designer.selected_box = designer.onbox(mx,my);
-            if (!designer.selected_box) $("#when-selected").hide();
-            designer.draw()
         });
 
         $(this.canvas).bind('touchstart mousedown', function(e){
@@ -585,13 +636,15 @@ var designer = {
 
             if (designer.edit_mode){
                 // If its not yet selected check if a box is selected now
-                if (!designer.selected_box) designer.selected_box = designer.onbox(mx,my);
+                var selected_box = designer.onbox(mx,my);
+                if (selected_box) {
+                    designer.selectbox(selected_box);
+                }
 
-                if (designer.selected_box){
+                if (selected_box) {
                     designer.start_save_undo_state();
 
-                    $("#when-selected").show();
-                    resize = designer.boxlist[designer.selected_box];
+                    resize = designer.boxlist[selected_box];
 
                     var rightedge = resize['left']+resize['width'];
                     var bottedge = resize['top']+resize['height'];
@@ -599,17 +652,17 @@ var designer = {
                     var midy = resize['top']+(resize['height']/2);
 
                     if (Math.abs(mx - rightedge)<4)
-                        selected_edge = selected_edges.right;
+                        designer.selected_edge = selected_edges.right;
                     else if (Math.abs(mx - resize['left'])<4)
-                        selected_edge = selected_edges.left;
+                        designer.selected_edge = selected_edges.left;
                     else if (Math.abs(my - bottedge)<4)
-                        selected_edge = selected_edges.bottom;
+                        designer.selected_edge = selected_edges.bottom;
                     else if (Math.abs(my - resize['top'])<4)
-                        selected_edge = selected_edges.top;
+                        designer.selected_edge = selected_edges.top;
                     else if (Math.abs(my - midy)<4 && Math.abs(mx - midx)<4)
-                        selected_edge = selected_edges.center;
+                        designer.selected_edge = selected_edges.center;
                     else
-                        selected_edge = selected_edges.none;
+                        designer.selected_edge = selected_edges.none;
 
                     designer.draw();
                 }
@@ -625,12 +678,14 @@ var designer = {
         $(this.canvas).bind('touchend touchcancel mouseup', function(event){
             designer.end_save_undo_state();
             designer.mousedown = false;
-            selected_edge = selected_edges.none;
+            designer.selected_edge = selected_edges.none;
             designer.draw();
         });
 
         $(this.canvas).bind('touchmove mousemove', function(e){
-            if (designer.mousedown && designer.selected_box && selected_edge){
+            if (designer.mousedown && designer.selected_boxes.length == 1 && designer.selected_edge){
+                // We just allow moving/resizing with the mouse if one box is selected, so just grab the first
+                var selected_box = designer.selected_boxes[0];
 
                 var mx = 0, my = 0;
                 var event = designer.get_unified_event(e);
@@ -648,28 +703,28 @@ var designer = {
                 var rightedge = resize['left']+resize['width'];
                 var bottedge = resize['top']+resize['height'];
 
-                switch(selected_edge){
+                switch(designer.selected_edge){
                     case selected_edges.right:
-                        designer.boxlist[designer.selected_box]['width'] = (designer.snap(mx)-resize['left']);
+                        designer.boxlist[selected_box]['width'] = (designer.snap(mx)-resize['left']);
                         break;
                     case selected_edges.left:
-                        designer.boxlist[designer.selected_box]['left'] = (designer.snap(mx));
-                        designer.boxlist[designer.selected_box]['width'] = rightedge - designer.snap(mx);
+                        designer.boxlist[selected_box]['left'] = (designer.snap(mx));
+                        designer.boxlist[selected_box]['width'] = rightedge - designer.snap(mx);
                         break;
                     case selected_edges.bottom:
-                        designer.boxlist[designer.selected_box]['height'] = (designer.snap(my)-resize['top']);
+                        designer.boxlist[selected_box]['height'] = (designer.snap(my)-resize['top']);
                         break;
                     case selected_edges.top:
-                        designer.boxlist[designer.selected_box]['top'] = (designer.snap(my));
-                        designer.boxlist[designer.selected_box]['height'] = bottedge - designer.snap(my);
+                        designer.boxlist[selected_box]['top'] = (designer.snap(my));
+                        designer.boxlist[selected_box]['height'] = bottedge - designer.snap(my);
                         break;
                     case selected_edges.center:
-                        designer.boxlist[designer.selected_box]['left'] = (designer.snap(mx-designer.boxlist[designer.selected_box]['width']/2));
-                        designer.boxlist[designer.selected_box]['top'] = (designer.snap(my-designer.boxlist[designer.selected_box]['height']/2));
+                        designer.boxlist[selected_box]['left'] = (designer.snap(mx-designer.boxlist[selected_box]['width']/2));
+                        designer.boxlist[selected_box]['top'] = (designer.snap(my-designer.boxlist[selected_box]['height']/2));
                         break;
                 }
-                if (designer.boxlist[designer.selected_box]['width'] < designer.grid_size) designer.boxlist[designer.selected_box]['width'] = designer.grid_size;    // Zero cant be selected se we default to minimal grid size
-                if (designer.boxlist[designer.selected_box]['height'] < designer.grid_size) designer.boxlist[designer.selected_box]['height'] = designer.grid_size;
+                if (designer.boxlist[selected_box]['width'] < designer.grid_size) designer.boxlist[selected_box]['width'] = designer.grid_size;    // Zero cant be selected se we default to minimal grid size
+                if (designer.boxlist[selected_box]['height'] < designer.grid_size) designer.boxlist[selected_box]['height'] = designer.grid_size;
                 
                 if (bottedge>designer.page_height-designer.grid_size){
                     designer.page_height = bottedge+designer.grid_size;
@@ -709,33 +764,42 @@ var designer = {
             }
         });
 
+        $(window).keyup(function(e) {
+            var keyCode = e.keyCode;
+
+            if (keyCode == 16) {
+                designer.shiftdown = false;
+            }
+        });
+
         // On save click
         $("#options-save").click(function(){
             designer.start_save_undo_state();
+            var selected_box = designer.selected_boxes[0];
             $(".options").each(function() {
                 if ($(this).attr("id")=="html"){
-                    $("#"+designer.selected_box).html($(this).val());
+                    $("#"+selected_box).html($(this).val());
                 }
                 else if ($(this).attr("id").substring(0,6)=="colour"){
                     // Since colour values are generally prefixed with "#", and "#" isn't valid in URLs, we strip out the "#".
                     // It will be replaced by the value-checking in the actual plot function, so this won't cause issues.
                     var colour = $(this).val();
                     colour = colour.replace("#","");
-                    $("#"+designer.selected_box).attr($(this).attr("id"), colour);
+                    $("#"+selected_box).attr($(this).attr("id"), colour);
                 }
                 else if ($(this).attr("id").indexOf("styleUnit") == 0){
                     //Get styleUnit* options and set it to boxlist array
-                    designer.boxlist[designer.selected_box][$(this).attr("id")]=parseInt($(this).val());
+                    designer.boxlist[selected_box][$(this).attr("id")]=parseInt($(this).val());
                 }
                 else {
-                    $("#"+designer.selected_box).attr($(this).attr("id"), $(this).val());
+                    $("#"+selected_box).attr($(this).attr("id"), $(this).val());
                 }
             });
             $('#widget_options').modal('hide')
             designer.end_save_undo_state();
             designer.draw();
             designer.modified();
-            reloadiframe = designer.selected_box;
+            reloadiframe = selected_box;
         });
 
         $("#undo-button").click(function(event){
@@ -751,18 +815,24 @@ var designer = {
         });
 
         $("#options-button").click(function(event){
-            if (designer.selected_box){
-                designer.draw_options($("#"+designer.selected_box).attr("class"));
+            if (designer.selected_boxes.length == 1){
+                designer.draw_options($("#"+designer.selected_boxes[0]).attr("class"));
             }
         });
 
         $("#move-forward-button").click(function(event){
-            if (designer.selected_box){
+            if (designer.selected_boxes.length > 0){
                 designer.start_save_undo_state();
-                var selected_box_element = $("#"+designer.selected_box);
-                var next_element = selected_box_element.next();
-                if (next_element.length > 0) {
-                    selected_box_element.insertAfter(next_element);
+                var need_redraw = false;
+                designer.selected_boxes.forEach(function(selected_box) {
+                    var selected_box_element = $("#"+selected_box);
+                    var next_element = selected_box_element.next();
+                    if (next_element.length > 0) {
+                        selected_box_element.insertAfter(next_element);
+                        need_redraw = true;
+                    }
+                });
+                if (need_redraw) {
                     designer.draw();
                     designer.modified();
                     designer.end_save_undo_state('moveforward');
@@ -773,12 +843,18 @@ var designer = {
         });
 
         $("#move-backward-button").click(function(event){
-            if (designer.selected_box){
+            if (designer.selected_boxes.length > 0){
                 designer.start_save_undo_state();
-                var selected_box_element = $("#"+designer.selected_box);
-                var prev_element = selected_box_element.prev();
-                if (prev_element.length > 0) {
-                    selected_box_element.insertBefore(prev_element);
+                var need_redraw = false;
+                designer.selected_boxes.forEach(function(selected_box) {
+                    var selected_box_element = $("#"+selected_box);
+                    var prev_element = selected_box_element.prev();
+                    if (prev_element.length > 0) {
+                        selected_box_element.insertBefore(prev_element);
+                        need_redraw = true;
+                    }
+                });
+                if (need_redraw) {
                     designer.draw();
                     designer.modified();
                     designer.end_save_undo_state('movebackward');
