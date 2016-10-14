@@ -39,19 +39,19 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     </div>
 </div>
 
-<div style="background-color:#ddd; padding:4px;">
+<div data-draggable="true" class="toolbox" style="cursor:move; background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; width: 130px; height: 330px; top:110px; right: 50px;">
     <span id="widget-buttons"></span>
     <span id="undo-buttons">
-        <button id="undo-button" class="btn"><i class="icon-backward"></i> <?php echo _('Undo'); ?></button>
-        <button id="redo-button" class="btn"><i class="icon-forward"></i> <?php echo _('Redo'); ?></button>
+        <button id="undo-button" class="btn" style="float:left; width:65px"><i class="icon-backward"></i> <?php echo _('Undo'); ?></button>
+        <button id="redo-button" class="btn" style="float:left; width:65px"><i class="icon-forward"></i> <?php echo _('Redo'); ?></button>
     </span>
     <span id="when-selected">
-        <button id="options-button" class="btn" data-toggle="modal" data-target="#widget_options"><i class="icon-wrench"></i> <?php echo _('Configure'); ?></button>
-        <button id="move-forward-button" class="btn"><i class="icon-arrow-up"></i> <?php echo _('Forward'); ?></button>
-        <button id="move-backward-button" class="btn"><i class="icon-arrow-down"></i> <?php echo _('Backward'); ?></button>
-        <button id="delete-button" class="btn btn-danger"><i class="icon-trash"></i> <?php echo _('Delete'); ?></button>
+        <button id="options-button" class="btn" style="float:left; width:130px" data-toggle="modal" data-target="#widget_options"><i class="icon-wrench"></i> <?php echo _('Configure'); ?></button>
+        <button id="move-forward-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-up"></i> <?php echo _('Forw.'); ?></button>
+        <button id="move-backward-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-down"></i> <?php echo _('Backw.'); ?></button>
+        <button id="delete-button" class="btn btn-danger" style="float:left; width:130px"><i class="icon-trash"></i> <?php echo _('Delete'); ?></button>
     </span>
-    <span><button id="save-dashboard" class="btn btn-success" style="float:right"><?php echo _('Not modified'); ?></button></span>
+    <span><button id="save-dashboard" class="btn btn-success" style="float:left; width:130px; bottom: 5px"><?php echo _('Not modified'); ?></button></span>
 </div>
 
 <div id="page-container" style="height:<?php echo $dashboard['height']; ?>px; background-color:#<?php echo $dashboard['backgroundcolor']; ?>; position:relative;">
