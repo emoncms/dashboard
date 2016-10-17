@@ -15,6 +15,51 @@
 
 var selected_edges = {none : 0, left : 1, right : 2, top : 3, bottom : 4, center : 5};
 
+$(document).ready(function() {
+		    
+		    var $body = $('body');
+		    var $target = null;
+		    var isDraggEnabled = false;
+
+		    $body.on("mousedown", "div", function(e) {
+		       
+		    	$this = $(this);
+		       	isDraggEnabled = $this.data("draggable");
+
+		       	if (isDraggEnabled) {
+		       		if(e.offsetX==undefined){
+						x = e.pageX-$(this).offset().left;
+						y = e.pageY-$(this).offset().top;
+					}else{
+						x = e.offsetX;
+						y = e.offsetY;
+					};
+
+					$this.addClass('draggable');
+		        	$body.addClass('noselect');
+		        	$target = $(e.target);
+		       	};
+   
+		    });
+		    
+		     $body.on("mouseup", function(e) {
+		        $target = null;
+		        $body.find(".draggable").removeClass('draggable');
+		        $body.removeClass('noselect');
+		    });
+		    
+		     $body.on("mousemove", function(e) {
+	            if ($target) {
+	                $target.offset({
+	                    top: e.pageY  - y,
+	                    left: e.pageX - x
+	                });
+	            };     
+		     });
+
+		});
+
+
 var designer = {
 
     'grid_size':20,
@@ -472,8 +517,8 @@ var designer = {
         }
 
         for (z in select){
-            widget_html += "<div class='btn-group'><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown'>"+z+"&nbsp<span class='caret'></span></button>";
-            widget_html += "<ul class='dropdown-menu' name='d'>"+select[z]+"</ul>";
+            widget_html += "<div class='btn-group' style='white-space:normal; width:130px'><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown' style='width:100%'>"+z+"&nbsp<span class='caret'></span></button>";
+            widget_html += "<ul class='dropdown-menu' style='top:30px' name='d'>"+select[z]+"</ul>";
         }
         $("#widget-buttons").html(widget_html);
 
