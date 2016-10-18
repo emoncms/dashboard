@@ -20,7 +20,7 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/dashboard.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/widgetlist.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/render.js"></script>
-
+	<script type="text/javascript" src="<?php echo $path; ?>/modules/dashboard/byrei-dyndiv_1.0rc1.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js"></script>
 
     <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
@@ -39,25 +39,59 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     </div>
 </div>
 
-<div data-draggable="true" class="toolbox" style="cursor:move; background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; width: 130px; height: 330px; top:110px; right: 50px;">
-    <span id="widget-buttons"></span>
-    <span id="undo-buttons">
-        <button id="undo-button" class="btn" style="float:left; width:65px"><i class="icon-backward"></i> <?php echo _('Undo'); ?></button>
-        <button id="redo-button" class="btn" style="float:left; width:65px"><i class="icon-forward"></i> <?php echo _('Redo'); ?></button>
-    </span>
-    <span id="when-selected">
-        <button id="options-button" class="btn" style="float:left; width:130px" data-toggle="modal" data-target="#widget_options"><i class="icon-wrench"></i> <?php echo _('Configure'); ?></button>
-        <button id="move-forward-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-up"></i> <?php echo _('Forw.'); ?></button>
-        <button id="move-backward-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-down"></i> <?php echo _('Backw.'); ?></button>
-        <button id="delete-button" class="btn btn-danger" style="float:left; width:130px"><i class="icon-trash"></i> <?php echo _('Delete'); ?></button>
-    </span>
-    <span><button id="save-dashboard" class="btn btn-success" style="float:left; width:130px; bottom: 5px"><?php echo _('Not modified'); ?></button></span>
+<div id="toolbox" class="toolbox" style="background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; border-style:groove; width: 130px; height: auto; top:110px; right: 50px;">
+	<span id="dashboard-config-buttons">
+	<button id="dashboard-config-button" style="float:left"  class='btn' style="float:right" href='#dashConfigModal' role='button' data-toggle='modal'><span class='icon-wrench' title= <?php echo ("Configure dashboard"); ?>></span></button>
+	<a class='btn' style="float:right" href=' <?php echo ('/dashboard/view?id='); ?><?php echo $dashboard['id']; ?>' ><i class='icon-eye-open' title=<?php echo ("View Mode"); ?>></i></a>
+	</span>
+	<span id="widget-buttons"></span>
+	<span id="undo-buttons">
+		<button id="undo-button" class="btn" style="float:left; width:65px"><span class="icon-arrow-left"></span><?php echo _('Undo'); ?></button>
+		<button id="redo-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-right"></i> <?php echo _('Redo'); ?></button>
+	</span>
+	<span id="when-selected">
+		<button id="options-button" class="btn" style="float:left; width:130px" data-toggle="modal" data-target="#widget_options"><i class="icon-wrench"></i> <?php echo _('Configure'); ?></button>
+		<button id="move-forward-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-up"></i> <?php echo _('Forw.'); ?></button>
+		<button id="move-backward-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-down"></i> <?php echo _('Backw.'); ?></button>
+		<button id="delete-button" class="btn btn-danger" style="float:left; width:130px"><i class="icon-trash"></i> <?php echo _('Delete'); ?></button>
+	</span>
+	<span><button id="save-dashboard" class="btn btn-success" style="float:left; width:130px; bottom: 5px"><?php echo _('Not modified'); ?></button></span>
 </div>
+
 
 <div id="page-container" style="height:<?php echo $dashboard['height']; ?>px; background-color:#<?php echo $dashboard['backgroundcolor']; ?>; position:relative;">
     <div id="page"><?php echo $dashboard['content']; ?></div>
     <canvas id="can" width="940px" height="<?php echo $dashboard['height']; ?>px" style="position:absolute; top:0px; left:0px; margin:0; padding:0;"></canvas>
 </div>
+
+<script type="application/javascript">
+window.onload = addListeners();
+var x_pos = 0,
+	y_pos = 0;
+
+function addListeners() {
+  document.getElementById('toolbox').addEventListener('mousedown', mouseDown, false);
+  window.addEventListener('mouseup', mouseUp, false);
+}
+
+function mouseUp() {
+  window.removeEventListener('mousemove', divMove, true);
+}
+
+function mouseDown(e) {
+  var div = document.getElementById('toolbox');
+  x_pos = e.clientX - div.offsetLeft;
+  y_pos = e.clientY - div.offsetTop;
+  window.addEventListener('mousemove', divMove, true);
+}
+
+function divMove(e) {
+  var div = document.getElementById('toolbox');
+  div.style.position = 'absolute';
+  div.style.top = (e.clientY - y_pos) + 'px';
+  div.style.left = (e.clientX - x_pos) + 'px';
+}
+</script>
 
 <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/designer.js"></script>
 <script type="application/javascript">
