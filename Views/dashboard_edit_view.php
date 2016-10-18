@@ -20,7 +20,6 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/dashboard.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/widgetlist.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/render.js"></script>
-	<script type="text/javascript" src="<?php echo $path; ?>/modules/dashboard/byrei-dyndiv_1.0rc1.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js"></script>
 
     <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
