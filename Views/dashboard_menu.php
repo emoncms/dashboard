@@ -13,10 +13,11 @@
 
     $result = "";
 
+/*
     if ($type=="view" && isset($id)) {
         $result .= "<a class='btn btn-mini' href='" . $path . "dashboard/edit?id=" . $id . "'><span class='icon-edit' title='" . _("Draw Editor") . "'></span></a>";
     }
-
+*/
 
     //CHAVEIRO: Removed, dashboard list is accessible via setup menu now
     //if ($type!="list") {
