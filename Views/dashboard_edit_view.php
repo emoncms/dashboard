@@ -41,7 +41,7 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
 <div id="toolbox" class="toolbox" style="background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; border-style:groove; width: 130px; height: auto; top:110px; right: 50px;">
 	<span id="dashboard-config-buttons">
 	<button id="dashboard-config-button" style="float:left"  class='btn' style="float:right" href='#dashConfigModal' role='button' data-toggle='modal'><span class='icon-wrench' title= <?php echo ("Configure dashboard"); ?>></span></button>
-	<a class='btn' style="float:right" href=' <?php echo ($path.'/dashboard/view?id='); ?><?php echo $dashboard['id']; ?>' ><i class='icon-eye-open' title=<?php echo ("View Mode"); ?>></i></a>
+	<a class='btn' style="float:right" href=' <?php echo ($path.'dashboard/view?id='); ?><?php echo $dashboard['id']; ?>' ><i class='icon-eye-open' title=<?php echo ("View Mode"); ?>></i></a>
 	</span>
 	<span id="widget-buttons"></span>
 	<span id="undo-buttons">
@@ -81,6 +81,8 @@ function mouseDown(e) {
   var div = document.getElementById('toolbox');
   x_pos = e.clientX - div.offsetLeft;
   y_pos = e.clientY - div.offsetTop;
+  e=e || window.event;
+  pauseEvent(e);
   window.addEventListener('mousemove', divMove, true);
 }
 
@@ -89,6 +91,14 @@ function divMove(e) {
   div.style.position = 'absolute';
   div.style.top = (e.clientY - y_pos) + 'px';
   div.style.left = (e.clientX - x_pos) + 'px';
+}
+
+function pauseEvent(e){
+    if(e.stopPropagation) e.stopPropagation();
+    if(e.preventDefault) e.preventDefault();
+    e.cancelBubble=true;
+    e.returnValue=false;
+    return false;
 }
 </script>
 
