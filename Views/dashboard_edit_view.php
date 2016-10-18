@@ -65,30 +65,31 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
 
 <script type="application/javascript">
 window.onload = addListeners();
-var x_pos = 0,
-	y_pos = 0;
+var startx = 0, starty = 0;
 
 function addListeners() {
-  document.getElementById('toolbox').addEventListener('mousedown', mouseDown, false);
-  window.addEventListener('mouseup', mouseUp, false);
+  $("#toolbox").on("mousedown", null, null, mouseDown);
+  $(window).on("mouseup", null, null, mouseUp);
 }
 
 function mouseUp() {
-  window.removeEventListener('mousemove', divMove, true);
+  $(window).off("mousemove", null, toolboxMove);
 }
 
 function mouseDown(e) {
-  var div = document.getElementById('toolbox');
-  x_pos = e.clientX - div.offsetLeft;
-  y_pos = e.clientY - div.offsetTop;
-  window.addEventListener('mousemove', divMove, true);
+  var toolbox = $('#toolbox');
+  if (toolbox[0] === e.target) {
+    var position = toolbox.position();
+    startx = e.clientX - position.left;
+    starty = e.clientY - position.top;
+    $(window).on("mousemove", null, null, toolboxMove);
+  }
 }
 
-function divMove(e) {
-  var div = document.getElementById('toolbox');
-  div.style.position = 'absolute';
-  div.style.top = (e.clientY - y_pos) + 'px';
-  div.style.left = (e.clientX - x_pos) + 'px';
+function toolboxMove(e) {
+  var left = e.clientX - startx;
+  var top = e.clientY - starty;
+  $('#toolbox').css({position: 'absolute', left: left+'px', top: top+'px'});
 }
 </script>
 
