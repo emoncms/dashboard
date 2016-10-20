@@ -20,9 +20,9 @@ global $session,$path;
 
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 
-  <div id="editicon" style="background-color:#ddd; padding:5px; opacity:0.3; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; border-style:groove; width: 130px; height: auto; top:60px; right: 20px;">
+  <div id="editicon" style="background-color:transparent; padding:5px; position:fixed;z-index:1; width: 130px; height: auto; top:63px; right: 27px;">
 	<span id="dashboard-config-button">
-	<a id="editbutton" style="float:left; text-align:center" class='btn' href='<?php echo ($path.'dashboard/edit?id='); ?><?php echo $dashboard['id']; ?>'><i class='icon-wrench' ></i> <?php echo _('Edit Dashboard'); ?></a>
+	<a id="editbutton" style="float:right; text-align:center" class='btn-link' href='<?php echo ($path.'dashboard/edit?id='); ?><?php echo $dashboard['id']; ?>'><i class='icon-cog' ></i> <?php ?></a>
 	</span>
 	</div>
 
