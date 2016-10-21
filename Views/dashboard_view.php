@@ -20,9 +20,9 @@ global $session,$path;
 
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 
-<div id="editicon" style="cursor: move; opacity: 0.7; text-align:center; padding:5px; position:fixed;z-index:1; width: 35px; height: 35px; top:50px; right: 10px;">
+<div id="editicon" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top:50px; right: 10px;">
 	<div id="innerbutton" style="cursor: default";>
-		<button id="dashboardeditor"><a href='<?php echo ($path.'dashboard/edit?id='); ?> <?php echo $dashboard['id']; ?>'><span class='icon-cog' style="font-size: 25px" ></span></a></button>		
+		<button id="dashboardeditor" style="background: rgba(221, 221, 221, 0.8)"><a href='<?php echo ($path.'dashboard/edit?id='); ?> <?php echo $dashboard['id']; ?>'><span class='icon-cog' ></span></a></button>		
 	</div>
 </div>
 
@@ -48,34 +48,4 @@ global $session,$path;
   $(window).resize(function(){
     redraw = 1;
   });
-</script>
-
-<script type="application/javascript">
-window.onload = addListeners();
-var startx = 0, starty = 0;
-
-function addListeners() {
-  $("#editicon").on("mousedown", null, null, mouseDown);
-  $(window).on("mouseup", null, null, mouseUp);
-}
-
-function mouseUp() {
-  $(window).off("mousemove", null, editiconMove);
-}
-
-function mouseDown(e) {
-  var editicon = $('#editicon');
-  if (editicon[0] === e.target) {
-    var position = editicon.position();
-    startx = e.clientX - position.left;
-    starty = e.clientY - position.top;
-    $(window).on("mousemove", null, null, editiconMove);
-  }
-}
-
-function editiconMove(e) {
-  var left = e.clientX - startx;
-  var top = e.clientY - starty;
-  $('#editicon').css({position: 'absolute', left: left+'px', top: top+'px'});
-}
 </script>
