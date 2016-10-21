@@ -68,12 +68,12 @@ window.onload = addListeners();
 var startx = 0, starty = 0;
 
 function addListeners() {
-  $("#toolbox").on("mousedown", null, null, mouseDown);
-  $(window).on("mouseup", null, null, mouseUp);
+  $("#toolbox").on("touchstart mousedown", null, null, mouseDown);
+  $(window).on("touchend touchcancel mouseup", null, null, mouseUp);
 }
 
 function mouseUp() {
-  $(window).off("mousemove", null, toolboxMove);
+  $(window).off("touchmove mousemove", null, toolboxMove);
 }
 
 function mouseDown(e) {
@@ -82,8 +82,18 @@ function mouseDown(e) {
     var position = toolbox.position();
     startx = e.clientX - position.left;
     starty = e.clientY - position.top;
-    $(window).on("mousemove", null, null, toolboxMove);
+    $(window).on("touchmove mousemove", null, null, toolboxMove);
+	e=e || window.event;
+	pauseEvent(e);
   }
+}
+
+function pauseEvent(e){
+    if(e.stopPropagation) e.stopPropagation();
+    if(e.preventDefault) e.preventDefault();
+    e.cancelBubble=true;
+    e.returnValue=false;
+    return false;
 }
 
 function toolboxMove(e) {
