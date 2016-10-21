@@ -20,7 +20,7 @@ global $session,$path;
 
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 
-<div id="editicon" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top:50px; right: 10px;">
+ <div id="editicon" class="hidden-phone" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top:53px; right: 10px;">
 	<div id="innerbutton" style="cursor: default";>
 		<button id="dashboardeditor" style="background: rgba(221, 221, 221, 0.8)"><a href='<?php echo ($path.'dashboard/edit?id='); ?> <?php echo $dashboard['id']; ?>'><span class='icon-cog' ></span></a></button>		
 	</div>
