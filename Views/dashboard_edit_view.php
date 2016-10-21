@@ -38,10 +38,10 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     </div>
 </div>
 
-<div id="toolbox" class="toolbox" style="background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; border-style:groove; width: 130px; height: auto; top:110px; right: 50px;">
+<div id="toolbox" class="toolbox" style="background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; border-style:groove; width: 130px; height: auto; top:50px; right: 10px;">
 	<span id="dashboard-config-buttons">
 	<button id="dashboard-config-button" style="float:left"  class='btn' style="float:right" href='#dashConfigModal' role='button' data-toggle='modal'><span class='icon-wrench' title= <?php echo ("Configure dashboard"); ?>></span></button>
-	<a class='btn' style="float:right" href=' <?php echo ($path.'/dashboard/view?id='); ?><?php echo $dashboard['id']; ?>' ><i class='icon-eye-open' title=<?php echo ("View Mode"); ?>></i></a>
+	<a class='btn' style="float:right" href=' <?php echo ($path.'dashboard/view?id='); ?><?php echo $dashboard['id']; ?>' ><i class='icon-eye-open' title=<?php echo ("View Mode"); ?>></i></a>
 	</span>
 	<span id="widget-buttons"></span>
 	<span id="undo-buttons">
