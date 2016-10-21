@@ -22,7 +22,7 @@ global $session,$path;
 
 <div id="editicon" class="hidden-phone" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top:53px; right: 0px;">
 	<div id="innerbutton" style="cursor: default";>
-		<a href='<?php echo ($path.'dashboard/edit?id='); ?> <?php echo $dashboard['id']; ?>'><img src="/Modules/dashboard/Views/gear-icon.png" style="width:65%" ></a>
+		<a href='<?php echo ($path.'dashboard/edit?id='); ?> <?php echo $dashboard['id']; ?>'> <img src='<?php echo ($path.'Modules/dashboard/Views/gear-icon.png'); ?>' style="width:65%" ></a>
 	</div>
 </div>
 
