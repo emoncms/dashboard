@@ -38,25 +38,22 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     </div>
 </div>
 
-<div id="toolbox" class="toolbox" style="background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; border-style:groove; width: 130px; height: auto; top:50px; right: 10px;">
+<div id="toolbox" style="background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 120px; height: auto; top:55px; right: 0px;">
 	<span id="dashboard-config-buttons">
-	<button id="dashboard-config-button" style="float:left"  class='btn' style="float:right" href='#dashConfigModal' role='button' data-toggle='modal'><span class='icon-wrench' title= <?php echo ("Configure dashboard"); ?>></span></button>
-	<a class='btn' style="float:right" href=' <?php echo ($path.'dashboard/view?id='); ?><?php echo $dashboard['id']; ?>' ><i class='icon-eye-open' title=<?php echo ("View Mode"); ?>></i></a>
-	</span>
-	<span id="widget-buttons"></span>
-	<span id="undo-buttons">
-		<button id="undo-button" class="btn" style="float:left; width:65px"><span class="icon-arrow-left"></span><?php echo _('Undo'); ?></button>
-		<button id="redo-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-right"></i> <?php echo _('Redo'); ?></button>
+	<button id="dashboard-config-button" style="padding:5px; float:left; width:30px"  class='btn' style="float:right" href='#dashConfigModal' role='button' data-toggle='modal'><span><img style="" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>'></span></button>
+	<button id="undo-button" class="btn" style="padding:5px; float:left; width:30px"><span><img src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>'></span></button>
+	<button id="redo-button" class="btn" style="padding:5px; float:left; width:30px"><span><img src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>'></span></button>
+	<button id="view-mode" class='btn' style="float:left; padding:5px; width:30px"><span><a href='<?php echo ($path.'dashboard/view?id='); ?><?php echo $dashboard['id']; ?>' ><img src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>' ></span></a></button>
 	</span>
 	<span id="when-selected">
-		<button id="options-button" class="btn" style="float:left; width:130px" data-toggle="modal" data-target="#widget_options"><i class="icon-wrench"></i> <?php echo _('Configure'); ?></button>
-		<button id="move-forward-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-up"></i> <?php echo _('Forw.'); ?></button>
-		<button id="move-backward-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-down"></i> <?php echo _('Backw.'); ?></button>
-		<button id="delete-button" class="btn btn-danger" style="float:left; width:130px"><i class="icon-trash"></i> <?php echo _('Delete'); ?></button>
+		<button id="options-button" class="btn" style="float:left; padding:5px; width:30px" data-toggle="modal" data-target="#widget_options"><span><img src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>'></span></button>
+		<button id="move-forward-button" class="btn" style="float:left; padding:5px; width:30px" ><span><img src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-front.png'); ?>'></span></button>
+		<button id="move-backward-button" class="btn" style="float:left; padding:5px; width:30px" ><span><img src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-back.png'); ?>'></span></button>
+		<button id="delete-button" class="btn btn-danger" style="float:left; padding:5px; width:30px" ><span><img style="width:100%" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-delete.png'); ?>'></span></button>
 	</span>
-	<span><button id="save-dashboard" class="btn btn-success" style="float:left; width:130px; bottom: 5px"><?php echo _('Not modified'); ?></button></span>
+	<span id="widget-buttons"></span>
+	<span><button id="save-dashboard" class="btn btn-success" style="float:left; padding:5px; width:120px; bottom:5px" ><?php echo _('Not modified'); ?></button></span>
 </div>
-
 
 <div id="page-container" style="height:<?php echo $dashboard['height']; ?>px; background-color:#<?php echo $dashboard['backgroundcolor']; ?>; position:relative;">
     <div id="page"><?php echo $dashboard['content']; ?></div>
