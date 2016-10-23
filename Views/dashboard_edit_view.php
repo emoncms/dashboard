@@ -38,21 +38,24 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     </div>
 </div>
 
-<div id="toolbox" style="background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top:55px; right: 10px;">
+<div id="toolbox" style="text-align: center; background-color:#ddd; padding-left:5px; padding-right:5px; padding-bottom:15px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top:55px; right: 30px;"><span id="Toolboxtitle" style="width:50px" title="Click and drag to move toolbox">Toolbox</span>
+	<div id="separator" style="height:1.5px; background:#717171"></div>
+	<div id="Buttons" style="position:relative; top:5px; bottom:5px">
 	<span id="dashboard-config-buttons">
-	<button id="dashboard-config-button" style="padding:2px; float:left; width:31px"  class='btn' style="float:right" href='#dashConfigModal' role='button' data-toggle='modal'><span><img title="Configure dashboard basic data" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>'></span></button>
-	<button id="undo-button" class="btn" style="padding:2px; float:left; width:31px"><span><img title="Undo last step" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>'></span></button>
-	<button id="redo-button" class="btn" style="padding:2px; float:left; width:31px"><span><img title="Redo last step" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>'></span></button>
-	<button id="view-mode" class='btn' style="float:left; padding:2px; width:31px"><span><a href='<?php echo ($path.'dashboard/view?id='); ?><?php echo $dashboard['id']; ?>' ><img title="Return to view mode" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>' ></span></a></button>
+	<button id="dashboard-config-button" style="padding:4px; float:left; width:31px"  class='btn' style="float:right" href='#dashConfigModal' role='button' data-toggle='modal'><span><img title="Configure dashboard basic data" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>'></span></button>
+	<button id="undo-button" class="btn" style="padding:4px; float:left; width:31px"><span><img title="Undo last step" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>'></span></button>
+	<button id="redo-button" class="btn" style="padding:4px; float:left; width:31px"><span><img title="Redo last step" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>'></span></button>
+	<button id="view-mode" class='btn' style="float:left; padding:4px; width:31px"><span><a href='<?php echo ($path.'dashboard/view?id='); ?><?php echo $dashboard['id']; ?>' ><img title="Return to view mode" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>' ></span></a></button>
 	</span>
 	<span id="when-selected">
-		<button id="options-button" class="btn" style="float:left; padding:2px; width:31px" data-toggle="modal" data-target="#widget_options"><span><img title="Configure selected item" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>'></span></button>
-		<button id="move-forward-button" class="btn" style="float:left; padding:2px; width:31px" ><span><img title="Move selected item in front of other items" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-front.png'); ?>'></span></button>
-		<button id="move-backward-button" class="btn" style="float:left; padding:2px; width:31px" ><span><img title="Move selected item to back of other items" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-back.png'); ?>'></span></button>
-		<button id="delete-button" class="btn btn-danger" style="float:left; padding:2px; width:31px" ><span><img title="Delete selected items" style="width:100%" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-delete.png'); ?>'></span></button>
+		<button id="options-button" class="btn" style="float:left; padding:4px; width:31px" data-toggle="modal" data-target="#widget_options"><span><img title="Configure selected item" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>'></span></button>
+		<button id="move-forward-button" class="btn" style="float:left; padding:4px; width:31px" ><span><img title="Move selected item in front of other items" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-front.png'); ?>'></span></button>
+		<button id="move-backward-button" class="btn" style="float:left; padding:4px; width:31px" ><span><img title="Move selected item to back of other items" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-back.png'); ?>'></span></button>
+		<button id="delete-button" class="btn btn-danger" style="float:left; padding:4px; width:31px" ><span><img title="Delete selected items" style="width:100%" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-delete.png'); ?>'></span></button>
 	</span>
 	<span id="widget-buttons"></span>
-	<span><button id="save-dashboard" class="btn btn-success" style="float:left; padding:2px; width:125px; bottom:5px" title="Nothing to save" ><?php echo _('Not modified'); ?></button></span>
+	<span><button id="save-dashboard" class="btn btn-success" style="float:left; padding:2px; width:125px" title="Nothing to save" ><?php echo _('Not modified'); ?></button></span>
+	</div>
 </div>
 
 
