@@ -472,8 +472,8 @@ var designer = {
         }
 
         for (z in select){
-            widget_html += "<div class='btn-group' style='white-space:normal; width:130px'><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown' style='width:100%'>"+z+"&nbsp<span class='caret'></span></button>";
-            widget_html += "<ul class='dropdown-menu scrollable-menu' style='top:30px' name='d'>"+select[z]+"</ul>";
+            widget_html += "<div class='btn-group' style='white-space:normal; width:125px'><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown' style='width:100%'>"+z+"&nbsp<span class='caret'></span></button>";
+            widget_html += "<ul class='dropdown-menu scrollable-menu'  style='top:30px' name='d'>"+select[z]+"</ul>";
         }
         $("#widget-buttons").html(widget_html);
 
