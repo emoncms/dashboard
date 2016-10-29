@@ -20,7 +20,6 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/dashboard.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/widgetlist.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/render.js"></script>
-
     <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js"></script>
 
     <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
@@ -39,25 +38,68 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     </div>
 </div>
 
-<div data-draggable="true" class="toolbox" style="cursor:move; background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 15px 15px 15px 15px; width: 130px; height: 330px; top:110px; right: 50px;">
-    <span id="widget-buttons"></span>
-    <span id="undo-buttons">
-        <button id="undo-button" class="btn" style="float:left; width:65px"><i class="icon-backward"></i> <?php echo _('Undo'); ?></button>
-        <button id="redo-button" class="btn" style="float:left; width:65px"><i class="icon-forward"></i> <?php echo _('Redo'); ?></button>
-    </span>
-    <span id="when-selected">
-        <button id="options-button" class="btn" style="float:left; width:130px" data-toggle="modal" data-target="#widget_options"><i class="icon-wrench"></i> <?php echo _('Configure'); ?></button>
-        <button id="move-forward-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-up"></i> <?php echo _('Forw.'); ?></button>
-        <button id="move-backward-button" class="btn" style="float:left; width:65px"><i class="icon-arrow-down"></i> <?php echo _('Backw.'); ?></button>
-        <button id="delete-button" class="btn btn-danger" style="float:left; width:130px"><i class="icon-trash"></i> <?php echo _('Delete'); ?></button>
-    </span>
-    <span><button id="save-dashboard" class="btn btn-success" style="float:left; width:130px; bottom: 5px"><?php echo _('Not modified'); ?></button></span>
+<div id="toolbox" style="background-color:#ddd; padding:10px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top:55px; right: 10px;">
+	<span id="dashboard-config-buttons">
+	<button id="dashboard-config-button" style="padding:2px; float:left; width:31px"  class='btn' style="float:right" href='#dashConfigModal' role='button' data-toggle='modal'><span><img title="Configure dashboard basic data" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>'></span></button>
+	<button id="undo-button" class="btn" style="padding:2px; float:left; width:31px"><span><img title="Undo last step" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>'></span></button>
+	<button id="redo-button" class="btn" style="padding:2px; float:left; width:31px"><span><img title="Redo last step" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>'></span></button>
+	<button id="view-mode" class='btn' style="float:left; padding:2px; width:31px"><span><a href='<?php echo ($path.'dashboard/view?id='); ?><?php echo $dashboard['id']; ?>' ><img title="Return to view mode" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>' ></span></a></button>
+	</span>
+	<span id="when-selected">
+		<button id="options-button" class="btn" style="float:left; padding:2px; width:31px" data-toggle="modal" data-target="#widget_options"><span><img title="Configure selected item" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>'></span></button>
+		<button id="move-forward-button" class="btn" style="float:left; padding:2px; width:31px" ><span><img title="Move selected item in front of other items" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-front.png'); ?>'></span></button>
+		<button id="move-backward-button" class="btn" style="float:left; padding:2px; width:31px" ><span><img title="Move selected item to back of other items" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-back.png'); ?>'></span></button>
+		<button id="delete-button" class="btn btn-danger" style="float:left; padding:2px; width:31px" ><span><img title="Delete selected items" style="width:100%" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-delete.png'); ?>'></span></button>
+	</span>
+	<span id="widget-buttons"></span>
+	<span><button id="save-dashboard" class="btn btn-success" style="float:left; padding:2px; width:125px; bottom:5px" title="Nothing to save" ><?php echo _('Not modified'); ?></button></span>
 </div>
+
 
 <div id="page-container" style="height:<?php echo $dashboard['height']; ?>px; background-color:#<?php echo $dashboard['backgroundcolor']; ?>; position:relative;">
     <div id="page"><?php echo $dashboard['content']; ?></div>
     <canvas id="can" width="940px" height="<?php echo $dashboard['height']; ?>px" style="position:absolute; top:0px; left:0px; margin:0; padding:0;"></canvas>
 </div>
+
+<script type="application/javascript">
+window.onload = addListeners();
+var startx = 0, starty = 0;
+
+function addListeners() {
+  $("#toolbox").on("touchstart mousedown", null, null, mouseDown);
+  $(window).on("touchend touchcancel mouseup", null, null, mouseUp);
+}
+
+function mouseUp() {
+  $(window).off("touchmove mousemove", null, toolboxMove);
+}
+
+function mouseDown(e) {
+  var toolbox = $('#toolbox');
+  if (toolbox[0] === e.target) {
+    var position = toolbox.position();
+    startx = e.clientX - position.left;
+    starty = e.clientY - position.top;
+    $(window).on("touchmove mousemove", null, null, toolboxMove);
+	e=e || window.event;
+	pauseEvent(e);
+  }
+}
+
+function pauseEvent(e){
+    if(e.stopPropagation) e.stopPropagation();
+    if(e.preventDefault) e.preventDefault();
+    e.cancelBubble=true;
+    e.returnValue=false;
+    return false;
+}
+
+function toolboxMove(e) {
+  var left = e.clientX - startx;
+  var top = e.clientY - starty;
+  $('#toolbox').css({position: 'absolute', left: left+'px', top: top+'px'});
+}
+</script>
 
 <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/designer.js"></script>
 <script type="application/javascript">
