@@ -45,7 +45,7 @@ http://openenergymonitor.org
 
 ::-webkit-scrollbar
 {
-  width: 5px;  /* for vertical scrollbars */
+  width: 10px;  /* for vertical scrollbars */
   height: 5px; /* for horizontal scrollbars */
 }
 
