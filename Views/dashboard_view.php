@@ -25,12 +25,9 @@ global $session,$path;
 		<a href='<?php echo ($path.'dashboard/edit?id='); ?> <?php echo $dashboard['id']; ?>'> <img src='<?php echo ($path.'Modules/dashboard/Views/icons/gear-icon-outlined.png'); ?>' style="width:80%" ></a>
 	</div>
 </div>
-  
+
   <div id="page-container" style="height:<?php echo $dashboard['height']; ?>px; position:relative;">
     <div id="page"><?php echo $dashboard['content']; ?></div>
-
-  
-
 
 <script type="application/javascript">
   var dashid = <?php echo $dashboard['id']; ?>;
