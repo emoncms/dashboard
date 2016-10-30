@@ -263,7 +263,7 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 			var curY;
 			
 			context.fillStyle = colour_label;
-			context.fillText((static_offset+max_value)+units_string, width+(size*0.1), 10+size*0.15);
+			context.fillText((static_offset+max_value)+units_string, width+(size*0.1), size*0.15);
 			var divisions = Number(graduationQuant)+1;
 			for (var y = 0; y < graduationQuant; y++)
 			{
@@ -280,7 +280,7 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 				context.fillText(unitOffset+units_string, width+(size*0.1), curY+(size*0.1));
 			}
 			context.fillStyle = colour_label;
-			context.fillText(static_offset+units_string, width+(size*0.1), height-10);
+			context.fillText(static_offset+units_string, width+(size*0.1), height-2);
 
 			context.strokeStyle = "#888";
 			context.stroke();
@@ -359,5 +359,3 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 
 
 }
-
-
