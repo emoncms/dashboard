@@ -152,9 +152,7 @@ function draw_bar(context,
 	// if units_string == false: "". Else units_string
 	units_string = units_string || "";
 	title = title || "";
-	font = font || "arial black";
 	colour_label = colour_label || "000";
-
 	static_offset = 1*static_offset || 0;
 	var display_value = raw_value
 	display_value = display_value-static_offset
@@ -180,9 +178,8 @@ function draw_bar(context,
 	if (font == 7){fontname = "Arial Narrow"}
 	if (font == 8){fontname = "Arial"}
 	if (font == 9){fontname = "Arial Black"}
-	else
-		fontname = "Arial Black"
-		
+	else if (typeof(font) == "undefined") {fontname = "Arial Black"}
+	
 	if (graduationBool == 1)
 	{
 		height = height - (size/2)
@@ -222,35 +219,11 @@ function draw_bar(context,
 					width-(bar_border_space*2),
 					(height-bar_border_space) - bar_top );
 
-// print title
-
 if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 	colour_label = "#" + colour_label;
-
-					
 					
 	if (graduationBool == 1)
 	{
-
-		// context.font = "bold "+(size*0.22)+"px arial";
-
-		// var posStrt = polar_to_cart(size/1.15, 90+spreadAngle, half_width, half_height);
-		// var posStop = polar_to_cart(size/1.15, 90-spreadAngle, half_width, half_height);
-
-		// context.save()
-		// context.translate(posStrt[0], posStrt[1]);
-		// context.rotate(deg_to_radians(-45));
-		// context.fillText(""+static_offset+units_string, 0, 0);        // Since we've translated the entire context, the coords we want to draw at are now at [0,0]
-		// context.restore();
-
-		// context.save(); // each context.save is only good for one restore, apparently.
-		// context.translate(posStop[0], posStop[1]);
-		// context.rotate(deg_to_radians(45));
-		// context.fillText(""+(static_offset+max_value)+units_string, 0, 0);
-		// context.restore();
-
-
-
 		if (graduationQuant > 0)
 		{
 
@@ -287,8 +260,6 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 		}
 	}
 
-
-
 	if (raw_value>100)
 	{
 		raw_value = raw_value.toFixed(0);
@@ -302,60 +273,36 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 		raw_value = raw_value.toFixed(2);
 	}
 
-
 	if (graduationBool == 1)
 	{
-	if (title === ""){
+
 		if (raw_value > 1000)		// Add additional offset to make alignment work for HUGE numbers
 		half_width += (size*0.20)
 		//context.fillStyle = "#000";
-		fontname = fontname || "arial black";
+
 		context.textAlign    = "center";
 		context.fillStyle = colour_label;
 		context.font = ((size*0.25)+"px "+ fontname);
-		context.fillText(raw_value+units_string, half_width+(size*0.40), height + (size*0.3));
+		context.fillText(raw_value+units_string, half_width+(size*0.40), height + (size*0.48));
 		context.fillStyle = colour_label;
 		context.font = ((size*0.15)+"px "+ fontname);
 		context.textAlign    = "center";
+		context.fillText(title+":", half_width + (size * 0.35), height + (size * 0.2));					
 	}
-			else if (title) {
-				if (raw_value > 1000)		// Add additional offset to make alignment work for HUGE numbers
-				half_width += (size*0.20)
-				//context.fillStyle = "#000";
-				fontname = fontname || "arial black";
-				context.textAlign    = "center";
-				context.fillStyle = colour_label;
-				context.font = ((size*0.25)+"px "+ fontname);
-				context.fillText(raw_value+units_string, half_width+(size*0.40), height + (size*0.48));
-				context.fillStyle = colour_label;
-				context.font = ((size*0.15)+"px "+ fontname);
-				context.textAlign    = "center";
-				context.fillText(title+":", half_width + (size * 0.35), height + (size * 0.2));						
-			}
-	}
-		
-		//	else
-		
 
 	else
 	{
 		//context.fillStyle = "#000";
 		context.fillStyle = colour_label;
 		context.textAlign    = "center";
-		context.font = ((size*0.35)+"px "+ fontname);
+		context.font = ((size*0.5)+"px "+ fontname);
 		context.fillText(raw_value+units_string, half_width, height/2 + (size*0.2));
 		context.fillStyle = colour_label;
 		context.textAlign    = "center";
 		context.font = ((size*0.2)+"px "+ fontname);
 		context.fillText(title, half_width, height/7 + (size *0.1));
-		
-
 	}
-
-
 
 	context.fillStyle = "#000";
 	var spreadAngle = 32;
-
-
 }
