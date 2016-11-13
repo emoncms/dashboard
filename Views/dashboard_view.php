@@ -20,16 +20,14 @@ global $session,$path;
 
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 
-<div id="editicon" class="hidden-phone" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top:53px; right: 0px;">
+ <div id="editicon" class="hidden-phone" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top:53px; right: 0px;">
 	<div id="innerbutton" style="cursor: default";>
 		<a href='<?php echo ($path.'dashboard/edit?id='); ?> <?php echo $dashboard['id']; ?>'> <img src='<?php echo ($path.'Modules/dashboard/Views/icons/gear-icon-outlined.png'); ?>' style="width:80%" ></a>
 	</div>
 </div>
 
-
   <div id="page-container" style="height:<?php echo $dashboard['height']; ?>px; position:relative;">
-  <div id="page"><?php echo $dashboard['content']; ?></div>
-  </div>
+    <div id="page"><?php echo $dashboard['content']; ?></div>
 
 <script type="application/javascript">
   var dashid = <?php echo $dashboard['id']; ?>;
