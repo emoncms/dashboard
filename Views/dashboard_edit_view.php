@@ -100,9 +100,13 @@ function pauseEvent(e){
 }
 
 function toolboxMove(e) {
-  var left = e.clientX - startx;
-  var top = e.clientY - starty;
-  $('#toolbox').css({position: 'absolute', left: left+'px', top: top+'px'});
+  var posx = e.clientX - startx;
+  var posy = e.clientY - starty;
+  if (posx < 0 ) posx = 0;
+  if (posy < 50 ) posy = 50;
+	
+  $('#toolbox').css({position: 'absolute', left: posx+'px', top: posy+'px'});
+  console.log("posx:" + posx + "posy:" + posy);
 }
 </script>
 
