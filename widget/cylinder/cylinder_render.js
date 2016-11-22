@@ -70,7 +70,6 @@ function cylinder_fastupdate()
     var cyl_left = midx - (cyl_width/2);
     var top_pos = midx;
     var bot_pos = height - 4 - (cyl_width/2);
-    var bh = (bot_pos - top_pos) / 6;
 
     ctx.clearRect(0,0,width,500);
     cyl_top = cyl_top || 0;
@@ -78,31 +77,19 @@ function cylinder_fastupdate()
     ctx.strokeStyle = "#fff";
     ctx.lineWidth = 8;
 
-    var diff = 1*cyl_top - 1*cyl_bot;
-    var step_diff = -diff / 5;
-    var step_temp = cyl_top;
-
-    ctx.fillStyle = get_color(step_temp);
+    ctx.fillStyle = get_color(cyl_top);
     ctx.beginPath();
     ctx.arc(midx,top_pos,cyl_width/2,Math.PI,0,false);
     ctx.closePath();
     ctx.fill();
 
-    var y = top_pos;
-    ctx.fillStyle = get_color(step_temp); step_temp += step_diff;
-    ctx.fillRect(cyl_left,y,cyl_width,bh); y+=bh;
-    ctx.fillStyle = get_color(step_temp); step_temp += step_diff;
-    ctx.fillRect(cyl_left,y,cyl_width,bh); y+=bh;
-    ctx.fillStyle = get_color(step_temp); step_temp += step_diff;
-    ctx.fillRect(cyl_left,y,cyl_width,bh); y+=bh;
-    ctx.fillStyle = get_color(step_temp); step_temp += step_diff;
-    ctx.fillRect(cyl_left,y,cyl_width,bh); y+=bh;
-    ctx.fillStyle = get_color(step_temp); step_temp += step_diff;
-    ctx.fillRect(cyl_left,y,cyl_width,bh); y+=bh;
-    ctx.fillStyle = get_color(step_temp);
-    ctx.fillRect(cyl_left,y,cyl_width,bh); y+=bh;
+    var gradient = ctx.createLinearGradient(0, top_pos, 0, bot_pos);
+    gradient.addColorStop(0, get_color(cyl_top));
+    gradient.addColorStop(1, get_color(cyl_bot));
+    ctx.fillStyle = gradient;
+    ctx.fillRect(cyl_left, bot_pos, cyl_width, top_pos-bot_pos);
 
-    ctx.fillStyle = get_color(step_temp);
+    ctx.fillStyle = get_color(cyl_bot);
     ctx.beginPath();
     ctx.arc(midx,bot_pos,cyl_width/2,0,Math.PI,false);
     ctx.closePath();
