@@ -69,8 +69,8 @@ function cylinder_fastupdate()
     var cyl_width = width - 8;
     var cyl_left = midx - (cyl_width/2);
     var top_pos = midx;
-    var bh = 28;
-    var bot_pos = top_pos + 6 * bh;
+    var bot_pos = height - 4 - (cyl_width/2);
+    var bh = (bot_pos - top_pos) / 6;
 
     ctx.clearRect(0,0,width,500);
     cyl_top = cyl_top || 0;
