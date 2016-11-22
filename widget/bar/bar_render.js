@@ -256,8 +256,8 @@ function draw_bar(context,
 
 	if (graduationBool == 1)
 	{
-		if (raw_value > 1000)		// Add additional offset to make alignment work for HUGE numbers
-			half_width += (size*0.20)
+		if (raw_value.length + units_string.length > 4)		// Add additional offset to make alignment work for HUGE numbers
+			half_width += (size*0.25)
 		context.fillText(raw_value+units_string, half_width+(size*0.25), height + (size*0.45));
 	}
 	else
