@@ -223,7 +223,8 @@ function draw_bar(context,
 				context.lineTo(width-border_space, curY);
 
 				var unitOffset = Number(static_offset+((graduationQuant-y)*(max_value/divisions)))
-				if (unitOffset < 1000)
+				var unitOffset_test = unitOffset.toFixed(0);
+				if (unitOffset_test.length + units_string.length < 6)
 					unitOffset = unitOffset.toFixed(1)
 				else
 					unitOffset = unitOffset.toFixed(0)
@@ -240,11 +241,12 @@ function draw_bar(context,
 	context.fillStyle = "#000";
 	context.textAlign    = "center";
 	context.font = "bold "+(size*0.55)+"px arial";
-	if (raw_value>100)
+	var raw_value_abs = Math.abs(raw_value);
+	if (raw_value_abs>100)
 	{
 		raw_value = raw_value.toFixed(0);
 	}
-	else if (raw_value>10)
+	else if (raw_value_abs>10)
 	{
 		raw_value = raw_value.toFixed(1);
 	}
