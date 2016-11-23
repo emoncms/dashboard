@@ -97,20 +97,20 @@ function bar_draw()
 			var id = "can-"+$(this).attr("id");
 			var scale = 1*$(this).attr("scale") || 1;
 			draw_bar(widgetcanvas[id],
-								 0,
-								 0,
-								 $(this).attr("title"),
-								 $(this).attr("font"),
-								 $(this).width(),
-								 $(this).height(),val*scale,
-								 $(this).attr("max"),
-								 $(this).attr("units"),
-								 $(this).attr("colour"),
-								 $(this).attr("colour_label"),
-								 $(this).attr("offset"),
-								 $(this).attr("graduations"),
-								 $(this).attr("gradNumber")
-								 );
+								0,
+								0,
+								$(this).attr("title"),
+								$(this).attr("font"),
+								$(this).width(),
+								$(this).height(),val*scale,
+								$(this).attr("max"),
+								$(this).attr("units"),
+								$(this).attr("colour"),
+								$(this).attr("colour_label"),
+								$(this).attr("offset"),
+								$(this).attr("graduations"),
+								$(this).attr("gradNumber")
+								);
 		}
 	});
 }
@@ -166,7 +166,6 @@ function draw_bar(context,
 		size = width/2;
 	else
 		size = height/2;
-		size = size;
 	
 	if (font == 0){fontname = "Impact"}
 	if (font == 1){fontname = "Georgia"}
@@ -200,9 +199,8 @@ function draw_bar(context,
 					border_space,
 					width-(border_space*2),
 					height-(border_space*2));
-
-
 	context.lineWidth = 0;
+	
 	if (display_colour.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 		display_colour = "#" + display_colour;
 
@@ -226,18 +224,17 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 	{
 		if (graduationQuant > 0)
 		{
-
-		//	context.fillStyle = "#000";
 			context.fillStyle = colour_label;
 			context.textAlign    = "start";
-			context.font = ((size*0.15)+"px "+ fontname);
+			context.font = ((size*0.20)+"px "+ fontname);
 
 			var step = (height-border_space*2)/(Number(graduationQuant)+1);
 			var curY;
 			
 			context.fillStyle = colour_label;
-			context.fillText((static_offset+max_value)+units_string, width+(size*0.1), size*0.15);
+			context.fillText((static_offset+max_value)+units_string, width+(size*0.1), (size*0.15)+2);
 			var divisions = Number(graduationQuant)+1;
+			
 			for (var y = 0; y < graduationQuant; y++)
 			{
 				curY = Number(((y+1)*step).toFixed(0))+0.5;  // Bin down so we're drawing in the middle of the pixel, so the line is exactly 1 px wide
@@ -250,7 +247,7 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 				else
 					unitOffset = unitOffset.toFixed(0)
 				context.fillStyle = colour_label;
-				context.fillText(unitOffset+units_string, width+(size*0.1), curY+(size*0.1));
+				context.fillText(unitOffset+units_string, width+(size*0.1), curY+(size*0.05));
 			}
 			context.fillStyle = colour_label;
 			context.fillText(static_offset+units_string, width+(size*0.1), height-2);
@@ -275,8 +272,22 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 
 	if (graduationBool == 1)
 	{
+		if (title === ""){
+			//if (raw_value > 1000)		// Add additional offset to make alignment work for HUGE numbers
+			half_width += (size*0.20)
+			//context.fillStyle = "#000";
 
-		if (raw_value > 1000)		// Add additional offset to make alignment work for HUGE numbers
+			context.textAlign    = "center";
+			context.fillStyle = colour_label;
+			context.font = ((size*0.3)+"px "+ fontname);
+			context.fillText(raw_value+units_string, half_width+(size*0.2), height + (size*0.3));
+			context.fillStyle = colour_label;
+			context.font = ((size*0.20)+"px "+ fontname);
+			context.textAlign    = "center";
+			context.fillText(title, half_width + (size * 0.35), height + (size * 0.2));					
+		}
+		else if (title) {
+		//if (raw_value > 1000)		// Add additional offset to make alignment work for HUGE numbers
 		half_width += (size*0.20)
 		//context.fillStyle = "#000";
 
@@ -285,11 +296,12 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 		context.font = ((size*0.25)+"px "+ fontname);
 		context.fillText(raw_value+units_string, half_width+(size*0.40), height + (size*0.48));
 		context.fillStyle = colour_label;
-		context.font = ((size*0.15)+"px "+ fontname);
+		context.font = ((size*0.20)+"px "+ fontname);
 		context.textAlign    = "center";
-		context.fillText(title+":", half_width + (size * 0.35), height + (size * 0.2));					
+		context.fillText(title+":", half_width + (size * 0.35), height + (size * 0.2));
+		}
 	}
-
+	
 	else
 	{
 		//context.fillStyle = "#000";
@@ -305,4 +317,5 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 
 	context.fillStyle = "#000";
 	var spreadAngle = 32;
+
 }
