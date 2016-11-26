@@ -257,11 +257,11 @@ if (colour_label.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 		}
 	}
 
-	if (raw_value>100)
+	if (raw_value>=100)
 	{
 		raw_value = raw_value.toFixed(0);
 	}
-	else if (raw_value>10)
+	else if (raw_value>=10)
 	{
 		raw_value = raw_value.toFixed(1);
 	}
