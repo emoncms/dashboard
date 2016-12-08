@@ -88,13 +88,13 @@ function feedvalue_draw()
     if (decimals<0)
     {
 
-      if (val>=100)
+      if (val>=1000)
           val = val.toFixed(0);
-      else if (val>=10)
+      else if (val>=100)
           val = val.toFixed(1);
-      else if (val<=-100)
+      else if (val<=-1000)
           val = val.toFixed(0);
-      else if (val<=-10)
+      else if (val<=-100)
           val = val.toFixed(1);
       else
           val = val.toFixed(2);
@@ -103,7 +103,9 @@ function feedvalue_draw()
     {
       val = val.toFixed(decimals);
     }
-
+    
+    val = parseFloat(val);
+	
     if (unitend == 0)
     {
       $(this).html(val+units);

@@ -76,9 +76,9 @@ function dial_draw(){
   $('.dial').each(function(index) {
     var feedid = $(this).attr("feedid");
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var val = curve_value(feedid,dialrate);
+    var val = curve_value(feedid,dialrate).toFixed(3);
     // ONLY UPDATE ON CHANGE
-    if ((val * 1).toFixed(3) != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1)
+    if (val != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1)
     {
       var id = "can-"+$(this).attr("id");
       var scale = 1*$(this).attr("scale") || 1;
@@ -265,6 +265,8 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
      val = val.toFixed(1);
   else
      val = val.toFixed(2);
+
+  val = parseFloat(val);
     
   var dialtext = val+units;
   var textsize = (size / (dialtext.length+2)) * 6;

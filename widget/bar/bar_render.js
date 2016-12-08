@@ -85,13 +85,11 @@ function bar_draw()
 {
     $('.bar').each(function(index)
     {
-        var font = $(this).attr("font");
-        var title = $(this).attr("title");
         var feedid = $(this).attr("feedid");
         if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-        var val = curve_value(feedid,dialrate);
+        var val = curve_value(feedid,dialrate).toFixed(3);
         // ONLY UPDATE ON CHANGE
-        if ((val * 1).toFixed(3) != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1)
+        if (val != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1)
         {
             var id = "can-"+$(this).attr("id");
             var scale = 1*$(this).attr("scale") || 1;
@@ -242,7 +240,7 @@ function draw_bar(context,
                     unitOffset = unitOffset.toFixed(1)
                 else
                     unitOffset = unitOffset.toFixed(0)
-                context.fillText(unitOffset+units_string, width+(size*0.1), curY+(size*0.05));
+                context.fillText(parseFloat(unitOffset)+units_string, width+(size*0.1), curY+(size*0.05));
             }
             context.fillText(static_offset+units_string, width+(size*0.1), height-2);
 
@@ -258,6 +256,7 @@ function draw_bar(context,
     } else  {
         raw_value = raw_value.toFixed(2);
     }
+    raw_value = parseFloat(raw_value);
 
     context.fillStyle = colour_label;
     context.textAlign    = "center";
