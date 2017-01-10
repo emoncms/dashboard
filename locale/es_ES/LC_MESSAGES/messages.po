@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: emoncms3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-23 15:40+0200\n"
-"PO-Revision-Date: 2016-09-23 15:50+0200\n"
+"POT-Creation-Date: 2017-01-10 18:06+0100\n"
+"PO-Revision-Date: 2017-01-10 18:16+0100\n"
 "Last-Translator: Rubén de Celis Hernández <contact@rdch106.hol.es>\n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -36,46 +36,50 @@ msgstr "Color de fondo:"
 msgid "Description: "
 msgstr "Descripción"
 
-#: ../../../Views/dashboard_config.php:31
+#: ../../../Views/dashboard_config.php:28
+msgid "Grid size: "
+msgstr "Tamaño de cuadrícula: "
+
+#: ../../../Views/dashboard_config.php:33
 msgid "Make this dashboard the first shown"
 msgstr "Hacer este panel como el primero que se muestra"
 
-#: ../../../Views/dashboard_config.php:31 ../../../Views/dashboard_list.php:59
+#: ../../../Views/dashboard_config.php:33 ../../../Views/dashboard_list.php:59
 msgid "Main"
 msgstr "Principal"
 
-#: ../../../Views/dashboard_config.php:36
+#: ../../../Views/dashboard_config.php:38
 msgid "Activate this dashboard"
 msgstr "Activar este panel"
 
-#: ../../../Views/dashboard_config.php:36 ../../../Views/dashboard_list.php:61
+#: ../../../Views/dashboard_config.php:38 ../../../Views/dashboard_list.php:61
 msgid "Published"
 msgstr "Publicado"
 
-#: ../../../Views/dashboard_config.php:41
+#: ../../../Views/dashboard_config.php:43
 msgid "Anyone with the URL can see this dashboard"
 msgstr "Cualquiera con la dirección URL puede ver este panel"
 
-#: ../../../Views/dashboard_config.php:41 ../../../Views/dashboard_list.php:60
+#: ../../../Views/dashboard_config.php:43 ../../../Views/dashboard_list.php:60
 msgid "Public"
 msgstr "Público"
 
-#: ../../../Views/dashboard_config.php:46
+#: ../../../Views/dashboard_config.php:48
 msgid ""
 "Shows dashboard description on mouse over dashboard name in menu project"
 msgstr ""
 "Muestra la descripción del panel cuando se pasa el ratón sobre su nombre en "
 "el menú del proyecto"
 
-#: ../../../Views/dashboard_config.php:46
+#: ../../../Views/dashboard_config.php:48
 msgid "Show description"
 msgstr "Mostrar descripción"
 
-#: ../../../Views/dashboard_config.php:51
+#: ../../../Views/dashboard_config.php:53
 msgid "Close"
 msgstr "Cerrar"
 
-#: ../../../Views/dashboard_config.php:52
+#: ../../../Views/dashboard_config.php:54
 #: ../../../Views/dashboard_edit_view.php:37
 msgid "Save changes"
 msgstr "Guardar cambios"
@@ -94,16 +98,24 @@ msgid "Configure"
 msgstr "Configuración"
 
 #: ../../../Views/dashboard_edit_view.php:46
+msgid "Forward"
+msgstr "Traer adelante"
+
+#: ../../../Views/dashboard_edit_view.php:47
+msgid "Backward"
+msgstr "Enviar Atrás"
+
+#: ../../../Views/dashboard_edit_view.php:48
 msgid "Delete"
 msgstr "Borrar"
 
-#: ../../../Views/dashboard_edit_view.php:48
+#: ../../../Views/dashboard_edit_view.php:50
 msgid "Not modified"
 msgstr "No modificado"
 
-#: ../../../Views/dashboard_edit_view.php:87
+#: ../../../Views/dashboard_edit_view.php:89
 msgid "Saved"
-msgstr "Guardar"
+msgstr "Guardado"
 
 #: ../../../Views/dashboard_list.php:15 ../../../dashboard_menu.php:34
 #: ../../../dashboard_menu.php:37
