@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: emoncms3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-10 18:06+0100\n"
-"PO-Revision-Date: 2017-01-10 18:16+0100\n"
+"PO-Revision-Date: 2017-01-10 18:44+0100\n"
 "Last-Translator: Rubén de Celis Hernández <contact@rdch106.hol.es>\n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -103,7 +103,7 @@ msgstr "Traer adelante"
 
 #: ../../../Views/dashboard_edit_view.php:47
 msgid "Backward"
-msgstr "Enviar Atrás"
+msgstr "Enviar atrás"
 
 #: ../../../Views/dashboard_edit_view.php:48
 msgid "Delete"
