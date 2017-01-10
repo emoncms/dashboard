@@ -68,7 +68,7 @@ LANG_JS["Listen port of server"] = '<?php echo addslashes(_("Listen port of serv
 LANG_JS["URL example: node/param"] = '<?php echo addslashes(_("URL example: node/param")); ?>';
 LANG_JS["Data to send"] = '<?php echo addslashes(_("Data to send")); ?>';
 LANG_JS["GET/POST"] = '<?php echo addslashes(_("GET/POST")); ?>';
-LANG_JS[""yes/no""] = '<?php echo addslashes(_("yes/no")); ?>';
+LANG_JS["yes/no"] = '<?php echo addslashes(_("yes/no")); ?>';
 LANG_JS["in milliseconds"] = '<?php echo addslashes(_("in milliseconds")); ?>';
 LANG_JS["0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"] = '<?php echo addslashes(_("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk")); ?>';
 LANG_JS["Button Text"] = '<?php echo addslashes(_("Button Text")); ?>';
