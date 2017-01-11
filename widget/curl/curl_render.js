@@ -32,26 +32,28 @@ function curl_events()
 {
   $('.curl').on("click", function(event) {
 
+    var jqxhr; //jQuery XMLHttpRequest
+
     if($(this).attr("confirm")=="yes"){
         
             var r = confirm(_Tr("Do you want to continue?"));
             if (r == true) {
-                var xhr =  $.ajax({type:$(this).attr("method"),
-                    url:"http"+(($(this).attr("https")=="yes")?"s":"")+"://"+$(this).attr("ip")+':'+$(this).attr("port")+'/'+$(this).attr("url"),
-                    data: ($(this).attr("payload").trim().charAt(0) === '{') ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload"),
-                    timeout: ($(this).attr("timeout") > 0) ? $(this).attr("timeout") : 1000 });
-                console.log(xhr);
+                jqxhr =  $.ajax({type:$(this).attr("method"),
+                    url:"http"+(($(this).attr("https")=="yes")?"s":"")+"://"+$(this).attr("ip")+":"+$(this).attr("port")+"/"+$(this).attr("url"),
+                    data: ($(this).attr("payload").trim().charAt(0) === "{") ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload"),
+                    timeout: ($(this).attr("timeout") > 0) ? $(this).attr("timeout") : 1000 });                
             } else {
                 // Nothing to do
             }
         
     }else{
-        var xhr =  $.ajax({type:$(this).attr("method"),
-            url:"http"+(($(this).attr("https")=="yes")?"s":"")+"://"+$(this).attr("ip")+':'+$(this).attr("port")+'/'+$(this).attr("url"),
-            data: ($(this).attr("payload").trim().charAt(0) === '{') ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload"),
-            timeout: ($(this).attr("timeout") > 0) ? $(this).attr("timeout") : 1000 });;
-        console.log(xhr);
-    }		
+        jqxhr =  $.ajax({type:$(this).attr("method"),
+            url:"http"+(($(this).attr("https")=="yes")?"s":"")+"://"+$(this).attr("ip")+":"+$(this).attr("port")+"/"+$(this).attr("url"),
+            data: ($(this).attr("payload").trim().charAt(0) === "{") ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload"),
+            timeout: ($(this).attr("timeout") > 0) ? $(this).attr("timeout") : 1000 });
+    }
+    
+    console.log(jqxhr);
 
   });
 }
