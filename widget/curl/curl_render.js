@@ -17,9 +17,9 @@ function curl_widgetlist()
     {
       "offsetx":-60,"offsety":-20,"width":120,"height":40,
       "menu":"Widgets",
-      "options":["ip","port","url","payload","colour","caption","confirm"],
-      "optionsname":[_Tr("IP"),_Tr("Port"),_Tr("URL"),_Tr("Payload"),_Tr("Colour"),_Tr("Caption"),_Tr("Confirmation")],
-      "optionshint":[_Tr("IP address of server"),_Tr("Listen port of server"),_Tr("URL example: node/param"),_Tr("Data to send"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Button Text"),_Tr("Confirmation Box: yes/no")]
+      "options":["ip","port","url","payload","method", "https","timeout","colour","caption","confirm"],
+      "optionsname":[_Tr("IP"),_Tr("Port"),_Tr("URL"),_Tr("Payload"),_Tr("Method"),_Tr("HTTPS"),_Tr("Timeout"),_Tr("Colour"),_Tr("Caption"),_Tr("Confirmation")],
+      "optionshint":[_Tr("IP address of server"),_Tr("Listen port of server"),_Tr("URL example: node/param"),_Tr("Data to send"),_Tr("GET/POST"),_Tr("yes/no"),_Tr("in milliseconds"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Button Text"),_Tr("Confirmation Box: yes/no")]
     }
   };
 
@@ -32,18 +32,28 @@ function curl_events()
 {
   $('.curl').on("click", function(event) {
 
+    var jqxhr; //jQuery XMLHttpRequest
+
     if($(this).attr("confirm")=="yes"){
         
             var r = confirm(_Tr("Do you want to continue?"));
             if (r == true) {
-                $.ajax({type:'GET', url:'http://'+$(this).attr("ip")+':'+$(this).attr("port")+'/'+$(this).attr("url"), data: {"data": $(this).attr("payload")}, timeout: 1000 });
+                jqxhr =  $.ajax({type:$(this).attr("method"),
+                    url:"http"+(($(this).attr("https")=="yes")?"s":"")+"://"+$(this).attr("ip")+":"+$(this).attr("port")+"/"+$(this).attr("url"),
+                    data: ($(this).attr("payload").trim().charAt(0) === "{") ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload"),
+                    timeout: ($(this).attr("timeout") > 0) ? $(this).attr("timeout") : 1000 });                
             } else {
                 // Nothing to do
             }
         
     }else{
-        $.ajax({type:'GET', url:'http://'+$(this).attr("ip")+':'+$(this).attr("port")+'/'+$(this).attr("url"), data: {"data": $(this).attr("payload")}, timeout: 1000 });
-    }		
+        jqxhr =  $.ajax({type:$(this).attr("method"),
+            url:"http"+(($(this).attr("https")=="yes")?"s":"")+"://"+$(this).attr("ip")+":"+$(this).attr("port")+"/"+$(this).attr("url"),
+            data: ($(this).attr("payload").trim().charAt(0) === "{") ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload"),
+            timeout: ($(this).attr("timeout") > 0) ? $(this).attr("timeout") : 1000 });
+    }
+    
+    console.log(jqxhr);
 
   });
 }
