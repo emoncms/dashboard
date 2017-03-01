@@ -10,18 +10,19 @@ http://openenergymonitor.org
 */
 
 global $session,$path;
+$js_css_version = 1;
 
 if (!$dashboard['height']) $dashboard['height'] = 400;
 ?>
     <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
-    <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css" rel="stylesheet">
-	<link href="<?php echo $path; ?>Modules/dashboard/Views/dashboardeditor.css" rel="stylesheet">
+    <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
+	  <link href="<?php echo $path; ?>Modules/dashboard/Views/dashboardeditor.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
 
     <script type="text/javascript" src="<?php echo $path; ?>Lib/flot/jquery.flot.min.js"></script>
-    <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/dashboard.js"></script>
-    <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/widgetlist.js"></script>
-    <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/render.js"></script>
-    <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js"></script>
+    <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/dashboard.js?ver=<?php echo $js_css_version; ?>"></script>
+    <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/widgetlist.js?ver=<?php echo $js_css_version; ?>"></script>
+    <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/render.js?ver=<?php echo $js_css_version; ?>"></script>
+    <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js?ver=<?php echo $js_css_version; ?>"></script>
 
     <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 
