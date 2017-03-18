@@ -1,11 +1,9 @@
 /*
    All emon_widgets code is released under the GNU General Public License v3.
    See COPYRIGHT.txt and LICENSE.txt.
-
     ---------------------------------------------------------------------
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
-
     Author: Vikas Lamba: vikas13jun@gmail.com
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
@@ -37,11 +35,26 @@ function battery_widgetlist(){
     }
   };
 
+  var fontoptions = [
+    [9, "Arial Black"],
+    [8, "arial"],
+    [7, "Arial Narrow"],
+    [6, "sans-serif"],
+    [5, "Helvetica"],
+    [4, "Comic Sans MS"],
+    [3, "Courier New"],
+    [2, "arial"],
+    [1, "Georgia"],
+    [0, "Impact"]
+  ];
+
   addOption(widgets["battery"], "feedid",      "feedid",  _Tr("Feed"),        _Tr("Feed value"),                                                            []);
   addOption(widgets["battery"], "max",         "value",   _Tr("Max value"),   _Tr("Max value to show"),                                                     []);
   addOption(widgets["battery"], "scale",       "value",   _Tr("Scale"),       _Tr("Value is multiplied by scale before display"),                           []);
   addOption(widgets["battery"], "units",       "value",   _Tr("Units"),       _Tr("Units to show"),                                                         []);
   addOption(widgets["battery"], "offset",      "value",   _Tr("Offset"),      _Tr("Static offset. Subtracted from value before computing needle position"), []);
+  addOption(widgets["battery"], "colour",      "colour_picker",   _Tr("Colour label"),      _Tr("Color of the label"), []);
+  addOption(widgets["battery"], "font",      "dropbox",   _Tr("Font"),      _Tr("Label font"), fontoptions);
 
   return widgets;
 }
@@ -56,13 +69,15 @@ function battery_draw(){
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var val = curve_value(feedid,dialrate).toFixed(3);
     // ONLY UPDATE ON CHANGE
-    if (val != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1)
+    if (val != (associd[feedid]["value"] * 1).toFixed(3) || redraw == 1)
     {
       var id = "can-"+$(this).attr("id");
       var scale = 1*$(this).attr("scale") || 1;
       var offset = 1*$(this).attr("offset") || 0;
       var max_val = 1*$(this).attr("max") || 100;
       var units = $(this).attr("units");
+      var font = $(this).attr("font");
+      var color = $(this).attr("colour") || "000";
 
       var start_x = 0, start_y = 0;
       var battery_height = $(this).height();
@@ -72,6 +87,20 @@ function battery_draw(){
       var line_width = 2;
       var margin = 1;
       var number_of_blocks = 5;
+
+      if (font == 0){fontname = "Impact"}
+      if (font == 1){fontname = "Georgia"}
+      if (font == 2){fontname = "arial"}
+      if (font == 3){fontname = "Courier New"}
+      if (font == 4){fontname = "Comic Sans MS"}
+      if (font == 5){fontname = "Helvetica"}
+      if (font == 6){fontname = "sans-serif"}
+      if (font == 7){fontname = "Arial Narrow"}
+      if (font == 8){fontname = "Arial"}
+      if (font == 9){fontname = "Arial Black"}
+      else if (typeof(font) == "undefined") {fontname = "Arial Black"}
+
+      if (color.indexOf("#") == -1) color = "#" + color;
 
       var data = val*scale + offset;
       
@@ -108,9 +137,9 @@ function battery_draw(){
                                         start_y + cap_height + line_width + margin, 
                                         start_x + line_width + margin + block_width, 
                                         start_y + cap_height + line_width + margin);
-      linearGradient1.addColorStop(0, 'rgb('+red_val+', '+green_val+', 0)');
-      linearGradient1.addColorStop(0.5, 'rgb(0, 0, 0)');
-      linearGradient1.addColorStop(1, 'rgb('+red_val+','+green_val+', 0)');
+      linearGradient1.addColorStop(0, "rgb("+red_val+", "+green_val+", 0)");
+      linearGradient1.addColorStop(0.5, "rgb(0, 0, 0)");
+      linearGradient1.addColorStop(1, "rgb("+red_val+","+green_val+", 0)");
       
       for(var i=1;i <= last_block; i++)
       {
@@ -120,8 +149,9 @@ function battery_draw(){
         context.fillRect(start_x + line_width + margin, y_pos, block_width, block_height);
       }
 
-      context.font      = "16px Verdana";
-      context.fillStyle = "#ff0000";
+      context.font      = fontname;
+      context.fillStyle = color;
+      context.font = ((battery_width*0.20)+"px "+ fontname);
       context.fillText(data.toFixed(1) + units, start_x + battery_width/4, start_y + battery_height/2+10, battery_width);
     }
   });
