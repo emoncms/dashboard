@@ -99,8 +99,8 @@ function battery_draw(){
       var block_height = Math.ceil((battery_height - cap_height - 2*(line_width + margin))/number_of_blocks) - 2*margin;
       var block_start_y = start_y + battery_height - line_width - margin;
       
-      var last_block = Math.ceil(number_of_blocks*data/100);
-      var green_val = Math.floor(data*255/100);//<49?255:0;
+      var last_block = Math.ceil(number_of_blocks*data/max_val);
+      var green_val = Math.floor(data*255/max_val);//<49?255:0;
 
 
       var red_val = 255 - green_val;
