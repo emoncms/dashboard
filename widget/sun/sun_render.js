@@ -55,9 +55,9 @@ function sun_widgetlist(){
   addOption(widgets["sun"], "scale",       "value",   _Tr("Scale"),       _Tr("Value is multiplied by scale before display"),                           []);
   addOption(widgets["sun"], "units",       "value",   _Tr("Units"),       _Tr("Units to show"),                                                         []);
   addOption(widgets["sun"], "offset",      "value",   _Tr("Offset"),      _Tr("Static offset. Subtracted from value before computing needle position"), []);
-  addOption(widgets["solar"], "solar_title",       "value",   _Tr("solar title"),       _Tr("Solar title"),                                     []);
-  addOption(widgets["solar"], "colour",      "colour_picker",   _Tr("Colour label"),      _Tr("Color of the label"),                                  []);
-  addOption(widgets["solar"], "font",      "dropbox",   _Tr("Font"),      _Tr("Label font"),                                                  fontoptions);
+  addOption(widgets["sun"], "solar_title",       "value",   _Tr("solar title"),       _Tr("Solar title"),                                     []);
+  addOption(widgets["sun"], "colour",      "colour_picker",   _Tr("Colour label"),      _Tr("Color of the label"),                                  []);
+  addOption(widgets["sun"], "font",      "dropbox",   _Tr("Font"),      _Tr("Label font"),                                                  fontoptions);
 
   return widgets;
 }
@@ -81,7 +81,7 @@ function sun_draw(){
       var units = $(this).attr("units");
       var font = $(this).attr("font");
       var color = $(this).attr("colour") || "000";
-      var title = $(this).attr("battery_title");
+      var title = $(this).attr("solar_title");
 
       if (font == 0){fontname = "Impact"}
       if (font == 1){fontname = "Georgia"}
@@ -164,19 +164,19 @@ function sun_draw(){
       }
       context.stroke();
 
-      var size = ((sun_width<sun_height)?sun_width:sun_height)/2;
+      var size = radius/2;
       context.font      = fontname;
       context.fillStyle = color;
       context.textAlign = "center";
       context.font = ((size*0.50)+"px "+ fontname);
-      context.fillText(data + units, start_x + sun_width/2, start_y + sun_height*0.6);
+      context.fillText(data + units, start_x + sun_width/2, start_y + sun_height*0.8);
 
       if(title)
       {
         context.fillStyle = color;
         context.textAlign = "center";
         context.font = ((size*0.20)+"px "+ fontname);
-        context.fillText(title, start_x + sun_width/2, start_y + sun_height*0.25);
+        context.fillText(title, start_x + sun_width/2, start_y + sun_height*0.4);
       }
     }
   });
