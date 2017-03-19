@@ -49,6 +49,7 @@ function battery_widgetlist(){
   ];
 
   addOption(widgets["battery"], "feedid",      "feedid",  _Tr("Feed"),        _Tr("Feed value"),                                                            []);
+  addOption(widgets["battery"], "battery_title",       "value",   _Tr("Battery title"),       _Tr("Battery title"),                                                                 []);
   addOption(widgets["battery"], "max",         "value",   _Tr("Max value"),   _Tr("Max value to show"),                                                     []);
   addOption(widgets["battery"], "scale",       "value",   _Tr("Scale"),       _Tr("Value is multiplied by scale before display"),                           []);
   addOption(widgets["battery"], "units",       "value",   _Tr("Units"),       _Tr("Units to show"),                                                         []);
@@ -78,6 +79,7 @@ function battery_draw(){
       var units = $(this).attr("units");
       var font = $(this).attr("font");
       var color = $(this).attr("colour") || "000";
+      var title = $(this).attr("battery_title");
 
       var start_x = 0, start_y = 0;
       var battery_height = $(this).height();
@@ -121,8 +123,7 @@ function battery_draw(){
         context.strokeStyle = "#000f00";
       context.lineWidth   = line_width;
       context.strokeRect(start_x, start_y + cap_height, battery_width, battery_height-cap_height);
-      //context.fillStyle = "#000000";
-      //context.fillRect(start_x + margin, start_y + cap_height + margin, battery_width - margin, battery_height-cap_height-margin);
+
       //Filling body
       var block_width = battery_width - 2*(line_width + margin);
       var block_height = Math.ceil((battery_height - cap_height - 2*(line_width + margin))/number_of_blocks) - 2*margin;
@@ -149,10 +150,20 @@ function battery_draw(){
         context.fillRect(start_x + line_width + margin, y_pos, block_width, block_height);
       }
 
+      var size = ((battery_width<battery_height)?battery_width:battery_height)/2;
       context.font      = fontname;
       context.fillStyle = color;
-      context.font = ((battery_width*0.20)+"px "+ fontname);
-      context.fillText(data.toFixed(1) + units, start_x + battery_width/4, start_y + battery_height/2+10, battery_width);
+      context.textAlign = "center";
+      context.font = ((size*0.50)+"px "+ fontname);
+      context.fillText(data.toFixed(1) + units, start_x + battery_width/2, start_y + battery_height*0.6);
+
+      if(title)
+      {
+        context.fillStyle = color;
+        context.textAlign = "center";
+        context.font = ((size*0.20)+"px "+ fontname);
+        context.fillText(title, start_x + battery_width/2, start_y + battery_height*0.25);
+      }
     }
   });
 }
