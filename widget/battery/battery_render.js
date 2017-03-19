@@ -108,13 +108,21 @@ function battery_draw(){
       
       if(data > max_val)
         data = max_val;
+      if (data>=100) {
+          data = data.toFixed(0);
+      } else if (data>=10) {
+          data = data.toFixed(1);
+      } else  {
+          data = data.toFixed(2);
+      }
+      data = parseFloat(data);
 
       var context = widgetcanvas[id];
       context.globalAlpha = 1;
       
       //Drawing the battery cap
       context.fillStyle = "#ffffff";
-        context.fillRect(start_x + battery_width/2 - cap_width/2, start_y, cap_width, cap_height);
+      context.fillRect(start_x + battery_width/2 - cap_width/2, start_y, cap_width, cap_height);
         
         //Clear the battery area first
       context.fillStyle = "#ffffff";
@@ -155,7 +163,7 @@ function battery_draw(){
       context.fillStyle = color;
       context.textAlign = "center";
       context.font = ((size*0.50)+"px "+ fontname);
-      context.fillText(data.toFixed(1) + units, start_x + battery_width/2, start_y + battery_height*0.6);
+      context.fillText(data + units, start_x + battery_width/2, start_y + battery_height*0.6);
 
       if(title)
       {
