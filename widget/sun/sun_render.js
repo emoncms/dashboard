@@ -136,7 +136,7 @@ function sun_draw(){
 
       context.fillStyle = 'rgb('+fill+', '+(fill-27)+', 124)';
       context.fill();
-      context.lineWidth = line_width;
+      context.lineWidth = line_width+2;
       context.strokeStyle = '#ffffff';
       context.stroke();
 
