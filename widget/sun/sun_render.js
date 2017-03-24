@@ -167,14 +167,14 @@ function sun_draw(){
       context.fillStyle = color;
       context.textAlign = "center";
       context.font = ((size*0.50)+"px "+ fontname);
-      context.fillText(data + units, start_x + sun_width/2, start_y + sun_height*0.8);
+      context.fillText(data + units, start_x + sun_width/2, start_y + centerY - radius*0.2);
 
       if(title)
       {
         context.fillStyle = color;
         context.textAlign = "center";
         context.font = ((size*0.20)+"px "+ fontname);
-        context.fillText(title, start_x + sun_width/2, start_y + sun_height*0.4);
+        context.fillText(title, start_x + sun_width/2, start_y + centerY - radius*0.6);
       }
     }
   });
