@@ -38,7 +38,7 @@ function sun_widgetlist(){
   };
 
   var fontoptions = [
-    [9, "Arial Black"],
+    [8, "Arial Black"],
     [7, "Arial Narrow"],
     [6, "sans-serif"],
     [5, "Helvetica"],
