@@ -52,11 +52,11 @@ function signal_widgetlist(){
   addOption(widgets["signal"], "feedid",      "feedid",  _Tr("Feed"),        _Tr("Feed value"),                                                            []);
   addOption(widgets["signal"], "max",         "value",   _Tr("Max value"),   _Tr("Max value to show"),                                                     []);
   addOption(widgets["signal"], "scale",       "value",   _Tr("Scale"),       _Tr("Value is multiplied by scale before display"),                           []);
-  addOption(widgets["signal"], "units",       "value",   _Tr("Units"),       _Tr("Units to show"),                                                         []);
+  // addOption(widgets["signal"], "units",       "value",   _Tr("Units"),       _Tr("Units to show"),                                                      []);
   addOption(widgets["signal"], "offset",      "value",   _Tr("Offset"),      _Tr("Static offset. Subtracted from value before computing needle position"), []);
-  addOption(widgets["signal"], "signal_title",       "value",   _Tr("Signal title"),       _Tr("Solar title"),                                     []);
-  addOption(widgets["signal"], "colour",      "colour_picker",   _Tr("Colour label"),      _Tr("Color of the label"),                                  []);
-  addOption(widgets["signal"], "signal_bar_colour",      "colour_picker",   _Tr("Colour signal bar"),      _Tr("Color of the signal bar"),                                  []);
+  addOption(widgets["signal"], "signal_title",       "value",   _Tr("Signal title"),       _Tr("Signal title"),                                             []);
+  addOption(widgets["signal"], "colour1",      "colour_picker",   _Tr("Colour signal"),      _Tr("Color of the signal"),                                      []);
+  addOption(widgets["signal"], "colour",      "colour_picker",   _Tr("Colour label"),      _Tr("Color of the label"),                 []);
   addOption(widgets["signal"], "font",      "dropbox",   _Tr("Font"),      _Tr("Label font"),                                                  fontoptions);
 
   return widgets;
@@ -78,11 +78,11 @@ function signal_draw(){
       var scale = 1*$(this).attr("scale") || 1;
       var offset = 1*$(this).attr("offset") || 0;
       var max_val = 1*$(this).attr("max") || 100;
-      var units = $(this).attr("units");
+      // var units = $(this).attr("units");
       var font = $(this).attr("font");
       var color = $(this).attr("colour") || "000";
       var title = $(this).attr("signal_title");
-      var signal_bar_colour = $(this).attr("signal_bar_colour");
+      var colour1 = $(this).attr("colour1") || "000";
 
       if (font == 0){fontname = "Impact"}
       if (font == 1){fontname = "Georgia"}
@@ -95,7 +95,9 @@ function signal_draw(){
       if (font == 8){fontname = "Arial Black"}
       else if (typeof(font) == "undefined") {fontname = "Arial Black"}
 
+      console.log(color, colour1);
       if (color.indexOf("#") == -1) color = "#" + color;
+      if (colour1.indexOf("#") == -1) colour1 = "#" + colour1;
 
       var start_x = 0, start_y = 0;
       var signal_height = $(this).height();
@@ -129,7 +131,7 @@ function signal_draw(){
       var centerX = signal_width/2;
       var centerY = signal_height;
 
-      var stroke_style = signal_bar_colour;
+      var stroke_style = colour1;
       var stroke_style_empty = "#BDBDBD";
 
       var arc_radius = radius;
@@ -149,7 +151,7 @@ function signal_draw(){
         context.arc(start_x + centerX, start_y + centerY, arc_radius, (1.25+angle) * Math.PI, (1.75-angle) * Math.PI, false);
 
         context.lineWidth = block_width;
-        if(signal_bars > number_of_blocks - i)
+        if(signal_bars >= number_of_blocks - i)
           context.strokeStyle = stroke_style;
         else
           context.strokeStyle = stroke_style_empty;
