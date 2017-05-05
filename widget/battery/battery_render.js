@@ -50,6 +50,7 @@ function battery_widgetlist(){
   addOption(widgets["battery"], "feedid",      "feedid",  _Tr("Feed"),        _Tr("Feed value"),                                                            []);
   addOption(widgets["battery"], "battery_title",       "value",   _Tr("Battery title"),       _Tr("Battery title"),                                                                 []);
   addOption(widgets["battery"], "max",         "value",   _Tr("Max value"),   _Tr("Max value to show"),                                                     []);
+  addOption(widgets["battery"], "min",         "value",   _Tr("Min value"),   _Tr("Min value to show"),                                                     []); //TT
   addOption(widgets["battery"], "scale",       "value",   _Tr("Scale"),       _Tr("Value is multiplied by scale before display"),                           []);
   addOption(widgets["battery"], "units",       "value",   _Tr("Units"),       _Tr("Units to show"),                                                         []);
   addOption(widgets["battery"], "offset",      "value",   _Tr("Offset"),      _Tr("Static offset. Subtracted from value before computing needle position"), []);
@@ -75,6 +76,7 @@ function battery_draw(){
       var scale = 1*$(this).attr("scale") || 1;
       var offset = 1*$(this).attr("offset") || 0;
       var max_val = 1*$(this).attr("max") || 100;
+      var min_val = 1*$(this).attr("min") || 0;
       var units = $(this).attr("units");
       var font = $(this).attr("font");
       var color = $(this).attr("colour") || "000";
@@ -135,8 +137,8 @@ function battery_draw(){
       var block_height = Math.ceil((battery_height - cap_height - 2*(line_width + margin))/number_of_blocks) - 2*margin;
       var block_start_y = start_y + battery_height - line_width - margin;
       
-      var last_block = Math.ceil(number_of_blocks*data/max_val);
-      var green_val = Math.floor(data*255/max_val);//<49?255:0;
+      var last_block = Math.ceil((number_of_blocks*(data-min_val))/(max_val - min_val));
+      var green_val = Math.floor(((data-min_val)*255)/(max_val - min_val));
 
 
       var red_val = 255 - green_val;
