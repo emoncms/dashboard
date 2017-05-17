@@ -7,7 +7,6 @@
     http://openenergymonitor.org
 
     Author: Trystan Lea: trystan.lea@googlemail.com
-    Enhancements done by Andreas Messerli: firefox7518@gmail.com
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
  */
@@ -23,11 +22,11 @@
   widget["optionsdata"].push(optionData);
 }
 
-function feedvalue_custom_widgetlist()
+function feedvalue_widgetlist()
 {
   var widgets =
   {
-    "feedvalue_custom":
+    "feedvalue":
     {
       "offsetx":-40,"offsety":-30,"width":120,"height":60,
       "menu":"Widgets",
@@ -66,12 +65,20 @@ function feedvalue_custom_widgetlist()
 				
 				
 	var sizeoptions = [
-					[5, "24"],
-					[4, "16"],
+					[13, "40"],
+					[12, "36"],
+					[11, "32"],
+					[10, "28"],
+					[9, "24"],
+					[8, "22"],
+					[7, "20"],
+					[6, "18"],
+					[5, "16"],
+					[4, "14"],
 					[3, "12"],
 					[2, "10"],
 					[1, "8"],
-					[0, "32"]
+					[0, "6"]
 				];
 
 	var unitEndOptions = [
@@ -79,25 +86,25 @@ function feedvalue_custom_widgetlist()
 					[1, "Front"]
 				];				
 
-  addOption(widgets["feedvalue_custom"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
-  addOption(widgets["feedvalue_custom"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
-  addOption(widgets["feedvalue_custom"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for Display"),      fontoptions);
-  addOption(widgets["feedvalue_custom"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
-  addOption(widgets["feedvalue_custom"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
-  addOption(widgets["feedvalue_custom"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
-  addOption(widgets["feedvalue_custom"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
+  addOption(widgets["feedvalue"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
+  addOption(widgets["feedvalue"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
+  addOption(widgets["feedvalue"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for Display"),      fontoptions);
+  addOption(widgets["feedvalue"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
+  addOption(widgets["feedvalue"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
+  addOption(widgets["feedvalue"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
+  addOption(widgets["feedvalue"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
 
   return widgets;
 }
 
-function feedvalue_custom_init()
+function feedvalue_init()
 {
-	setup_widget_canvas('feedvalue_custom');
+	setup_widget_canvas('feedvalue');
 }
 
-function feedvalue_custom_draw()
+function feedvalue_draw()
 {
-  $('.feedvalue_custom').each(function(index)
+  $('.feedvalue').each(function(index)
   {
     
 	var font = $(this).attr("font");
@@ -109,21 +116,18 @@ function feedvalue_custom_draw()
     
 	var size = $(this).attr("size");
 	if (size==undefined) size = 24;
-	//var size = 24;
 	
-    var units = $(this).attr("units");
-    if (units==undefined) units = '';
-    
+	var units = $(this).attr("units");
+      
     var decimals = $(this).attr("decimals");
     if (decimals==undefined) decimals = -1;
 	
 	var unitend = $(this).attr("unitend");
-    if (unitend==undefined) unitend = 0;
-	
+    	
 	{
 	var id = "can-"+$(this).attr("id");
 
-	draw_feedvalue_custom(widgetcanvas[id],
+	draw_feedvalue(widgetcanvas[id],
 						 0,
 						 0,
 						 $(this).attr("font"),
@@ -142,19 +146,19 @@ function feedvalue_custom_draw()
 
 
 
-function feedvalue_custom_slowupdate()
+function feedvalue_slowupdate()
 {
-	feedvalue_custom_draw();
+	feedvalue_draw();
 }
 
-function feedvalue_custom_fastupdate()
+function feedvalue_fastupdate()
 {
-	feedvalue_custom_draw();
+	feedvalue_draw();
 }
 
 
 
-function draw_feedvalue_custom(context,
+function draw_feedvalue(context,
 				x_pos,				// these x and y coords seem unused?
 				y_pos,
 				font,
@@ -171,90 +175,38 @@ function draw_feedvalue_custom(context,
 		return;
 
 	context.clearRect(0,0,width+10,height+10); // Clear old drawing
-
-	font = font || "arial black";    
-
-	if (size == 0)
-	{
-		size = 32
-		}
+	colour = colour || "000000";
+	unitend = unitend || "0";
+	size = size || "8";
 	
-	if (size == 1)
-	{
-		size = 8
-		}
 
-	if (size == 2)
-	{
-		size = 10
-		}
+	if (size == 0){size = 6}
+	if (size == 1){size = 8}
+	if (size == 2){size = 10}
+	if (size == 3){size = 12}
+	if (size == 4){size = 14}
+	if (size == 5){size = 16}
+	if (size == 6){size = 18}
+	if (size == 7){size = 20}
+	if (size == 8){size = 22}
+	if (size == 9){size = 24}
+	if (size == 10){size = 28}
+	if (size == 11){size = 32}
+	if (size == 12){size = 36}
+	if (size == 13){size = 40}
 	
-	if (size == 3)
-	{
-		size = 12
-		}
 
-	if (size == 4)
-	{
-		size = 16
-		}
-	
-	if (size == 5)
-	{
-		size = 24
-		}
-
-		
-	if (font == 0)
-	{
-		fontname = "Impact"
-		}
-	
-	
-	if (font == 1)
-	{
-		fontname = "Georgia"
-		}
-	
-	if (font == 2)
-	{
-		fontname = "arial"
-		}
-	
-	if (font == 3)
-	{
-		fontname = "Courier New"
-		}
-		
-	if (font == 4)
-	{
-		fontname = "Comic Sans MS"
-		}
-		
-	if (font == 5)
-	{
-		fontname = "Helvetica"
-		}
-
-	if (font == 6)
-	{
-		fontname = "sans-serif"
-		}
-
-	if (font == 7)
-	{
-		fontname = "Arial Narrow"
-		}
-
-	if (font == 8)
-	{
-		fontname = "Arial"
-		}
-		
-	if (font == 9)
-	{
-		fontname = "Arial Black"
-		}
+	if (font == 0){fontname = "Impact"}
+	if (font == 1){fontname = "Georgia"}
+	if (font == 2){fontname = "arial"}
+	if (font == 3){fontname = "Courier New"}
+	if (font == 4){fontname = "Comic Sans MS"}
+	if (font == 5){fontname = "Helvetica"}
+	if (font == 6){fontname = "sans-serif"}
+	if (font == 7){fontname = "Arial Narrow"}
+	if (font == 8){fontname = "Arial"}
+	if (font == 9){fontname = "Arial Black"}
+	else if (typeof(font) == "undefined") {fontname = "Arial"}
 
 	
    
@@ -283,22 +235,20 @@ function draw_feedvalue_custom(context,
     //$(this).html(val+units);
 
 	
-	var half_width = width/2;
-	var half_height = height/2;
+	//var half_width = width/2;
+	//var half_height = height/4;
 	
 	context.fillStyle = colour;
-	context.textAlign    = "center";
+	context.textAlign    = 'center';
+	context.textBaseline = 'middle';
 	context.font = (size+"px "+ fontname);
 	
 	if (unitend ==0){
-	context.fillText(val+units, half_width , half_height);
+	context.fillText(val+units, width*0.5 , height*0.3-6);
 	}
 	
 	if (unitend ==1){
 	context.fillText(units+val, half_width , half_height);
 	}
-  
+//console.log("Value for colour " + colour + " and font " + fontname + " Unit position " + unitend); return;  
 }
-
-
-
