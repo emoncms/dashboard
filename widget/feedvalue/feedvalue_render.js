@@ -7,6 +7,7 @@
     http://openenergymonitor.org
 
     Author: Trystan Lea: trystan.lea@googlemail.com
+	Enhancements done by: Andreas Messerli firefox7518@gmail.com
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
  */
@@ -157,7 +158,6 @@ function feedvalue_fastupdate()
 }
 
 
-
 function draw_feedvalue(context,
 				x_pos,				// these x and y coords seem unused?
 				y_pos,
@@ -174,11 +174,11 @@ function draw_feedvalue(context,
 	if (!context)
 		return;
 
-	context.clearRect(0,0,width+10,height+10); // Clear old drawing
-	colour = colour || "000000";
+	context.clearRect(0,0,width-10,height-10); // Clear old drawing
+	colour = colour || "4444CC";
 	unitend = unitend || "0";
 	size = size || "8";
-	
+	font = font || "5";
 
 	if (size == 0){size = 6}
 	if (size == 1){size = 8}
@@ -204,12 +204,10 @@ function draw_feedvalue(context,
 	if (font == 5){fontname = "Helvetica"}
 	if (font == 6){fontname = "sans-serif"}
 	if (font == 7){fontname = "Arial Narrow"}
-	if (font == 8){fontname = "Arial"}
+	if (font == 8){fontname = "Helvetica Neue"}
 	if (font == 9){fontname = "Arial Black"}
-	else if (typeof(font) == "undefined") {fontname = "Arial"}
 
-	
-   
+	   
     if (decimals<0)
     {
 
@@ -232,23 +230,18 @@ function draw_feedvalue(context,
 	if (colour.indexOf("#") == -1)			// Fix missing "#" on colour if needed
 		colour = "#" + colour;	
 	
-    //$(this).html(val+units);
 
-	
-	//var half_width = width/2;
-	//var half_height = height/4;
-	
 	context.fillStyle = colour;
 	context.textAlign    = 'center';
 	context.textBaseline = 'middle';
-	context.font = (size+"px "+ fontname);
-	
+	context.font = ("bold "+ size+"px "+ fontname);
+		
 	if (unitend ==0){
 	context.fillText(val+units, width*0.5 , height*0.3-6);
 	}
 	
 	if (unitend ==1){
-	context.fillText(units+val, half_width , half_height);
+	context.fillText(units+val, width*0.5 , height*0.3-6);
 	}
 //console.log("Value for colour " + colour + " and font " + fontname + " Unit position " + unitend); return;  
 }
