@@ -9,8 +9,10 @@ Part of the OpenEnergyMonitor project:
 http://openenergymonitor.org
 */
 
-global $session,$path;
+global $session,$path,$dashboard_editor_icon;
 $js_css_version = 1;
+
+if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit?id='. $dashboard['id'].'"> <img src="'.$path.'Modules/dashboard/Views/icons/gear-icon-outlined.png" style="width:80%" ></a>';
 
 ?>
   <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
@@ -24,7 +26,7 @@ $js_css_version = 1;
 
  <div id="editicon" class="hidden-phone" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top:53px; right: 0px;">
 	<div id="innerbutton" style="cursor: default";>
-		<a href='<?php echo ($path.'dashboard/edit?id='); ?> <?php echo $dashboard['id']; ?>'> <img src='<?php echo ($path.'Modules/dashboard/Views/icons/gear-icon-outlined.png'); ?>' style="width:80%" ></a>
+		<?php echo $dashboard_editor_icon; ?>
 	</div>
 </div>
 
