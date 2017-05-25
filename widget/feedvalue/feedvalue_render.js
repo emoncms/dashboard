@@ -53,7 +53,7 @@ function feedvalue_widgetlist()
 
 	var fontoptions = [
 					[9, "Arial Black"],
- 					[8, "Arial Narrow"],
+					[8, "Arial Narrow"],
 					[7, "sans-serif"],
 					[6, "Helvetica Neue"],
 					[5, "Helvetica"],
@@ -87,15 +87,15 @@ function feedvalue_widgetlist()
 					[1, "Front"]
 				];				
 
-  addOption(widgets["feedvalue"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
-  addOption(widgets["feedvalue"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
-  addOption(widgets["feedvalue"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for Display"),      fontoptions);
-  addOption(widgets["feedvalue"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
-  addOption(widgets["feedvalue"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
-  addOption(widgets["feedvalue"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
-  addOption(widgets["feedvalue"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
+	addOption(widgets["feedvalue"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
+	addOption(widgets["feedvalue"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
+	addOption(widgets["feedvalue"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for Display"),      fontoptions);
+	addOption(widgets["feedvalue"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
+	addOption(widgets["feedvalue"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
+	addOption(widgets["feedvalue"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
+	addOption(widgets["feedvalue"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
 
-  return widgets;
+	return widgets;
 }
 
 function feedvalue_init()
@@ -105,141 +105,152 @@ function feedvalue_init()
 
 function feedvalue_draw()
 {
-  $('.feedvalue').each(function(index)
-  {
+	$('.feedvalue').each(function(index)
+		{
     
-	var font = $(this).attr("font");
-	var feedid = $(this).attr("feedid");
-    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var val = associd[feedid]['value'] * 1;
-    if (val==undefined) val = 0;
-    if (isNaN(val))  val = 0;
-    
-	var size = $(this).attr("size");
-	if (size==undefined) size = 24;
-	
-	var units = $(this).attr("units");
-      
-    var decimals = $(this).attr("decimals");
-    if (decimals==undefined) decimals = -1;
-	
-	var unitend = $(this).attr("unitend");
-    	
-	{
-	var id = "can-"+$(this).attr("id");
+			var font = $(this).attr("font");
+			var feedid = $(this).attr("feedid");
+			if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
+			var val = associd[feedid]['value'] * 1;
+			if (val==undefined) val = 0;
+			if (isNaN(val))  val = 0;
 
-	draw_feedvalue(widgetcanvas[id],
-						 0,
-						 0,
-						 $(this).attr("font"),
-						 $(this).width(),
-						 $(this).height(),
-						 val,
-						 $(this).attr("units"),
-						 $(this).attr("colour"),
-						 $(this).attr("decimals"),
-						 $(this).attr("size"),
-						 $(this).attr("unitend")
-						 );
-	}
-  });
+			var size = $(this).attr("size");
+			if (size===undefined){ size = 20};
+
+			var units = $(this).attr("units");
+			  
+			var decimals = $(this).attr("decimals");
+			if (decimals===undefined) decimals = -1;
+
+			var unitend = $(this).attr("unitend");
+				
+			{
+				var id = "can-"+$(this).attr("id");
+
+				draw_feedvalue(widgetcanvas[id],
+					0,
+					0,
+					$(this).attr("font"),
+					$(this).width(),
+					$(this).height(),
+					val,
+					$(this).attr("units"),
+					$(this).attr("colour"),
+					$(this).attr("decimals"),
+					$(this).attr("size"),
+					$(this).attr("unitend")
+					);
+			}
+		});
 }
 
 
 
 function feedvalue_slowupdate()
-{
-	feedvalue_draw();
-}
+	{
+		feedvalue_draw();
+	}
 
 function feedvalue_fastupdate()
-{
-	feedvalue_draw();
-}
+	{
+		feedvalue_draw();
+	}
 
 
 function draw_feedvalue(context,
-				x_pos,				// these x and y coords seem unused?
-				y_pos,
-				font,
-				width,
-				height,
-				val,
-				units,
-				colour,
-				decimals,
-				size,
-				unitend)
-{
-	if (!context)
-		return;
+		x_pos,				// these x and y coords seem unused?
+		y_pos,
+		font,
+		width,
+		height,
+		val,
+		units,
+		colour,
+		decimals,
+		size,
+		unitend)
+		{
+			if (!context)
+			return;
 
-	context.clearRect(0,0,width-10,height-10); // Clear old drawing
-	colour = colour || "4444CC";
-	unitend = unitend || "0";
-	size = size || "8";
-	font = font || "5";
+			context.save();
+			context.clearRect(0,0,width,height); // Clear old drawing
+			context.restore();
+			colour = colour || "4444CC";
+			unitend = unitend || "0";
+			size = size || "8";
+			font = font || "5";
 
-	if (size == 0){size = 6}
-	if (size == 1){size = 8}
-	if (size == 2){size = 10}
-	if (size == 3){size = 12}
-	if (size == 4){size = 14}
-	if (size == 5){size = 16}
-	if (size == 6){size = 18}
-	if (size == 7){size = 20}
-	if (size == 8){size = 22}
-	if (size == 9){size = 24}
-	if (size == 10){size = 28}
-	if (size == 11){size = 32}
-	if (size == 12){size = 36}
-	if (size == 13){size = 40}
+			if (size == 0){size = 6}
+			if (size == 1){size = 8}
+			if (size == 2){size = 10}
+			if (size == 3){size = 12}
+			if (size == 4){size = 14}
+			if (size == 5){size = 16}
+			if (size == 6){size = 18}
+			if (size == 7){size = 20}
+			if (size == 8){size = 22}
+			if (size == 9){size = 24}
+			if (size == 10){size = 28}
+			if (size == 11){size = 32}
+			if (size == 12){size = 36}
+			if (size == 13){size = 40}
+
+			if (font == 0){fontname = "Impact"}
+			if (font == 1){fontname = "Georgia"}
+			if (font == 2){fontname = "Arial"}
+			if (font == 3){fontname = "Courier New"}
+			if (font == 4){fontname = "Comic Sans MS"}
+			if (font == 5){fontname = "Helvetica"}
+			if (font == 6){fontname = "Helvetica Neue"}
+			if (font == 7){fontname = "sans-serif"}
+			if (font == 8){fontname = "Arial Narrow"}
+			if (font == 9){fontname = "Arial Black"}
+			   
+			if (decimals<0)
+				{
+
+					if (val>=100){
+						val = val.toFixed(0);
+						}
+					else if (val>=10){
+						val = val.toFixed(1);
+						}
+					else if (val<=-100){
+						val = val.toFixed(0);
+						}
+					else if (val<=-10){
+						val = val.toFixed(1);
+						}
+					else {
+						val = val.toFixed(2);
+						}
+				}
+			else 
+				{
+					val = val.toFixed(decimals);
+				}
+
+			if (colour.indexOf("#") == -1){			// Fix missing "#" on colour if needed
+				colour = "#" + colour;	
+
+
+				context.fillStyle = colour;
+				context.textAlign    = 'center';
+				context.textBaseline = 'middle';
+				context.font = ("bold "+ size+"px "+ fontname);
+				}
+
+			if (unitend ==0)
+				{
+				context.fillText(val+units, width/2 , height/2);
+				}
 	
-	if (font == 0){fontname = "Impact"}
-	if (font == 1){fontname = "Georgia"}
-	if (font == 2){fontname = "Arial"}
-	if (font == 3){fontname = "Courier New"}
-	if (font == 4){fontname = "Comic Sans MS"}
-	if (font == 5){fontname = "Helvetica"}
-	if (font == 6){fontname = "Helvetica Neue"}
-	if (font == 7){fontname = "sans-serif"}
-	if (font == 8){fontname = "Arial Narrow"}
-	if (font == 9){fontname = "Arial Black"}
-	   
-    if (decimals<0)
-    {
-
-      if (val>=100)
-          val = val.toFixed(0);
-      else if (val>=10)
-          val = val.toFixed(1);
-      else if (val<=-100)
-          val = val.toFixed(0);
-      else if (val<=-10)
-          val = val.toFixed(1);
-      else
-          val = val.toFixed(2);
-    }
-    else 
-    {
-      val = val.toFixed(decimals);
-    }
-
-	if (colour.indexOf("#") == -1)			// Fix missing "#" on colour if needed
-		colour = "#" + colour;	
-	
-
-	context.fillStyle = colour;
-	context.textAlign    = 'center';
-	context.textBaseline = 'middle';
-	context.font = ("bold "+ size+"px "+ fontname);
-		
-	if (unitend ==0){
-	context.fillText(val+units, width*0.5 , height*0.3-6);
-	}
-	
-	if (unitend ==1){
-	context.fillText(units+val, width*0.5 , height*0.3-6);
-	}
+			if (unitend ==1)
+				{
+				context.fillText(units+val, width/2 , height/2);
+				}
 //console.log("Value for colour " + colour + " and font " + fontname + " Unit position " + unitend); return;  
+			
 }
