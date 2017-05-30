@@ -66,6 +66,7 @@ function feedvalue_widgetlist()
 				
 				
 	var sizeoptions = [
+					[14, "18"], // set size 18 to the top position to be the default value for creating new feedvalue widgets otherwise size 40 would be always the default
 					[13, "40"],
 					[12, "36"],
 					[11, "32"],
@@ -116,11 +117,9 @@ function feedvalue_draw()
 			if (isNaN(val))  val = 0;
 
 			var size = $(this).attr("size");
-			if (size===undefined){ size = 20};
-
 			var units = $(this).attr("units");
-			  
 			var decimals = $(this).attr("decimals");
+			
 			if (decimals===undefined) {decimals = -1};
 
 			var unitend = $(this).attr("unitend");
@@ -171,9 +170,10 @@ function draw_feedvalue(context,
 		size,
 		unitend)
 		{
-			if (!context)
+			if (!context){
 			return;
-
+			}
+			
 			context.save();
 			context.clearRect(0,0,width,height); // Clear old drawing
 			context.restore();
@@ -182,31 +182,32 @@ function draw_feedvalue(context,
 			size = size || "8";
 			font = font || "5";
 
-			if (size == 0){size = 6};
-			if (size == 1){size = 8};
-			if (size == 2){size = 10};
-			if (size == 3){size = 12};
-			if (size == 4){size = 14};
-			if (size == 5){size = 16};
-			if (size == 6){size = 18};
-			if (size == 7){size = 20};
-			if (size == 8){size = 22};
-			if (size == 9){size = 24};
-			if (size == 10){size = 28};
-			if (size == 11){size = 32};
-			if (size == 12){size = 36};
-			if (size == 13){size = 40};
+			if (size == 0){fontsize = 6;}
+			if (size == 1){fontsize = 8;}
+			if (size == 2){fontsize = 10;}
+			if (size == 3){fontsize = 12;}
+			if (size == 4){fontsize = 14;}
+			if (size == 5){fontsize = 16;}
+			if (size == 6){fontsize = 18;}
+			if (size == 7){fontsize = 20;}
+			if (size == 8){fontsize = 22;}
+			if (size == 9){fontsize = 24;}
+			if (size == 10){fontsize = 28;}
+			if (size == 11){fontsize = 32;}
+			if (size == 12){fontsize = 36;}
+			if (size == 13){fontsize = 40;}
+			if (size == 14){fontsize = 18;}  //default value so that not size 40 is always the default
 
-			if (font == 0){fontname = "Impact"};
-			if (font == 1){fontname = "Georgia"};
-			if (font == 2){fontname = "Arial"};
-			if (font == 3){fontname = "Courier New"};
-			if (font == 4){fontname = "Comic Sans MS"};
-			if (font == 5){fontname = "Helvetica"};
-			if (font == 6){fontname = "Helvetica Neue"};
-			if (font == 7){fontname = "sans-serif"};
-			if (font == 8){fontname = "Arial Narrow"};
-			if (font == 9){fontname = "Arial Black"};
+			if (font == 0){fontname = "Impact";}
+			if (font == 1){fontname = "Georgia";}
+			if (font == 2){fontname = "Arial";}
+			if (font == 3){fontname = "Courier New";}
+			if (font == 4){fontname = "Comic Sans MS";}
+			if (font == 5){fontname = "Helvetica";}
+			if (font == 6){fontname = "Helvetica Neue";}
+			if (font == 7){fontname = "sans-serif";}
+			if (font == 8){fontname = "Arial Narrow";}
+			if (font == 9){fontname = "Arial Black";}
 			
 			   
 			if (decimals<0)
@@ -240,7 +241,7 @@ function draw_feedvalue(context,
 				context.fillStyle = colour;
 				context.textAlign    = 'center';
 				context.textBaseline = 'middle';
-				context.font = ("bold "+ size+"px "+ fontname);
+				context.font = ("bold "+ fontsize+"px "+ fontname);
 				}
 
 			if (unitend ==0)
@@ -252,6 +253,6 @@ function draw_feedvalue(context,
 				{
 				context.fillText(units+val, width/2 , height/2);
 				}
-//console.log("Value for colour " + colour + " and font " + fontname + " Unit position " + unitend); return;  
+//console.log("Value for colour " + colour + " and font " + fontname + " Unit position " + unitend + " Value for size " + fontsize); return;  
 			
 }
