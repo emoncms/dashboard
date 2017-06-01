@@ -159,4 +159,28 @@ LANG_JS["Ufac value"] = '<?php echo addslashes(_("Ufac value")); ?>';
 LANG_JS["Units"] = '<?php echo addslashes(_("Units")); ?>';
 LANG_JS["units"] = '<?php echo addslashes(_("units")); ?>';
 LANG_JS["Units to show"] = '<?php echo addslashes(_("Units to show")); ?>';
+
+// battery_render.js
+LANG_JS["Feed"] = '<?php echo addslashes(_("Feed")); ?>';
+LANG_JS["Feed value"] = '<?php echo addslashes(_("Feed value")); ?>';
+LANG_JS["Max value"] = '<?php echo addslashes(_("Max value")); ?>';
+LANG_JS["Max value to show"] = '<?php echo addslashes(_("Max value to show")); ?>';
+LANG_JS["Min value"] = '<?php echo addslashes(_("Min value")); ?>';
+LANG_JS["Min value to show"] = '<?php echo addslashes(_("Min value to show")); ?>';
+LANG_JS["Offset"] = '<?php echo addslashes(_("Offset")); ?>';
+LANG_JS["Scale"] = '<?php echo addslashes(_("Scale")); ?>';
+LANG_JS["Units"] = '<?php echo addslashes(_("Units")); ?>';
+LANG_JS["Units to show"] = '<?php echo addslashes(_("Units to show")); ?>';
+LANG_JS["Value is multiplied by scale before display"] = '<?php echo addslashes(_("Value is multiplied by scale before display")); ?>';
+
+// sun_render.js
+LANG_JS["Feed"] = '<?php echo addslashes(_("Feed")); ?>';
+LANG_JS["Feed value"] = '<?php echo addslashes(_("Feed value")); ?>';
+LANG_JS["Max value"] = '<?php echo addslashes(_("Max value")); ?>';
+LANG_JS["Max value to show"] = '<?php echo addslashes(_("Max value to show")); ?>';
+LANG_JS["Offset"] = '<?php echo addslashes(_("Offset")); ?>';
+LANG_JS["Scale"] = '<?php echo addslashes(_("Scale")); ?>';
+LANG_JS["Units"] = '<?php echo addslashes(_("Units")); ?>';
+LANG_JS["Units to show"] = '<?php echo addslashes(_("Units to show")); ?>';
+LANG_JS["Value is multiplied by scale before display"] = '<?php echo addslashes(_("Value is multiplied by scale before display")); ?>';
 //END 

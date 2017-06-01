@@ -50,11 +50,11 @@ function jgauge2_draw()
     var feedid2 = $(this).attr("feedid2");
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     if (associd[feedid2] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var val = curve_value(feedid,dialrate);
-    var val2 = curve_value(feedid2, dialrate);
+    var val = curve_value(feedid,dialrate).toFixed(3);
+    var val2 = curve_value(feedid2, dialrate).toFixed(3);
     // ONLY UPDATE ON CHANGE
-    if ((val * 1).toFixed(2) != (associd[feedid]['value'] * 1).toFixed(2) || 
-        (val2 * 1).toFixed(2) != (associd[feedid2]['value'] * 1).toFixed(2) ||
+    if (val != (associd[feedid]['value'] * 1).toFixed(3) || 
+        val2 != (associd[feedid2]['value'] * 1).toFixed(3) ||
         redraw == 1)
     {
       var id = "can-"+$(this).attr("id");

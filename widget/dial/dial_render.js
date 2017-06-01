@@ -38,18 +38,29 @@ function dial_widgetlist(){
   };
 
   var typeDropBoxOptions = [        // Options for the type combobox. Each item is [typeID, "description"]
-          [0,    "Light <-> dark green, Zero at left"],
+          [10,   "Black <-> White, Zero at left"],
           [1,    "Red <-> Green, Zero at center"],
           [2,    "Green <-> Red, Zero at left"],
           [3,    "Green <-> Red, Zero at center"],
           [4,    "Red <-> Green, Zero at left"],
           [5,    "Red <-> Green, Zero at center"],
-          [6,    "Green center <-> orange edges, Zero at center "],
-          [7,    "Light <-> Dark blue, Zero at left"],
-          [8,    "Light blue <-> Red, Zero at mid-left"],
+          [6,    "Green center <-> orange edges, Zero at center"],
           [9,    "Red <-> Dark Red, Zero at left"],
-          [10,   "Black <-> White, Zero at left"],
-          [11,   "Blue <-> Red, Zero at upper-left"]
+          [11,   "Blue <-> Red, Zero at upper-left"],
+          [8,    "Light blue <-> Red, Zero at mid-left"],
+          [12,   "Light <-> dark red, Zero at left"],
+          [13,   "Light <-> dark orange, Zero at left"],
+          [14,   "Light <-> dark yellow, Zero at left"],
+          [0,    "Light <-> dark green, Zero at left"],
+          [18,   "Light <-> dark lime, Zero at left"],
+          [19,   "Light <-> dark mint, Zero at left"],
+          [15,   "Light <-> dark cyan, Zero at left"],
+          [7,    "Light <-> dark blue, Zero at left"],
+          [20,   "Light <-> dark royal blue, Zero at left"],
+          [16,   "Light <-> dark purple, Zero at left"],
+          [17,   "Light <-> dark pink, Zero at left"],
+          [21,   "Rainbow!, Zero at left"],
+          [22,   "Reverse Rainbow!, Zero at left"]
         ];
 
   var graduationDropBoxOptions = [
@@ -76,9 +87,9 @@ function dial_draw(){
   $('.dial').each(function(index) {
     var feedid = $(this).attr("feedid");
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var val = curve_value(feedid,dialrate);
+    var val = curve_value(feedid,dialrate).toFixed(3);
     // ONLY UPDATE ON CHANGE
-    if ((val * 1).toFixed(2) != (associd[feedid]['value'] * 1).toFixed(2) || redraw == 1)
+    if (val != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1)
     {
       var id = "can-"+$(this).attr("id");
       var scale = 1*$(this).attr("scale") || 1;
@@ -150,16 +161,12 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
   if (type == 0){ // Standard dial from 0 to maxvalue if offset is not set.
     // TODO: seperate between needle position at maximum/minimum and the value displayed.
     // TODO: Do we need to limit the value being displayed? Only needle position should be limited.
-    if (position<0)
-      position = 0;
   }
   else if (type == 1){
     angleOffset = -0.75;
     segment = ["#e61703","#ff6254","#ffa29a","#70ac21","#378d42","#046b34"];
   }
   else if (type == 2){
-    if (position<0)
-      position = 0;
     segment = ["#046b34","#378d42","#87c03f","#f8a01b","#f46722","#bf2025"];
   }
   else if (type == 3){
@@ -167,8 +174,6 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     segment = ["#046b34","#378d42","#87c03f","#f8a01b","#f46722","#bf2025"];
   }
   else if (type == 4){
-    if (position<0)
-      position = 0;
     segment = ["#bf2025","#f46722","#f8a01b","#87c03f","#378d42","#046b34"];
   }
   else if (type == 5){
@@ -180,8 +185,6 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     segment = ["#f46722","#f8a01b","#87c03f","#87c03f","#f8a01b","#f46722"];
   }
   else if (type == 7){
-    if (position<0)
-      position = 0;
     segment = ["#a7cbe2","#68b7eb","#0d97f3","#0f81d0","#0c6dae","#08578e"];
   }
   else if (type == 8){  //temperature dial blue-red, first segment blue should mean below freezing C
@@ -193,17 +196,67 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     segment = ["#e94937","#da4130","#c43626","#ad2b1c","#992113","#86170a"];
   }
   else if (type == 10){ //light: from dark grey to white
-    if (position<0)
-      position = 0;
     segment = ["#202020","#4D4D4D","#7D7D7D","#EEF0F3","#F7F7F7", "#FFFFFF"];
   }
   else if (type == 11){  //temperature dial blue-red, first 2 segments blue should mean below freezing C
     angleOffset = -0.5;
     segment = ["#0d97f3","#a7cbe2","#ffbebe","#ff8383","#ff6464","#ff3d3d"];
   }
-  
-  if (position>maxvalue) position = maxvalue;
-
+  else if (type == 12){ //  - from light to dark red
+    if (position<0)
+      position = 0;
+    segment = ["#FFCCCC", "#FFA3A3", "#FF7A7A", "#FF5151", "#FF2828", "#FF0000"];
+  }
+  else if (type == 13){ //  - from light to dark orange
+    if (position<0)
+      position = 0;
+    segment = ["#FFE5CC", "#FFD0A3", "#FFBC7A", "#FFA851", "#FF9428", "#FF8000"];
+  }
+  else if (type == 14){ //  - from light to dark yellow
+    if (position<0)
+      position = 0;
+    segment = ["#FFFFCC", "#FFFFA3", "#FFFF7A", "#FFFF51", "#FFFF28", "#FFFF00"];
+  }
+  else if (type == 15){ //  - from light to dark cyan
+    if (position<0)
+      position = 0;
+    segment = ["#CCFFFF", "#A3FFFF", "#7AFFFF", "#51FFFF", "#28FFFF", "#00FFFF"];
+  }
+  else if (type == 16){ //  - from light to dark purple
+    if (position<0)
+      position = 0;
+    segment = ["#E5CCFF", "#D0A3FF", "#BC7AFF", "#A851FF", "#9428FF", "#8000FF"];
+  }
+  else if (type == 17){ //  - from light to dark pink
+    if (position<0)
+      position = 0;
+    segment = ["#FFCCFF", "#FFA3FF", "#FF7AFF", "#FF51FF", "#FF28FF", "#FF00FF"];
+  }
+  else if (type == 18){ //  - from light to dark lime
+    if (position<0)
+      position = 0;
+    segment = ["#CCFFCC", "#A3FFA3", "#7AFF7A", "#51FF51", "#28FF28", "#00FF00"];
+  }
+  else if (type == 19){ //  - from light to dark mint
+    if (position<0)
+      position = 0;
+    segment = ["#EEFCF5", "#E0F9ED", "#D2F7E6", "#C5F4DF", "#B7F2D8", "#AAF0D1"];
+  }
+  else if (type == 20){ //  - from light to dark royal blue
+    if (position<0)
+      position = 0;
+    segment = ["#CCCCFF", "#A3A3FF", "#7A7AFF", "#5151FF", "#2828FF", "#0000FF"];
+  }
+  else if (type == 21){ //  - rainbow!
+    if (position<0)
+      position = 0;
+    segment = ["#FF0000", "#FF8000", "#FFFF00", "#00FF00", "#0000FF", "#8000FF"];
+  }
+  else if (type == 22){ //  - reverse rainbow!
+    if (position<0)
+      position = 0;
+    segment = ["#8000FF", "#0000FF", "#00FF00", "#FFFF00", "#FF8000", "#FF0000"];
+  }
   // needle values and their corresponding direction
   // South West (limit start) a = 1.75
   // West: .. ............... a = 1.5
@@ -212,7 +265,15 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
   // North East: ............ a = 0.75
   // East: .................. a = 0.5
   // South East (limit stop)  a = 0.25
+  //
+  // Calculation explanation:
+  // Total needle space = 1.75 - 0.25 = 1.5 (from above).
+  // (1.5 + angleOffset) = needle space from 0 to maxvalue (because angleOffset is negative).
+  // (position / maxvalue) = fraction of how far round the needle space from 0 to maxvalue we need to be.
+  // The rest follows from these.
   var needle = 1.75 - ((position/maxvalue) * (1.5+angleOffset)) + angleOffset;
+  needle = Math.min(needle, 1.75);
+  needle = Math.max(needle, 0.25);
   
   width = 0.785;
   var c=3*0.785;
@@ -269,6 +330,8 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
      val = val.toFixed(1);
   else
      val = val.toFixed(2);
+
+  val = parseFloat(val);
     
   var dialtext = val+units;
   var textsize = (size / (dialtext.length+2)) * 6;
@@ -293,7 +356,9 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     ctx.rotate(deg_to_radians(-45));
    
     // graduation text - start limit
-    ctx.fillText(""+round1decimal( (2*angleOffset/3*1.5*maxvalue)+offset )+units, 0, 0);        // Since we've translated the entire context, the coords we want to draw at are now at [0,0]  
+    // Calculation similar to the `needle` calculation above
+    var start_limit = round1decimal((angleOffset * (maxvalue / (1.5 + angleOffset))) + offset);
+    ctx.fillText(""+start_limit+units, 0, 0); // Since we've translated the entire context, the coords we want to draw at are now at [0,0]  
     ctx.restore();
     
     ctx.save(); // each ctx.save is only good for one restore, apparently.
@@ -301,7 +366,8 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     ctx.rotate(deg_to_radians(45));
     
     // graduation text - end limit
-    ctx.fillText(""+round1decimal(offset+maxvalue)+units, 0, 0);  
+    var end_limit = round1decimal(offset+maxvalue);
+    ctx.fillText(""+end_limit+units, 0, 0);  
     ctx.restore();
   }
   
