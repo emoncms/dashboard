@@ -38,18 +38,18 @@ function curl_events()
         
             var r = confirm(_Tr("Do you want to continue?"));
             if (r == true) {
-                jqxhr =  $.ajax({type:$(this).attr("method"),
+                jqxhr =  $.ajax({type:$(this).attr("method")==="" || $(this).attr("method")===undefined ? "GET" : $(this).attr("method"),
                     url:"http"+(($(this).attr("https")=="yes")?"s":"")+"://"+$(this).attr("ip")+":"+$(this).attr("port")+"/"+$(this).attr("url"),
-                    data: ($(this).attr("payload").trim().charAt(0) === "{") ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload"),
+                    data: ($(this).attr("payload").trim().charAt(0) === "{") ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload").indexOf("=")===-1 ? {"data": $(this).attr("payload")} : $(this).attr("payload"),
                     timeout: ($(this).attr("timeout") > 0) ? $(this).attr("timeout") : 1000 });                
             } else {
                 // Nothing to do
             }
         
     }else{
-        jqxhr =  $.ajax({type:$(this).attr("method"),
+        jqxhr =  $.ajax({type:$(this).attr("method")==="" || $(this).attr("method")===undefined ? "GET" : $(this).attr("method"),
             url:"http"+(($(this).attr("https")=="yes")?"s":"")+"://"+$(this).attr("ip")+":"+$(this).attr("port")+"/"+$(this).attr("url"),
-            data: ($(this).attr("payload").trim().charAt(0) === "{") ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload"),
+            data: ($(this).attr("payload").trim().charAt(0) === "{") ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload").indexOf("=")===-1 ? {"data": $(this).attr("payload")} : $(this).attr("payload"),
             timeout: ($(this).attr("timeout") > 0) ? $(this).attr("timeout") : 1000 });
     }
     
