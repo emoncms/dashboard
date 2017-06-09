@@ -97,9 +97,9 @@ function humidex_widgetlist()
 					[0, "6"]
 				];
     
-    addOption(widgets["humidex"], "feedhumid", "feedid",  _Tr("Humidity"),    _Tr("Relative humidity in %"),          []);
-    addOption(widgets["humidex"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
-    addOption(widgets["humidex"], "temptype",  "dropbox", _Tr("Temp unit"),   _Tr("Units of the choosen temp feed"),  tempDropBoxOptions);
+	addOption(widgets["humidex"], "feedhumid", "feedid",  _Tr("Humidity"),    _Tr("Relative humidity in %"),          []);
+	addOption(widgets["humidex"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
+	addOption(widgets["humidex"], "temptype",  "dropbox", _Tr("Temp unit"),   _Tr("Units of the choosen temp feed"),  tempDropBoxOptions);
 	addOption(widgets["humidex"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
 	addOption(widgets["humidex"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
 	addOption(widgets["humidex"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
@@ -108,15 +108,6 @@ function humidex_widgetlist()
 	addOption(widgets["humidex"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
     return widgets;
 }
-
-
-function humidex_init(){
-	setup_widget_canvas('humidex');
-}
-
-function humidex_slowupdate() { humidex_draw();}
-
-function humidex_fastupdate() { humidex_draw();}
 
 function humidex_draw()
 {
@@ -170,6 +161,16 @@ function humidex_draw()
 		}
 	});
 } 
+
+function humidex_init(){
+	setup_widget_canvas('humidex');
+}
+
+function humidex_slowupdate() { humidex_draw();}
+
+function humidex_fastupdate() { humidex_draw();}
+
+
 function draw_humidex(context,
 		x_pos,				// these x and y coords seem unused?
 		y_pos,
