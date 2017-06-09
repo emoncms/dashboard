@@ -1,15 +1,20 @@
-/**
- http://www.e-lab.de/downloads/DOCs/SHT11appnote2.pdf
- Compute frostPoint for given relative humidity RH[%] and temperature T[Deg.C].
- returns : Frost Point Temperature [0C]
-*/
-function frostPoint(RH,T) {
-  var H = ((Math.log(RH)/Math.LN10)-2)/0.4343 + (17.62*T)/(243.12+T); 
-  var dp = 243.12*H/(17.62-H);     // this is the dew point in Celsius
-  var fp= (dp+273.15) + 2671.02 /(2954.61/(T+273.15)+2.193665*Math.log(T+273.15) -13.3448) -(T+273.15)- 273.15;
-  return fp;
-}
 
+/**
+ http://www.meteolafleche.com/temperature.html
+ Compute humidex for given relative humidity RH[%] and temperature T[Deg.C].
+ returns : Humidex
+*/
+function humidex(RH,T) {
+   var t=7.5*T/(237.7+T);
+   var et=Math.pow(10,t);
+   var e=6.112*et*(RH/100);
+   var hum=T+(5/9)*(e-10);
+   if (hum < T)
+   {
+       hum=T;
+   }
+  return hum;
+}
 function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
 {
     widget["options"    ].push(optionKey);
@@ -19,11 +24,11 @@ function addOption(widget, optionKey, optionType, optionName, optionHint, option
     widget["optionsdata"].push(optionData);
 }
 
-function frostpoint_widgetlist()
+function humidex_widgetlist()
 {
     var widgets =
     {
-        "frostpoint":
+        "humidex":
         {
             "offsetx":-40,"offsety":-10,"width":80,"height":20,
             "menu":"Widgets",
@@ -50,7 +55,6 @@ function frostpoint_widgetlist()
         [5,    "5"],
         [6,    "6"]
     ];
-    
 	var fontoptions = [
 					[9, "Arial Black"],
 					[8, "Arial Narrow"],
@@ -63,7 +67,7 @@ function frostpoint_widgetlist()
 					[1, "Georgia"],
 					[0, "Impact"]
 				];
-	
+				
 	var fstyleoptions = [
 					[2, "Normal"],
 					[1, "Italic"],
@@ -76,7 +80,7 @@ function frostpoint_widgetlist()
 				];
 				
 	var sizeoptions = [
-					[14, "18"], // set size 18 to the top position to be the default value for creating new frostpoint widgets otherwise size 40 would be always the default
+					[14, "18"], // set size 18 to the top position to be the default value for creating new humidex widgets otherwise size 40 would be always the default
 					[13, "40"],
 					[12, "36"],
 					[11, "32"],
@@ -92,24 +96,19 @@ function frostpoint_widgetlist()
 					[1, "8"],
 					[0, "6"]
 				];
-	var unitEndOptions = [
-					[0, "Back"],
-					[1, "Front"]
-				];				
-	addOption(widgets["frostpoint"], "feedhumid", "feedid",  _Tr("Humidity"),    _Tr("Relative humidity in %"),          []);
-	addOption(widgets["frostpoint"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
-	addOption(widgets["frostpoint"], "temptype",  "dropbox", _Tr("Temp unit"),   _Tr("Units of the choosen temp feed"),  tempDropBoxOptions);
-	addOption(widgets["frostpoint"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
-	addOption(widgets["frostpoint"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
-	addOption(widgets["frostpoint"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
-	addOption(widgets["frostpoint"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-	addOption(widgets["frostpoint"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
-	addOption(widgets["frostpoint"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
-	addOption(widgets["frostpoint"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
+    
+    addOption(widgets["humidex"], "feedhumid", "feedid",  _Tr("Humidity"),    _Tr("Relative humidity in %"),          []);
+    addOption(widgets["humidex"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
+    addOption(widgets["humidex"], "temptype",  "dropbox", _Tr("Temp unit"),   _Tr("Units of the choosen temp feed"),  tempDropBoxOptions);
+	addOption(widgets["humidex"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
+	addOption(widgets["humidex"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
+	addOption(widgets["humidex"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
+	addOption(widgets["humidex"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
+	addOption(widgets["humidex"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
+	addOption(widgets["humidex"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
     return widgets;
 }
-
-function draw_frostpoint(context,
+function draw_humidex(context,
 		x_pos,				// these x and y coords seem unused?
 		y_pos,
 		font,
@@ -118,12 +117,9 @@ function draw_frostpoint(context,
 		width,
 		height,
 		val,
-		unit,
-		temp,
 		colour,
 		decimals,
-		size,
-		unitend)
+		size)
 		{
 			if (!context){
 			return;
@@ -179,7 +175,7 @@ function draw_frostpoint(context,
 
 			if (fweight === "0"){fontweight = "normal";}
 			if (fweight === "1"){fontweight = "bold";}
-						
+			
 			if (decimals<0)
 				{
 
@@ -203,75 +199,59 @@ function draw_frostpoint(context,
 				{
 					val = val.toFixed(decimals);
 				}
-			
-			if(temp>0){
-			val="-- ";
-			}
-		
+
 			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
 				colour = "#" + colour;	
 
+			
 				context.fillStyle = colour;
 				context.textAlign    = "center";
 				context.textBaseline = "middle";
 				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
-
 				}
 
-			if (unitend ===0)
-				{
-				context.fillText(val+unit, width/2 , height/2);
-				}
-	
-			if (unitend ===1)
-				{
-				context.fillText(unit+val, width/2 , height/2);
-				}
+				context.fillText(val, width/2 , height/2);
+
 			
 }
 
-function frostpoint_draw()
+function humidex_draw()
 {
-  $(".frostpoint").each(function(index)
+  $('.humidex').each(function(index)
   {
     var font = $(this).attr("font");
-    var fstyle = $(this).attr("fstyle");
-    var fweight = $(this).attr("fweight");
+	var fstyle = $(this).attr("fstyle");
+	var fweight = $(this).attr("fweight");
     var feedtemp = $(this).attr("feedtemp");
     if (associd[feedtemp] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var temp = associd[feedtemp]["value"] * 1;
     if (temp===undefined) {temp = 0;}
-    if (isNaN(temp)) {temp = 0;}
+    if (isNaN(temp))  {temp = 0;}
     
     var temptype = $(this).attr("temptype");
-    if (temptype===undefined) {temptype = 0;}
+    if (temptype===undefined) {temptype = 0};
 
     var feedhumid = $(this).attr("feedhumid");
     if (associd[feedhumid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var humid = associd[feedhumid]["value"] * 1;
-    if (humid===undefined) {humid = 0;}
-    if (isNaN(humid))  {humid = 0;}
+    if (humid===undefined) humid = 0;
+    if (isNaN(humid))  humid = 0;
 
     var size = $(this).attr("size");
     var decimals = $(this).attr("decimals");
-    if (decimals===undefined) {decimals = -1;}
+    if (decimals===undefined) decimals = -1;
 
-    if (temptype === 1) { 
+    if (temptype ===1) { 
     temp = (temp - 32) * (5 / 9); // Fahrenheit to celsius
     }
-    var val = frostPoint(humid,temp);
-	var unit;
+    val = humidex(humid,temp);
     if (temptype === 1) {
     val = (val * 9/5 + 32) ; // Celsius to Fahrenheit
-    unit = "ºF";
-    } else {
-    unit = "ºC";
     }
-    var unitend = $(this).attr("unitend");
     {
 		var id = "can-"+$(this).attr("id");
 
-		draw_frostpoint(widgetcanvas[id],
+		draw_humidex(widgetcanvas[id],
 			0,
 			0,
 			$(this).attr("font"),
@@ -280,22 +260,19 @@ function frostpoint_draw()
 			$(this).width(),
 			$(this).height(),
 			val,
-			unit,
-			temp,
 			$(this).attr("colour"),
 			$(this).attr("decimals"),
-			$(this).attr("size"),
-			$(this).attr("unitend")
+			$(this).attr("size")
 			);
 		}
 	});
 } 
 
 
-function frostpoint_init(){
-	setup_widget_canvas("frostpoint");
+function humidex_init(){
+	setup_widget_canvas("humidex");
 }
 
-function frostpoint_slowupdate() { frostpoint_draw();}
+function humidex_slowupdate() { humidex_draw();}
 
-function frostpoint_fastupdate() { frostpoint_draw();}
+function humidex_fastupdate() { humidex_draw();}
