@@ -222,7 +222,7 @@ function draw_frostpoint(context,
 				context.fillText(val+unit, width/2 , height/2);
 				}
 	
-			if (unitend ==1)
+			if (unitend ===1)
 				{
 				context.fillText(unit+val, width/2 , height/2);
 				}
@@ -231,7 +231,7 @@ function draw_frostpoint(context,
 
 function frostpoint_draw()
 {
-  $('.frostpoint').each(function(index)
+  $(".frostpoint").each(function(index)
   {
     var font = $(this).attr("font");
     var fstyle = $(this).attr("fstyle");
@@ -253,7 +253,7 @@ function frostpoint_draw()
 
     var size = $(this).attr("size");
     var decimals = $(this).attr("decimals");
-    if (decimals===undefined) {decimals = -1};
+    if (decimals===undefined) {decimals = -1;}
 
     if (temptype === 1) { 
     temp = (temp - 32) * (5 / 9); // Fahrenheit to celsius
