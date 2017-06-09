@@ -109,75 +109,6 @@ function frostpoint_widgetlist()
     return widgets;
 }
 
-function frostpoint_draw()
-{
-  $('.frostpoint').each(function(index)
-  {
-    var font = $(this).attr("font");
-    var fstyle = $(this).attr("fstyle");
-    var fweight = $(this).attr("fweight");
-    var feedtemp = $(this).attr("feedtemp");
-    if (associd[feedtemp] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var temp = associd[feedtemp]['value'] * 1;
-    if (temp==undefined) temp = 0;
-    if (isNaN(temp))  temp = 0;
-    
-    var temptype = $(this).attr("temptype");
-    if (temptype==undefined) temptype = 0;
-
-    var feedhumid = $(this).attr("feedhumid");
-    if (associd[feedhumid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var humid = associd[feedhumid]['value'] * 1;
-    if (humid==undefined) humid = 0;
-    if (isNaN(humid))  humid = 0;
-
-    var size = $(this).attr("size");
-    var decimals = $(this).attr("decimals");
-    if (decimals==undefined) decimals = -1;
-
-    if (temptype == 1) { 
-    temp = (temp - 32) * (5 / 9); // Fahrenheit to celsius
-    }
-    val = frostPoint(humid,temp);
-    if (temptype == 1) {
-    val = (val * 9/5 + 32) ; // Celsius to Fahrenheit
-    unit = "ºF";
-    } else {
-    unit = "ºC";
-    }
-    var unitend = $(this).attr("unitend");
-    {
-		var id = "can-"+$(this).attr("id");
-
-		draw_frostpoint(widgetcanvas[id],
-			0,
-			0,
-			$(this).attr("font"),
-			$(this).attr("fstyle"),
-			$(this).attr("fweight"),
-			$(this).width(),
-			$(this).height(),
-			val,
-			unit,
-			temp,
-			$(this).attr("colour"),
-			$(this).attr("decimals"),
-			$(this).attr("size"),
-			$(this).attr("unitend")
-			);
-		}
-	});
-} 
-
-
-function frostpoint_init(){
-	setup_widget_canvas('frostpoint');
-}
-
-function frostpoint_slowupdate() { frostpoint_draw();}
-
-function frostpoint_fastupdate() { frostpoint_draw();}
-
 function draw_frostpoint(context,
 		x_pos,				// these x and y coords seem unused?
 		y_pos,
@@ -288,3 +219,74 @@ function draw_frostpoint(context,
 				}
 			
 }
+
+function frostpoint_draw()
+{
+  $('.frostpoint').each(function(index)
+  {
+    var font = $(this).attr("font");
+    var fstyle = $(this).attr("fstyle");
+    var fweight = $(this).attr("fweight");
+    var feedtemp = $(this).attr("feedtemp");
+    if (associd[feedtemp] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
+    var temp = associd[feedtemp]['value'] * 1;
+    if (temp==undefined) temp = 0;
+    if (isNaN(temp))  temp = 0;
+    
+    var temptype = $(this).attr("temptype");
+    if (temptype==undefined) temptype = 0;
+
+    var feedhumid = $(this).attr("feedhumid");
+    if (associd[feedhumid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
+    var humid = associd[feedhumid]['value'] * 1;
+    if (humid==undefined) humid = 0;
+    if (isNaN(humid))  humid = 0;
+
+    var size = $(this).attr("size");
+    var decimals = $(this).attr("decimals");
+    if (decimals==undefined) decimals = -1;
+
+    if (temptype == 1) { 
+    temp = (temp - 32) * (5 / 9); // Fahrenheit to celsius
+    }
+    val = frostPoint(humid,temp);
+    if (temptype == 1) {
+    val = (val * 9/5 + 32) ; // Celsius to Fahrenheit
+    unit = "ºF";
+    } else {
+    unit = "ºC";
+    }
+    var unitend = $(this).attr("unitend");
+    {
+		var id = "can-"+$(this).attr("id");
+
+		draw_frostpoint(widgetcanvas[id],
+			0,
+			0,
+			$(this).attr("font"),
+			$(this).attr("fstyle"),
+			$(this).attr("fweight"),
+			$(this).width(),
+			$(this).height(),
+			val,
+			unit,
+			temp,
+			$(this).attr("colour"),
+			$(this).attr("decimals"),
+			$(this).attr("size"),
+			$(this).attr("unitend")
+			);
+		}
+	});
+} 
+
+
+function frostpoint_init(){
+	setup_widget_canvas('frostpoint');
+}
+
+function frostpoint_slowupdate() { frostpoint_draw();}
+
+function frostpoint_fastupdate() { frostpoint_draw();}
+
+
