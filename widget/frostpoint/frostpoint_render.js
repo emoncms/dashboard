@@ -261,7 +261,7 @@ function frostpoint_draw()
     }
     var val = frostPoint(humid,temp);
 	var unit;
-    if (temptype == 1) {
+    if (temptype === 1) {
     val = (val * 9/5 + 32) ; // Celsius to Fahrenheit
     unit = "ºF";
     } else {
