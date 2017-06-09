@@ -218,12 +218,12 @@ function draw_frostpoint(context,
 
 				}
 
-			if (unitend ==0)
+			if (unitend ===0)
 				{
 				context.fillText(val+unit, width/2 , height/2);
 				}
 	
-			if (unitend ==1)
+			if (unitend ===1)
 				{
 				context.fillText(unit+val, width/2 , height/2);
 				}
@@ -248,15 +248,15 @@ function frostpoint_draw()
 
     var feedhumid = $(this).attr("feedhumid");
     if (associd[feedhumid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var humid = associd[feedhumid]['value'] * 1;
+    var humid = associd[feedhumid]["value"] * 1;
     if (humid===undefined) {humid = 0;}
     if (isNaN(humid))  {humid = 0;}
 
     var size = $(this).attr("size");
     var decimals = $(this).attr("decimals");
-    if (decimals===undefined) {decimals = -1};
+    if (decimals===undefined) {decimals = -1;}
 
-    if (temptype == 1) { 
+    if (temptype === 1) { 
     temp = (temp - 32) * (5 / 9); // Fahrenheit to celsius
     }
     var val = frostPoint(humid,temp);
@@ -299,5 +299,3 @@ function frostpoint_init(){
 function frostpoint_slowupdate() { frostpoint_draw();}
 
 function frostpoint_fastupdate() { frostpoint_draw();}
-
-
