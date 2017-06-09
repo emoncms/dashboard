@@ -1,3 +1,14 @@
+/**
+ http://www.e-lab.de/downloads/DOCs/SHT11appnote2.pdf
+ Compute frostPoint for given relative humidity RH[%] and temperature T[Deg.C].
+ returns : Frost Point Temperature [0C]
+*/
+function frostPoint(RH,T) {
+  var H = ((Math.log(RH)/Math.LN10)-2)/0.4343 + (17.62*T)/(243.12+T); 
+  var dp = 243.12*H/(17.62-H);     // this is the dew point in Celsius
+  var fp= (dp+273.15) + 2671.02 /(2954.61/(T+273.15)+2.193665*Math.log(T+273.15) -13.3448) -(T+273.15)- 273.15 
+  return fp;
+}
 
 function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
 {
@@ -278,15 +289,4 @@ function draw_frostpoint(context,
 
 //console.log("Value for colour " + colour + " and font " + fontname + " Unit position " + unitend + " Value for size " + fontsize); return;  
 			
-}
-/**
- http://www.e-lab.de/downloads/DOCs/SHT11appnote2.pdf
- Compute frostPoint for given relative humidity RH[%] and temperature T[Deg.C].
- returns : Frost Point Temperature [0C]
-*/
-function frostPoint(RH,T) {
-  var H = ((Math.log(RH)/Math.LN10)-2)/0.4343 + (17.62*T)/(243.12+T); 
-  var dp = 243.12*H/(17.62-H);     // this is the dew point in Celsius
-  var fp= (dp+273.15) + 2671.02 /(2954.61/(T+273.15)+2.193665*Math.log(T+273.15) -13.3448) -(T+273.15)- 273.15 
-  return fp;
 }
