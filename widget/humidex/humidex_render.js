@@ -1,3 +1,19 @@
+/**
+ http://www.meteolafleche.com/temperature.html
+ Compute humidex for given relative humidity RH[%] and temperature T[Deg.C].
+ returns : Humidex
+*/
+function humidex(RH,T) {
+   t=7.5*T/(237.7+T);
+   et=Math.pow(10,t);
+   e=6.112*et*(RH/100);
+   hum=T+(5/9)*(e-10);
+   if (hum < T)
+   {
+       hum=T;
+   }
+  return hum;
+}
 
 function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
 {
@@ -252,25 +268,4 @@ function draw_humidex(context,
 
 //console.log("Value for colour " + colour + " and font " + fontname + " Unit position " + unitend + " Value for size " + fontsize); return;  
 			
-}
-
-
-
-
-
-/**
- http://www.meteolafleche.com/temperature.html
- Compute humidex for given relative humidity RH[%] and temperature T[Deg.C].
- returns : Humidex
-*/
-function humidex(RH,T) {
-   t=7.5*T/(237.7+T);
-   et=Math.pow(10,t);
-   e=6.112*et*(RH/100);
-   hum=T+(5/9)*(e-10);
-   if (hum < T)
-   {
-       hum=T;
-   }
-  return hum;
 }
