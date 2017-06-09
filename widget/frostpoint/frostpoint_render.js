@@ -204,19 +204,20 @@ function draw_frostpoint(context,
 					val = val.toFixed(decimals);
 				}
 			
-			if(temp>0)
+			if(temp>0){
 			val="-- ";
+			}
 		
-			if (colour.indexOf("#") == -1){			// Fix missing "#" on colour if needed
+			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
 				colour = "#" + colour;	
 
 				context.fillStyle = colour;
-				context.textAlign    = 'center';
-				context.textBaseline = 'middle';
+				context.textAlign    = "center";
+				context.textBaseline = "middle";
 				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
 				}
 
-			if (unitend ==0)
+			if (unitend ===0)
 				{
 				context.fillText(val+unit, width/2 , height/2);
 				}
@@ -237,7 +238,7 @@ function frostpoint_draw()
     var fweight = $(this).attr("fweight");
     var feedtemp = $(this).attr("feedtemp");
     if (associd[feedtemp] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var temp = associd[feedtemp]['value'] * 1;
+    var temp = associd[feedtemp]["value"] * 1;
     if (temp===undefined) {temp = 0;}
     if (isNaN(temp)) {temp = 0;}
     
@@ -246,7 +247,7 @@ function frostpoint_draw()
 
     var feedhumid = $(this).attr("feedhumid");
     if (associd[feedhumid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var humid = associd[feedhumid]['value'] * 1;
+    var humid = associd[feedhumid]["value"] * 1;
     if (humid===undefined) {humid = 0;}
     if (isNaN(humid))  {humid = 0;}
 
@@ -291,11 +292,9 @@ function frostpoint_draw()
 
 
 function frostpoint_init(){
-	setup_widget_canvas('frostpoint');
+	setup_widget_canvas("frostpoint");
 }
 
 function frostpoint_slowupdate() { frostpoint_draw();}
 
 function frostpoint_fastupdate() { frostpoint_draw();}
-
-
