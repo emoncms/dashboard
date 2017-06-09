@@ -230,26 +230,27 @@ function frostpoint_draw()
     var feedtemp = $(this).attr("feedtemp");
     if (associd[feedtemp] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var temp = associd[feedtemp]['value'] * 1;
-    if (temp==undefined) temp = 0;
-    if (isNaN(temp))  temp = 0;
+    if (temp===undefined) {temp = 0;}
+    if (isNaN(temp)) {temp = 0;}
     
     var temptype = $(this).attr("temptype");
-    if (temptype==undefined) temptype = 0;
+    if (temptype===undefined) {temptype = 0;}
 
     var feedhumid = $(this).attr("feedhumid");
     if (associd[feedhumid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var humid = associd[feedhumid]['value'] * 1;
-    if (humid==undefined) humid = 0;
-    if (isNaN(humid))  humid = 0;
+    if (humid===undefined) {humid = 0;}
+    if (isNaN(humid))  {humid = 0;}
 
     var size = $(this).attr("size");
     var decimals = $(this).attr("decimals");
-    if (decimals==undefined) decimals = -1;
+    if (decimals===undefined) {decimals = -1};
 
     if (temptype == 1) { 
     temp = (temp - 32) * (5 / 9); // Fahrenheit to celsius
     }
-    val = frostPoint(humid,temp);
+    var val = frostPoint(humid,temp);
+	var unit;
     if (temptype == 1) {
     val = (val * 9/5 + 32) ; // Celsius to Fahrenheit
     unit = "ºF";
@@ -288,5 +289,3 @@ function frostpoint_init(){
 function frostpoint_slowupdate() { frostpoint_draw();}
 
 function frostpoint_fastupdate() { frostpoint_draw();}
-
-
