@@ -6,7 +6,7 @@
 function frostPoint(RH,T) {
   var H = ((Math.log(RH)/Math.LN10)-2)/0.4343 + (17.62*T)/(243.12+T); 
   var dp = 243.12*H/(17.62-H);     // this is the dew point in Celsius
-  var fp= (dp+273.15) + 2671.02 /(2954.61/(T+273.15)+2.193665*Math.log(T+273.15) -13.3448) -(T+273.15)- 273.15 
+  var fp= (dp+273.15) + 2671.02 /(2954.61/(T+273.15)+2.193665*Math.log(T+273.15) -13.3448) -(T+273.15)- 273.15;
   return fp;
 }
 
@@ -96,9 +96,9 @@ function frostpoint_widgetlist()
 					[0, "Back"],
 					[1, "Front"]
 				];				
-    addOption(widgets["frostpoint"], "feedhumid", "feedid",  _Tr("Humidity"),    _Tr("Relative humidity in %"),          []);
-    addOption(widgets["frostpoint"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
-    addOption(widgets["frostpoint"], "temptype",  "dropbox", _Tr("Temp unit"),   _Tr("Units of the choosen temp feed"),  tempDropBoxOptions);
+	addOption(widgets["frostpoint"], "feedhumid", "feedid",  _Tr("Humidity"),    _Tr("Relative humidity in %"),          []);
+	addOption(widgets["frostpoint"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
+	addOption(widgets["frostpoint"], "temptype",  "dropbox", _Tr("Temp unit"),   _Tr("Units of the choosen temp feed"),  tempDropBoxOptions);
 	addOption(widgets["frostpoint"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
 	addOption(widgets["frostpoint"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
 	addOption(widgets["frostpoint"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
@@ -109,22 +109,13 @@ function frostpoint_widgetlist()
     return widgets;
 }
 
-
-function frostpoint_init(){
-	setup_widget_canvas('frostpoint');
-}
-
-function frostpoint_slowupdate() { frostpoint_draw();}
-
-function frostpoint_fastupdate() { frostpoint_draw();}
-
 function frostpoint_draw()
 {
   $('.frostpoint').each(function(index)
   {
     var font = $(this).attr("font");
-	var fstyle = $(this).attr("fstyle");
-	var fweight = $(this).attr("fweight");
+    var fstyle = $(this).attr("fstyle");
+    var fweight = $(this).attr("fweight");
     var feedtemp = $(this).attr("feedtemp");
     if (associd[feedtemp] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var temp = associd[feedtemp]['value'] * 1;
@@ -177,6 +168,15 @@ function frostpoint_draw()
 		}
 	});
 } 
+
+
+function frostpoint_init(){
+	setup_widget_canvas('frostpoint');
+}
+
+function frostpoint_slowupdate() { frostpoint_draw();}
+
+function frostpoint_fastupdate() { frostpoint_draw();}
 
 function draw_frostpoint(context,
 		x_pos,				// these x and y coords seem unused?
@@ -286,7 +286,5 @@ function draw_frostpoint(context,
 				{
 				context.fillText(unit+val, width/2 , height/2);
 				}
-
-//console.log("Value for colour " + colour + " and font " + fontname + " Unit position " + unitend + " Value for size " + fontsize); return;  
 			
 }
