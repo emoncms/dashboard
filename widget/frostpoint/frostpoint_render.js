@@ -138,39 +138,47 @@ function draw_frostpoint(context,
 			fstyle = fstyle || "0";
 			fweight = fweight || "1";
 
-			if (size == 0){fontsize = 6;}
-			if (size == 1){fontsize = 8;}
-			if (size == 2){fontsize = 10;}
-			if (size == 3){fontsize = 12;}
-			if (size == 4){fontsize = 14;}
-			if (size == 5){fontsize = 16;}
-			if (size == 6){fontsize = 18;}
-			if (size == 7){fontsize = 20;}
-			if (size == 8){fontsize = 22;}
-			if (size == 9){fontsize = 24;}
-			if (size == 10){fontsize = 28;}
-			if (size == 11){fontsize = 32;}
-			if (size == 12){fontsize = 36;}
-			if (size == 13){fontsize = 40;}
-			if (size == 14){fontsize = 18;}  //default value so that not size 40 is always the default
+			var fontsize;
 
-			if (font == 0){fontname = "Impact";}
-			if (font == 1){fontname = "Georgia";}
-			if (font == 2){fontname = "Arial";}
-			if (font == 3){fontname = "Courier New";}
-			if (font == 4){fontname = "Comic Sans MS";}
-			if (font == 5){fontname = "Helvetica";}
-			if (font == 6){fontname = "Helvetica Neue";}
-			if (font == 7){fontname = "sans-serif";}
-			if (font == 8){fontname = "Arial Narrow";}
-			if (font == 9){fontname = "Arial Black";}
+			if (size === 0){fontsize = 6;}
+			if (size === 1){fontsize = 8;}
+			if (size === 2){fontsize = 10;}
+			if (size === 3){fontsize = 12;}
+			if (size === 4){fontsize = 14;}
+			if (size === 5){fontsize = 16;}
+			if (size === 6){fontsize = 18;}
+			if (size === 7){fontsize = 20;}
+			if (size === 8){fontsize = 22;}
+			if (size === 9){fontsize = 24;}
+			if (size === 10){fontsize = 28;}
+			if (size === 11){fontsize = 32;}
+			if (size === 12){fontsize = 36;}
+			if (size === 13){fontsize = 40;}
+			if (size === 14){fontsize = 18;}  //default value so that not size 40 is always the default
 
-			if (fstyle == 0){fontstyle = "oblique";}
-			if (fstyle == 1){fontstyle = "italic";}
-			if (fstyle == 2){fontstyle = "normal";}
+			var fontname;
+
+			if (font === 0){fontname = "Impact";}
+			if (font === 1){fontname = "Georgia";}
+			if (font === 2){fontname = "Arial";}
+			if (font === 3){fontname = "Courier New";}
+			if (font === 4){fontname = "Comic Sans MS";}
+			if (font === 5){fontname = "Helvetica";}
+			if (font === 6){fontname = "Helvetica Neue";}
+			if (font === 7){fontname = "sans-serif";}
+			if (font === 8){fontname = "Arial Narrow";}
+			if (font === 9){fontname = "Arial Black";}
+
+			var fontstyle;
 			
-			if (fweight == 0){fontweight = "normal";}
-			if (fweight == 1){fontweight = "bold";}
+			if (fstyle === 0){fontstyle = "oblique";}
+			if (fstyle === 1){fontstyle = "italic";}
+			if (fstyle === 2){fontstyle = "normal";}
+			
+			var fontweight;
+			
+			if (fweight === 0){fontweight = "normal";}
+			if (fweight === 1){fontweight = "bold";}
 						
 			if (decimals<0)
 				{
@@ -246,12 +254,12 @@ function frostpoint_draw()
     var decimals = $(this).attr("decimals");
     if (decimals===undefined) {decimals = -1};
 
-    if (temptype == 1) { 
+    if (temptype === 1) { 
     temp = (temp - 32) * (5 / 9); // Fahrenheit to celsius
     }
     var val = frostPoint(humid,temp);
 	var unit;
-    if (temptype == 1) {
+    if (temptype === 1) {
     val = (val * 9/5 + 32) ; // Celsius to Fahrenheit
     unit = "ºF";
     } else {
@@ -289,3 +297,5 @@ function frostpoint_init(){
 function frostpoint_slowupdate() { frostpoint_draw();}
 
 function frostpoint_fastupdate() { frostpoint_draw();}
+
+
