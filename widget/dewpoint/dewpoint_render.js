@@ -113,12 +113,12 @@ function dewpoint_widgetlist()
     addOption(widgets["dewpoint"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
     addOption(widgets["dewpoint"], "temptype",  "dropbox", _Tr("Temp unit"),   _Tr("Units of the choosen temp feed"),  tempDropBoxOptions);
     addOption(widgets["dewpoint"], "decimals",  "dropbox", _Tr("Decimals"),    _Tr("Decimals to show"),                decimalsDropBoxOptions);
-	addOption(widgets["dewpoint"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
-	addOption(widgets["dewpoint"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
-	addOption(widgets["dewpoint"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
-	addOption(widgets["dewpoint"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-	addOption(widgets["dewpoint"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
-	addOption(widgets["dewpoint"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
+    addOption(widgets["dewpoint"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
+    addOption(widgets["dewpoint"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
+    addOption(widgets["dewpoint"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
+    addOption(widgets["dewpoint"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
+    addOption(widgets["dewpoint"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
+    addOption(widgets["dewpoint"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
     return widgets;
 }
 
@@ -248,7 +248,7 @@ function dewpoint_draw()
     var fweight = $(this).attr("fweight");
     var feedtemp = $(this).attr("feedtemp");
     if (associd[feedtemp] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var temp = associd[feedtemp]['value'] * 1;
+    var temp = associd[feedtemp]["value"] * 1;
     if (temp===undefined) {temp = 0;}
     if (isNaN(temp))  {temp = 0;}
     
