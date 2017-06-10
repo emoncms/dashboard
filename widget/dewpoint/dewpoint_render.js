@@ -250,10 +250,10 @@ function dewpoint_draw()
     if (associd[feedtemp] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var temp = associd[feedtemp]['value'] * 1;
     if (temp===undefined) {temp = 0;}
-    if (isNaN(temp))  temp = 0;
+    if (isNaN(temp))  {temp = 0};}
     
     var temptype = $(this).attr("temptype");
-    if (temptype===undefined) {temptype = 0};
+    if (temptype===undefined) {temptype = 0;}
 
     var feedhumid = $(this).attr("feedhumid");
     if (associd[feedhumid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
