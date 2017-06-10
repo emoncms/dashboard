@@ -135,7 +135,7 @@ function draw_frostpoint(context,
 			colour = colour || "4444CC";
 			size = size || "8";
 			font = font || "5";
-			fstyle = fstyle || "0";
+			fstyle = fstyle || "2";
 			fweight = fweight || "1";
 
 			var fontsize;
