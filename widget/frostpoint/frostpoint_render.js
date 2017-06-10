@@ -215,15 +215,14 @@ function draw_frostpoint(context,
 				context.textAlign    = "center";
 				context.textBaseline = "middle";
 				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
-
 				}
 
-			if (unitend ===0)
+			if (unitend ==="0")
 				{
 				context.fillText(val+unit, width/2 , height/2);
 				}
 	
-			if (unitend ===1)
+			if (unitend ==="1")
 				{
 				context.fillText(unit+val, width/2 , height/2);
 				}
