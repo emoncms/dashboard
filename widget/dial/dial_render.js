@@ -257,11 +257,10 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
     segment = ["#8000FF", "#0000FF", "#00FF00", "#FFFF00", "#FF8000", "#FF0000"];
   }
   else if (type == 23)  // can be used to emulate a barometer and display a pressure
-  
   {
     if (position<0)
       position = 0;
-	  segment = ["#C0C0C0","#868686","#C0C0C0","#868686","#C0C0C0","#868686"];
+    segment = ["#C0C0C0","#868686","#C0C0C0","#868686","#C0C0C0","#868686"];
   }
 
   // needle values and their corresponding direction
