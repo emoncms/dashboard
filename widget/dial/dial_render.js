@@ -1,11 +1,9 @@
 /*
    All emon_widgets code is released under the GNU General Public License v3.
    See COPYRIGHT.txt and LICENSE.txt.
-
     ---------------------------------------------------------------------
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
-
     Author: Trystan Lea: trystan.lea@googlemail.com
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
@@ -60,7 +58,8 @@ function dial_widgetlist(){
           [16,   "Light <-> dark purple, Zero at left"],
           [17,   "Light <-> dark pink, Zero at left"],
           [21,   "Rainbow!, Zero at left"],
-          [22,   "Reverse Rainbow!, Zero at left"]
+          [22,   "Reverse Rainbow!, Zero at left"],
+          [23,   "Light <-> dark grey, alternating, Zero at left"]
         ];
 
   var graduationDropBoxOptions = [
@@ -257,6 +256,14 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,type, offset, g
       position = 0;
     segment = ["#8000FF", "#0000FF", "#00FF00", "#FFFF00", "#FF8000", "#FF0000"];
   }
+  else if (type == 23)  // can be used to emulate a barometer and display a pressure
+  
+  {
+    if (position<0)
+      position = 0;
+	  segment = ["#C0C0C0","#868686","#C0C0C0","#868686","#C0C0C0","#868686"];
+  }
+
   // needle values and their corresponding direction
   // South West (limit start) a = 1.75
   // West: .. ............... a = 1.5
