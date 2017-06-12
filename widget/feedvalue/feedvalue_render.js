@@ -206,12 +206,12 @@ function draw_feedvalue(context,
 					val = val.toFixed(decimals);
 				}
 
-			if (colour.indexOf("#") == -1){			// Fix missing "#" on colour if needed
+			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
 				colour = "#" + colour;	
 
 				context.fillStyle = colour;
-				context.textAlign    = 'center';
-				context.textBaseline = 'middle';
+				context.textAlign    = "center";
+				context.textBaseline = "middle";
 				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
 				}
 
