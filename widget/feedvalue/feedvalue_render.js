@@ -64,6 +64,16 @@ function feedvalue_widgetlist()
 					[0, "Impact"]
 				];
 				
+	var fstyleoptions = [
+					[2, "Normal"],
+					[1, "Italic"],
+					[0, "Oblique"]
+				];
+				
+	var fweightoptions = [
+					[1, "Bold"],
+					[0, "Normal"]
+				];
 				
 	var sizeoptions = [
 					[14, "18"], // set size 18 to the top position to be the default value for creating new feedvalue widgets otherwise size 40 would be always the default
@@ -90,7 +100,9 @@ function feedvalue_widgetlist()
 
 	addOption(widgets["feedvalue"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
 	addOption(widgets["feedvalue"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
-	addOption(widgets["feedvalue"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for Display"),      fontoptions);
+	addOption(widgets["feedvalue"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
+	addOption(widgets["feedvalue"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
+	addOption(widgets["feedvalue"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
 	addOption(widgets["feedvalue"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
 	addOption(widgets["feedvalue"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["feedvalue"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
@@ -99,68 +111,12 @@ function feedvalue_widgetlist()
 	return widgets;
 }
 
-function feedvalue_init()
-{
-	setup_widget_canvas('feedvalue');
-}
-
-function feedvalue_draw()
-{
-	$('.feedvalue').each(function(index)
-		{
-    
-			var font = $(this).attr("font");
-			var feedid = $(this).attr("feedid");
-			if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-			var val = associd[feedid]['value'] * 1;
-			if (val==undefined) val = 0;
-			if (isNaN(val))  val = 0;
-
-			var size = $(this).attr("size");
-			var units = $(this).attr("units");
-			var decimals = $(this).attr("decimals");
-			
-			if (decimals===undefined) {decimals = -1};
-
-			var unitend = $(this).attr("unitend");
-				
-			{
-				var id = "can-"+$(this).attr("id");
-
-				draw_feedvalue(widgetcanvas[id],
-					0,
-					0,
-					$(this).attr("font"),
-					$(this).width(),
-					$(this).height(),
-					val,
-					$(this).attr("units"),
-					$(this).attr("colour"),
-					$(this).attr("decimals"),
-					$(this).attr("size"),
-					$(this).attr("unitend")
-					);
-			}
-		});
-}
-
-
-
-function feedvalue_slowupdate()
-	{
-		feedvalue_draw();
-	}
-
-function feedvalue_fastupdate()
-	{
-		feedvalue_draw();
-	}
-
-
 function draw_feedvalue(context,
 		x_pos,				// these x and y coords seem unused?
 		y_pos,
 		font,
+		fstyle,
+		fweight,
 		width,
 		height,
 		val,
@@ -181,35 +137,51 @@ function draw_feedvalue(context,
 			unitend = unitend || "0";
 			size = size || "8";
 			font = font || "5";
+			fstyle = fstyle || "2";
+			fweight = fweight || "1";
 
-			if (size == 0){fontsize = 6;}
-			if (size == 1){fontsize = 8;}
-			if (size == 2){fontsize = 10;}
-			if (size == 3){fontsize = 12;}
-			if (size == 4){fontsize = 14;}
-			if (size == 5){fontsize = 16;}
-			if (size == 6){fontsize = 18;}
-			if (size == 7){fontsize = 20;}
-			if (size == 8){fontsize = 22;}
-			if (size == 9){fontsize = 24;}
-			if (size == 10){fontsize = 28;}
-			if (size == 11){fontsize = 32;}
-			if (size == 12){fontsize = 36;}
-			if (size == 13){fontsize = 40;}
-			if (size == 14){fontsize = 18;}  //default value so that not size 40 is always the default
+			var fontsize;
 
-			if (font == 0){fontname = "Impact";}
-			if (font == 1){fontname = "Georgia";}
-			if (font == 2){fontname = "Arial";}
-			if (font == 3){fontname = "Courier New";}
-			if (font == 4){fontname = "Comic Sans MS";}
-			if (font == 5){fontname = "Helvetica";}
-			if (font == 6){fontname = "Helvetica Neue";}
-			if (font == 7){fontname = "sans-serif";}
-			if (font == 8){fontname = "Arial Narrow";}
-			if (font == 9){fontname = "Arial Black";}
+			if (size === "0"){fontsize = 6;}
+			if (size === "1"){fontsize = 8;}
+			if (size === "2"){fontsize = 10;}
+			if (size === "3"){fontsize = 12;}
+			if (size === "4"){fontsize = 14;}
+			if (size === "5"){fontsize = 16;}
+			if (size === "6"){fontsize = 18;}
+			if (size === "7"){fontsize = 20;}
+			if (size === "8"){fontsize = 22;}
+			if (size === "9"){fontsize = 24;}
+			if (size === "10"){fontsize = 28;}
+			if (size === "11"){fontsize = 32;}
+			if (size === "12"){fontsize = 36;}
+			if (size === "13"){fontsize = 40;}
+			if (size === "14"){fontsize = 18;}  //default value so that not size 40 is always the default
+
+			var fontname;
+
+			if (font === "0"){fontname = "Impact";}
+			if (font === "1"){fontname = "Georgia";}
+			if (font === "2"){fontname = "Arial";}
+			if (font === "3"){fontname = "Courier New";}
+			if (font === "4"){fontname = "Comic Sans MS";}
+			if (font === "5"){fontname = "Helvetica";}
+			if (font === "6"){fontname = "Helvetica Neue";}
+			if (font === "7"){fontname = "sans-serif";}
+			if (font === "8"){fontname = "Arial Narrow";}
+			if (font === "9"){fontname = "Arial Black";}
 			
-			   
+			var fontstyle;
+			
+			if (fstyle === "0"){fontstyle = "oblique";}
+			if (fstyle === "1"){fontstyle = "italic";}
+			if (fstyle === "2"){fontstyle = "normal";}
+			
+			var fontweight;
+
+			if (fweight === "0"){fontweight = "normal";}
+			if (fweight === "1"){fontweight = "bold";}
+						
 			if (decimals<0)
 				{
 
@@ -234,25 +206,79 @@ function draw_feedvalue(context,
 					val = val.toFixed(decimals);
 				}
 
-			if (colour.indexOf("#") == -1){			// Fix missing "#" on colour if needed
+			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
 				colour = "#" + colour;	
 
-
 				context.fillStyle = colour;
-				context.textAlign    = 'center';
-				context.textBaseline = 'middle';
-				context.font = ("bold "+ fontsize+"px "+ fontname);
+				context.textAlign    = "center";
+				context.textBaseline = "middle";
+				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
 				}
 
-			if (unitend ==0)
+			if (unitend ==="0")
 				{
 				context.fillText(val+units, width/2 , height/2);
 				}
 	
-			if (unitend ==1)
+			if (unitend ==="1")
 				{
 				context.fillText(units+val, width/2 , height/2);
 				}
-//console.log("Value for colour " + colour + " and font " + fontname + " Unit position " + unitend + " Value for size " + fontsize); return;  
 			
 }
+
+function feedvalue_draw()
+{
+	$(".feedvalue").each(function(index)
+		{
+    
+			var font = $(this).attr("font");
+			var feedid = $(this).attr("feedid");
+			if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
+			var val = associd[feedid]["value"] * 1;
+			if (val===undefined) {val = 0;}
+			if (isNaN(val))  {val = 0;}
+
+			var size = $(this).attr("size");
+			var units = $(this).attr("units");
+			var decimals = $(this).attr("decimals");
+			
+			if (decimals===undefined) {decimals = -1};
+
+			var unitend = $(this).attr("unitend");
+				
+			{
+				var id = "can-"+$(this).attr("id");
+
+				draw_feedvalue(widgetcanvas[id],
+					0,
+					0,
+					$(this).attr("font"),
+					$(this).attr("fstyle"),
+					$(this).attr("fweight"),
+					$(this).width(),
+					$(this).height(),
+					val,
+					$(this).attr("units"),
+					$(this).attr("colour"),
+					$(this).attr("decimals"),
+					$(this).attr("size"),
+					$(this).attr("unitend")
+					);
+			}
+		});
+}
+
+function feedvalue_init()
+{
+	setup_widget_canvas("feedvalue");
+}
+function feedvalue_slowupdate()
+	{
+		feedvalue_draw();
+	}
+
+function feedvalue_fastupdate()
+	{
+		feedvalue_draw();
+	}
