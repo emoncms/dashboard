@@ -104,12 +104,12 @@ function polar_to_cart(mag, ang, xOff, yOff){
   return [x, y];
 }
   function round1decimal(x) {
-    Ergebnis = Math.round(x * 10) / 10 ;
+    var Ergebnis = Math.round(x * 10) / 10 ;
     return Ergebnis;
   }
   
   function round2decimal(x) {
-    Ergebnis = Math.round(x * 100) / 100 ;
+    var Ergebnis = Math.round(x * 100) / 100 ;
     return Ergebnis;
   }
 // X, Y are the center coordinates of the canvas
