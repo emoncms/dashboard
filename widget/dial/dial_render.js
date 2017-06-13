@@ -353,7 +353,7 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
     var posStrt = polar_to_cart(size/1.15, 90+spreadAngle, x, y);
     var posStop = polar_to_cart(size/1.15, 90-spreadAngle, x, y);
 
-    ctx.save()
+    ctx.save();
     ctx.translate(posStrt[0], posStrt[1]);
     ctx.rotate(deg_to_radians(-45));
    
