@@ -236,7 +236,7 @@ function humidex_draw()
     if (isNaN(temp))  {temp = 0;}
     
     var temptype = $(this).attr("temptype");
-    if (temptype===undefined) {temptype = 0;}
+    if (temptype===undefined) {temptype = "0";}
 
     var feedhumid = $(this).attr("feedhumid");
     if (associd[feedhumid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
@@ -248,13 +248,10 @@ function humidex_draw()
     var decimals = $(this).attr("decimals");
     if (decimals===undefined) {decimals = -1;}
 
-    if (temptype ===1) { 
+    if (temptype ==="1") { 
     temp = (temp - 32) * (5 / 9); // Fahrenheit to celsius
     }
     var val = humidex(humid,temp);
-    if (temptype === 1) {
-    val = (val * 9/5 + 32) ; // Celsius to Fahrenheit
-    }
     {
 		var id = "can-"+$(this).attr("id");
 
