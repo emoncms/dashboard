@@ -16,15 +16,16 @@ function heatindex(RH,T) {
   var hitemp = 61.0+((T-68.0)*1.2)+(RH*0.094);
   var fptemp = parseFloat(T);
   var hifinal = 0.5*(fptemp+hitemp);
+  var hi;
   if(hifinal >= 80.0){
-   var hi = -42.379 + 2.04901523 * T+ 10.14333127 * RH - 0.22475541 * T * RH - 6.83783 * (Math.pow(10, -3)) * (Math.pow(T, 2)) - 5.481717 * (Math.pow(10, -2)) * (Math.pow(RH, 2)) + 1.22874 * (Math.pow(10, -3)) * (Math.pow(T, 2)) * RH+ 8.5282 * (Math.pow(10, -4)) * T * (Math.pow(RH, 2)) - 1.99 * (Math.pow(10, -6)) * (Math.pow(T, 2)) * (Math.pow(RH,2));
+   hi = -42.379 + 2.04901523 * T+ 10.14333127 * RH - 0.22475541 * T * RH - 6.83783 * (Math.pow(10, -3)) * (Math.pow(T, 2)) - 5.481717 * (Math.pow(10, -2)) * (Math.pow(RH, 2)) + 1.22874 * (Math.pow(10, -3)) * (Math.pow(T, 2)) * RH+ 8.5282 * (Math.pow(10, -4)) * T * (Math.pow(RH, 2)) - 1.99 * (Math.pow(10, -6)) * (Math.pow(T, 2)) * (Math.pow(RH,2));
    var adjust = 0;
     if (RH < 13 && T >= 80 && T< 112) {adjust = (-1)*((13-RH)/4)*Math.sqrt([17-Math.abs(T-95.0)]/17);}
     else if (RH > 85 && T >= 80 && T< 87) {adjust = ((RH-85)/10) * ((87-T)/5);}
    hi = hi + adjust;
   }
   else{
-   var hi = hifinal;
+   hi = hifinal;
    }
   return hi;
 }
@@ -280,6 +281,7 @@ function heatindex_draw()
     val = (val - 32) * (5 / 9); // Fahrenheit to Celsius
     }
 
+    var unit;
     if (temptype === "0") {
     unit = "ºC";
     } else {
