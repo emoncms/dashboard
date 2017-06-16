@@ -59,6 +59,17 @@ function cylinder_widgetlist()
   return widgets;
 }
 
+  function get_color(temperature,temptype)
+  {
+    if (temptype === "1") { 
+    temperature = (temperature - 32) * (5 / 9); // Fahrenheit to Celsius
+    }
+    var red = (32+(temperature*3.95)).toFixed(0);
+    var green = 40;
+    var blue = (191-(temperature*3.65)).toFixed(0);
+    return "rgb("+red+","+green+","+blue+")";
+  }
+
   function draw_cylinder(ctx,cyl_bot,cyl_top,width,height,temptype,unitend,decimals)
   {
 
@@ -177,18 +188,6 @@ function cylinder_draw()
     draw_cylinder(widgetcanvas[id],cyl_bot,cyl_top,$(this).width(),$(this).height(),temptype,unitend,decimals);
   });
 }
-
-
-  function get_color(temperature,temptype)
-  {
-    if (temptype === "1") { 
-    temperature = (temperature - 32) * (5 / 9); // Fahrenheit to Celsius
-    }
-    var red = (32+(temperature*3.95)).toFixed(0);
-    var green = 40;
-    var blue = (191-(temperature*3.65)).toFixed(0);
-    return "rgb("+red+","+green+","+blue+")";
-  }
 
 function cylinder_init()
 {
