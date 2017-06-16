@@ -3,16 +3,16 @@
    See COPYRIGHT.txt and LICENSE.txt.
 
    Part of the OpenEnergyMonitor project: http://openenergymonitor.org
-
+   Authors : Paul Reed & Aymeric Thibaut
  */
 
 
 /**
-http://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
+ From http://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
  Compute heat index for given relative humidity RH[%] and temperature T[Deg.F].
- returns : heat index  [Deg.F]
+ returns : heat index [Deg.F] or temperature T[Deg.F] or nothing depending of the rule applied for T <50°F and the rule applied for 50°F < T < aproximately 80°F 
 */
-function heatindex(RH,T) {
+function heatindex(RH,T,rule1,rule2) {
   var hitemp = 61.0+((T-68.0)*1.2)+(RH*0.094);
   var fptemp = parseFloat(T);
   var hifinal = 0.5*(fptemp+hitemp);
@@ -24,9 +24,14 @@ function heatindex(RH,T) {
     else if (RH > 85 && T >= 80 && T< 87) {adjust = ((RH-85)/10) * ((87-T)/5);}
    hi = hi + adjust;
   }
-  else{
-   hi = hifinal;
-   }
+  if(T >=50.00 && hifinal <80.0){
+    if(rule1==="0"){hi = hifinal};
+    if(rule1==="1"){hi = T};
+  }
+  if(T <50.0){
+    if(rule2==="0"){hi = T};
+    if(rule2==="1"){hi = -500}; //below -459.67 °F which represents absolute zero (0K)
+  }
   return hi;
 }
 
@@ -96,7 +101,7 @@ function heatindex_widgetlist()
 				];
 				
 	var sizeoptions = [
-					[14, "18"], // set size 18 to the top position to be the default value for creating new frostpoint widgets otherwise size 40 would be always the default
+					[14, "18"], // set size 18 to the top position to be the default value for creating new heat index widgets otherwise size 40 would be always the default
 					[13, "40"],
 					[12, "36"],
 					[11, "32"],
@@ -115,18 +120,30 @@ function heatindex_widgetlist()
 	var unitEndOptions = [
 					[0, "Back"],
 					[1, "Front"]
-				];				
+				];
+				
+	var rule1options = [
+					[0, "Heat Index"],
+					[1, "Temperature Feed"]
+				];
+				
+	var rule2options = [
+					[0, "Temperature Feed"],
+					[1, "Display Nothing"]
+				];	
     
-    addOption(widgets["heatindex"], "feedhumid", "feedid",  _Tr("Humidity"),    _Tr("Relative humidity in %"),          []);
-    addOption(widgets["heatindex"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
-    addOption(widgets["heatindex"], "temptype",  "dropbox", _Tr("Temp unit"),   _Tr("Units of the choosen temp feed"),  tempDropBoxOptions);
-    addOption(widgets["heatindex"], "decimals",  "dropbox", _Tr("Decimals"),    _Tr("Decimals to show"),                decimalsDropBoxOptions);
-    addOption(widgets["heatindex"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
-    addOption(widgets["heatindex"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
-    addOption(widgets["heatindex"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
-    addOption(widgets["heatindex"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-    addOption(widgets["heatindex"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
-    addOption(widgets["heatindex"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
+    addOption(widgets["heatindex"], "feedhumid", "feedid",        _Tr("Humidity"),      _Tr("Relative humidity in %"),                      []);
+    addOption(widgets["heatindex"], "feedtemp",  "feedid",        _Tr("Temperature"),   _Tr("Temperature feed"),                            []);
+    addOption(widgets["heatindex"], "temptype",  "dropbox",       _Tr("Temp unit"),     _Tr("Units of the choosen temp feed"),              tempDropBoxOptions);
+    addOption(widgets["heatindex"], "decimals",  "dropbox",       _Tr("Decimals"),      _Tr("Decimals to show"),                            decimalsDropBoxOptions);
+    addOption(widgets["heatindex"], "rule1",     "dropbox",       _Tr("Rule 1"),        _Tr("Formula applied for T between 50°F and aproximately 80°F"), rule1options);
+    addOption(widgets["heatindex"], "rule2",     "dropbox",       _Tr("Rule 2"),        _Tr("Formula applied for T lower than 50°F"),       rule2options);
+    addOption(widgets["heatindex"], "colour",    "colour_picker", _Tr("Colour"),        _Tr("Colour used for display"),                     []);
+    addOption(widgets["heatindex"], "font",      "dropbox",       _Tr("Font"),          _Tr("Font used for display"),                       fontoptions);
+    addOption(widgets["heatindex"], "fstyle",    "dropbox",       _Tr("Font style"),    _Tr("Font style used for display"),                 fstyleoptions);
+    addOption(widgets["heatindex"], "fweight",   "dropbox",       _Tr("Font weight"),   _Tr("Font weight used for display"),                fweightoptions);
+    addOption(widgets["heatindex"], "size",      "dropbox",       _Tr("Size"),          _Tr("Text size in px to use"),                      sizeoptions);
+    addOption(widgets["heatindex"], "unitend",   "dropbox",       _Tr("Unit position"), _Tr("Where should the unit be shown"),              unitEndOptions);
     return widgets;
 }
 
@@ -201,7 +218,8 @@ function draw_heatindex(context,
 			if (fweight === "0"){fontweight = "normal";}
 			if (fweight === "1"){fontweight = "bold";}
 						
-			if (decimals<0)
+			if (val===-500){val = " -- ";}
+			else if (decimals<0)
 				{
 
 					if (val>=100){
@@ -272,11 +290,16 @@ function heatindex_draw()
     var size = $(this).attr("size");
     var decimals = $(this).attr("decimals");
     if (decimals===undefined) {decimals = -1;}
+    var rule1 = $(this).attr("rule1");
+    if (rule1===undefined) {rule1 = "0";}
+    var rule2 = $(this).attr("rule2");
+    if (rule2===undefined) {rule2 = "0"}
+
 
     if (temptype ==="0") {
     temp = (temp * 9/5 + 32) ; // Celsius to Fahrenheit
 	}
-    var val = heatindex(humid,temp);
+    var val = heatindex(humid,temp,rule1,rule2);
     if (temptype === "0") { 
     val = (val - 32) * (5 / 9); // Fahrenheit to Celsius
     }
