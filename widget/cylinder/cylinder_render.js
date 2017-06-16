@@ -1,11 +1,9 @@
 /*
    All emon_widgets code is released under the GNU General Public License v3.
    See COPYRIGHT.txt and LICENSE.txt.
-
     ---------------------------------------------------------------------
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
-
     Author: Trystan Lea: trystan.lea@googlemail.com
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
@@ -89,15 +87,15 @@ function cylinder_widgetlist()
     ctx.strokeStyle = "#fff";
     ctx.lineWidth = 8;
 
-    ctx.fillStyle = get_color(cyl_top);
+    ctx.fillStyle = get_color(cyl_top,temptype);
     ctx.beginPath();
     ctx.arc(midx,top_pos,cyl_width/2,Math.PI,0,false);
     ctx.closePath();
     ctx.fill();
 
     var gradient = ctx.createLinearGradient(0, top_pos, 0, bot_pos);
-    gradient.addColorStop(0, get_color(cyl_top));
-    gradient.addColorStop(1, get_color(cyl_bot));
+    gradient.addColorStop(0, get_color(cyl_top,temptype));
+    gradient.addColorStop(1, get_color(cyl_bot,temptype));
     ctx.fillStyle = gradient;
     ctx.fillRect(cyl_left, bot_pos, cyl_width, top_pos-bot_pos);
 
