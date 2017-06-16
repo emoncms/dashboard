@@ -103,6 +103,7 @@ function cylinder_widgetlist()
 
     ctx.fillStyle = get_color(cyl_bot,temptype);
     ctx.beginPath();
+
     ctx.arc(midx,bot_pos,cyl_width/2,0,Math.PI,false);
     ctx.closePath();
     ctx.fill();
@@ -155,6 +156,7 @@ function cylinder_widgetlist()
 
      cyl_bot = parseFloat(cyl_bot);
     }
+    var unit;
     if (temptype === "0") {
     unit = "ºC";
     } else {
