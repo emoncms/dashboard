@@ -25,12 +25,12 @@ function heatindex(RH,T,rule1,rule2) {
    hi = hi + adjust;
   }
   if(T >=50.00 && hifinal <80.0){
-    if(rule1==="0"){hi = hifinal;}
-    if(rule1==="1"){hi = T;}
+    if(rule1==="0"){hi = hifinal};
+    if(rule1==="1"){hi = T};
   }
   if(T <50.0){
-    if(rule2==="0"){hi = T;}
-    if(rule2==="1"){hi = -500;} //below -459.67 °F which represents absolute zero (0K)
+    if(rule2==="0"){hi = T};
+    if(rule2==="1"){hi = -500}; //below -459.67 °F which represents absolute zero (0K)
   }
   return hi;
 }
@@ -293,14 +293,14 @@ function heatindex_draw()
     var rule1 = $(this).attr("rule1");
     if (rule1===undefined) {rule1 = "0";}
     var rule2 = $(this).attr("rule2");
-    if (rule2===undefined) {rule2 = "0";}
+    if (rule2===undefined) {rule2 = "0"}
 
 
     if (temptype ==="0") {
     temp = (temp * 9/5 + 32) ; // Celsius to Fahrenheit
 	}
     var val = heatindex(humid,temp,rule1,rule2);
-    if (temptype === "0") { 
+    if (temptype === "0" && val !=-500) { 
     val = (val - 32) * (5 / 9); // Fahrenheit to Celsius
     }
 
