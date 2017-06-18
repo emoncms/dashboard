@@ -200,6 +200,7 @@ function draw_feedvalue(context,
 					else {
 						val = val.toFixed(2);
 						}
+					val = parseFloat(val);
 				}
 			else 
 				{
