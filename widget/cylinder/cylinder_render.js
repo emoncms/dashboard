@@ -68,7 +68,7 @@ function cylinder_widgetlist()
     return "rgb("+red+","+green+","+blue+")";
   }
 
-  function draw_cylinder(ctx,cyl_bot,cyl_top,width,height,temptype,unitend,decimals)
+  function drawCylinder(ctx,cylBot,cylTop,width,height,temptype,unitend,decimals)
   {
 
     // console.log("Draw cylinder");
@@ -76,39 +76,39 @@ function cylinder_widgetlist()
     if (!ctx) return;
 
     var midx = width / 2;
-    var cyl_width = width - 8;
-    var cyl_left = midx - (cyl_width/2);
-    var top_pos = midx;
-    var bot_pos = height - 4 - (cyl_width/2);
+    var cylWidth = width - 8;
+    var cylLeft = midx - (cylWidth/2);
+    var topPos = midx;
+    var botPos = height - 4 - (cylWidth/2);
 
     ctx.clearRect(0,0,width,500);
-    cyl_top = cyl_top || 0;
-    cyl_bot = cyl_bot || 0;
+    cylTop = cylTop || 0;
+    cylBot = cylBot || 0;
     ctx.strokeStyle = "#fff";
     ctx.lineWidth = 8;
 
-    ctx.fillStyle = get_color(cyl_top,temptype);
+    ctx.fillStyle = get_color(cylTop,temptype);
     ctx.beginPath();
-    ctx.arc(midx,top_pos,cyl_width/2,Math.PI,0,false);
+    ctx.arc(midx,topPos,cylWidth/2,Math.PI,0,false);
     ctx.closePath();
     ctx.fill();
 
-    var gradient = ctx.createLinearGradient(0, top_pos, 0, bot_pos);
-    gradient.addColorStop(0, get_color(cyl_top,temptype));
-    gradient.addColorStop(1, get_color(cyl_bot,temptype));
+    var gradient = ctx.createLinearGradient(0, topPos, 0, botPos);
+    gradient.addColorStop(0, get_color(cylTop,temptype));
+    gradient.addColorStop(1, get_color(cylBot,temptype));
     ctx.fillStyle = gradient;
-    ctx.fillRect(cyl_left, bot_pos, cyl_width, top_pos-bot_pos);
+    ctx.fillRect(cylLeft, botPos, cylWidth, topPos-botPos);
 
-    ctx.fillStyle = get_color(cyl_bot,temptype);
+    ctx.fillStyle = get_color(cylBot,temptype);
     ctx.beginPath();
 
-    ctx.arc(midx,bot_pos,cyl_width/2,0,Math.PI,false);
+    ctx.arc(midx,botPos,cylWidth/2,0,Math.PI,false);
     ctx.closePath();
     ctx.fill();
 
     ctx.beginPath();
-    ctx.arc(midx,top_pos,cyl_width/2,Math.PI,0,false);
-    ctx.arc(midx,bot_pos,cyl_width/2,0,Math.PI,false);
+    ctx.arc(midx,topPos,cylWidth/2,Math.PI,0,false);
+    ctx.arc(midx,botPos,cylWidth/2,0,Math.PI,false);
 
     ctx.closePath();
     ctx.stroke();
@@ -117,42 +117,42 @@ function cylinder_widgetlist()
     ctx.textAlign    = "center";
     ctx.font = "bold "+((width/168)*30)+"px arial";
 
-    if (isNaN(cyl_top)){
-    cyl_top = 0;}
+    if (isNaN(cylTop)){
+    cylTop = 0;}
     else if(Number(decimals)>=0){ //specified decimals
-    cyl_top = cyl_top.toFixed(decimals);}
+    cylTop = cylTop.toFixed(decimals);}
     else { //automatic decimals
-     if (cyl_top>=100){
-     cyl_top = cyl_top.toFixed(0);}
-     else if (cyl_top>=10){
-     cyl_top = cyl_top.toFixed(1);}
-     else if (cyl_top<=-100){
-     cyl_top = cyl_top.toFixed(0);}
-     else if (cyl_top<=-10){
-     cyl_top = cyl_top.toFixed(1);}
+     if (cylTop>=100){
+     cylTop = cylTop.toFixed(0);}
+     else if (cylTop>=10){
+     cylTop = cylTop.toFixed(1);}
+     else if (cylTop<=-100){
+     cylTop = cylTop.toFixed(0);}
+     else if (cylTop<=-10){
+     cylTop = cylTop.toFixed(1);}
      else{
-     cyl_top = cyl_top.toFixed(2);}
+     cylTop = cylTop.toFixed(2);}
 
-     cyl_top = parseFloat(cyl_top);
+     cylTop = parseFloat(cylTop);
     }
 
-    if (isNaN(cyl_bot)){
-    cyl_bot = 0;}
+    if (isNaN(cylBot)){
+    cylBot = 0;}
     else if(Number(decimals)>=0){ //specified decimals
-    cyl_bot = cyl_bot.toFixed(decimals);}
+    cylBot = cylBot.toFixed(decimals);}
     else { //automatic decimals
-     if (cyl_bot>=100){
-     cyl_bot = cyl_bot.toFixed(0);}
-     else if (cyl_bot>=10){
-     cyl_bot = cyl_bot.toFixed(1);}
-     else if (cyl_bot<=-100){
-     cyl_bot = cyl_bot.toFixed(0);}
-     else if (cyl_bot<=-10){
-     cyl_bot = cyl_bot.toFixed(1);}
+     if (cylBot>=100){
+     cylBot = cylBot.toFixed(0);}
+     else if (cylBot>=10){
+     cylBot = cylBot.toFixed(1);}
+     else if (cylBot<=-100){
+     cylBot = cylBot.toFixed(0);}
+     else if (cylBot<=-10){
+     cylBot = cylBot.toFixed(1);}
      else{
-     cyl_bot = cyl_bot.toFixed(2);}
+     cylBot = cylBot.toFixed(2);}
 
-     cyl_bot = parseFloat(cyl_bot);
+     cylBot = parseFloat(cylBot);
     }
     var unit;
     if (temptype === "0") {
@@ -161,14 +161,14 @@ function cylinder_widgetlist()
     unit = "ºF";
     }
     if (unitend ==="0"){
-      ctx.fillText(cyl_top+unit,midx,top_pos);
-      ctx.fillText(cyl_bot+unit,midx,bot_pos+15);}
+      ctx.fillText(cylTop+unit,midx,topPos);
+      ctx.fillText(cylBot+unit,midx,botPos+15);}
     if (unitend ==="1"){
-      ctx.fillText(unit+cyl_top,midx,top_pos);
-      ctx.fillText(unit+cyl_bot,midx,bot_pos+15);}
+      ctx.fillText(unit+cylTop,midx,topPos);
+      ctx.fillText(unit+cylBot,midx,botPos+15);}
     if (unitend ==="2"){
-      ctx.fillText(cyl_top,midx,top_pos);
-      ctx.fillText(cyl_bot,midx,bot_pos+15);}
+      ctx.fillText(cylTop,midx,topPos);
+      ctx.fillText(cylBot,midx,botPos+15);}
   }
 
 function cylinder_draw()
@@ -178,14 +178,14 @@ function cylinder_draw()
     var feedid1 = $(this).attr("topfeedid");
     var feedid2 = $(this).attr("botfeedid");
     if ((associd[feedid1] === undefined) || (associd[feedid2] === undefined)) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var cyl_top = associd[feedid1]["value"]*1;
-    var cyl_bot = associd[feedid2]["value"]*1;
+    var cylTop = associd[feedid1]["value"]*1;
+    var cylBot = associd[feedid2]["value"]*1;
     var unitend = $(this).attr("unitend") || "0";
     var temptype= $(this).attr("temptype") || "0";
     var decimals = $(this).attr("decimals") || "-1";
 
     var id = "can-"+$(this).attr("id");
-    draw_cylinder(widgetcanvas[id],cyl_bot,cyl_top,$(this).width(),$(this).height(),temptype,unitend,decimals);
+    drawCylinder(widgetcanvas[id],cylBot,cylTop,$(this).width(),$(this).height(),temptype,unitend,decimals);
   });
 }
 
