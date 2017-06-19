@@ -36,7 +36,7 @@ function isactivefeed_widgetlist()
       "optionshint":[],
       "optionsdata":[]
     }
-  }
+  };
   addOption(widgets["isactivefeed"], "feedid",      "feedid",         _Tr("Feed"),       _Tr("Feed value"),                                         []);
   addOption(widgets["isactivefeed"], "threshold1",  "value",          _Tr("Threshold1"), _Tr("Threshold1 in seconds"),                              []);
   addOption(widgets["isactivefeed"], "threshold2",  "value",          _Tr("Threshold2"), _Tr("Threshold2 in seconds"),                              []);
@@ -54,17 +54,17 @@ function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, colour) {
 
     ctx.strokeSyle = "#000";
     ctx.beginPath();
-    ctx.moveTo(cx, cy - outerRadius)
+    ctx.moveTo(cx, cy - outerRadius);
     for (i = 0; i < spikes; i++) {
         x = cx + Math.cos(rot) * outerRadius;
         y = cy + Math.sin(rot) * outerRadius;
-        ctx.lineTo(x, y)
-        rot += step
+        ctx.lineTo(x, y);
+        rot += step;
 
         x = cx + Math.cos(rot) * innerRadius;
         y = cy + Math.sin(rot) * innerRadius;
-        ctx.lineTo(x, y)
-        rot += step
+        ctx.lineTo(x, y);
+        rot += step;
     }
     ctx.lineTo(cx, cy - outerRadius)
     ctx.closePath();
@@ -77,7 +77,7 @@ function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, colour) {
 }
 
 function draw_isactivefeed(shape,feedstatus, colour1, colour2, colour3, shapetype){
-  if (!shape) return;
+  if (!shape) {return;}
   var width = shape.canvas.width;
   var height = shape.canvas.height;
   var borderx = Math.min(40, Math.floor(width/2));
@@ -176,12 +176,12 @@ function isactivefeed_draw() {
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     delay =  Math.round(Date.now() /1000 - offsetofTime - associd[feedid]["time"]);
 
-    if (delay > limit2)
-        val=0;
-    else if (delay > limit1)
-        val=1;
-    else
-        val=2;
+    if (delay > limit2){
+        val=0;}
+    else if (delay > limit1){
+        val=1;}
+    else {
+        val=2;}
     if (colour1.indexOf("#") === -1){// Fix missing "#" on colour if needed
     colour1 = "#" + colour1;}
     if (colour2.indexOf("#") === -1){
