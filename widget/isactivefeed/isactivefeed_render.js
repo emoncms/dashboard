@@ -40,9 +40,9 @@ function isactivefeed_widgetlist()
   addOption(widgets["isactivefeed"], "feedid",      "feedid",         _Tr("Feed"),       _Tr("Feed value"),                                         []);
   addOption(widgets["isactivefeed"], "threshold1",  "value",          _Tr("Threshold1"), _Tr("Threshold1 in seconds"),                              []);
   addOption(widgets["isactivefeed"], "threshold2",  "value",          _Tr("Threshold2"), _Tr("Threshold2 in seconds"),                              []);
-  addOption(widgets["isactivefeed"], "colour1",     "colour_picker",  _Tr("Colour1"),    _Tr("Colour for range above Threshold2"),                  []);
+  addOption(widgets["isactivefeed"], "colour1",     "colour_picker",  _Tr("Colour1"),    _Tr("Colour for range below Threshold1"),                  []);
   addOption(widgets["isactivefeed"], "colour2",     "colour_picker",  _Tr("Colour2"),    _Tr("Colour for range between Threshold1 and Threshold2"), []);
-  addOption(widgets["isactivefeed"], "colour3",     "colour_picker",  _Tr("Colour3"),    _Tr("Colour for range below Threshold1"),                  []);
+  addOption(widgets["isactivefeed"], "colour3",     "colour_picker",  _Tr("Colour3"),    _Tr("Colour for range above Threshold2"),                  []);
   addOption(widgets["isactivefeed"], "shapetype",   "dropbox",        _Tr("Shape"),      _Tr("Shape"),                                              shapeOptions);
   return widgets;
 }
@@ -78,7 +78,7 @@ function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, colour) {
 
 }
 
-function draw_isactivefeed(shape,feedstatus, colour1, colour2, colour3, shapetype){
+function draw_isactivefeed(shape,feedstatus, colour3, colour2, colour1, shapetype){
   if (!shape) {return;}
   var width = shape.canvas.width;
   var height = shape.canvas.height;
@@ -90,11 +90,11 @@ function draw_isactivefeed(shape,feedstatus, colour1, colour2, colour3, shapetyp
   shape.clearRect(0,0,width,height);
   var fillcolor;
       if (feedstatus===0) {
-      fillcolor= colour1;
+      fillcolor= colour3;
     } else if (feedstatus===1) {
       fillcolor= colour2;
     } else if (feedstatus===2) {
-      fillcolor= colour3;
+      fillcolor= colour1;
     } else {
       fillcolor= "#000000";
     }
@@ -135,15 +135,15 @@ function isactivefeed_isnonetwork()
   $(".isactivefeed").each(function(index)
   {
     var id = "can-"+$(this).attr("id");
-    var colour1 = $(this).attr("colour1")|| "#F70511";
+    var colour3 = $(this).attr("colour3")|| "#F70511";
     var colour2 = $(this).attr("colour2")|| "#FF8425";
-    var colour3 = $(this).attr("colour3")|| "#019F62";
-    if (colour1.indexOf("#") === -1){// Fix missing "#" on colour if needed
-    colour1 = "#" + colour1;}
+    var colour1 = $(this).attr("colour1")|| "#019F62";
+    if (colour3.indexOf("#") === -1){// Fix missing "#" on colour if needed
+    colour3 = "#" + colour3;}
     if (colour2.indexOf("#") === -1){
     colour2 = "#" + colour2;}
-    if (colour3.indexOf("#") === -1){
-    colour3 = "#" + colour3;}
+    if (colour1.indexOf("#") === -1){
+    colour1 = "#" + colour1;}
     var shapetype = $(this).attr("shapetype")|| "2";
     var width = widgetcanvas[id].canvas.width;
     var height = widgetcanvas[id].canvas.height;
@@ -153,7 +153,7 @@ function isactivefeed_isnonetwork()
     var offsetx = Math.floor((width - dimension) / 2.0);
     var offsety = Math.floor((height - dimension) / 2.0);
 
-    draw_isactivefeed(widgetcanvas[id], 0, colour1, colour2, colour3, shapetype);
+    draw_isactivefeed(widgetcanvas[id], 0, colour3, colour2, colour1, shapetype);
 
     widgetcanvas[id].font = "bold "+ dimension +"px Arial";
     widgetcanvas[id].fillStyle = "#000000";
@@ -168,9 +168,9 @@ function isactivefeed_draw() {
     var feedid = $(this).attr("feedid");
     var limit1 = $(this).attr("threshold1")*1 || 60;
     var limit2 = $(this).attr("threshold2")*1 || 120;
-    var colour1 = $(this).attr("colour1")|| "#F70511";
+    var colour3 = $(this).attr("colour3")|| "#F70511";
     var colour2 = $(this).attr("colour2")|| "#FF8425";
-    var colour3 = $(this).attr("colour3")|| "#019F62";
+    var colour1 = $(this).attr("colour1")|| "#019F62";
     var shapetype = $(this).attr("shapetype")|| "2";
     var val=0; 
     var delay=1000;
@@ -184,15 +184,15 @@ function isactivefeed_draw() {
         val=1;}
     else {
         val=2;}
-    if (colour1.indexOf("#") === -1){// Fix missing "#" on colour if needed
-    colour1 = "#" + colour1;}
+    if (colour3.indexOf("#") === -1){// Fix missing "#" on colour if needed
+    colour3 = "#" + colour3;}
     if (colour2.indexOf("#") === -1){
     colour2 = "#" + colour2;}
-    if (colour3.indexOf("#") === -1){
-    colour3 = "#" + colour3;}
+    if (colour1.indexOf("#") === -1){
+    colour1 = "#" + colour1;}
     var id = "can-"+$(this).attr("id");
 
-    draw_isactivefeed(widgetcanvas[id], val, colour1, colour2, colour3, shapetype);
+    draw_isactivefeed(widgetcanvas[id], val, colour3, colour2, colour1, shapetype);
   }
   );
 }
