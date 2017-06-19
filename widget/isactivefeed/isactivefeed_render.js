@@ -51,10 +51,12 @@ function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, colour) {
     var x = cx;
     var y = cy;
     var step = Math.PI / spikes;
+    var i;
 
     ctx.strokeSyle = "#000";
     ctx.beginPath();
     ctx.moveTo(cx, cy - outerRadius);
+
     for (i = 0; i < spikes; i++) {
         x = cx + Math.cos(rot) * outerRadius;
         y = cy + Math.sin(rot) * outerRadius;
@@ -66,7 +68,7 @@ function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, colour) {
         ctx.lineTo(x, y);
         rot += step;
     }
-    ctx.lineTo(cx, cy - outerRadius)
+    ctx.lineTo(cx, cy - outerRadius);
     ctx.closePath();
     ctx.lineWidth=1;
     ctx.strokeStyle= colour;
