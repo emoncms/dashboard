@@ -95,7 +95,7 @@ function update(first_time){
           fn();
         }
       }
-    }
+    },
     error : function(){
           for (z in widget){ 
           var fname = widget[z]+"_isnonetwork";
