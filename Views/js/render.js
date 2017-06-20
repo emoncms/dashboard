@@ -25,6 +25,7 @@ var widgetcanvas = {};
 var dialrate = 0.15;
 var browserVersion = 999;
 var fast_update_fps = 25;
+var isnetwork = 0;
 
 var Browser = {
   Version : function()
@@ -94,6 +95,15 @@ function update(first_time){
           fn();
         }
       }
+    },
+    error : function(){
+          for (z in widget){ 
+          var fname = widget[z]+"_isnonetwork";
+          var fn = window[fname];
+             if(typeof(fn) == 'function') {
+             fn();
+             }
+         }
     }
   });
 }
