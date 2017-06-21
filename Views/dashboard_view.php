@@ -34,8 +34,6 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
     <div id="page"><?php echo $dashboard['content']; ?></div>
 
 <script type="application/javascript">
-  var requestTime = Date.now() /1000;
-  var offsetofTime = 0;
   var dashid = <?php echo $dashboard['id']; ?>;
   var path = "<?php echo $path; ?>";
   var widget = <?php echo json_encode($widgets); ?>;
@@ -43,8 +41,6 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
   var userid = <?php echo $session['userid']; ?>;
   var redraw = 1;
   var reloadiframe = 0; // dont re-calculate vis iframe urls
-
-  offsetofTime = Math.round(requestTime - <?php echo time(); ?>); // Offset in s from local to server time
 
   $('body').css("background-color","#<?php echo $dashboard['backgroundcolor']; ?>");
 
