@@ -25,7 +25,6 @@ var widgetcanvas = {};
 var dialrate = 0.15;
 var browserVersion = 999;
 var fast_update_fps = 25;
-var isnetwork = 0;
 
 var Browser = {
   Version : function()
