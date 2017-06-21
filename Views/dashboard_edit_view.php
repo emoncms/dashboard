@@ -113,8 +113,6 @@ function toolboxMove(e) {
 
 <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/designer.js"></script>
 <script type="application/javascript">
-    var requestTime = Date.now() /1000;
-    var offsetofTime = 0;
     var dashid = <?php echo $dashboard['id']; ?>;
     var path = "<?php echo $path; ?>";
     var apikey = "";
@@ -123,8 +121,6 @@ function toolboxMove(e) {
     var widget = <?php echo json_encode($widgets); ?>;
     var redraw = 0;
     var reloadiframe = -1; // force iframes url to recalculate for all vis widgets 
-
-    offsetofTime = Math.round(requestTime - <?php echo time(); ?>); // Offset in s from local to server time
 
     $('#can').width($('#dashboardpage').width());
 
