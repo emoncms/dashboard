@@ -153,6 +153,7 @@ function draw_bar(context,
         size = width/2;
     else
         size = height/2;
+    size = size - (size*0.058/2);
 
     var fontname;
 
@@ -224,7 +225,7 @@ function draw_bar(context,
         if (graduationQuant > 0)
         {
             context.textAlign    = "start";
-            context.font = (fontstyle+ " "+ fontweight+ " "+(size*0.20)+"px "+ fontname);
+            context.font = (fontstyle+ " "+ fontweight+ " "+(size*0.15)+"px "+ fontname);
 
             var step = (height-border_space*2)/(Number(graduationQuant)+1);
             var curY;
@@ -272,27 +273,34 @@ function draw_bar(context,
 
     context.fillStyle = colour_label;
     context.textAlign    = "center";
+    
+    var unitsandval = raw_value+units_string;
+    var valsize = (size / (unitsandval.length+2)) * 6;
+    var titlesize ;
+	if (title.length >10) {titlesize = (size / (title.length+2)) * 10;}
+	else {titlesize = (size / 12) * 10;}
+    
     if (graduationBool == 1) {
         half_width += (size*0.20)
 
         if (title) {
-            context.font = (fontstyle+ " "+ fontweight+ " "+(size*0.25)+"px "+ fontname);
+            context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
             if (unitend ==="0"){context.fillText(raw_value+units_string, half_width+(size*0.40), height + (size*0.48))}
             if (unitend ==="1"){context.fillText(units_string+raw_value, half_width+(size*0.40), height + (size*0.48))}
-            context.font = (fontstyle+ " "+ fontweight+ " "+(size*0.20)+"px "+ fontname);
+            context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.4)+"px "+ fontname);
             context.fillText(title, half_width + (size * 0.35), height + (size * 0.2));
         } else {
-            context.font = (fontstyle+ " "+ fontweight+ " "+(size*0.3)+"px "+ fontname);
+            context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.4)+"px "+ fontname);
             if (unitend ==="0"){context.fillText(raw_value+units_string, half_width+(size*0.2), height + (size*0.3));}
             if (unitend ==="1"){context.fillText(units_string+raw_value, half_width+(size*0.2), height + (size*0.3));}
         }
     }
     else
     {
-        context.font = (fontstyle+ " "+ fontweight+ " "+(size*0.5)+"px "+ fontname);
+        context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.5)+"px "+ fontname);
         if (unitend ==="0"){context.fillText(raw_value+units_string, half_width, height/2 + (size*0.2));}
         if (unitend ==="1"){context.fillText(units_string+raw_value, half_width, height/2 + (size*0.2));}
-        context.font = (fontstyle+ " "+ fontweight+ " "+(size*0.2)+"px "+ fontname);
+        context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.4)+"px "+ fontname);
         context.fillText(title, half_width, height/7 + (size *0.1));
     }
 
