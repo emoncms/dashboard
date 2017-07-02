@@ -137,7 +137,7 @@ function draw_bar(context,
     units_string = units_string || "";
     title = title || "";
     fstyle = fstyle || "2";
-    fweight = fweight || "1";
+    fweight = fweight || "0";
     unitend = unitend || "0";
     colour_label = colour_label || "000";
     static_offset = 1*static_offset || 0;
@@ -275,22 +275,24 @@ function draw_bar(context,
     context.textAlign    = "center";
     
     var unitsandval = raw_value+units_string;
-    var valsize = (size / (unitsandval.length+2)) * 6;
+    var valsize;
+    if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
+	else {valsize = (size / 6) * 5.5;}
     var titlesize ;
-	if (title.length >10) {titlesize = (size / (title.length+2)) * 10;}
-	else {titlesize = (size / 12) * 10;}
+	if (title.length >10) {titlesize = (size / (title.length+2)) * 9;}
+	else {titlesize = (size / 12) * 9.5;}
     
     if (graduationBool == 1) {
         half_width += (size*0.20)
 
         if (title) {
-            context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
+            context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.35)+"px "+ fontname);
             if (unitend ==="0"){context.fillText(raw_value+units_string, half_width+(size*0.40), height + (size*0.48))}
             if (unitend ==="1"){context.fillText(units_string+raw_value, half_width+(size*0.40), height + (size*0.48))}
             context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.4)+"px "+ fontname);
             context.fillText(title, half_width + (size * 0.35), height + (size * 0.2));
         } else {
-            context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.4)+"px "+ fontname);
+            context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
             if (unitend ==="0"){context.fillText(raw_value+units_string, half_width+(size*0.2), height + (size*0.3));}
             if (unitend ==="1"){context.fillText(units_string+raw_value, half_width+(size*0.2), height + (size*0.3));}
         }
