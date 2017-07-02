@@ -53,13 +53,13 @@ function bar_widgetlist()
 
     var fontoptions = [
                     [9, "Arial Black"],
-                    [8, "arial"],
-                    [7, "Arial Narrow"],
-                    [6, "sans-serif"],
+                    [8, "Arial Narrow"],
+                    [7, "sans-serif"],
+                    [6, "Helvetica Neue"],
                     [5, "Helvetica"],
                     [4, "Comic Sans MS"],
                     [3, "Courier New"],
-                    [2, "arial"],
+                    [2, "Arial"],
                     [1, "Georgia"],
                     [0, "Impact"]
                 ];
@@ -157,16 +157,16 @@ function draw_bar(context,
 
     var fontname;
 
-    if (font === "0"){fontname = "Impact"}
-    if (font === "1"){fontname = "Georgia"}
-    if (font === "2"){fontname = "arial"}
-    if (font === "3"){fontname = "Courier New"}
-    if (font === "4"){fontname = "Comic Sans MS"}
-    if (font === "5"){fontname = "Helvetica"}
-    if (font === "6"){fontname = "sans-serif"}
-    if (font === "7"){fontname = "Arial Narrow"}
-    if (font === "8"){fontname = "Arial"}
-    if (font === "9"){fontname = "Arial Black"}
+    if (font === "0"){fontname = "Impact";}
+    if (font === "1"){fontname = "Georgia";}
+    if (font === "2"){fontname = "Arial";}
+    if (font === "3"){fontname = "Courier New";}
+    if (font === "4"){fontname = "Comic Sans MS";}
+    if (font === "5"){fontname = "Helvetica";}
+    if (font === "6"){fontname = "Helvetica Neue";}
+    if (font === "7"){fontname = "sans-serif";}
+    if (font === "8"){fontname = "Arial Narrow";}
+    if (font === "9"){fontname = "Arial Black";}
     else if (typeof(font) === "undefined") {fontname = "Arial Black"}
 
     var fontstyle;
