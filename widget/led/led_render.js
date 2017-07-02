@@ -10,6 +10,18 @@
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
  */
+function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
+{
+    widget["options"    ].push(optionKey);
+    widget["optionstype"].push(optionType);
+    widget["optionsname"].push(optionName);
+    widget["optionshint"].push(optionHint);
+    widget["optionsdata"].push(optionData);
+}
+	var StyleOptions = [
+    [1, "With colour gradients"],
+    [0, "Without colour gradients"]
+    ];
 
 function led_widgetlist()
 {
@@ -18,16 +30,19 @@ function led_widgetlist()
     {
       "offsetx":-40,"offsety":-40,"width":80,"height":80,
       "menu":"Widgets",
-      "options":["feedid"],
-      "optionstype":["feedid"],
-      "optionsname":[_Tr("Feed")],
-      "optionshint":[_Tr("Feed value")]
+      "options":    [],
+      "optionstype":[],
+      "optionsname":[],
+      "optionshint":[],
+      "optionsdata":[]
     }
-  }
+  };
+  addOption(widgets["led"], "feedid",      "feedid",         _Tr("Feed"),       _Tr("Feed value"),          []);
+  addOption(widgets["led"], "ledstyle",       "dropbox",     _Tr("Style"),      _Tr("Display style"),       StyleOptions);
   return widgets;
 }
 
-function draw_led(circle,status){
+function draw_led(circle,status,ledstyle){
   if (!circle) return;
 
   var width = circle.canvas.width;
@@ -39,114 +54,71 @@ function draw_led(circle,status){
   var offsety = Math.floor((height - dimension) / 2.0);
 
   circle.clearRect(0,0,width,height);
-
+  if (ledstyle ==="1"){
   var radgrad = circle.createRadialGradient(width/2,height/2,0,width/2,height/2,dimension/2);
+    if (status==0) {                   // red
+      radgrad.addColorStop(0, "#F75D59");
+      radgrad.addColorStop(0.9, "#C11B17");
+    } else if (status>0 && status <=1) {            // green
+     radgrad.addColorStop(0, "#A7D30C");
+      radgrad.addColorStop(0.9, "#019F62");
+    } else if (status>1 && status <=2) {           // grey
+      radgrad.addColorStop(0, "#736F6E");
+      radgrad.addColorStop(0.9, "#4A4344");
+    } else if (status>2 && status <=3) { 		  //Blue
+      radgrad.addColorStop(0, "#00C9FF");
+      radgrad.addColorStop(0.9, "#00B5E2");
+    } else if (status>3 && status <=4) {		  // Purple
+      radgrad.addColorStop(0, "#FF5F98");
+      radgrad.addColorStop(0.9, "#FF0188");
+    } else if (status>4 && status <=5)   {         // yellow
+      radgrad.addColorStop(0, "#F4F201");
+      radgrad.addColorStop(0.9, "#E4C700");
+    } else {					  // Black
+      radgrad.addColorStop(0, "#000000");
+      radgrad.addColorStop(0.9, "#000000");
+    }
 
-  if (status==0) {                   // red
-    radgrad.addColorStop(0, "#F75D59");
-    radgrad.addColorStop(0.9, "#C11B17");
-  } else if (status>0 && status <=1) {            // green
-    radgrad.addColorStop(0, "#A7D30C");
-    radgrad.addColorStop(0.9, "#019F62");
-  } else if (status>1 && status <=2) {           // grey
-    radgrad.addColorStop(0, "#736F6E");
-    radgrad.addColorStop(0.9, "#4A4344");
-  } else if (status>2 && status <=3) { 		  //Blue
-    radgrad.addColorStop(0, "#00C9FF");
-    radgrad.addColorStop(0.9, "#00B5E2");
-  } else if (status>3 && status <=4) {		  // Purple
-    radgrad.addColorStop(0, "#FF5F98");
-    radgrad.addColorStop(0.9, "#FF0188");
-  } else if (status>4 && status <=5)   {         // yellow
-    radgrad.addColorStop(0, "#F4F201");
-    radgrad.addColorStop(0.9, "#E4C700");
-  } else {					  // Black
-    radgrad.addColorStop(0, "#000000");
-    radgrad.addColorStop(0.9, "#000000");
+    radgrad.addColorStop(1, 'rgba(1,159,98,0)');
+    // draw shapes
+    circle.fillStyle = radgrad;
+    circle.fillRect(offsetx,offsety,dimension,dimension);
   }
-
-  radgrad.addColorStop(1, 'rgba(1,159,98,0)');
-  // draw shapes
-  circle.fillStyle = radgrad;
-  circle.fillRect(offsetx,offsety,dimension,dimension);
-}
-
-
-function draw_led_ie8(circle,status){
-  if (!circle) return;
-
-  if (status==0) {			// red
-    circle.fillStyle = "#C11B17";
-  } else if (status==1) {			// green
-    circle.fillStyle = "#019F62";
-  } else if (status==2) {			// grey
-    circle.fillStyle = "#4A4344";
-  } else if (status==3) {			//Blue
-    circle.fillStyle = "#00B5E2";
-  } else if (status ==4) {		// Purple
-    circle.fillStyle = "#FF0188";
-  } else if (status==5)  {		// yellow
-    circle.fillStyle = "#E4C700";
-  } else {				// Black
-    circle.fillStyle = "#000000";
+  
+  if (ledstyle ==="0"){
+      if (status==0) {			// red
+      circle.fillStyle = "#C11B17";
+    } else if (status==1) {			// green
+      circle.fillStyle = "#019F62";
+    } else if (status==2) {			// grey
+      circle.fillStyle = "#4A4344";
+    } else if (status==3) {			//Blue
+     circle.fillStyle = "#00B5E2";
+    } else if (status ==4) {		// Purple
+     circle.fillStyle = "#FF0188";
+    } else if (status==5)  {		// yellow
+      circle.fillStyle = "#E4C700";
+    } else {				// Black
+      circle.fillStyle = "#000000";
+    }
+    circle.beginPath();
+    circle.arc(width/2,height/2,dimension/2, 0,Math.PI * 2);
+    circle.closePath();
+    circle.fill()
   }
-
-  circle.beginPath();
-  circle.arc(25,25,20, 0,Math.PI * 2,false);
-  circle.closePath();
-  circle.fill()
 }
 
 function led_draw() {
-  $('.led').each(function(index)
+  $(".led").each(function(index)
   {
     var feedid = $(this).attr("feedid");
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var val = associd[feedid]["value"] * 1;
+    var ledstyle = $(this).attr("ledstyle")|| "1";
     var id = "can-"+$(this).attr("id");
-    if (browserVersion < 9)
-      draw_led_ie8(widgetcanvas[id], val);
-    else
-      draw_led(widgetcanvas[id], val);
-  });
-}
-
-
-
-
-function draw_binary_led(circle,status){
-  if (!circle) return;
-  circle.clearRect(0,0,80,80);
-
-  var radgrad = circle.createRadialGradient(40,40,0,40,40,20);
-
-  if (status==0) {                               // red
-    radgrad.addColorStop(0, "#F75D59");
-    radgrad.addColorStop(0.9, "#C11B17");
-  } else {                                       // green
-    radgrad.addColorStop(0, "#A7D30C");
-    radgrad.addColorStop(0.9, "#019F62");
+    draw_led(widgetcanvas[id],val,ledstyle);
   }
-
-  radgrad.addColorStop(1, 'rgba(1,159,98,0)');
-  // draw shapes
-  circle.fillStyle = radgrad;
-  circle.fillRect(20,20,60,60);
-}
-
-function draw_binary_led_ie8(circle,status){
-  if (!circle) return;
-
-  if (status==0) {			// red
-    circle.fillStyle = "#C11B17";
-  } else {			// green
-    circle.fillStyle = "#019F62";
-  }
-
-  circle.beginPath();
-  circle.arc(25,25,20, 0,Math.PI * 2,false);
-  circle.closePath();
-  circle.fill()
+  );
 }
 
 function led_init()
