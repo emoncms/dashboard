@@ -288,7 +288,7 @@ function draw_bar(context,
             if (unitend ==="0"){context.fillText(raw_value+units_string, bar_border_space, height + (size*0.42))}
             if (unitend ==="1"){context.fillText(units_string+raw_value, bar_border_space, height + (size*0.42))}
             context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.4)+"px "+ fontname);
-            context.fillText(title, bar_border_space, height + (size * 0.15));
+            context.fillText(title, bar_border_space, height + (size * 0.2));
         } else {
             context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
             if (unitend ==="0"){context.fillText(raw_value+units_string, bar_border_space, height + (size*0.3));}
