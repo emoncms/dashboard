@@ -93,7 +93,7 @@ function bar_widgetlist()
     addOption(widgets["bar"], "feedid",         "feedid",           _Tr("Feed"),            _Tr("Feed value"),                                                                  []);
     addOption(widgets["bar"], "max",            "value",            _Tr("Max value"),       _Tr("Max value to show"),                                                           []);
     addOption(widgets["bar"], "scale",          "value",            _Tr("Scale"),           _Tr("Value is multiplied by scale before display. Defaults to 1"),                  []);
-    addOption(widgets["bar"], "units",          "value",            _Tr("Units"),           _Tr("Units to show"),           []);
+    addOption(widgets["bar"], "units",          "value",            _Tr("Units"),           _Tr("Units to show"),                                                               []);
     addOption(widgets["bar"], "unitend",        "dropbox",          _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                              unitEndOptions);
     addOption(widgets["bar"], "decimals",       "dropbox",          _Tr("Decimals"),        _Tr("Decimals to show"),                                                            decimalsDropBoxOptions);
     addOption(widgets["bar"], "offset",         "value",            _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing position (default 0)"),  []);
@@ -272,7 +272,6 @@ function draw_bar(context,
 
 
     context.fillStyle = colour_label;
-    context.textAlign    = "center";
     
     var unitsandval = raw_value+units_string;
     var valsize;
@@ -283,22 +282,22 @@ function draw_bar(context,
 	else {titlesize = (size / 12) * 9.5;}
     
     if (graduationBool == 1) {
-        half_width += (size*0.20)
-
+    context.textAlign    = "start";
         if (title) {
             context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.35)+"px "+ fontname);
-            if (unitend ==="0"){context.fillText(raw_value+units_string, half_width+(size*0.40), height + (size*0.48))}
-            if (unitend ==="1"){context.fillText(units_string+raw_value, half_width+(size*0.40), height + (size*0.48))}
+            if (unitend ==="0"){context.fillText(raw_value+units_string, bar_border_space, height + (size*0.42))}
+            if (unitend ==="1"){context.fillText(units_string+raw_value, bar_border_space, height + (size*0.42))}
             context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.4)+"px "+ fontname);
-            context.fillText(title, half_width + (size * 0.35), height + (size * 0.2));
+            context.fillText(title, bar_border_space, height + (size * 0.15));
         } else {
             context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
-            if (unitend ==="0"){context.fillText(raw_value+units_string, half_width+(size*0.2), height + (size*0.3));}
-            if (unitend ==="1"){context.fillText(units_string+raw_value, half_width+(size*0.2), height + (size*0.3));}
+            if (unitend ==="0"){context.fillText(raw_value+units_string, bar_border_space, height + (size*0.3));}
+            if (unitend ==="1"){context.fillText(units_string+raw_value, bar_border_space, height + (size*0.3));}
         }
     }
     else
     {
+    context.textAlign    = "center";
         context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.5)+"px "+ fontname);
         if (unitend ==="0"){context.fillText(raw_value+units_string, half_width, height/2 + (size*0.2));}
         if (unitend ==="1"){context.fillText(units_string+raw_value, half_width, height/2 + (size*0.2));}
