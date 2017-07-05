@@ -3,5 +3,8 @@
 **Enhancements**
 
  - Update bar widget to add decimals, fontstyle, fontweight, position of unit options & optimization of the code
+ - Remove obsolete code from LED widget and introduce option of displaying without gradients.
  
 ### v1.0.0: Milestone Release
+
+- Intitial stable version release
