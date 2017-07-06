@@ -4,11 +4,11 @@
 
 **Enhancements**
 
-Add decimals, fontstyle, fontweight, position of unit options to Battery widget.
+ - Add decimals, fontstyle, fontweight, position of unit options to Battery widget.
 
 **Fixes**
 
-Optimization of the code to the battery widget.
+ - Optimization of the code to the battery widget.
 
 ### v1.0.1: Maintenance Release
 
