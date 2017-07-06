@@ -35,6 +35,33 @@ function battery_widgetlist(){
     }
   };
 
+  var decimalsDropBoxOptions = [        // Options for the type combobox. Each item is [typeID, "description"]
+                  [-1,   "Automatic"],
+                  [0,    "0"],
+                  [1,    "1"],
+                  [2,    "2"],
+                  [3,    "3"],
+                  [4,    "4"],
+                  [5,    "5"],
+                  [6,    "6"]
+  ];
+  
+  var fstyleoptions = [
+                  [2, "Normal"],
+                  [1, "Italic"],
+                  [0, "Oblique"]
+              ];
+
+  var fweightoptions = [
+                  [0, "Normal"],
+                  [1, "Bold"]
+              ];
+
+  var unitEndOptions = [
+                  [0, "Back"],
+                  [1, "Front"]
+              ];  
+
   var fontoptions = [
     [8, "Arial Black"],
     [7, "Arial Narrow"],
@@ -47,15 +74,19 @@ function battery_widgetlist(){
     [0, "Impact"]
   ];
 
-  addOption(widgets["battery"], "feedid",      "feedid",  _Tr("Feed"),        _Tr("Feed value"),                                                            []);
-  addOption(widgets["battery"], "battery_title",       "value",   _Tr("Battery title"),       _Tr("Battery title"),                                                                 []);
-  addOption(widgets["battery"], "max",         "value",   _Tr("Max value"),   _Tr("Max value to show"),                                                     []);
-  addOption(widgets["battery"], "min",         "value",   _Tr("Min value"),   _Tr("Min value to show"),                                                     []); //TT
-  addOption(widgets["battery"], "scale",       "value",   _Tr("Scale"),       _Tr("Value is multiplied by scale before display"),                           []);
-  addOption(widgets["battery"], "units",       "value",   _Tr("Units"),       _Tr("Units to show"),                                                         []);
-  addOption(widgets["battery"], "offset",      "value",   _Tr("Offset"),      _Tr("Static offset. Subtracted from value before computing needle position"), []);
-  addOption(widgets["battery"], "colour",      "colour_picker",   _Tr("Colour label"),      _Tr("Color of the label"), []);
-  addOption(widgets["battery"], "font",      "dropbox",   _Tr("Font"),      _Tr("Label font"), fontoptions);
+  addOption(widgets["battery"], "feedid",           "feedid",        _Tr("Feed"),            _Tr("Feed value"),                                                            []);
+  addOption(widgets["battery"], "battery_title",    "value",         _Tr("Battery title"),   _Tr("Battery title"),                                                         []);
+  addOption(widgets["battery"], "max",              "value",         _Tr("Max value"),       _Tr("Max value to show"),                                                     []);
+  addOption(widgets["battery"], "min",              "value",         _Tr("Min value"),       _Tr("Min value to show"),                                                     []); //TT
+  addOption(widgets["battery"], "scale",            "value",         _Tr("Scale"),           _Tr("Value is multiplied by scale before display"),                           []);
+  addOption(widgets["battery"], "units",            "value",         _Tr("Units"),           _Tr("Units to show"),                                                         []);
+  addOption(widgets["battery"], "unitend",          "dropbox",       _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                        unitEndOptions);
+  addOption(widgets["battery"], "decimals",         "dropbox",       _Tr("Decimals"),        _Tr("Decimals to show"),                                                      decimalsDropBoxOptions);
+  addOption(widgets["battery"], "offset",           "value",         _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing needle position"), []);
+  addOption(widgets["battery"], "colour",           "colour_picker", _Tr("Colour label"),    _Tr("Color of the label"),                                                    []);
+  addOption(widgets["battery"], "font",             "dropbox",       _Tr("Font"),            _Tr("Label font"),                                                            fontoptions);
+  addOption(widgets["battery"], "fstyle",           "dropbox",       _Tr("Font style"),      _Tr("Font style used for display"),                                           fstyleoptions);
+  addOption(widgets["battery"], "fweight",          "dropbox",       _Tr("Font weight"),     _Tr("Font weight used for display"),                                          fweightoptions);
 
   return widgets;
 }
@@ -78,7 +109,11 @@ function battery_draw(){
       var max_val = 1*$(this).attr("max") || 100;
       var min_val = 1*$(this).attr("min") || 0;
       var units = $(this).attr("units");
+      var decimals = $(this).attr("decimals");
       var font = $(this).attr("font");
+      var fstyle = $(this).attr("fstyle") || "2";
+      var fweight = $(this).attr("fweight") || "0";
+      var unitend = $(this).attr("unitend") || "0";
       var color = $(this).attr("colour") || "000";
       var title = $(this).attr("battery_title");
 
@@ -91,31 +126,48 @@ function battery_draw(){
       var margin = 1;
       var number_of_blocks = 5;
 
-      if (font == 0){fontname = "Impact"}
-      if (font == 1){fontname = "Georgia"}
-      if (font == 2){fontname = "Arial"}
-      if (font == 3){fontname = "Courier New"}
-      if (font == 4){fontname = "Comic Sans MS"}
-      if (font == 5){fontname = "Helvetica"}
-      if (font == 6){fontname = "sans-serif"}
-      if (font == 7){fontname = "Arial Narrow"}
-      if (font == 8){fontname = "Arial Black"}
-      else if (typeof(font) == "undefined") {fontname = "Arial Black"}
+      var fontname;
+      if (font === "0"){fontname = "Impact";}
+      if (font === "1"){fontname = "Georgia";}
+      if (font === "2"){fontname = "Arial";}
+      if (font === "3"){fontname = "Courier New";}
+      if (font === "4"){fontname = "Comic Sans MS";}
+      if (font === "5"){fontname = "Helvetica";}
+      if (font === "6"){fontname = "sans-serif";}
+      if (font === "7"){fontname = "Arial Narrow";}
+      if (font === "8"){fontname = "Arial Black";}
+      else if (typeof(font) === "undefined") {fontname = "Arial Black";}
 
-      if (color.indexOf("#") == -1) color = "#" + color;
+      var fontstyle;
+
+     if (fstyle === "0"){fontstyle = "oblique";}
+     if (fstyle === "1"){fontstyle = "italic";}
+     if (fstyle === "2"){fontstyle = "normal";}
+
+     var fontweight;
+
+     if (fweight === "0"){fontweight = "normal";}
+     if (fweight === "1"){fontweight = "bold";}
+
+      if (color.indexOf("#") === -1) color = "#" + color;
 
       var data = val*scale + offset;
       
-      if(data > max_val)
-        data = max_val;
-      if (data>=100) {
-          data = data.toFixed(0);
-      } else if (data>=10) {
-          data = data.toFixed(1);
-      } else  {
+      if (decimals<0){
+        if(data > max_val)
+          data = max_val;
+        if (data>=100) {
+            data = data.toFixed(0);
+        } else if (data>=10) {
+            data = data.toFixed(1);
+        } else  {
           data = data.toFixed(2);
+        }
+        data = parseFloat(data);
       }
-      data = parseFloat(data);
+      else {
+        data = data.toFixed(decimals);
+      }
 
       var context = widgetcanvas[id];
       context.globalAlpha = 1;
@@ -159,17 +211,24 @@ function battery_draw(){
       }
 
       var size = ((battery_width<battery_height)?battery_width:battery_height)/2;
-      context.font      = fontname;
+      var unitsandval = data + units;
+      var valsize;
+      if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
+      else {valsize = (size / 6) * 5.5;}
+      var titlesize ;
+      if (title.length >10) {titlesize = (size / (title.length+2)) * 9;}
+      else {titlesize = (size / 12) * 9.5;}
       context.fillStyle = color;
       context.textAlign = "center";
-      context.font = ((size*0.50)+"px "+ fontname);
-      context.fillText(data + units, start_x + battery_width/2, start_y + battery_height*0.6);
+      context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.5)+"px "+ fontname);
+      if (unitend ==="0"){context.fillText(data + units, start_x + battery_width/2, start_y + battery_height*0.6);}
+	  if (unitend ==="1"){context.fillText(units + data, start_x + battery_width/2, start_y + battery_height*0.6);}
 
       if(title)
       {
         context.fillStyle = color;
         context.textAlign = "center";
-        context.font = ((size*0.20)+"px "+ fontname);
+        context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.30)+"px "+ fontname);
         context.fillText(title, start_x + battery_width/2, start_y + battery_height*0.25);
       }
     }
