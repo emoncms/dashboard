@@ -82,7 +82,7 @@ function battery_widgetlist(){
   addOption(widgets["battery"], "units",            "value",         _Tr("Units"),           _Tr("Units to show"),                                                         []);
   addOption(widgets["battery"], "unitend",          "dropbox",       _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                        unitEndOptions);
   addOption(widgets["battery"], "decimals",         "dropbox",       _Tr("Decimals"),        _Tr("Decimals to show"),                                                      decimalsDropBoxOptions);
-  addOption(widgets["battery"], "offset",           "value",         _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing needle position"), []);
+  addOption(widgets["battery"], "offset",           "value",         _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing"),                 []);
   addOption(widgets["battery"], "colour",           "colour_picker", _Tr("Colour label"),    _Tr("Color of the label"),                                                    []);
   addOption(widgets["battery"], "font",             "dropbox",       _Tr("Font"),            _Tr("Label font"),                                                            fontoptions);
   addOption(widgets["battery"], "fstyle",           "dropbox",       _Tr("Font style"),      _Tr("Font style used for display"),                                           fstyleoptions);
