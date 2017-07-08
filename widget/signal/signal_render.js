@@ -53,7 +53,7 @@ function signal_widgetlist(){
   addOption(widgets["signal"], "max",         "value",   _Tr("Max value"),   _Tr("Max value to show"),                                                     []);
   addOption(widgets["signal"], "scale",       "value",   _Tr("Scale"),       _Tr("Value is multiplied by scale before display"),                           []);
   // addOption(widgets["signal"], "units",       "value",   _Tr("Units"),       _Tr("Units to show"),                                                      []);
-  addOption(widgets["signal"], "offset",      "value",   _Tr("Offset"),      _Tr("Static offset. Subtracted from value before computing needle position"), []);
+  addOption(widgets["signal"], "offset",      "value",   _Tr("Offset"),      _Tr("Static offset. Subtracted from value before computing"), []);
   addOption(widgets["signal"], "signal_title",       "value",   _Tr("Signal title"),       _Tr("Signal title"),                                             []);
   addOption(widgets["signal"], "colour1",      "colour_picker",   _Tr("Colour signal"),      _Tr("Color of the signal"),                                      []);
   addOption(widgets["signal"], "colour",      "colour_picker",   _Tr("Colour label"),      _Tr("Color of the label"),                 []);
