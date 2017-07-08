@@ -211,6 +211,7 @@ function draw_dewpoint(context,
 					else {
 						val = val.toFixed(2);
 						}
+				val = parseFloat(val);
 				}
 			else 
 				{
