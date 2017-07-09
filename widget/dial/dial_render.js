@@ -79,17 +79,25 @@ function dial_widgetlist(){
   var unitDropBoxOptions = [
           [0, "Back"],
           [1, "Front"]
-        ];	
+        ];
 
-  addOption(widgets["dial"], "feedid",      "feedid",  _Tr("Feed"),        _Tr("Feed value"),                                                            []);
-  addOption(widgets["dial"], "max",         "value",   _Tr("Max value"),   _Tr("Max value to show"),                                                     []);
-  addOption(widgets["dial"], "scale",       "value",   _Tr("Scale"),       _Tr("Value is multiplied by scale before display"),                           []);
-  addOption(widgets["dial"], "units",       "value",   _Tr("Units"),       _Tr("Units to show"),                                                         []);
-  addOption(widgets["dial"], "decimals",    "dropbox", _Tr("Decimals"),    _Tr("Decimals to show"),                                                      decimalsDropBoxOptions);
-  addOption(widgets["dial"], "offset",      "value",   _Tr("Offset"),      _Tr("Static offset. Subtracted from value before computing needle position"), []);
-  addOption(widgets["dial"], "type",        "dropbox", _Tr("Type"),        _Tr("Type to show"),                                                          typeDropBoxOptions);
-  addOption(widgets["dial"], "graduations", "dropbox", _Tr("Graduations"), _Tr("Should the graduation limits be shown"),                                 graduationDropBoxOptions);
-  addOption(widgets["dial"], "unitend",     "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"),                                      unitDropBoxOptions);
+  var displayminmaxDropBoxOptions = [
+          [0, "No"],
+          [1, "Yes"]
+        ];
+
+  addOption(widgets["dial"], "feedid",        "feedid",  _Tr("Feed"),         _Tr("Feed value"),                                                            []);
+  addOption(widgets["dial"], "max",           "value",   _Tr("Max value"),    _Tr("Max value to show"),                                                     []);
+  addOption(widgets["dial"], "scale",         "value",   _Tr("Scale"),        _Tr("Value is multiplied by scale before display"),                           []);
+  addOption(widgets["dial"], "units",         "value",   _Tr("Units"),        _Tr("Units to show"),                                                         []);
+  addOption(widgets["dial"], "decimals",      "dropbox", _Tr("Decimals"),     _Tr("Decimals to show"),                                                      decimalsDropBoxOptions);
+  addOption(widgets["dial"], "offset",        "value",   _Tr("Offset"),       _Tr("Static offset. Subtracted from value before computing needle position"), []);
+  addOption(widgets["dial"], "type",          "dropbox", _Tr("Type"),         _Tr("Type to show"),                                                          typeDropBoxOptions);
+  addOption(widgets["dial"], "graduations",   "dropbox", _Tr("Graduations"),  _Tr("Should the graduation limits be shown"),                                 graduationDropBoxOptions);
+  addOption(widgets["dial"], "unitend",       "dropbox", _Tr("Unit position"),_Tr("Where should the unit be shown"),                                        unitDropBoxOptions);
+  addOption(widgets["dial"], "displayminmax", "dropbox", _Tr("Min / Max ?"),  _Tr("Display Min. and Max. ?"),                                               displayminmaxDropBoxOptions);
+  addOption(widgets["dial"], "minvaluefeed",  "feedid",  _Tr("Min. feed"),    _Tr("The feed for the minimum value"),                                        []);
+  addOption(widgets["dial"], "maxvaluefeed",  "feedid",  _Tr("Max. feed"),    _Tr("The feed for the maximum value"),                                        []);
 
   return widgets;
 }
@@ -113,26 +121,30 @@ function polar_to_cart(mag, ang, xOff, yOff){
     return Ergebnis;
   }
 // X, Y are the center coordinates of the canvas
-function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend){
+function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed){
   if (!ctx) return;
 
   // if (1 * maxvalue) == false: 3000. Else 1 * maxvalue
   maxvalue = 1 * maxvalue || 3000;
   // if units == false: "". Else units
   units = units || "";
+  displayminmax = displayminmax || "0";
   offset = 1*offset || 0;
-  var val = position
-  position = position-offset
+  var val = position;
+  position = position-offset;
+  minvaluefeed = minvaluefeed-offset;
+  maxvaluefeed = maxvaluefeed-offset;
 
   var size = 0;
   if (width<height) size = width/2;
   else size = height/2;
-  size = size - (size*0.058/2);
+  if(displayminmax==="1"){size = size - (size*0.13/2);}
+  else {size = size - (size*0.058/2);}
 
   x = width/2;
   y = height/2;
 
-  ctx.clearRect(0,0,200,200);
+  ctx.clearRect(0,0,width,height);
 
   if (!position) position = 0;
 
@@ -269,7 +281,15 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
   var needle = 1.75 - ((position/maxvalue) * (1.5+angleOffset)) + angleOffset;
   needle = Math.min(needle, 1.75);
   needle = Math.max(needle, 0.25);
-  
+
+  var minindicator = 1.75 - ((minvaluefeed/maxvalue) * (1.5+angleOffset)) + angleOffset;
+  minindicator = Math.min(minindicator, 1.75);
+  minindicator = Math.max(minindicator, 0.25);
+
+  var maxindicator = 1.75 - ((maxvaluefeed/maxvalue) * (1.5+angleOffset)) + angleOffset;
+  maxindicator = Math.min(maxindicator, 1.75);
+  maxindicator = Math.max(maxindicator, 0.25);
+
   width = 0.785;
   var c=3*0.785;
   var pos = 0;
@@ -311,6 +331,7 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
+  
 
   
   if (isNaN(val)){
@@ -364,7 +385,7 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
     ctx.fillText(""+start_limit+units, 0, 0);}
     if (unitend ==="1"){
     ctx.fillText(""+units+start_limit, 0, 0);}
-	// Since we've translated the entire context, the coords we want to draw at are now at [0,0]  
+    // Since we've translated the entire context, the coords we want to draw at are now at [0,0]  
     ctx.restore();
     
     ctx.save(); // each ctx.save is only good for one restore, apparently.
@@ -378,14 +399,36 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
     if (unitend ==="1"){
     ctx.fillText(""+units+end_limit, 0, 0);}  
     ctx.restore();
+
+
+    if(displayminmax==="1"){
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x+Math.sin(Math.PI*minindicator)*size,y+Math.cos(Math.PI*minindicator)*size,size*0.052,0,2*Math.PI,true);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(x+Math.sin(Math.PI*maxindicator)*size,y+Math.cos(Math.PI*maxindicator)*size,size*0.052,0,2*Math.PI,true);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
   }
 }
 
 function dial_draw(){
   $(".dial").each(function(index) {
     var feedid = $(this).attr("feedid");
+    var minvaluefeed = $(this).attr("minvaluefeed")||"0";
+    var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
+
     var val = curve_value(feedid,dialrate).toFixed(3);
+    var minval = curve_value(minvaluefeed,dialrate).toFixed(3);
+    var maxval = curve_value(maxvaluefeed,dialrate).toFixed(3);
+
     // ONLY UPDATE ON CHANGE
     if (val != (associd[feedid]["value"] * 1).toFixed(3) || redraw == 1)
     {
@@ -404,7 +447,10 @@ function dial_draw(){
                  $(this).attr("type"),
                  $(this).attr("offset"),
                  $(this).attr("graduations"),
-                 unitend
+                 unitend,
+                 $(this).attr("displayminmax"),
+                 minval*scale,
+                 maxval*scale
                  );
     }
   });
@@ -414,7 +460,8 @@ function dial_init(){
   setup_widget_canvas("dial");
 }
 
-function dial_slowupdate(){}
+function dial_slowupdate(){
+}
 
 function dial_fastupdate(){
   dial_draw();
