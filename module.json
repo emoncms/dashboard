@@ -1,0 +1,11 @@
+{
+    "name"         : "Dashboard",
+    "version"      : "1.0.2",
+    "description"  : "Dashboard module for emoncms",
+    "homepage"     : "https://github.com/emoncms/dashboard",
+    "license"      : "GNU Affero General Public License v3.0",
+    "repository"   : {
+        "type":"git",
+        "url":"https://github.com/emoncms/dashboard.git"
+    }
+}
