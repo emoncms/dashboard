@@ -310,6 +310,9 @@ function draw_bar(context,
       var canvas = document.getElementById(canvasid);
       var cw=canvas.width;
       var ch=canvas.height;
+      var offsetX,offsetY;
+      var mouseX,mouseY;
+
       div1 = document.createElement("div");      // the tool-tip div
       div2 = document.createElement("div");      // the tool-tip div
       parent = canvas.parentNode;           // parent node for canvas
@@ -326,8 +329,8 @@ function draw_bar(context,
 
       var offsetX,offsetY;
       reOffset();
-      window.onscroll=function(e){ reOffset(); }
-      window.onresize=function(e){ reOffset(); }
+      window.onscroll=function(e){ reOffset(); };
+      window.onresize=function(e){ reOffset(); };
 
 	  
 
