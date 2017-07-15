@@ -337,9 +337,6 @@ function draw_bar(context,
       {xspot:(bar_border_space),yspot:(bar_max),wspot:(width-(bar_border_space*2)),hspot:2,tip: maxvaluefeed},
       ];
 
-
-
-       $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
        function handleMouseMove(e){
        e.preventDefault();
        e.stopPropagation();
@@ -375,8 +372,9 @@ function draw_bar(context,
         else {
           div2.style.visibility ="hidden";
           }
+       }
 
-     }
+       $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
 
     if (colour_label.indexOf("#") === -1) {colour_label = "#" + colour_label;} // Fix missing "#" on colour if needed
     context.fillStyle = colour_label;
