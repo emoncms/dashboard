@@ -458,13 +458,14 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
       var canvas = document.getElementById(canvasid);
       var cw=canvas.width;
       var ch=canvas.height;
+      var offsetX,offsetY;
+
       function reOffset(){
        var BB=canvas.getBoundingClientRect();
        offsetX=BB.left;
        offsetY=BB.top;
       }
 
-      var offsetX,offsetY;
       reOffset();
       window.onscroll=function(e){ reOffset(); }
       window.onresize=function(e){ reOffset(); }
