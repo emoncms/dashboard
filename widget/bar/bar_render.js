@@ -116,29 +116,30 @@ function bar_widgetlist()
 
 
 function draw_bar(context,
-                x_pos,              // these x and y coords seem unused?
-                y_pos,
-                title,
-                font,
-                fstyle,
-                fweight,
-                width,
-                height,
-                raw_value,
-                max_value,
-                units_string,
-                decimals,
-                unitend,
-                display_colour,
-                colour_label,
-                static_offset,
-                graduationBool,
-                graduationQuant,
-                displayminmax,
-                minvaluefeed,
-                maxvaluefeed,
-                colour_minmax
-                )
+                  canvasid,
+                  x_pos,              // these x and y coords seem unused?
+                  y_pos,
+                  title,
+                  font,
+                  fstyle,
+                  fweight,
+                  width,
+                  height,
+                  raw_value,
+                  max_value,
+                  units_string,
+                  decimals,
+                  unitend,
+                  display_colour,
+                  colour_label,
+                  static_offset,
+                  graduationBool,
+                  graduationQuant,
+                  displayminmax,
+                  minvaluefeed,
+                  maxvaluefeed,
+                  colour_minmax
+                  )
 {
     if (!context)
         return;
@@ -174,6 +175,47 @@ function draw_bar(context,
     var max_scaled_value = (max_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
     if (max_scaled_value < 0){max_scaled_value = 0;}
 
+        if (decimals<0){
+            if (raw_value>=100) {
+            raw_value = raw_value.toFixed(0);
+            } else if (raw_value>=10) {
+            raw_value = raw_value.toFixed(1);
+            } else  {
+            raw_value = raw_value.toFixed(2);
+            }
+        raw_value = parseFloat(raw_value);
+        }
+        else {
+             raw_value = raw_value.toFixed(decimals);
+        }
+
+        if (decimals<0){
+            if (minvaluefeed>=100) {
+            minvaluefeed = minvaluefeed.toFixed(0);
+            } else if (minvaluefeed>=10) {
+            minvaluefeed = minvaluefeed.toFixed(1);
+            } else  {
+            minvaluefeed = minvaluefeed.toFixed(2);
+            }
+        minvaluefeed = parseFloat(minvaluefeed);
+        }
+        else {
+             minvaluefeed = minvaluefeed.toFixed(decimals);
+        }
+
+        if (decimals<0){
+            if (maxvaluefeed>=100) {
+            maxvaluefeed = maxvaluefeed.toFixed(0);
+            } else if (maxvaluefeed>=10) {
+            maxvaluefeed = maxvaluefeed.toFixed(1);
+            } else  {
+            maxvaluefeed = maxvaluefeed.toFixed(2);
+            }
+        maxvaluefeed = parseFloat(maxvaluefeed);
+        }
+        else {
+             maxvaluefeed = maxvaluefeed.toFixed(decimals);
+        }
     var size = 0;
     if (width<height){size = width/2;}
     else {size = height/2;}
@@ -265,6 +307,77 @@ function draw_bar(context,
                     2 );
     }
 
+      var canvas = document.getElementById(canvasid);
+      var cw=canvas.width;
+      var ch=canvas.height;
+      div1 = document.createElement("div");      // the tool-tip div
+      div2 = document.createElement("div");      // the tool-tip div
+      parent = canvas.parentNode;           // parent node for canvas
+
+      parent.appendChild(div1);
+      parent.appendChild(div2);
+      function reOffset(){
+       var BB=canvas.getBoundingClientRect();
+       offsetX=BB.left;
+       offsetY=BB.top;
+       div1.style.visibility ="hidden";
+       div2.style.visibility ="hidden";
+      }
+
+      var offsetX,offsetY;
+      reOffset();
+      window.onscroll=function(e){ reOffset(); }
+      window.onresize=function(e){ reOffset(); }
+
+	  
+
+
+     var hotspots=[ // declare hotspots in order to active associated tooltips
+      {xspot:(bar_border_space),yspot:(bar_min),wspot:(width-(bar_border_space*2)),hspot:2,tip: minvaluefeed},
+      {xspot:(bar_border_space),yspot:(bar_max),wspot:(width-(bar_border_space*2)),hspot:2,tip: maxvaluefeed},
+      ];
+
+
+
+       $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
+       function handleMouseMove(e){
+       e.preventDefault();
+       e.stopPropagation();
+
+       mouseX=parseInt(e.clientX-offsetX);
+       mouseY=parseInt(e.clientY-offsetY);
+
+        var dx=mouseX;
+        var dy=mouseY;
+
+        var h=hotspots[0];
+        if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
+        var tooltipsize = minvaluefeed.length;
+        div1.style.cssText = "position:fixed;padding:0px;background-color:#E4E4E4;pointer-events:none;width:" + tooltipsize*size*0.11 + "px;color:#5C5C5C;font-size:"+ size*0.18 +"px";
+        div1.style.left = offsetX + "px";
+        div1.style.top =  offsetY+ "px";
+        div1.style.visibility ="visible";
+        div1.innerHTML = "&nbsp;"+h.tip;
+        }
+        else {
+          div1.style.visibility ="hidden";
+          }
+
+        var h=hotspots[1];
+        if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
+        var tooltipsize = maxvaluefeed.length;
+        div2.style.cssText = "position:fixed;padding:0px;background-color:#E4E4E4;pointer-events:none;width:" + tooltipsize*size*0.11 + "px;color:#5C5C5C;font-size:"+ size*0.18 +"px";
+        div2.style.left = offsetX + "px";
+        div2.style.top =  offsetY + "px";
+        div2.style.visibility ="visible";
+        div2.innerHTML = "&nbsp;"+h.tip;
+        }
+        else {
+          div2.style.visibility ="hidden";
+          }
+
+     }
+
     if (colour_label.indexOf("#") === -1) {colour_label = "#" + colour_label;} // Fix missing "#" on colour if needed
     context.fillStyle = colour_label;
     
@@ -303,21 +416,6 @@ function draw_bar(context,
             context.stroke();
         }
     }
-
-        if (decimals<0){
-            if (raw_value>=100) {
-            raw_value = raw_value.toFixed(0);
-            } else if (raw_value>=10) {
-            raw_value = raw_value.toFixed(1);
-            } else  {
-            raw_value = raw_value.toFixed(2);
-            }
-        raw_value = parseFloat(raw_value);
-        }
-        else {
-             raw_value = raw_value.toFixed(decimals);
-        }
-
 
     context.fillStyle = colour_label;
     
@@ -374,29 +472,30 @@ function bar_draw()
             var id = "can-"+$(this).attr("id");
             var scale = 1*$(this).attr("scale") || 1;
             draw_bar(widgetcanvas[id],
-                                0,
-                                0,
-                                $(this).attr("title"),
-                                $(this).attr("font"),
-                                $(this).attr("fstyle"),
-                                $(this).attr("fweight"),
-                                $(this).width(),
-                                $(this).height(),
-                                val*scale,
-                                $(this).attr("max"),
-                                $(this).attr("units"),
-                                $(this).attr("decimals"),
-                                $(this).attr("unitend"),
-                                $(this).attr("colour"),
-                                $(this).attr("colour_label"),
-                                $(this).attr("offset"),
-                                $(this).attr("graduations"),
-                                $(this).attr("gradNumber"),
-                                $(this).attr("displayminmax"),
-                                minval*scale,
-                                maxval*scale,
-                                $(this).attr("colour_minmax")
-                                );
+                     id,
+                     0,
+                     0,
+                     $(this).attr("title"),
+                     $(this).attr("font"),
+                     $(this).attr("fstyle"),
+                     $(this).attr("fweight"),
+                     $(this).width(),
+                     $(this).height(),
+                     val*scale,
+                     $(this).attr("max"),
+                     $(this).attr("units"),
+                     $(this).attr("decimals"),
+                     $(this).attr("unitend"),
+                     $(this).attr("colour"),
+                     $(this).attr("colour_label"),
+                     $(this).attr("offset"),
+                     $(this).attr("graduations"),
+                     $(this).attr("gradNumber"),
+                     $(this).attr("displayminmax"),
+                     minval*scale,
+                     maxval*scale,
+                     $(this).attr("colour_minmax")
+                     );
         }
     });
 }
