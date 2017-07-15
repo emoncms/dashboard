@@ -85,6 +85,11 @@ function bar_widgetlist()
                     [1, "On"]
                     ];
 
+    var displayminmaxDropBoxOptions = [
+                    [0, "No"],
+                    [1, "Yes"]
+                    ];
+
     addOption(widgets["bar"], "title",          "value",            _Tr("Title"),           _Tr("Title of bar"),                                                                []);
     addOption(widgets["bar"], "colour_label",   "colour_picker",    _Tr("Label Colour"),    _Tr("Colour of title and values"),                                                  []);
     addOption(widgets["bar"], "font",           "dropbox",          _Tr("Font used"),       _Tr("Font used"),                                                                   fontoptions);
@@ -100,6 +105,10 @@ function bar_widgetlist()
     addOption(widgets["bar"], "colour",         "colour_picker",    _Tr("Colour"),          _Tr("Colour to draw bar in"),                                                       []);
     addOption(widgets["bar"], "graduations",    "dropbox",          _Tr("Graduations"),     _Tr("Should the graduations be shown"),                                             graduationDropBoxOptions);
     addOption(widgets["bar"], "gradNumber",     "value",            _Tr("Grad. Num."),      _Tr("How many graduation lines to draw (only relevant if graduations are on)"),     []);
+    addOption(widgets["bar"], "displayminmax",  "dropbox",          _Tr("Min / Max ?"),     _Tr("Display Min. and Max. ?"),                                                     displayminmaxDropBoxOptions);
+    addOption(widgets["bar"], "minvaluefeed",   "feedid",           _Tr("Min. feed"),       _Tr("The feed for the minimum value"),                                              []);
+    addOption(widgets["bar"], "maxvaluefeed",   "feedid",           _Tr("Max. feed"),       _Tr("The feed for the maximum value"),                                              []);
+    addOption(widgets["bar"], "colour_minmax",   "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
 
 
     return widgets;
@@ -124,7 +133,12 @@ function draw_bar(context,
                 colour_label,
                 static_offset,
                 graduationBool,
-                graduationQuant)
+                graduationQuant,
+                displayminmax,
+                minvaluefeed,
+                maxvaluefeed,
+                colour_minmax
+                )
 {
     if (!context)
         return;
@@ -140,19 +154,29 @@ function draw_bar(context,
     fweight = fweight || "0";
     unitend = unitend || "0";
     colour_label = colour_label || "000";
+    colour_minmax = colour_minmax || "555";
     static_offset = 1*static_offset || 0;
-    var display_value = raw_value
-    display_value = display_value-static_offset
+    var display_value = raw_value;
+    display_value = display_value-static_offset;
 
     var scaled_value = (display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
-    if (scaled_value < 0)
-        scaled_value = 0;
+    if (scaled_value < 0){scaled_value = 0;}
+
+    var min_display_value = minvaluefeed
+    min_display_value = min_display_value-static_offset
+
+    var min_scaled_value = (min_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
+    if (min_scaled_value < 0){min_scaled_value = 0;}
+
+    var max_display_value = maxvaluefeed
+    max_display_value = max_display_value-static_offset
+
+    var max_scaled_value = (max_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
+    if (max_scaled_value < 0){max_scaled_value = 0;}
 
     var size = 0;
-    if (width<height)
-        size = width/2;
-    else
-        size = height/2;
+    if (width<height){size = width/2;}
+    else {size = height/2;}
     size = size - (size*0.058/2);
 
     var fontname;
@@ -167,7 +191,7 @@ function draw_bar(context,
     if (font === "7"){fontname = "sans-serif";}
     if (font === "8"){fontname = "Arial Narrow";}
     if (font === "9"){fontname = "Arial Black";}
-    else if (typeof(font) === "undefined") {fontname = "Arial Black"}
+    else if (typeof(font) === "undefined") {fontname = "Arial Black";}
 
     var fontstyle;
 
@@ -182,8 +206,8 @@ function draw_bar(context,
 
     if (graduationBool === "1")
     {
-        height = height - (size/2)
-        width = width - (size)
+        height = height - (size/2);
+        width = width - (size);
     }
 
     var half_width = width/2;
@@ -201,7 +225,7 @@ function draw_bar(context,
                        height-(border_space*2));
     context.lineWidth = 0;
     
-    if (display_colour.indexOf("#") === -1) display_colour = "#" + display_colour;  // Fix missing "#" on colour if needed
+    if (display_colour.indexOf("#") === -1) {display_colour = "#" + display_colour;}  // Fix missing "#" on colour if needed
 
     context.fillStyle = display_colour;
 
@@ -209,15 +233,39 @@ function draw_bar(context,
     var bar_top = ((height-bar_border_space) - (scaled_value * (height - (bar_border_space*2))));
 
     if (bar_top < bar_border_space)     // Clamp value so we don't overshoot the top of the bargraph.
-        bar_top = bar_border_space;
+       {bar_top = bar_border_space;}
 
     context.fillRect(bar_border_space,
                     bar_top,
                     width-(bar_border_space*2),
                     (height-bar_border_space) - bar_top );
+    if(displayminmax==="1"){
 
-                    
-    if (colour_label.indexOf("#") === -1) colour_label = "#" + colour_label; // Fix missing "#" on colour if needed
+    if (colour_minmax.indexOf("#") === -1) {colour_minmax = "#" + colour_minmax;}  // Fix missing "#" on colour if needed
+    context.fillStyle = colour_minmax;
+    var bar_min = ((height-bar_border_space) - (min_scaled_value * (height - (bar_border_space*2))));
+
+    if (bar_min < bar_border_space)     // Clamp value so we don't overshoot the top of the bargraph.
+       {bar_min = bar_border_space;}
+
+    context.fillRect(bar_border_space,
+                    bar_min,
+                    width-(bar_border_space*2),
+                    2 );
+
+    context.fillStyle = colour_minmax;
+    var bar_max = ((height-bar_border_space) - (max_scaled_value * (height - (bar_border_space*2))));
+
+    if (bar_max < bar_border_space)     // Clamp value so we don't overshoot the top of the bargraph.
+       {bar_max = bar_border_space;}
+
+    context.fillRect(bar_border_space,
+                    bar_max,
+                    width-(bar_border_space*2),
+                    2 );
+    }
+
+    if (colour_label.indexOf("#") === -1) {colour_label = "#" + colour_label;} // Fix missing "#" on colour if needed
     context.fillStyle = colour_label;
     
     if (graduationBool == 1)
@@ -240,11 +288,11 @@ function draw_bar(context,
                 context.moveTo(border_space, curY);
                 context.lineTo(width-border_space, curY);
 
-                var unitOffset = Number(static_offset+((graduationQuant-y)*(max_value/divisions)))
+                var unitOffset = Number(static_offset+((graduationQuant-y)*(max_value/divisions)));
                 if (unitOffset < 1000)
-                    unitOffset = unitOffset.toFixed(1)
+                    {unitOffset = unitOffset.toFixed(1);}
                 else
-                    unitOffset = unitOffset.toFixed(0)
+                    {unitOffset = unitOffset.toFixed(0);}
                 if (unitend ==="0"){context.fillText(parseFloat(unitOffset)+units_string, width+(size*0.1), curY+(size*0.05));}
                 if (unitend ==="1"){context.fillText(units_string+parseFloat(unitOffset), width+(size*0.1), curY+(size*0.05));}
             }
@@ -311,13 +359,17 @@ function draw_bar(context,
 }
 function bar_draw()
 {
-    $('.bar').each(function(index)
+    $(".bar").each(function(index)
     {
         var feedid = $(this).attr("feedid");
+        var minvaluefeed = $(this).attr("minvaluefeed");
+        var maxvaluefeed = $(this).attr("maxvaluefeed");
         if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
         var val = curve_value(feedid,dialrate).toFixed(3);
+        var minval = curve_value(minvaluefeed,dialrate).toFixed(3);
+        var maxval = curve_value(maxvaluefeed,dialrate).toFixed(3);
         // ONLY UPDATE ON CHANGE
-        if (val != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1)
+        if (val != (associd[feedid]["value"] * 1).toFixed(3) || redraw == 1)
         {
             var id = "can-"+$(this).attr("id");
             var scale = 1*$(this).attr("scale") || 1;
@@ -339,7 +391,11 @@ function bar_draw()
                                 $(this).attr("colour_label"),
                                 $(this).attr("offset"),
                                 $(this).attr("graduations"),
-                                $(this).attr("gradNumber")
+                                $(this).attr("gradNumber"),
+                                $(this).attr("displayminmax"),
+                                minval*scale,
+                                maxval*scale,
+                                $(this).attr("colour_minmax")
                                 );
         }
     });
@@ -348,7 +404,7 @@ function bar_draw()
 
 function bar_init()
 {
-    setup_widget_canvas('bar');
+    setup_widget_canvas("bar");
 }
 function bar_slowupdate()
 {
