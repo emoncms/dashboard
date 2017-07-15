@@ -371,7 +371,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
     else{
     val2 = val2.toFixed(2);}
 
-    val2 = parseFloat(val);
+    val2 = parseFloat(val2);
   }
   
   if (isNaN(val3)){
@@ -390,7 +390,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
     else{
     val3 = val3.toFixed(2);}
 
-    val3 = parseFloat(val);
+    val3 = parseFloat(val3);
   }
     
   var dialtext;
@@ -476,7 +476,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
       {xspot:(x+Math.sin(Math.PI*maxindicator)*size),yspot:(y+Math.cos(Math.PI*maxindicator)*size),radius:(size*0.052),tip: val3},
       ];
 
-       $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
+
 
       function handleMouseMove(e){
        e.preventDefault();
@@ -502,6 +502,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
         }
       }
      }
+     $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
     }
   }
 }
