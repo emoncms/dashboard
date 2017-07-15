@@ -467,8 +467,8 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
       }
 
       reOffset();
-      window.onscroll=function(e){ reOffset(); }
-      window.onresize=function(e){ reOffset(); }
+      window.onscroll=function(e){ reOffset(); };
+      window.onresize=function(e){ reOffset(); };
 
       var hotspots=[ // declare hotspots in order to active associated tooltips
       {xspot:(x+Math.sin(Math.PI*minindicator)*size),yspot:(y+Math.cos(Math.PI*minindicator)*size),radius:(size*0.052),tip: val2},
