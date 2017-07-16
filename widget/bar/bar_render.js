@@ -256,7 +256,7 @@ function draw_bar(context,
     var half_height = height/2;
 
 
-    if (!display_value) display_value = 0;  // Clamp value so we don't draw negative values.
+    if (!display_value) {display_value = 0;}  // Clamp value so we don't draw negative values.
 
     context.lineWidth = 1;
     context.strokeStyle = "#000";
@@ -348,7 +348,7 @@ function draw_bar(context,
         div1.style.left = e.clientX + 15 + "px";
         div1.style.top =  e.clientY + 15+ "px";
         div1.style.visibility ="visible";
-        div1.innerHTML = "&nbsp"+h.tip+"&nbsp";
+        div1.innerHTML = "&nbsp;"+h.tip+"&nbsp;";
         }
         else {
           div1.style.visibility ="hidden";
