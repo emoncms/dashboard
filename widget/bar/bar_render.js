@@ -313,18 +313,10 @@ function draw_bar(context,
       var offsetX,offsetY;
       var mouseX,mouseY;
 
-      div1 = document.createElement("div");      // the tool-tip div
-      div2 = document.createElement("div");      // the tool-tip div
-      parent = canvas.parentNode;           // parent node for canvas
-
-      parent.appendChild(div1);
-      parent.appendChild(div2);
       function reOffset(){
        var BB=canvas.getBoundingClientRect();
        offsetX=BB.left;
        offsetY=BB.top;
-       div1.style.visibility ="hidden";
-       div2.style.visibility ="hidden";
       }
 
       var offsetX,offsetY;
@@ -352,12 +344,11 @@ function draw_bar(context,
 
         var h=hotspots[0];
         if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
-        var tooltipsize = minvaluefeed.length;
-        div1.style.cssText = "position:fixed;padding:0px;background-color:#E4E4E4;pointer-events:none;width:" + tooltipsize*size*0.11 + "px;color:#5C5C5C;font-size:"+ size*0.18 +"px";
-        div1.style.left = offsetX + "px";
-        div1.style.top =  offsetY+ "px";
+        div1.style.cssText = "position:fixed;padding:0px;background-color:#E4E4E4;pointer-events:none;color:#5C5C5C;font-size:"+ 18 +"px";
+        div1.style.left = e.clientX + 15 + "px";
+        div1.style.top =  e.clientY + 15+ "px";
         div1.style.visibility ="visible";
-        div1.innerHTML = "&nbsp;"+h.tip;
+        div1.innerHTML = "&nbsp"+h.tip+"&nbsp";
         }
         else {
           div1.style.visibility ="hidden";
@@ -365,12 +356,11 @@ function draw_bar(context,
 
         var h=hotspots[1];
         if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
-        var tooltipsize = maxvaluefeed.length;
-        div2.style.cssText = "position:fixed;padding:0px;background-color:#E4E4E4;pointer-events:none;width:" + tooltipsize*size*0.11 + "px;color:#5C5C5C;font-size:"+ size*0.18 +"px";
-        div2.style.left = offsetX + "px";
-        div2.style.top =  offsetY + "px";
+        div2.style.cssText = "position:fixed;padding:0px;background-color:#E4E4E4;pointer-events:none;color:#5C5C5C;font-size:"+ 18 +"px";
+        div2.style.left = e.clientX + 15 + "px";
+        div2.style.top =  e.clientY + 15+ "px";
         div2.style.visibility ="visible";
-        div2.innerHTML = "&nbsp;"+h.tip;
+        div2.innerHTML = "&nbsp"+h.tip+"&nbsp";
         }
         else {
           div2.style.visibility ="hidden";
@@ -456,6 +446,19 @@ function draw_bar(context,
     var spreadAngle = 32;
 
 }
+
+function bar_define_tooltips(){
+  $(".bar").each(function(index) {
+      var id2 = "can-"+$(this).attr("id");
+      var canvas2 = document.getElementById(id2);
+      div1 = document.createElement("div");      // the tool-tip div
+      div2 = document.createElement("div");      // the tool-tip div
+      parent = canvas2.parentNode;           // parent node for canvas
+
+      parent.appendChild(div1);
+      parent.appendChild(div2);
+  });
+}
 function bar_draw()
 {
     $(".bar").each(function(index)
@@ -467,6 +470,7 @@ function bar_draw()
         var val = curve_value(feedid,dialrate).toFixed(3);
         var minval = curve_value(minvaluefeed,dialrate).toFixed(3);
         var maxval = curve_value(maxvaluefeed,dialrate).toFixed(3);
+
         // ONLY UPDATE ON CHANGE
         if (val != (associd[feedid]["value"] * 1).toFixed(3) || redraw == 1)
         {
@@ -505,6 +509,7 @@ function bar_draw()
 function bar_init()
 {
     setup_widget_canvas("bar");
+    bar_define_tooltips();
 }
 function bar_slowupdate()
 {
