@@ -448,12 +448,13 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
       var ch=canvas.height;
       var offsetX,offsetY;
       var mouseX,mouseY;
+      var dx,dy;
 
       function reOffset(){
        var BB=canvas.getBoundingClientRect();
        offsetX=BB.left;
        offsetY=BB.top;
-      }
+      };
 
       reOffset();
       window.onscroll=function(e){ reOffset(); };
@@ -473,34 +474,34 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
        mouseX=parseInt(e.clientX-offsetX);
        mouseY=parseInt(e.clientY-offsetY);
 
-        var h=hotspots[0];
-        var dx=mouseX-h.xspot;
-        var dy=mouseY-h.yspot;
-        if(dx*dx+dy*dy<h.radius*h.radius){
+       h=hotspots[0];
+       dx=mouseX-h.xspot;
+       dy=mouseY-h.yspot;
+       if(dx*dx+dy*dy<h.radius*h.radius){
         div1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
         div1.style.left = e.clientX + 15 + "px";
         div1.style.top =  e.clientY + 15+ "px";
         div1.style.visibility ="visible";
         div1.innerHTML = "&nbsp;"+h.tip+"&nbsp;";
-        }
-        else {
-          div1.style.visibility ="hidden";
-          }
-
-        var h=hotspots[1];
-        var dx=mouseX-h.xspot;
-        var dy=mouseY-h.yspot;
-        if(dx*dx+dy*dy<h.radius*h.radius){
-        div2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
-        div2.style.left = e.clientX + 15 + "px";
-        div2.style.top =  e.clientY + 15+ "px";
-        div2.style.visibility ="visible";
-        div2.innerHTML = "&nbsp"+h.tip+"&nbsp";
-        }
-        else {
-          div2.style.visibility ="hidden";
-          }
        }
+       else {
+         div1.style.visibility ="hidden";
+       }
+
+       h=hotspots[1];
+       dx=mouseX-h.xspot;
+       dy=mouseY-h.yspot;
+       if(dx*dx+dy*dy<h.radius*h.radius){
+       div2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+       div2.style.left = e.clientX + 15 + "px";
+       div2.style.top =  e.clientY + 15+ "px";
+       div2.style.visibility ="visible";
+       div2.innerHTML = "&nbsp"+h.tip+"&nbsp";
+       }
+       else {
+          div2.style.visibility ="hidden";
+       }
+      }
      $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
     }
   }
