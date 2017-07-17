@@ -103,7 +103,7 @@ function dial_widgetlist(){
 }
 
 function deg_to_radians(deg){
-  return deg * (Math.PI / 180)
+  return deg * (Math.PI / 180);
 }
 function polar_to_cart(mag, ang, xOff, yOff){
   ang = deg_to_radians(ang);
@@ -138,8 +138,8 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   maxvaluefeed = maxvaluefeed-offset;
 
   var size = 0;
-  if (width<height) size = width/2;
-  else size = height/2;
+  if (width<height) {size = width/2;}
+  else {size = height/2;}
   if(displayminmax==="1"){size = size - (size*0.13/2);}
   else {size = size - (size*0.058/2);}
 
@@ -205,64 +205,52 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
     segment = ["#0d97f3","#a7cbe2","#ffbebe","#ff8383","#ff6464","#ff3d3d"];
   }
   else if (type === "12"){ //  - from light to dark red
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#FFCCCC", "#FFA3A3", "#FF7A7A", "#FF5151", "#FF2828", "#FF0000"];
   }
   else if (type === "13"){ //  - from light to dark orange
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#FFE5CC", "#FFD0A3", "#FFBC7A", "#FFA851", "#FF9428", "#FF8000"];
   }
   else if (type === "14"){ //  - from light to dark yellow
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#FFFFCC", "#FFFFA3", "#FFFF7A", "#FFFF51", "#FFFF28", "#FFFF00"];
   }
   else if (type === "15"){ //  - from light to dark cyan
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#CCFFFF", "#A3FFFF", "#7AFFFF", "#51FFFF", "#28FFFF", "#00FFFF"];
   }
   else if (type === "16"){ //  - from light to dark purple
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#E5CCFF", "#D0A3FF", "#BC7AFF", "#A851FF", "#9428FF", "#8000FF"];
   }
   else if (type === "17"){ //  - from light to dark pink
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#FFCCFF", "#FFA3FF", "#FF7AFF", "#FF51FF", "#FF28FF", "#FF00FF"];
   }
   else if (type === "18"){ //  - from light to dark lime
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#CCFFCC", "#A3FFA3", "#7AFF7A", "#51FF51", "#28FF28", "#00FF00"];
   }
   else if (type === "19"){ //  - from light to dark mint
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#EEFCF5", "#E0F9ED", "#D2F7E6", "#C5F4DF", "#B7F2D8", "#AAF0D1"];
   }
   else if (type === "20"){ //  - from light to dark royal blue
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#CCCCFF", "#A3A3FF", "#7A7AFF", "#5151FF", "#2828FF", "#0000FF"];
   }
   else if (type === "21"){ //  - rainbow!
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#FF0000", "#FF8000", "#FFFF00", "#00FF00", "#0000FF", "#8000FF"];
   }
   else if (type === "22"){ //  - reverse rainbow!
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#8000FF", "#0000FF", "#00FF00", "#FFFF00", "#FF8000", "#FF0000"];
   }
   else if (type === "23")  // can be used to emulate a barometer and display a pressure
   {
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#C0C0C0","#868686","#C0C0C0","#868686","#C0C0C0","#868686"];
   }
 
