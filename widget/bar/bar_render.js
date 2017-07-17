@@ -316,7 +316,7 @@ function draw_bar(context,
        var BB=canvas.getBoundingClientRect();
        offsetX=BB.left;
        offsetY=BB.top;
-      }
+      };
 
       reOffset();
       window.onscroll=function(e){ reOffset(); };
@@ -337,7 +337,7 @@ function draw_bar(context,
         var dx=mouseX;
         var dy=mouseY;
 
-        var h=hotspots[0];
+        h=hotspots[0];
         if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
         div1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
         div1.style.left = e.clientX + 15 + "px";
@@ -349,7 +349,7 @@ function draw_bar(context,
           div1.style.visibility ="hidden";
           }
 
-        var h=hotspots[1];
+        h=hotspots[1];
         if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
         div2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
         div2.style.left = e.clientX + 15 + "px";
