@@ -122,7 +122,7 @@ function polar_to_cart(mag, ang, xOff, yOff){
   }
 // X, Y are the center coordinates of the canvas
 function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed){
-  if (!ctx) return;
+  if (!ctx) {return;}
 
   // if (1 * maxvalue) == false: 3000. Else 1 * maxvalue
   maxvalue = 1 * maxvalue || 3000;
@@ -148,7 +148,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
 
   ctx.clearRect(0,0,width,height);
 
-  if (!position) position = 0;
+  if (!position) {position = 0;}
 
   var angleOffset = 0;
   var segment = ["#c0e392","#9dc965","#87c03f","#70ac21","#378d42","#046b34"];
@@ -485,26 +485,50 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
        mouseX=parseInt(e.clientX-offsetX);
        mouseY=parseInt(e.clientY-offsetY);
 
-       ctx.clearRect(0,0,cw*0.27,size*0.22); // clear old tootltip
-
-       for(var i=0;i<hotspots.length;i++){ // display tooltip when mouse is over a hotspot
-        var h=hotspots[i];
+        var h=hotspots[0];
         var dx=mouseX-h.xspot;
         var dy=mouseY-h.yspot;
         if(dx*dx+dy*dy<h.radius*h.radius){
-        var tooltipsize = (h.tip).length;
-        ctx.fillStyle="#E4E4E4";
-        ctx.fillRect(0,0,tooltipsize*size*0.11,size*0.22);
-        ctx.textAlign = "start";
-        ctx.font = "bold "+(size*0.18)+"px arial";
-        ctx.fillStyle="#5C5C5C";
-        ctx.fillText(h.tip,size*0.03,size*0.18);
+        div1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+        div1.style.left = e.clientX + 15 + "px";
+        div1.style.top =  e.clientY + 15+ "px";
+        div1.style.visibility ="visible";
+        div1.innerHTML = "&nbsp;"+h.tip+"&nbsp;";
         }
-      }
-     }
+        else {
+          div1.style.visibility ="hidden";
+          }
+
+        var h=hotspots[1];
+        var dx=mouseX-h.xspot;
+        var dy=mouseY-h.yspot;
+        if(dx*dx+dy*dy<h.radius*h.radius){
+        div2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+        div2.style.left = e.clientX + 15 + "px";
+        div2.style.top =  e.clientY + 15+ "px";
+        div2.style.visibility ="visible";
+        div2.innerHTML = "&nbsp"+h.tip+"&nbsp";
+        }
+        else {
+          div2.style.visibility ="hidden";
+          }
+       }
      $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
     }
   }
+}
+
+function dial_define_tooltips(){
+  $(".dial").each(function(index) {
+      var id2 = "can-"+$(this).attr("id");
+      var canvas2 = document.getElementById(id2);
+      div1 = document.createElement("div");      // the tool-tip div
+      div2 = document.createElement("div");      // the tool-tip div
+      parent = canvas2.parentNode;           // parent node for canvas
+
+      parent.appendChild(div1);
+      parent.appendChild(div2);
+  });
 }
 
 function dial_draw(){
@@ -548,6 +572,7 @@ function dial_draw(){
 
 function dial_init(){
   setup_widget_canvas("dial");
+  dial_define_tooltips();
 }
 
 function dial_slowupdate(){
