@@ -121,7 +121,7 @@ function polar_to_cart(mag, ang, xOff, yOff){
     return Ergebnis;
   }
 // X, Y are the center coordinates of the canvas
-function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed){
+function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed){
   if (!ctx) return;
 
   // if (1 * maxvalue) == false: 3000. Else 1 * maxvalue
@@ -131,8 +131,6 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   displayminmax = displayminmax || "0";
   offset = 1*offset || 0;
   var val = position;
-  var val2 = minvaluefeed;
-  var val3 = maxvaluefeed;
   position = position-offset;
   minvaluefeed = minvaluefeed-offset;
   maxvaluefeed = maxvaluefeed-offset;
@@ -354,44 +352,6 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
 
     val = parseFloat(val);
   }
-  
-  if (isNaN(val2)){
-  val2 = 0;}
-  else if(Number(decimals)>=0){ //specified decimals
-  val2 = val2.toFixed(decimals);}
-  else { //automatic decimals
-    if (val2>=100){
-    val2 = val2.toFixed(0);}
-    else if (val2>=10){
-    val2 = val2.toFixed(1);}
-    else if (val2<=-100){
-    val2 = val2.toFixed(0);}
-    else if (val2<=-10){
-    val2 = val2.toFixed(1);}
-    else{
-    val2 = val2.toFixed(2);}
-
-    val2 = parseFloat(val);
-  }
-  
-  if (isNaN(val3)){
-  val3 = 0;}
-  else if(Number(decimals)>=0){ //specified decimals
-  val3 = val3.toFixed(decimals);}
-  else { //automatic decimals
-    if (val3>=100){
-    val3 = val3.toFixed(0);}
-    else if (val3>=10){
-    val3 = val3.toFixed(1);}
-    else if (val3<=-100){
-    val3 = val3.toFixed(0);}
-    else if (val3<=-10){
-    val3 = val3.toFixed(1);}
-    else{
-    val3 = val3.toFixed(2);}
-
-    val3 = parseFloat(val);
-  }
     
   var dialtext;
   if (unitend ==="0"){
@@ -402,7 +362,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   var textsize = (size / (dialtext.length+2)) * 6;
   
   ctx.fillStyle = "#fff";
-  ctx.textAlign = "center";
+  ctx.textAlign    = "center";
   ctx.font = "bold "+(textsize*0.26)+"px arial";
   ctx.fillText(dialtext,x,y+(textsize*0.125));
   ctx.fillStyle = "#000";
@@ -437,69 +397,23 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
     if (unitend ==="0"){
     ctx.fillText(""+end_limit+units, 0, 0);}
     if (unitend ==="1"){
-    ctx.fillText(""+units+end_limit, 0, 0);}
+    ctx.fillText(""+units+end_limit, 0, 0);}  
     ctx.restore();
 
 
-    if(displayminmax==="1"){ //display min max circle
-
+    if(displayminmax==="1"){
+      ctx.save();
       ctx.beginPath();
-      ctx.arc(x+Math.sin(Math.PI*minindicator)*size,y+Math.cos(Math.PI*minindicator)*size,size*0.052,0,2*Math.PI,true); // draw min circle
+      ctx.arc(x+Math.sin(Math.PI*minindicator)*size,y+Math.cos(Math.PI*minindicator)*size,size*0.052,0,2*Math.PI,true);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
 
       ctx.beginPath();
-      ctx.arc(x+Math.sin(Math.PI*maxindicator)*size,y+Math.cos(Math.PI*maxindicator)*size,size*0.052,0,2*Math.PI,true); // draw max circle
+      ctx.arc(x+Math.sin(Math.PI*maxindicator)*size,y+Math.cos(Math.PI*maxindicator)*size,size*0.052,0,2*Math.PI,true);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
-
-      var canvas = document.getElementById(canvasid);
-      var cw=canvas.width;
-      var ch=canvas.height;
-      function reOffset(){
-       var BB=canvas.getBoundingClientRect();
-       offsetX=BB.left;
-       offsetY=BB.top;
-      }
-
-      var offsetX,offsetY;
-      reOffset();
-      window.onscroll=function(e){ reOffset(); }
-      window.onresize=function(e){ reOffset(); }
-
-      var hotspots=[ // declare hotspots in order to active associated tooltips
-      {xspot:(x+Math.sin(Math.PI*minindicator)*size),yspot:(y+Math.cos(Math.PI*minindicator)*size),radius:(size*0.052),tip: val2},
-      {xspot:(x+Math.sin(Math.PI*maxindicator)*size),yspot:(y+Math.cos(Math.PI*maxindicator)*size),radius:(size*0.052),tip: val3},
-      ];
-
-       $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
-
-      function handleMouseMove(e){
-       e.preventDefault();
-       e.stopPropagation();
-
-       mouseX=parseInt(e.clientX-offsetX);
-       mouseY=parseInt(e.clientY-offsetY);
-
-       ctx.clearRect(0,0,cw*0.27,size*0.22); // clear old tootltip
-
-       for(var i=0;i<hotspots.length;i++){ // display tooltip when mouse is over a hotspot
-        var h=hotspots[i];
-        var dx=mouseX-h.xspot;
-        var dy=mouseY-h.yspot;
-        if(dx*dx+dy*dy<h.radius*h.radius){
-        var tooltipsize = (h.tip).length;
-        ctx.fillStyle="#E4E4E4";
-        ctx.fillRect(0,0,tooltipsize*size*0.11,size*0.22);
-        ctx.textAlign = "start";
-        ctx.font = "bold "+(size*0.18)+"px arial";
-        ctx.fillStyle="#5C5C5C";
-        ctx.fillText(h.tip,size*0.03,size*0.18);
-        }
-      }
-     }
     }
   }
 }
@@ -522,7 +436,6 @@ function dial_draw(){
       var scale = 1*$(this).attr("scale") || 1;
       var unitend = $(this).attr("unitend") || "0";
       draw_gauge(widgetcanvas[id],
-                 id,
                  0,
                  0,
                  $(this).width(),
