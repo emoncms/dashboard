@@ -162,14 +162,14 @@ function draw_bar(context,
     var scaled_value = (display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
     if (scaled_value < 0){scaled_value = 0;}
 
-    var min_display_value = minvaluefeed
-    min_display_value = min_display_value-static_offset
+    var min_display_value = minvaluefeed;
+    min_display_value = min_display_value-static_offset;
 
     var min_scaled_value = (min_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
     if (min_scaled_value < 0){min_scaled_value = 0;}
 
-    var max_display_value = maxvaluefeed
-    max_display_value = max_display_value-static_offset
+    var max_display_value = maxvaluefeed;
+    max_display_value = max_display_value-static_offset;
 
     var max_scaled_value = (max_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
     if (max_scaled_value < 0){max_scaled_value = 0;}
