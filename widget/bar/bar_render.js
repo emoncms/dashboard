@@ -141,8 +141,7 @@ function draw_bar(context,
                   colour_minmax
                   )
 {
-    if (!context)
-        return;
+    if (!context) {return;}
 
     context.clearRect(0,0,width+10,height+10); // Clear old drawing
 
@@ -319,13 +318,9 @@ function draw_bar(context,
        offsetY=BB.top;
       }
 
-      var offsetX,offsetY;
       reOffset();
       window.onscroll=function(e){ reOffset(); };
       window.onresize=function(e){ reOffset(); };
-
-	  
-
 
      var hotspots=[ // declare hotspots in order to active associated tooltips
       {xspot:(bar_border_space),yspot:(bar_min),wspot:(width-(bar_border_space*2)),hspot:2,tip: minvaluefeed},
@@ -344,7 +339,7 @@ function draw_bar(context,
 
         var h=hotspots[0];
         if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
-        div1.style.cssText = "position:fixed;padding:0px;background-color:#E4E4E4;pointer-events:none;color:#5C5C5C;font-size:"+ 18 +"px";
+        div1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
         div1.style.left = e.clientX + 15 + "px";
         div1.style.top =  e.clientY + 15+ "px";
         div1.style.visibility ="visible";
@@ -356,7 +351,7 @@ function draw_bar(context,
 
         var h=hotspots[1];
         if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
-        div2.style.cssText = "position:fixed;padding:0px;background-color:#E4E4E4;pointer-events:none;color:#5C5C5C;font-size:"+ 18 +"px";
+        div2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
         div2.style.left = e.clientX + 15 + "px";
         div2.style.top =  e.clientY + 15+ "px";
         div2.style.visibility ="visible";
@@ -367,7 +362,7 @@ function draw_bar(context,
           }
        }
 
-       $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
+    $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
 
     if (colour_label.indexOf("#") === -1) {colour_label = "#" + colour_label;} // Fix missing "#" on colour if needed
     context.fillStyle = colour_label;
