@@ -90,7 +90,7 @@ function bar_widgetlist()
                     [1, "Yes"]
                     ];
 
-    addOption(widgets["bar"], "title",          "value",            _Tr("Title"),           _Tr("Title of bar"),                                                                []);
+    addOption(widgets["bar"], "title_bar",      "value",            _Tr("Title"),           _Tr("Title of bar"),                                                                []);
     addOption(widgets["bar"], "colour_label",   "colour_picker",    _Tr("Label Colour"),    _Tr("Colour of title and values"),                                                  []);
     addOption(widgets["bar"], "font",           "dropbox",          _Tr("Font used"),       _Tr("Font used"),                                                                   fontoptions);
     addOption(widgets["bar"], "fstyle",         "dropbox",          _Tr("Font style"),      _Tr("Font style used for display"),                                                 fstyleoptions);
@@ -108,7 +108,7 @@ function bar_widgetlist()
     addOption(widgets["bar"], "displayminmax",  "dropbox",          _Tr("Min / Max ?"),     _Tr("Display Min. and Max. ?"),                                                     displayminmaxDropBoxOptions);
     addOption(widgets["bar"], "minvaluefeed",   "feedid",           _Tr("Min. feed"),       _Tr("The feed for the minimum value"),                                              []);
     addOption(widgets["bar"], "maxvaluefeed",   "feedid",           _Tr("Max. feed"),       _Tr("The feed for the maximum value"),                                              []);
-    addOption(widgets["bar"], "colour_minmax",   "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
+    addOption(widgets["bar"], "colour_minmax",  "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
 
 
     return widgets;
@@ -149,7 +149,7 @@ function draw_bar(context,
     max_value = 1 * max_value || 3000;
     // if units_string == false: "". Else units_string
     units_string = units_string || "";
-    title = title || "";
+    title_bar = title_bar || "";
     fstyle = fstyle || "2";
     fweight = fweight || "0";
     unitend = unitend || "0";
@@ -408,19 +408,19 @@ function draw_bar(context,
     var unitsandval = raw_value+units_string;
     var valsize;
     if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
-	else {valsize = (size / 6) * 5.5;}
+    else {valsize = (size / 6) * 5.5;}
     var titlesize ;
-	if (title.length >10) {titlesize = (size / (title.length+2)) * 9;}
-	else {titlesize = (size / 12) * 9.5;}
+    if (title_bar.length >10) {titlesize = (size / (title_bar.length+2)) * 9;}
+    else {titlesize = (size / 12) * 9.5;}
     
     if (graduationBool == 1) {
     context.textAlign    = "start";
-        if (title) {
+        if (title_bar) {
             context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.3)+"px "+ fontname);
             if (unitend ==="0"){context.fillText(raw_value+units_string, bar_border_space, height + (size*0.42))}
             if (unitend ==="1"){context.fillText(units_string+raw_value, bar_border_space, height + (size*0.42))}
             context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.35)+"px "+ fontname);
-            context.fillText(title, bar_border_space, height + (size * 0.2));
+            context.fillText(title_bar, bar_border_space, height + (size * 0.2));
         } else {
             context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
             if (unitend ==="0"){context.fillText(raw_value+units_string, bar_border_space, height + (size*0.3));}
@@ -434,7 +434,7 @@ function draw_bar(context,
         if (unitend ==="0"){context.fillText(raw_value+units_string, half_width, height/2 + (size*0.2));}
         if (unitend ==="1"){context.fillText(units_string+raw_value, half_width, height/2 + (size*0.2));}
         context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.4)+"px "+ fontname);
-        context.fillText(title, half_width, height/7 + (size *0.1));
+        context.fillText(title_bar, half_width, height/7 + (size *0.1));
     }
 
     context.fillStyle = "#000";
@@ -461,6 +461,12 @@ function bar_draw()
         var feedid = $(this).attr("feedid");
         var minvaluefeed = $(this).attr("minvaluefeed");
         var maxvaluefeed = $(this).attr("maxvaluefeed");
+        if($(this).attr("title")){ //transform the title property in the div by title_bar in order to avoid title tootip displayed by the browser
+        title_bar=$(this).attr("title");
+        $(this).removeAttr("title");
+        }
+        else {title_bar= $(this).attr("title_bar");
+        }
         if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
         var val = curve_value(feedid,dialrate).toFixed(3);
         var minval = curve_value(minvaluefeed,dialrate).toFixed(3);
@@ -475,7 +481,7 @@ function bar_draw()
                      id,
                      0,
                      0,
-                     $(this).attr("title"),
+                     $(this).attr("title_bar"),
                      $(this).attr("font"),
                      $(this).attr("fstyle"),
                      $(this).attr("fweight"),
