@@ -90,7 +90,7 @@ function bar_widgetlist()
                     [1, "Yes"]
                     ];
 
-    addOption(widgets["bar"], "title",          "value",            _Tr("Title"),           _Tr("Title of bar"),                                                                []);
+    addOption(widgets["bar"], "title_bar",      "value",            _Tr("Title"),           _Tr("Title of bar"),                                                                []);
     addOption(widgets["bar"], "colour_label",   "colour_picker",    _Tr("Label Colour"),    _Tr("Colour of title and values"),                                                  []);
     addOption(widgets["bar"], "font",           "dropbox",          _Tr("Font used"),       _Tr("Font used"),                                                                   fontoptions);
     addOption(widgets["bar"], "fstyle",         "dropbox",          _Tr("Font style"),      _Tr("Font style used for display"),                                                 fstyleoptions);
@@ -108,7 +108,7 @@ function bar_widgetlist()
     addOption(widgets["bar"], "displayminmax",  "dropbox",          _Tr("Min / Max ?"),     _Tr("Display Min. and Max. ?"),                                                     displayminmaxDropBoxOptions);
     addOption(widgets["bar"], "minvaluefeed",   "feedid",           _Tr("Min. feed"),       _Tr("The feed for the minimum value"),                                              []);
     addOption(widgets["bar"], "maxvaluefeed",   "feedid",           _Tr("Max. feed"),       _Tr("The feed for the maximum value"),                                              []);
-    addOption(widgets["bar"], "colour_minmax",   "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
+    addOption(widgets["bar"], "colour_minmax",  "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
 
 
     return widgets;
@@ -116,32 +116,32 @@ function bar_widgetlist()
 
 
 function draw_bar(context,
-                x_pos,              // these x and y coords seem unused?
-                y_pos,
-                title,
-                font,
-                fstyle,
-                fweight,
-                width,
-                height,
-                raw_value,
-                max_value,
-                units_string,
-                decimals,
-                unitend,
-                display_colour,
-                colour_label,
-                static_offset,
-                graduationBool,
-                graduationQuant,
-                displayminmax,
-                minvaluefeed,
-                maxvaluefeed,
-                colour_minmax
-                )
+                  canvasid,
+                  x_pos,              // these x and y coords seem unused?
+                  y_pos,
+                  title,
+                  font,
+                  fstyle,
+                  fweight,
+                  width,
+                  height,
+                  raw_value,
+                  max_value,
+                  units_string,
+                  decimals,
+                  unitend,
+                  display_colour,
+                  colour_label,
+                  static_offset,
+                  graduationBool,
+                  graduationQuant,
+                  displayminmax,
+                  minvaluefeed,
+                  maxvaluefeed,
+                  colour_minmax
+                  )
 {
-    if (!context)
-        return;
+    if (!context) {return;}
 
     context.clearRect(0,0,width+10,height+10); // Clear old drawing
 
@@ -149,7 +149,7 @@ function draw_bar(context,
     max_value = 1 * max_value || 3000;
     // if units_string == false: "". Else units_string
     units_string = units_string || "";
-    title = title || "";
+    title_bar = title_bar || "";
     fstyle = fstyle || "2";
     fweight = fweight || "0";
     unitend = unitend || "0";
@@ -162,18 +162,59 @@ function draw_bar(context,
     var scaled_value = (display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
     if (scaled_value < 0){scaled_value = 0;}
 
-    var min_display_value = minvaluefeed
-    min_display_value = min_display_value-static_offset
+    var min_display_value = minvaluefeed;
+    min_display_value = min_display_value-static_offset;
 
     var min_scaled_value = (min_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
     if (min_scaled_value < 0){min_scaled_value = 0;}
 
-    var max_display_value = maxvaluefeed
-    max_display_value = max_display_value-static_offset
+    var max_display_value = maxvaluefeed;
+    max_display_value = max_display_value-static_offset;
 
     var max_scaled_value = (max_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
     if (max_scaled_value < 0){max_scaled_value = 0;}
 
+        if (decimals<0){
+            if (raw_value>=100) {
+            raw_value = raw_value.toFixed(0);
+            } else if (raw_value>=10) {
+            raw_value = raw_value.toFixed(1);
+            } else  {
+            raw_value = raw_value.toFixed(2);
+            }
+        raw_value = parseFloat(raw_value);
+        }
+        else {
+             raw_value = raw_value.toFixed(decimals);
+        }
+
+        if (decimals<0){
+            if (minvaluefeed>=100) {
+            minvaluefeed = minvaluefeed.toFixed(0);
+            } else if (minvaluefeed>=10) {
+            minvaluefeed = minvaluefeed.toFixed(1);
+            } else  {
+            minvaluefeed = minvaluefeed.toFixed(2);
+            }
+        minvaluefeed = parseFloat(minvaluefeed);
+        }
+        else {
+             minvaluefeed = minvaluefeed.toFixed(decimals);
+        }
+
+        if (decimals<0){
+            if (maxvaluefeed>=100) {
+            maxvaluefeed = maxvaluefeed.toFixed(0);
+            } else if (maxvaluefeed>=10) {
+            maxvaluefeed = maxvaluefeed.toFixed(1);
+            } else  {
+            maxvaluefeed = maxvaluefeed.toFixed(2);
+            }
+        maxvaluefeed = parseFloat(maxvaluefeed);
+        }
+        else {
+             maxvaluefeed = maxvaluefeed.toFixed(decimals);
+        }
     var size = 0;
     if (width<height){size = width/2;}
     else {size = height/2;}
@@ -214,7 +255,7 @@ function draw_bar(context,
     var half_height = height/2;
 
 
-    if (!display_value) display_value = 0;  // Clamp value so we don't draw negative values.
+    if (!display_value) {display_value = 0;}  // Clamp value so we don't draw negative values.
 
     context.lineWidth = 1;
     context.strokeStyle = "#000";
@@ -265,6 +306,64 @@ function draw_bar(context,
                     2 );
     }
 
+      var canvas = document.getElementById(canvasid);
+      var cw=canvas.width;
+      var ch=canvas.height;
+      var offsetX,offsetY;
+      var mouseX,mouseY;
+
+      function reOffset(){
+       var BB=canvas.getBoundingClientRect();
+       offsetX=BB.left;
+       offsetY=BB.top;
+      };
+
+      reOffset();
+      window.onscroll=function(e){ reOffset(); };
+      window.onresize=function(e){ reOffset(); };
+
+     var hotspots=[ // declare hotspots in order to active associated tooltips
+      {xspot:(bar_border_space),yspot:(bar_min),wspot:(width-(bar_border_space*2)),hspot:2,tip: minvaluefeed},
+      {xspot:(bar_border_space),yspot:(bar_max),wspot:(width-(bar_border_space*2)),hspot:2,tip: maxvaluefeed},
+      ];
+
+       function handleMouseMove(e){
+       e.preventDefault();
+       e.stopPropagation();
+
+       mouseX=parseInt(e.clientX-offsetX);
+       mouseY=parseInt(e.clientY-offsetY);
+
+        var dx=mouseX;
+        var dy=mouseY;
+
+        h=hotspots[0];
+        if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
+        div1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+        div1.style.left = e.clientX + 15 + "px";
+        div1.style.top =  e.clientY + 15+ "px";
+        div1.style.visibility ="visible";
+        div1.innerHTML = "&nbsp;"+h.tip+"&nbsp;";
+        }
+        else {
+          div1.style.visibility ="hidden";
+          }
+
+        h=hotspots[1];
+        if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
+        div2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+        div2.style.left = e.clientX + 15 + "px";
+        div2.style.top =  e.clientY + 15+ "px";
+        div2.style.visibility ="visible";
+        div2.innerHTML = "&nbsp"+h.tip+"&nbsp";
+        }
+        else {
+          div2.style.visibility ="hidden";
+          }
+       }
+
+    $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
+
     if (colour_label.indexOf("#") === -1) {colour_label = "#" + colour_label;} // Fix missing "#" on colour if needed
     context.fillStyle = colour_label;
     
@@ -304,39 +403,24 @@ function draw_bar(context,
         }
     }
 
-        if (decimals<0){
-            if (raw_value>=100) {
-            raw_value = raw_value.toFixed(0);
-            } else if (raw_value>=10) {
-            raw_value = raw_value.toFixed(1);
-            } else  {
-            raw_value = raw_value.toFixed(2);
-            }
-        raw_value = parseFloat(raw_value);
-        }
-        else {
-             raw_value = raw_value.toFixed(decimals);
-        }
-
-
     context.fillStyle = colour_label;
     
     var unitsandval = raw_value+units_string;
     var valsize;
     if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
-	else {valsize = (size / 6) * 5.5;}
+    else {valsize = (size / 6) * 5.5;}
     var titlesize ;
-	if (title.length >10) {titlesize = (size / (title.length+2)) * 9;}
-	else {titlesize = (size / 12) * 9.5;}
+    if (title_bar.length >10) {titlesize = (size / (title_bar.length+2)) * 9;}
+    else {titlesize = (size / 12) * 9.5;}
     
     if (graduationBool == 1) {
     context.textAlign    = "start";
-        if (title) {
+        if (title_bar) {
             context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.3)+"px "+ fontname);
             if (unitend ==="0"){context.fillText(raw_value+units_string, bar_border_space, height + (size*0.42))}
             if (unitend ==="1"){context.fillText(units_string+raw_value, bar_border_space, height + (size*0.42))}
             context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.35)+"px "+ fontname);
-            context.fillText(title, bar_border_space, height + (size * 0.2));
+            context.fillText(title_bar, bar_border_space, height + (size * 0.2));
         } else {
             context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
             if (unitend ==="0"){context.fillText(raw_value+units_string, bar_border_space, height + (size*0.3));}
@@ -350,12 +434,25 @@ function draw_bar(context,
         if (unitend ==="0"){context.fillText(raw_value+units_string, half_width, height/2 + (size*0.2));}
         if (unitend ==="1"){context.fillText(units_string+raw_value, half_width, height/2 + (size*0.2));}
         context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.4)+"px "+ fontname);
-        context.fillText(title, half_width, height/7 + (size *0.1));
+        context.fillText(title_bar, half_width, height/7 + (size *0.1));
     }
 
     context.fillStyle = "#000";
     var spreadAngle = 32;
 
+}
+
+function bar_define_tooltips(){
+  $(".bar").each(function(index) {
+      var id2 = "can-"+$(this).attr("id");
+      var canvas2 = document.getElementById(id2);
+      div1 = document.createElement("div");      // the tool-tip div
+      div2 = document.createElement("div");      // the tool-tip div
+      parent = canvas2.parentNode;           // parent node for canvas
+
+      parent.appendChild(div1);
+      parent.appendChild(div2);
+  });
 }
 function bar_draw()
 {
@@ -364,39 +461,47 @@ function bar_draw()
         var feedid = $(this).attr("feedid");
         var minvaluefeed = $(this).attr("minvaluefeed");
         var maxvaluefeed = $(this).attr("maxvaluefeed");
+        if($(this).attr("title")){ //transform the title property in the div by title_bar in order to avoid title tootip displayed by the browser
+        title_bar=$(this).attr("title");
+        $(this).removeAttr("title");
+        }
+        else {title_bar= $(this).attr("title_bar");
+        }
         if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
         var val = curve_value(feedid,dialrate).toFixed(3);
         var minval = curve_value(minvaluefeed,dialrate).toFixed(3);
         var maxval = curve_value(maxvaluefeed,dialrate).toFixed(3);
+
         // ONLY UPDATE ON CHANGE
         if (val != (associd[feedid]["value"] * 1).toFixed(3) || redraw == 1)
         {
             var id = "can-"+$(this).attr("id");
             var scale = 1*$(this).attr("scale") || 1;
             draw_bar(widgetcanvas[id],
-                                0,
-                                0,
-                                $(this).attr("title"),
-                                $(this).attr("font"),
-                                $(this).attr("fstyle"),
-                                $(this).attr("fweight"),
-                                $(this).width(),
-                                $(this).height(),
-                                val*scale,
-                                $(this).attr("max"),
-                                $(this).attr("units"),
-                                $(this).attr("decimals"),
-                                $(this).attr("unitend"),
-                                $(this).attr("colour"),
-                                $(this).attr("colour_label"),
-                                $(this).attr("offset"),
-                                $(this).attr("graduations"),
-                                $(this).attr("gradNumber"),
-                                $(this).attr("displayminmax"),
-                                minval*scale,
-                                maxval*scale,
-                                $(this).attr("colour_minmax")
-                                );
+                     id,
+                     0,
+                     0,
+                     $(this).attr("title_bar"),
+                     $(this).attr("font"),
+                     $(this).attr("fstyle"),
+                     $(this).attr("fweight"),
+                     $(this).width(),
+                     $(this).height(),
+                     val*scale,
+                     $(this).attr("max"),
+                     $(this).attr("units"),
+                     $(this).attr("decimals"),
+                     $(this).attr("unitend"),
+                     $(this).attr("colour"),
+                     $(this).attr("colour_label"),
+                     $(this).attr("offset"),
+                     $(this).attr("graduations"),
+                     $(this).attr("gradNumber"),
+                     $(this).attr("displayminmax"),
+                     minval*scale,
+                     maxval*scale,
+                     $(this).attr("colour_minmax")
+                     );
         }
     });
 }
@@ -405,6 +510,7 @@ function bar_draw()
 function bar_init()
 {
     setup_widget_canvas("bar");
+    bar_define_tooltips();
 }
 function bar_slowupdate()
 {
