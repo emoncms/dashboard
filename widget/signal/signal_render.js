@@ -135,7 +135,7 @@ function signal_draw(){
       var data = val*scale + offset;
       
       if(data > max_val){
-	  data = max_val;}
+      data = max_val;}
 
       if (data>=100) {
           data = data.toFixed(0);
@@ -171,18 +171,15 @@ function signal_draw(){
       {
         var angle = 0;
         arc_radius -= block_width;
-        if(arc_radius < 0)
-          break;
+        if(arc_radius < 0){break;}
 
         
         context.beginPath();
         context.arc(start_x + centerX, start_y + centerY, arc_radius, (1.25+angle) * Math.PI, (1.75-angle) * Math.PI, false);
 
         context.lineWidth = block_width;
-        if(signal_bars >= number_of_blocks - i)
-          context.strokeStyle = stroke_style;
-        else
-          context.strokeStyle = stroke_style_empty;
+        if(signal_bars >= number_of_blocks - i){context.strokeStyle = stroke_style;}
+        else {context.strokeStyle = stroke_style_empty;}
         context.stroke();
 
         arc_radius -= line_width;
