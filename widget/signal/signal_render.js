@@ -100,15 +100,15 @@ function signal_draw(){
 
       var fontname;
 
-      if (font === "0"){fontname = "Impact"};
-      if (font === "1"){fontname = "Georgia"};
-      if (font === "2"){fontname = "Arial"};
-      if (font === "3"){fontname = "Courier New"};
-      if (font === "4"){fontname = "Comic Sans MS"};
-      if (font === "5"){fontname = "Helvetica"};
-      if (font === "6"){fontname = "sans-serif"};
-      if (font === "7"){fontname = "Arial Narrow"};
-      if (font === "8"){fontname = "Arial Black"};
+      if (font === "0"){fontname = "Impact";}
+      if (font === "1"){fontname = "Georgia";}
+      if (font === "2"){fontname = "Arial";}
+      if (font === "3"){fontname = "Courier New";}
+      if (font === "4"){fontname = "Comic Sans MS";}
+      if (font === "5"){fontname = "Helvetica";}
+      if (font === "6"){fontname = "sans-serif";}
+      if (font === "7"){fontname = "Arial Narrow";}
+      if (font === "8"){fontname = "Arial Black";}
 
       var fontstyle;
 
@@ -148,12 +148,12 @@ function signal_draw(){
 
       var context = widgetcanvas[id];
 
-      context.clearRect(0,0,signal_width,signal_height); // Clear old drawing
+      context.clearRect(0,0,signal_width,signal_height*1.6); // Clear old drawing
 
       context.globalAlpha = 1;
 
       var bar_length = 10;
-      var radius = Math.min(signal_width,signal_height)/(0.5*Math.PI);
+      var radius = Math.min(signal_width,signal_height*1.6)/(0.5*Math.PI);
       var block_width = radius/number_of_blocks - line_width;
   
       var centerX = signal_width/2;
