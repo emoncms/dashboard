@@ -103,7 +103,7 @@ function dial_widgetlist(){
 }
 
 function deg_to_radians(deg){
-  return deg * (Math.PI / 180)
+  return deg * (Math.PI / 180);
 }
 function polar_to_cart(mag, ang, xOff, yOff){
   ang = deg_to_radians(ang);
@@ -121,8 +121,8 @@ function polar_to_cart(mag, ang, xOff, yOff){
     return Ergebnis;
   }
 // X, Y are the center coordinates of the canvas
-function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed){
-  if (!ctx) return;
+function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed){
+  if (!ctx) {return;}
 
   // if (1 * maxvalue) == false: 3000. Else 1 * maxvalue
   maxvalue = 1 * maxvalue || 3000;
@@ -131,13 +131,15 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
   displayminmax = displayminmax || "0";
   offset = 1*offset || 0;
   var val = position;
+  var val2 = minvaluefeed;
+  var val3 = maxvaluefeed;
   position = position-offset;
   minvaluefeed = minvaluefeed-offset;
   maxvaluefeed = maxvaluefeed-offset;
 
   var size = 0;
-  if (width<height) size = width/2;
-  else size = height/2;
+  if (width<height) {size = width/2;}
+  else {size = height/2;}
   if(displayminmax==="1"){size = size - (size*0.13/2);}
   else {size = size - (size*0.058/2);}
 
@@ -146,7 +148,7 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
 
   ctx.clearRect(0,0,width,height);
 
-  if (!position) position = 0;
+  if (!position) {position = 0;}
 
   var angleOffset = 0;
   var segment = ["#c0e392","#9dc965","#87c03f","#70ac21","#378d42","#046b34"];
@@ -203,64 +205,52 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
     segment = ["#0d97f3","#a7cbe2","#ffbebe","#ff8383","#ff6464","#ff3d3d"];
   }
   else if (type === "12"){ //  - from light to dark red
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#FFCCCC", "#FFA3A3", "#FF7A7A", "#FF5151", "#FF2828", "#FF0000"];
   }
   else if (type === "13"){ //  - from light to dark orange
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#FFE5CC", "#FFD0A3", "#FFBC7A", "#FFA851", "#FF9428", "#FF8000"];
   }
   else if (type === "14"){ //  - from light to dark yellow
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#FFFFCC", "#FFFFA3", "#FFFF7A", "#FFFF51", "#FFFF28", "#FFFF00"];
   }
   else if (type === "15"){ //  - from light to dark cyan
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#CCFFFF", "#A3FFFF", "#7AFFFF", "#51FFFF", "#28FFFF", "#00FFFF"];
   }
   else if (type === "16"){ //  - from light to dark purple
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#E5CCFF", "#D0A3FF", "#BC7AFF", "#A851FF", "#9428FF", "#8000FF"];
   }
   else if (type === "17"){ //  - from light to dark pink
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#FFCCFF", "#FFA3FF", "#FF7AFF", "#FF51FF", "#FF28FF", "#FF00FF"];
   }
   else if (type === "18"){ //  - from light to dark lime
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#CCFFCC", "#A3FFA3", "#7AFF7A", "#51FF51", "#28FF28", "#00FF00"];
   }
   else if (type === "19"){ //  - from light to dark mint
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#EEFCF5", "#E0F9ED", "#D2F7E6", "#C5F4DF", "#B7F2D8", "#AAF0D1"];
   }
   else if (type === "20"){ //  - from light to dark royal blue
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#CCCCFF", "#A3A3FF", "#7A7AFF", "#5151FF", "#2828FF", "#0000FF"];
   }
   else if (type === "21"){ //  - rainbow!
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#FF0000", "#FF8000", "#FFFF00", "#00FF00", "#0000FF", "#8000FF"];
   }
   else if (type === "22"){ //  - reverse rainbow!
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#8000FF", "#0000FF", "#00FF00", "#FFFF00", "#FF8000", "#FF0000"];
   }
   else if (type === "23")  // can be used to emulate a barometer and display a pressure
   {
-    if (position<0)
-      position = 0;
+    if (position<0){position = 0;}
     segment = ["#C0C0C0","#868686","#C0C0C0","#868686","#C0C0C0","#868686"];
   }
 
@@ -352,6 +342,44 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
 
     val = parseFloat(val);
   }
+  
+  if (isNaN(val2)){
+  val2 = 0;}
+  else if(Number(decimals)>=0){ //specified decimals
+  val2 = val2.toFixed(decimals);}
+  else { //automatic decimals
+    if (val2>=100){
+    val2 = val2.toFixed(0);}
+    else if (val2>=10){
+    val2 = val2.toFixed(1);}
+    else if (val2<=-100){
+    val2 = val2.toFixed(0);}
+    else if (val2<=-10){
+    val2 = val2.toFixed(1);}
+    else{
+    val2 = val2.toFixed(2);}
+
+    val2 = parseFloat(val2);
+  }
+  
+  if (isNaN(val3)){
+  val3 = 0;}
+  else if(Number(decimals)>=0){ //specified decimals
+  val3 = val3.toFixed(decimals);}
+  else { //automatic decimals
+    if (val3>=100){
+    val3 = val3.toFixed(0);}
+    else if (val3>=10){
+    val3 = val3.toFixed(1);}
+    else if (val3<=-100){
+    val3 = val3.toFixed(0);}
+    else if (val3<=-10){
+    val3 = val3.toFixed(1);}
+    else{
+    val3 = val3.toFixed(2);}
+
+    val3 = parseFloat(val3);
+  }
     
   var dialtext;
   if (unitend ==="0"){
@@ -362,7 +390,7 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
   var textsize = (size / (dialtext.length+2)) * 6;
   
   ctx.fillStyle = "#fff";
-  ctx.textAlign    = "center";
+  ctx.textAlign = "center";
   ctx.font = "bold "+(textsize*0.26)+"px arial";
   ctx.fillText(dialtext,x,y+(textsize*0.125));
   ctx.fillStyle = "#000";
@@ -397,25 +425,99 @@ function draw_gauge(ctx,x,y,width,height,position,maxvalue,units,decimals,type,o
     if (unitend ==="0"){
     ctx.fillText(""+end_limit+units, 0, 0);}
     if (unitend ==="1"){
-    ctx.fillText(""+units+end_limit, 0, 0);}  
+    ctx.fillText(""+units+end_limit, 0, 0);}
     ctx.restore();
 
 
-    if(displayminmax==="1"){
-      ctx.save();
+    if(displayminmax==="1"){ //display min max circle
+
       ctx.beginPath();
-      ctx.arc(x+Math.sin(Math.PI*minindicator)*size,y+Math.cos(Math.PI*minindicator)*size,size*0.052,0,2*Math.PI,true);
+      ctx.arc(x+Math.sin(Math.PI*minindicator)*size,y+Math.cos(Math.PI*minindicator)*size,size*0.052,0,2*Math.PI,true); // draw min circle
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
 
       ctx.beginPath();
-      ctx.arc(x+Math.sin(Math.PI*maxindicator)*size,y+Math.cos(Math.PI*maxindicator)*size,size*0.052,0,2*Math.PI,true);
+      ctx.arc(x+Math.sin(Math.PI*maxindicator)*size,y+Math.cos(Math.PI*maxindicator)*size,size*0.052,0,2*Math.PI,true); // draw max circle
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
+
+      var canvas = document.getElementById(canvasid);
+      var cw=canvas.width;
+      var ch=canvas.height;
+      var offsetX,offsetY;
+      var mouseX,mouseY;
+      var dx,dy;
+
+      function reOffset(){
+       var BB=canvas.getBoundingClientRect();
+       offsetX=BB.left;
+       offsetY=BB.top;
+      };
+
+      reOffset();
+      window.onscroll=function(e){ reOffset(); };
+      window.onresize=function(e){ reOffset(); };
+
+      var hotspots=[ // declare hotspots in order to active associated tooltips
+      {xspot:(x+Math.sin(Math.PI*minindicator)*size),yspot:(y+Math.cos(Math.PI*minindicator)*size),radius:(size*0.052),tip: val2},
+      {xspot:(x+Math.sin(Math.PI*maxindicator)*size),yspot:(y+Math.cos(Math.PI*maxindicator)*size),radius:(size*0.052),tip: val3},
+      ];
+
+
+
+      function handleMouseMove(e){
+       e.preventDefault();
+       e.stopPropagation();
+
+       mouseX=parseInt(e.clientX-offsetX);
+       mouseY=parseInt(e.clientY-offsetY);
+
+       h=hotspots[0];
+       dx=mouseX-h.xspot;
+       dy=mouseY-h.yspot;
+       if(dx*dx+dy*dy<h.radius*h.radius){
+        div1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+        div1.style.left = e.clientX + 15 + "px";
+        div1.style.top =  e.clientY + 15+ "px";
+        div1.style.visibility ="visible";
+        div1.innerHTML = "&nbsp;"+h.tip+"&nbsp;";
+       }
+       else {
+         div1.style.visibility ="hidden";
+       }
+
+       h=hotspots[1];
+       dx=mouseX-h.xspot;
+       dy=mouseY-h.yspot;
+       if(dx*dx+dy*dy<h.radius*h.radius){
+       div2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+       div2.style.left = e.clientX + 15 + "px";
+       div2.style.top =  e.clientY + 15+ "px";
+       div2.style.visibility ="visible";
+       div2.innerHTML = "&nbsp"+h.tip+"&nbsp";
+       }
+       else {
+          div2.style.visibility ="hidden";
+       }
+      }
+     $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
     }
   }
+}
+
+function dial_define_tooltips(){
+  $(".dial").each(function(index) {
+      var id2 = "can-"+$(this).attr("id");
+      var canvas2 = document.getElementById(id2);
+      div1 = document.createElement("div");      // the tool-tip div
+      div2 = document.createElement("div");      // the tool-tip div
+      parent = canvas2.parentNode;           // parent node for canvas
+
+      parent.appendChild(div1);
+      parent.appendChild(div2);
+  });
 }
 
 function dial_draw(){
@@ -436,6 +538,7 @@ function dial_draw(){
       var scale = 1*$(this).attr("scale") || 1;
       var unitend = $(this).attr("unitend") || "0";
       draw_gauge(widgetcanvas[id],
+                 id,
                  0,
                  0,
                  $(this).width(),
@@ -458,6 +561,7 @@ function dial_draw(){
 
 function dial_init(){
   setup_widget_canvas("dial");
+  dial_define_tooltips();
 }
 
 function dial_slowupdate(){
