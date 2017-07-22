@@ -155,7 +155,7 @@ function battery_draw(){
      if (fweight === "0"){fontweight = "normal";}
      if (fweight === "1"){fontweight = "bold";}
 
-      if (color.indexOf("#") === -1) color = "#" + color;
+      if (color.indexOf("#") === -1) {color = "#" + color;}
 
       var raw_value = val*scale + offset;
       var data;
@@ -163,7 +163,7 @@ function battery_draw(){
       if(raw_value > max_val){
          data = max_val;} // Clamp value so we don't overshoot the top of the battery.
       else{
-         data=raw_value};
+         data=raw_value;}
 
       if (decimals<0){
         if (raw_value>=100) {
