@@ -74,6 +74,11 @@ function battery_widgetlist(){
     [0, "Impact"]
   ];
 
+  var StyleOptions = [
+    [1, "With colour gradients"],
+    [0, "Without colour gradients"]
+    ];
+
   addOption(widgets["battery"], "feedid",           "feedid",        _Tr("Feed"),            _Tr("Feed value"),                                                            []);
   addOption(widgets["battery"], "battery_title",    "value",         _Tr("Battery title"),   _Tr("Battery title"),                                                         []);
   addOption(widgets["battery"], "max",              "value",         _Tr("Max value"),       _Tr("Max value to show"),                                                     []);
@@ -87,16 +92,17 @@ function battery_widgetlist(){
   addOption(widgets["battery"], "font",             "dropbox",       _Tr("Font"),            _Tr("Label font"),                                                            fontoptions);
   addOption(widgets["battery"], "fstyle",           "dropbox",       _Tr("Font style"),      _Tr("Font style used for display"),                                           fstyleoptions);
   addOption(widgets["battery"], "fweight",          "dropbox",       _Tr("Font weight"),     _Tr("Font weight used for display"),                                          fweightoptions);
+  addOption(widgets["battery"], "battery_style",    "dropbox",       _Tr("Style"),           _Tr("Display style"),                                                         StyleOptions);
 
   return widgets;
 }
 
 function battery_init(){
-  setup_widget_canvas('battery');
+  setup_widget_canvas("battery");
 }
 
 function battery_draw(){
-  $('.battery').each(function(index) {
+  $(".battery").each(function(index) {
     var feedid = $(this).attr("feedid");
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var val = curve_value(feedid,dialrate).toFixed(3);
@@ -110,12 +116,13 @@ function battery_draw(){
       var min_val = 1*$(this).attr("min") || 0;
       var units = $(this).attr("units");
       var decimals = $(this).attr("decimals");
-      var font = $(this).attr("font");
+      var font = $(this).attr("font")|| "8";
       var fstyle = $(this).attr("fstyle") || "2";
       var fweight = $(this).attr("fweight") || "0";
       var unitend = $(this).attr("unitend") || "0";
       var color = $(this).attr("colour") || "000";
       var title = $(this).attr("battery_title");
+      var battery_style = $(this).attr("battery_style") || "1";
 
       var start_x = 0, start_y = 0;
       var battery_height = $(this).height();
@@ -136,7 +143,6 @@ function battery_draw(){
       if (font === "6"){fontname = "sans-serif";}
       if (font === "7"){fontname = "Arial Narrow";}
       if (font === "8"){fontname = "Arial Black";}
-      else if (typeof(font) === "undefined") {fontname = "Arial Black";}
 
       var fontstyle;
 
@@ -149,69 +155,85 @@ function battery_draw(){
      if (fweight === "0"){fontweight = "normal";}
      if (fweight === "1"){fontweight = "bold";}
 
-      if (color.indexOf("#") === -1) color = "#" + color;
+      if (color.indexOf("#") === -1) {color = "#" + color;}
 
-      var data = val*scale + offset;
-      
+      var raw_value = val*scale + offset;
+      var data;
+
+      if(raw_value > max_val){
+         data = max_val;} // Clamp value so we don't overshoot the top of the battery.
+      else{
+         data=raw_value;}
+
       if (decimals<0){
-        if(data > max_val)
-          data = max_val;
-        if (data>=100) {
-            data = data.toFixed(0);
-        } else if (data>=10) {
-            data = data.toFixed(1);
+        if (raw_value>=100) {
+            raw_value = raw_value.toFixed(0);
+        } else if (raw_value>=10) {
+            raw_value = raw_value.toFixed(1);
         } else  {
-          data = data.toFixed(2);
+          raw_value = raw_value.toFixed(2);
         }
-        data = parseFloat(data);
+        raw_value = parseFloat(raw_value);
       }
       else {
-        data = data.toFixed(decimals);
+        raw_value = raw_value.toFixed(decimals);
       }
 
       var context = widgetcanvas[id];
       context.globalAlpha = 1;
-      
+      context.clearRect(0,0,battery_width,battery_height);
+
       //Drawing the battery cap
       context.fillStyle = "#ffffff";
-      context.fillRect(start_x + battery_width/2 - cap_width/2, start_y, cap_width, cap_height);
-        
+      context.fillRect(start_x + battery_width/2 - cap_width/2, start_y + line_width, cap_width, cap_height + line_width*2);
+      context.strokeStyle = "#000f00";
+      context.lineWidth   = line_width;
+      context.strokeRect(start_x + battery_width/2 - cap_width/2, start_y + line_width, cap_width, cap_height + line_width*2);
       //Clear the battery area first
       context.fillStyle = "#ffffff";
-      context.fillRect(start_x, start_y + cap_height, battery_width, battery_height-cap_height);
+      context.fillRect(start_x + line_width, start_y + line_width + cap_height, battery_width - line_width*2, battery_height-cap_height);
       //Drawing body outline
       context.strokeStyle = "#000f00";
       context.lineWidth   = line_width;
-      context.strokeRect(start_x, start_y + cap_height, battery_width, battery_height-cap_height);
+      context.strokeRect(start_x + line_width, start_y + line_width + cap_height, battery_width - line_width*2, battery_height-cap_height - line_width*2);
 
       //Filling body
-      var block_width = battery_width - 2*(line_width + margin);
-      var block_height = Math.ceil((battery_height - cap_height - 2*(line_width + margin))/number_of_blocks) - 2*margin;
-      var block_start_y = start_y + battery_height - line_width - margin;
+      var block_width = battery_width - 2*(line_width*2 + margin);
+      var block_height = Math.ceil((battery_height - cap_height - 2*(line_width*2 + margin))/number_of_blocks) - 2*margin;
+      var block_start_y = start_y + battery_height - line_width*2 - margin;
       
       var last_block = Math.ceil((number_of_blocks*(data-min_val))/(max_val - min_val));
       var green_val = Math.floor(((data-min_val)*255)/(max_val - min_val));
 
 
       var red_val = 255 - green_val;
-      var linearGradient1 = context.createLinearGradient(start_x + line_width + margin, 
-                                        start_y + cap_height + line_width + margin, 
-                                        start_x + line_width + margin + block_width, 
-                                        start_y + cap_height + line_width + margin);
-      linearGradient1.addColorStop(0, "rgb("+red_val+", "+green_val+", 0)");
-      linearGradient1.addColorStop(0.5, "rgb(0, 0, 0)");
-      linearGradient1.addColorStop(1, "rgb("+red_val+","+green_val+", 0)");
-      
+      if (battery_style ==="1"){
+        var linearGradient1 = context.createLinearGradient(start_x + line_width*2 + margin, 
+                                          start_y + cap_height + line_width*2 + margin, 
+                                          start_x + line_width*2 + margin + block_width, 
+                                          start_y + cap_height + line_width*2 + margin);
+        linearGradient1.addColorStop(0, "rgb("+red_val+", "+green_val+", 0)");
+        linearGradient1.addColorStop(0.5, "rgb(0, 0, 0)");
+        linearGradient1.addColorStop(1, "rgb("+red_val+","+green_val+", 0)");
+      }
+      if (battery_style ==="0"){
+        var linearGradient1 = context.createLinearGradient(start_x + line_width*2 + margin, 
+                                          start_y + cap_height + line_width*2 + margin, 
+                                          start_x + line_width*2 + margin + block_width, 
+                                          start_y + cap_height + line_width*2 + margin);
+        linearGradient1.addColorStop(0, "rgb("+red_val+", "+green_val+", 0)");
+        linearGradient1.addColorStop(1, "rgb("+red_val+","+green_val+", 0)");
+      }
       for(var i=1;i <= last_block; i++)
       {
         var y_pos = start_y + block_start_y - i*(block_height + margin);
         
         context.fillStyle = linearGradient1;
-        context.fillRect(start_x + line_width + margin, y_pos, block_width, block_height);
+        context.fillRect(start_x + line_width*2 + margin, y_pos, block_width, block_height);
       }
 
       var size = ((battery_width<battery_height)?battery_width:battery_height)/2;
-      var unitsandval = data + units;
+      var unitsandval = raw_value + units;
       var valsize;
       if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
       else {valsize = (size / 6) * 5.5;}
@@ -221,8 +243,8 @@ function battery_draw(){
       context.fillStyle = color;
       context.textAlign = "center";
       context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.5)+"px "+ fontname);
-      if (unitend ==="0"){context.fillText(data + units, start_x + battery_width/2, start_y + battery_height*0.6);}
-	  if (unitend ==="1"){context.fillText(units + data, start_x + battery_width/2, start_y + battery_height*0.6);}
+      if (unitend ==="0"){context.fillText(raw_value + units, start_x + battery_width/2, start_y + battery_height*0.6);}
+      if (unitend ==="1"){context.fillText(units + raw_value, start_x + battery_width/2, start_y + battery_height*0.6);}
 
       if(title)
       {
