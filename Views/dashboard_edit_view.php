@@ -40,7 +40,7 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
     </div>
 </div>
 
-<div id="toolbox" style="cursor:move; text-align: center; background-color:#ddd; padding-left:5px; padding-right:5px; padding-bottom:15px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top:55px; right: 30px;">Toolbox
+<div id="toolbox" style="cursor:move; text-align: center; background-color:#ddd; padding-left:5px; padding-right:5px; padding-bottom:15px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top:55px; right: 30px;"><?php echo _('Toolbox'); ?>
 	<div id="separator" style="height:1.5px; background:#717171"></div>
 	<div id="Buttons" style="position:relative; top:5px; cursor:pointer">
 	<span id="dashboard-config-buttons">
