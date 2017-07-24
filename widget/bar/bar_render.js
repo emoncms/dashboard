@@ -1,8 +1,7 @@
 /*
-     All emon_widgets code is released under the GNU General Public License v3.
-     See COPYRIGHT.txt and LICENSE.txt.
-
-        ---------------------------------------------------------------------
+  All Emoncms code is released under the GNU Affero General Public License.
+  See COPYRIGHT.txt and LICENSE.txt.
+    ---------------------------------------------------------------------
         Part of the OpenEnergyMonitor project:
         http://openenergymonitor.org
 
@@ -41,7 +40,7 @@ function bar_widgetlist()
         }
     };
     var decimalsDropBoxOptions = [        // Options for the type combobox. Each item is [typeID, "description"]
-                    [-1,   "Automatic"],
+                    [-1,   _Tr("Automatic")],
                     [0,    "0"],
                     [1,    "1"],
                     [2,    "2"],
@@ -65,29 +64,29 @@ function bar_widgetlist()
                 ];
 
     var fstyleoptions = [
-                    [2, "Normal"],
-                    [1, "Italic"],
-                    [0, "Oblique"]
+                    [2, _Tr("Normal")],
+                    [1, _Tr("Italic")],
+                    [0, _Tr("Oblique")]
                 ];
 
     var fweightoptions = [
-                    [0, "Normal"],
-                    [1, "Bold"]
+                    [0, _Tr("Normal")],
+                    [1, _Tr("Bold")]
                 ];
     
     var unitEndOptions = [
-                    [0, "Back"],
-                    [1, "Front"]
+                    [0, _Tr("Back")],
+                    [1, _Tr("Front")]
                 ];
     
     var graduationDropBoxOptions = [
-                    [0, "Off"],
-                    [1, "On"]
+                    [0, _Tr("No")],
+                    [1, _Tr("Yes")]
                     ];
 
     var displayminmaxDropBoxOptions = [
-                    [0, "No"],
-                    [1, "Yes"]
+                    [0, _Tr("No")],
+                    [1, _Tr("Yes")]
                     ];
 
     addOption(widgets["bar"], "title_bar",      "value",            _Tr("Title"),           _Tr("Title of bar"),                                                                []);
