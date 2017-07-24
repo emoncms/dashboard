@@ -1,6 +1,6 @@
 /*
-   All emon_widgets code is released under the GNU General Public License v3.
-   See COPYRIGHT.txt and LICENSE.txt.
+  All Emoncms code is released under the GNU Affero General Public License.
+  See COPYRIGHT.txt and LICENSE.txt.
     ---------------------------------------------------------------------
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
@@ -36,38 +36,38 @@ function dial_widgetlist(){
   };
 
   var typeDropBoxOptions = [        // Options for the type combobox. Each item is [typeID, "description"]
-          [10,   "Black <-> White, Zero at left"],
-          [1,    "Red <-> Green, Zero at center"],
-          [2,    "Green <-> Red, Zero at left"],
-          [3,    "Green <-> Red, Zero at center"],
-          [4,    "Red <-> Green, Zero at left"],
-          [5,    "Red <-> Green, Zero at center"],
-          [6,    "Green center <-> orange edges, Zero at center"],
-          [9,    "Red <-> Dark Red, Zero at left"],
-          [11,   "Blue <-> Red, Zero at upper-left"],
-          [8,    "Light blue <-> Red, Zero at mid-left"],
-          [12,   "Light <-> dark red, Zero at left"],
-          [13,   "Light <-> dark orange, Zero at left"],
-          [14,   "Light <-> dark yellow, Zero at left"],
-          [0,    "Light <-> dark green, Zero at left"],
-          [18,   "Light <-> dark lime, Zero at left"],
-          [19,   "Light <-> dark mint, Zero at left"],
-          [15,   "Light <-> dark cyan, Zero at left"],
-          [7,    "Light <-> dark blue, Zero at left"],
-          [20,   "Light <-> dark royal blue, Zero at left"],
-          [16,   "Light <-> dark purple, Zero at left"],
-          [17,   "Light <-> dark pink, Zero at left"],
-          [21,   "Rainbow!, Zero at left"],
-          [22,   "Reverse Rainbow!, Zero at left"],
-          [23,   "Light <-> dark grey, alternating, Zero at left"]
+          [10,   _Tr("Black <-> White, Zero at left")],
+          [1,    _Tr("Red <-> Green, Zero at center")],
+          [2,    _Tr("Green <-> Red, Zero at left")],
+          [3,    _Tr("Green <-> Red, Zero at center")],
+          [4,    _Tr("Red <-> Green, Zero at left")],
+          [5,    _Tr("Red <-> Green, Zero at center")],
+          [6,    _Tr("Green center <-> orange edges, Zero at center")],
+          [9,    _Tr("Red <-> Dark Red, Zero at left")],
+          [11,   _Tr("Blue <-> Red, Zero at upper-left")],
+          [8,    _Tr("Light blue <-> Red, Zero at mid-left")],
+          [12,   _Tr("Light <-> dark red, Zero at left")],
+          [13,   _Tr("Light <-> dark orange, Zero at left")],
+          [14,   _Tr("Light <-> dark yellow, Zero at left")],
+          [0,    _Tr("Light <-> dark green, Zero at left")],
+          [18,   _Tr("Light <-> dark lime, Zero at left")],
+          [19,   _Tr("Light <-> dark mint, Zero at left")],
+          [15,   _Tr("Light <-> dark cyan, Zero at left")],
+          [7,    _Tr("Light <-> dark blue, Zero at left")],
+          [20,   _Tr("Light <-> dark royal blue, Zero at left")],
+          [16,   _Tr("Light <-> dark purple, Zero at left")],
+          [17,   _Tr("Light <-> dark pink, Zero at left")],
+          [21,   _Tr("Rainbow!, Zero at left")],
+          [22,   _Tr("Reverse Rainbow!, Zero at left")],
+          [23,   _Tr("Light <-> dark grey, alternating, Zero at left")]
         ];
 
   var graduationDropBoxOptions = [
-          [1, "Yes"],
-          [0, "No"]
+          [1, _Tr("Yes")],
+          [0, _Tr("No")]
         ];
   var decimalsDropBoxOptions = [
-        [-1,   "Automatic"],
+        [-1,   _Tr("Automatic")],
         [0,    "0"],
         [1,    "1"],
         [2,    "2"],
@@ -77,13 +77,13 @@ function dial_widgetlist(){
         [6,    "6"]
     ];
   var unitDropBoxOptions = [
-          [0, "Back"],
-          [1, "Front"]
+          [0, _Tr("Back")],
+          [1, _Tr("Front")]
         ];
 
   var displayminmaxDropBoxOptions = [
-          [0, "No"],
-          [1, "Yes"]
+          [0, _Tr("No")],
+          [1, _Tr("Yes")]
         ];
 
   addOption(widgets["dial"], "feedid",        "feedid",  _Tr("Feed"),         _Tr("Feed value"),                                                            []);
