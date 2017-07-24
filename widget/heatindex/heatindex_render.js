@@ -123,7 +123,7 @@ function heatindex_widgetlist()
 				];
 				
 	var rule1options = [
-					[0, _Tr("Heat Index)"],
+					[0, _Tr("Heat Index")],
 					[1, _Tr("Temperature Feed")]
 				];
 				
