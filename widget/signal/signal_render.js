@@ -1,7 +1,6 @@
 /*
-   All emon_widgets code is released under the GNU General Public License v3.
-   See COPYRIGHT.txt and LICENSE.txt.
-
+  All Emoncms code is released under the GNU Affero General Public License.
+  See COPYRIGHT.txt and LICENSE.txt.
     ---------------------------------------------------------------------
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
@@ -50,14 +49,14 @@ function signal_widgetlist(){
   ];
 
   var fstyleoptions = [
-    [2, "Normal"],
-    [1, "Italic"],
-    [0, "Oblique"]
+    [2, _Tr("Normal")],
+    [1, _Tr("Italic")],
+    [0, _Tr("Oblique")]
   ];
 
   var fweightoptions = [
-    [0, "Normal"],
-    [1, "Bold"]
+    [0, _Tr("Normal")],
+    [1, _Tr("Bold")]
 
   ];
 
