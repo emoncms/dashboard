@@ -1,6 +1,6 @@
-  /*
-   All Emoncms code is released under the GNU Affero General Public License.
-   See COPYRIGHT.txt and LICENSE.txt.
+/*
+  All Emoncms code is released under the GNU Affero General Public License.
+  See COPYRIGHT.txt and LICENSE.txt.
     ---------------------------------------------------------------------
     Emoncms - open source energy visualisation
     Part of the OpenEnergyMonitor project:
@@ -53,7 +53,7 @@ function humidex_widgetlist()
     ];
     
     var decimalsDropBoxOptions = [        // Options for the type combobox. Each item is [typeID, "description"]
-        [-1,   "Automatic"],
+        [-1,   _Tr("Automatic")],
         [0,    "0"],
         [1,    "1"],
         [2,    "2"],
@@ -76,14 +76,14 @@ function humidex_widgetlist()
 				];
 				
 	var fstyleoptions = [
-					[2, "Normal"],
-					[1, "Italic"],
-					[0, "Oblique"]
+					[2, _Tr("Normal")],
+					[1, _Tr("Italic")],
+					[0, _Tr("Oblique")]
 				];
 				
 	var fweightoptions = [
-					[1, "Bold"],
-					[0, "Normal"]
+					[1, _Tr("Bold")],
+					[0, _Tr("Normal")]
 				];
 				
 	var sizeoptions = [
