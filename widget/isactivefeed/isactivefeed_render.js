@@ -1,7 +1,6 @@
-
 /*
-   All emon_widgets code is released under the GNU General Public License v3.
-   See COPYRIGHT.txt and LICENSE.txt.
+  All Emoncms code is released under the GNU Affero General Public License.
+  See COPYRIGHT.txt and LICENSE.txt.
     ---------------------------------------------------------------------
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
@@ -16,11 +15,11 @@ function addOption(widget, optionKey, optionType, optionName, optionHint, option
     widget["optionsdata"].push(optionData);
 }
 	var shapeOptions = [
-    [2, "Circle"],
-    [1, "Triangle"],
-    [0, "Square"],
-    [3, "Star 5 spikes"],
-    [4, "Star 6 spikes"]
+    [2, _Tr("Circle")],
+    [1, _Tr("Triangle")],
+    [0, _Tr("Square")],
+    [3, _Tr("Star 5 spikes")],
+    [4, _Tr("Star 6 spikes")]
     ];
 
 function isactivefeed_widgetlist()
