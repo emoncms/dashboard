@@ -322,6 +322,7 @@ LANG_JS["Font weight used for display"] = '<?php echo addslashes(_("Font weight 
 LANG_JS["Formula applied for T between 50°F and aproximately 80°F"] = '<?php echo addslashes(_("Formula applied for T between 50°F and aproximately 80°F")); ?>';
 LANG_JS["Formula applied for T lower than 50°F"] = '<?php echo addslashes(_("Formula applied for T lower than 50°F")); ?>';
 LANG_JS["Front"] = '<?php echo addslashes(_("Front")); ?>';
+LANG_JS["Heat Index)"],"] = '<?php echo addslashes(_("Heat Index)"],")); ?>';
 LANG_JS["Humidity"] = '<?php echo addslashes(_("Humidity")); ?>';
 LANG_JS["Italic"] = '<?php echo addslashes(_("Italic")); ?>';
 LANG_JS["Normal"] = '<?php echo addslashes(_("Normal")); ?>';
