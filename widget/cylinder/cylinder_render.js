@@ -1,6 +1,6 @@
 /*
-   All emon_widgets code is released under the GNU General Public License v3.
-   See COPYRIGHT.txt and LICENSE.txt.
+  All Emoncms code is released under the GNU Affero General Public License.
+  See COPYRIGHT.txt and LICENSE.txt.
     ---------------------------------------------------------------------
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
@@ -31,7 +31,7 @@ function cylinder_widgetlist()
     }
   }
   var decimalsDropBoxOptions = [
-        [-1,   "Automatic"],
+        [-1,   _Tr("Automatic")],
         [0,    "0"],
         [1,    "1"],
         [2,    "2"],
@@ -41,9 +41,9 @@ function cylinder_widgetlist()
         [6,    "6"]
     ];
   var unitDropBoxOptions = [
-          [0, "Back"],
-          [1, "Front"],
-          [2, "No display"]
+          [0, _Tr("Back")],
+          [1, _Tr("Front")],
+          [2, _Tr("No display")]
         ];
     var tempDropBoxOptions = [        // Options for the type combobox. Each item is [typeID, "description"]
         [0,    "ºC"],
