@@ -1,7 +1,6 @@
 /*
-   All emon_widgets code is released under the GNU General Public License v3.
-   See COPYRIGHT.txt and LICENSE.txt.
-
+  All Emoncms code is released under the GNU Affero General Public License.
+  See COPYRIGHT.txt and LICENSE.txt.
     ---------------------------------------------------------------------
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
@@ -19,8 +18,8 @@ function addOption(widget, optionKey, optionType, optionName, optionHint, option
     widget["optionsdata"].push(optionData);
 }
 	var StyleOptions = [
-    [1, "With colour gradients"],
-    [0, "Without colour gradients"]
+    [1, _Tr("With colour gradients")],
+    [0, _Tr("Without colour gradients")]
     ];
 
 function led_widgetlist()
