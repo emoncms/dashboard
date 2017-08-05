@@ -159,17 +159,17 @@ function draw_thermometer(context,
     var scaledValue = (displayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
     if (scaledValue < 0){scaledValue = 0;}
 
-    var min_displayValue = minvaluefeed;
-    min_displayValue = min_displayValue-staticOffset;
+    var minDisplayValue = minvaluefeed;
+    minDisplayValue = minDisplayValue-staticOffset;
 
-    var min_scaledValue = (min_displayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
-    if (min_scaledValue < 0){min_scaledValue = 0;}
+    var minScaledValue = (minDisplayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
+    if (minScaledValue < 0){minScaledValue = 0;}
 
-    var max_displayValue = maxvaluefeed;
-    max_displayValue = max_displayValue-staticOffset;
+    var maxDisplayValue = maxvaluefeed;
+    maxDisplayValue = maxDisplayValue-staticOffset;
 
-    var max_scaledValue = (max_displayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
-    if (max_scaledValue < 0){max_scaledValue = 0;}
+    var maxScaledValue = (maxDisplayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
+    if (maxScaledValue < 0){maxScaledValue = 0;}
 
         if (decimals<0){
             if (rawValue>=100) {
@@ -219,8 +219,8 @@ function draw_thermometer(context,
     else {size = height/2;}
     size = size - (size*0.058/2);
 
-    var half_width = width/2;
-    var half_height = height/2;
+    var halfWidth = width/2;
+    var halfHeight = height/2;
 
 
     var fontname;
@@ -249,10 +249,10 @@ function draw_thermometer(context,
     if (fweight === "1"){fontweight = "bold";}
 
 
-    if (graduationBool == 1)
+    if (graduationBool === "1")
     {
      context.save();
-     context.translate((half_width*(-0.25)),0); //translate the thermometer to the left in order to get more space for the graduations
+     context.translate((halfWidth*(-0.25)),0); //translate the thermometer to the left in order to get more space for the graduations
         if (graduationQuant > 0)
         {
             context.textAlign    = "start";
@@ -266,21 +266,21 @@ function draw_thermometer(context,
             for (var y = 0; y < graduationQuant; y++)
             {
                 curY = Number(((y+1)*step).toFixed(0))+0.5;  // Bin down so we're drawing in the middle of the pixel, so the line is exactly 1 px wide
-                context.moveTo(half_width*0.3, curY);
-                context.lineTo(half_width*0.7, curY);
+                context.moveTo(halfWidth*0.3, curY);
+                context.lineTo(halfWidth*0.7, curY);
 
                 var unitOffset = Number(staticOffset+((graduationQuant-y)*(maxValue/divisions)));
                 if (unitOffset < 1000)
                     {unitOffset = unitOffset.toFixed(1);}
                 else
                     {unitOffset = unitOffset.toFixed(0);}
-                if (unitend ==="0"){context.fillText(parseFloat(unitOffset)+unitsString, half_width*0.75, curY);}
-                if (unitend ==="1"){context.fillText(unitsString+parseFloat(unitOffset), half_width*0.75, curY);}
+                if (unitend ==="0"){context.fillText(parseFloat(unitOffset)+unitsString, halfWidth*0.75, curY);}
+                if (unitend ==="1"){context.fillText(unitsString+parseFloat(unitOffset), halfWidth*0.75, curY);}
             }
-            context.moveTo(half_width*0.3, height*0.8);
-            context.lineTo(half_width*0.7, height*0.8);
-            if (unitend ==="0"){context.fillText(staticOffset+unitsString, half_width*0.75, height*0.8);}
-            if (unitend ==="1"){context.fillText(unitsString+staticOffset, half_width*0.75, height*0.8);}
+            context.moveTo(halfWidth*0.3, height*0.8);
+            context.lineTo(halfWidth*0.7, height*0.8);
+            if (unitend ==="0"){context.fillText(staticOffset+unitsString, halfWidth*0.75, height*0.8);}
+            if (unitend ==="1"){context.fillText(unitsString+staticOffset, halfWidth*0.75, height*0.8);}
 
             context.strokeStyle = "#888";
             context.stroke();
@@ -299,18 +299,18 @@ function draw_thermometer(context,
     context.beginPath();
     context.lineWidth = width*0.01;
     context.strokeStyle = "#000";
-    context.arc(half_width/2,height*0.05 + width*0.02,half_width*0.1,1*Math.PI,2*Math.PI);
+    context.arc(halfWidth/2,height*0.05 + width*0.02,halfWidth*0.1,1*Math.PI,2*Math.PI);
     context.fillStyle = "#FFF";
     context.fill();
-    context.fillRect(half_width*0.4,height*0.05,half_width*0.2,height*0.9);
-    context.moveTo(half_width*0.4,height*0.05 + width*0.01);
-    context.lineTo(half_width*0.4,height*0.9);
-    context.moveTo(half_width*0.6,height*0.05 + width*0.01);
-    context.lineTo(half_width*0.6,height*0.9);
+    context.fillRect(halfWidth*0.4,height*0.05,halfWidth*0.2,height*0.9);
+    context.moveTo(halfWidth*0.4,height*0.05 + width*0.01);
+    context.lineTo(halfWidth*0.4,height*0.9);
+    context.moveTo(halfWidth*0.6,height*0.05 + width*0.01);
+    context.lineTo(halfWidth*0.6,height*0.9);
     context.stroke();
 
     context.beginPath();
-    context.arc(half_width/2,height*0.9 - width*0.01,half_width*0.2,1.66*Math.PI,1.35*Math.PI);
+    context.arc(halfWidth/2,height*0.9 - width*0.01,halfWidth*0.2,1.66*Math.PI,1.35*Math.PI);
     context.fillStyle = "#FFF";
     context.fill();
     context.lineWidth = width*0.01;
@@ -318,38 +318,38 @@ function draw_thermometer(context,
     context.stroke();
 
     context.beginPath();
-    context.arc(half_width/2,height*0.9 - width*0.01,half_width*0.2-width*0.02,0,2*Math.PI);
+    context.arc(halfWidth/2,height*0.9 - width*0.01,halfWidth*0.2-width*0.02,0,2*Math.PI);
     context.fillStyle = "#FB0000";
     context.fill();
 
-    context.fillRect(half_width*0.4 + width*0.02,
+    context.fillRect(halfWidth*0.4 + width*0.02,
                     thermometer_top,
-                    half_width*0.2 - width*0.04,
+                    halfWidth*0.2 - width*0.04,
                     height*0.9 - thermometer_top);
 
     if(displayminmax==="1"){
 
     if (colourMinMax.indexOf("#") === -1) {colourMinMax = "#" + colourMinMax;}  // Fix missing "#" on colour if needed
     context.fillStyle = colourMinMax;
-    var thermometer_min = (height*0.8 - (min_scaledValue * height*0.8));
+    var thermometer_min = (height*0.8 - (minScaledValue * height*0.8));
 
     if (thermometer_min < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
        {thermometer_min = height*0.05;}
 
-    context.fillRect(half_width*0.4 + width*0.005,
+    context.fillRect(halfWidth*0.4 + width*0.005,
                     thermometer_min,
-                    half_width*0.2 - width*0.01,
+                    halfWidth*0.2 - width*0.01,
                     2);
 
     context.fillStyle = colourMinMax;
-    var thermometer_max = (height*0.8 - (max_scaledValue * height*0.8));
+    var thermometer_max = (height*0.8 - (maxScaledValue * height*0.8));
 
     if (thermometer_max < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
        {thermometer_max = height*0.05;}
 
-    context.fillRect(half_width*0.4 + width*0.005,
+    context.fillRect(halfWidth*0.4 + width*0.005,
                     thermometer_max,
-                    half_width*0.2 - width*0.01,
+                    halfWidth*0.2 - width*0.01,
                     2);
     }
 
@@ -372,11 +372,11 @@ function draw_thermometer(context,
       window.onresize=function(e){ reOffset(); };
 
      var offset_position = 0;
-     if (graduationBool == 1){offset_position = 0.25;}
+     if (graduationBool === "1"){offset_position = 0.25;}
 
      var hotspots=[ // declare hotspots in order to active associated tooltips
-      {xspot:(half_width*(0.4 - offset_position) + width*0.005),yspot:(thermometer_min),wspot:(half_width*0.2 - width*0.01),hspot:2,tip: minvaluefeed},
-      {xspot:(half_width*(0.4 - offset_position) + width*0.005),yspot:(thermometer_max),wspot:(half_width*0.2 - width*0.01),hspot:2,tip: maxvaluefeed},
+      {xspot:(halfWidth*(0.4 - offset_position) + width*0.005),yspot:(thermometer_min),wspot:(halfWidth*0.2 - width*0.01),hspot:2,tip: minvaluefeed},
+      {xspot:(halfWidth*(0.4 - offset_position) + width*0.005),yspot:(thermometer_max),wspot:(halfWidth*0.2 - width*0.01),hspot:2,tip: maxvaluefeed},
       ];
 
        function handleMouseMove(e){
