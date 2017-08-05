@@ -115,8 +115,8 @@ function thermometer_widgetlist()
 
 function draw_thermometer(context,
                   canvasid,
-                  x_pos,              // these x and y coords seem unused?
-                  y_pos,
+                  xPos,              // these x and y coords seem unused?
+                  yPos,
                   titleThermometer,
                   font,
                   fstyle,
@@ -375,8 +375,8 @@ function draw_thermometer(context,
      if (graduationBool === "1"){offsetPosition = 0.25;}
 
      var hotspots=[ // declare hotspots in order to active associated tooltips
-      {xspot:(halfWidth*(0.4 - offsetPosition) + width*0.005),yspot:(thermometerMin),wspot:(halfWidth*0.2 - width*0.01),hspot:2,tip: minvaluefeed},
-      {xspot:(halfWidth*(0.4 - offsetPosition) + width*0.005),yspot:(thermometerMax),wspot:(halfWidth*0.2 - width*0.01),hspot:2,tip: maxvaluefeed},
+      {xspot:(halfWidth*(0.4 - offsetPosition) + width*0.005),yspot: thermometerMin,wspot:(halfWidth*0.2 - width*0.01),hspot:2,tip: minvaluefeed},
+      {xspot:(halfWidth*(0.4 - offsetPosition) + width*0.005),yspot: thermometerMax,wspot:(halfWidth*0.2 - width*0.01),hspot:2,tip: maxvaluefeed},
       ];
 
        function handleMouseMove(e){
@@ -388,6 +388,7 @@ function draw_thermometer(context,
 
         var dx=mouseX;
         var dy=mouseY;
+        var h;
 
         h=hotspots[0];
         if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
