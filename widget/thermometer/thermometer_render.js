@@ -291,10 +291,10 @@ function draw_thermometer(context,
 
     context.fillStyle = "#FB0000";
 
-    var thermometer_top = (height*0.8 - (scaledValue * height*0.8));
+    var thermometerTop = (height*0.8 - (scaledValue * height*0.8));
 
-    if (thermometer_top < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
-       {thermometer_top = height*0.05;}
+    if (thermometerTop < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
+       {thermometerTop = height*0.05;}
 
     context.beginPath();
     context.lineWidth = width*0.01;
@@ -323,32 +323,32 @@ function draw_thermometer(context,
     context.fill();
 
     context.fillRect(halfWidth*0.4 + width*0.02,
-                    thermometer_top,
+                    thermometerTop,
                     halfWidth*0.2 - width*0.04,
-                    height*0.9 - thermometer_top);
+                    height*0.9 - thermometerTop);
 
     if(displayminmax==="1"){
 
     if (colourMinMax.indexOf("#") === -1) {colourMinMax = "#" + colourMinMax;}  // Fix missing "#" on colour if needed
     context.fillStyle = colourMinMax;
-    var thermometer_min = (height*0.8 - (minScaledValue * height*0.8));
+    var thermometerMin = (height*0.8 - (minScaledValue * height*0.8));
 
-    if (thermometer_min < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
-       {thermometer_min = height*0.05;}
+    if (thermometerMin < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
+       {thermometerMin = height*0.05;}
 
     context.fillRect(halfWidth*0.4 + width*0.005,
-                    thermometer_min,
+                    thermometerMin,
                     halfWidth*0.2 - width*0.01,
                     2);
 
     context.fillStyle = colourMinMax;
-    var thermometer_max = (height*0.8 - (maxScaledValue * height*0.8));
+    var thermometerMax = (height*0.8 - (maxScaledValue * height*0.8));
 
-    if (thermometer_max < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
-       {thermometer_max = height*0.05;}
+    if (thermometerMax < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
+       {thermometerMax = height*0.05;}
 
     context.fillRect(halfWidth*0.4 + width*0.005,
-                    thermometer_max,
+                    thermometerMax,
                     halfWidth*0.2 - width*0.01,
                     2);
     }
@@ -365,18 +365,18 @@ function draw_thermometer(context,
        var BB=canvas.getBoundingClientRect();
        offsetX=BB.left;
        offsetY=BB.top;
-      };
+      }
 
       reOffset();
       window.onscroll=function(e){ reOffset(); };
       window.onresize=function(e){ reOffset(); };
 
-     var offset_position = 0;
-     if (graduationBool === "1"){offset_position = 0.25;}
+     var offsetPosition = 0;
+     if (graduationBool === "1"){offsetPosition = 0.25;}
 
      var hotspots=[ // declare hotspots in order to active associated tooltips
-      {xspot:(halfWidth*(0.4 - offset_position) + width*0.005),yspot:(thermometer_min),wspot:(halfWidth*0.2 - width*0.01),hspot:2,tip: minvaluefeed},
-      {xspot:(halfWidth*(0.4 - offset_position) + width*0.005),yspot:(thermometer_max),wspot:(halfWidth*0.2 - width*0.01),hspot:2,tip: maxvaluefeed},
+      {xspot:(halfWidth*(0.4 - offsetPosition) + width*0.005),yspot:(thermometerMin),wspot:(halfWidth*0.2 - width*0.01),hspot:2,tip: minvaluefeed},
+      {xspot:(halfWidth*(0.4 - offsetPosition) + width*0.005),yspot:(thermometerMax),wspot:(halfWidth*0.2 - width*0.01),hspot:2,tip: maxvaluefeed},
       ];
 
        function handleMouseMove(e){
