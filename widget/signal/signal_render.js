@@ -120,7 +120,6 @@ function signal_draw(){
       if (fweight === "0"){fontweight = "normal";}
       if (fweight === "1"){fontweight = "bold";}
 
-      console.log(color, colour1);
       if (color.indexOf("#") === -1) {color = "#" + color;}
       if (colour1.indexOf("#") === -1) {colour1 = "#" + colour1;}
 
@@ -164,7 +163,6 @@ function signal_draw(){
       var arc_radius = radius;
 
       var signal_bars = Math.ceil(number_of_blocks*(data/max_val));
-      console.log("signal", signal_bars);
 
       for(var i=0; i<number_of_blocks; i++)
       {
