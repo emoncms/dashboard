@@ -117,7 +117,7 @@ function draw_thermometer(context,
                   canvasid,
                   x_pos,              // these x and y coords seem unused?
                   y_pos,
-                  title,
+                  title_thermometer,
                   font,
                   fstyle,
                   fweight,
@@ -456,12 +456,6 @@ function thermometer_draw()
         var feedid = $(this).attr("feedid");
         var minvaluefeed = $(this).attr("minvaluefeed");
         var maxvaluefeed = $(this).attr("maxvaluefeed");
-        if($(this).attr("title")){ //transform the title property in the div by title_thermometer in order to avoid title tootip displayed by the browser
-        title_thermometer=$(this).attr("title");
-        $(this).removeAttr("title");
-        }
-        else {title_thermometer= $(this).attr("title_thermometer");
-        }
         if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
         var val = curve_value(feedid,dialrate).toFixed(3);
         var minval = curve_value(minvaluefeed,dialrate).toFixed(3);
