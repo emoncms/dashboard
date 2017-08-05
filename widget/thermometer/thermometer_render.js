@@ -327,11 +327,14 @@ function draw_thermometer(context,
                     halfWidth*0.2 - width*0.04,
                     height*0.9 - thermometerTop);
 
+    var thermometerMin=0;
+    var thermometerMax=0;
+
     if(displayminmax==="1"){
 
     if (colourMinMax.indexOf("#") === -1) {colourMinMax = "#" + colourMinMax;}  // Fix missing "#" on colour if needed
     context.fillStyle = colourMinMax;
-    var thermometerMin = (height*0.8 - (minScaledValue * height*0.8));
+    thermometerMin = (height*0.8 - (minScaledValue * height*0.8));
 
     if (thermometerMin < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
        {thermometerMin = height*0.05;}
@@ -342,7 +345,7 @@ function draw_thermometer(context,
                     2);
 
     context.fillStyle = colourMinMax;
-    var thermometerMax = (height*0.8 - (maxScaledValue * height*0.8));
+    thermometerMax = (height*0.8 - (maxScaledValue * height*0.8));
 
     if (thermometerMax < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
        {thermometerMax = height*0.05;}
@@ -438,7 +441,7 @@ function draw_thermometer(context,
 
 }
 
-function thermometer_define_tooltips(){
+function thermometerDefineTooltips(){
   $(".thermometer").each(function(index) {
       var id2 = "can-"+$(this).attr("id");
       var canvas2 = document.getElementById(id2);
@@ -499,7 +502,7 @@ function thermometer_draw()
 function thermometer_init()
 {
     setup_widget_canvas("thermometer");
-    thermometer_define_tooltips();
+    thermometerDefineTooltips();
 }
 function thermometer_slowupdate()
 {
