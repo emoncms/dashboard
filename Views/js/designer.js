@@ -469,11 +469,11 @@ var designer = {
                 select[menu] = "<li><a id='"+z+"' class='widget-button'>"+z+"</a></li>";
             else
                 select[menu] += "<li><a id='"+z+"' class='widget-button'>"+z+"</a></li>";
-        }
+        } 
 
         for (z in select){
-            widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown' style='width:62px; padding:4px;' title='Add a "+z+" element to the dashboard'><img style='' src='../Modules/dashboard/Views/icons/"+z+".png'><span class='caret'></span></button>";
-			widget_html += "<ul class='dropdown-menu scrollable-menu' style='min-width: auto; padding: 0px; text-align:left; top:initial' name='d'>"+select[z]+"</ul></div>";
+            widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown' style='width:62px; padding:4px;' title='"+_Tr("Add a")+" "+z+" "+_Tr("element to the dashboard")+"'><img style='' src='../Modules/dashboard/Views/icons/"+z+".png'><span class='caret'></span></button>";
+            widget_html += "<ul class='dropdown-menu scrollable-menu' style='min-width: auto; padding: 0px; text-align:left; top:initial' name='d'>"+select[z]+"</ul></div>";
         }
         $("#widget-buttons").html(widget_html);
 
