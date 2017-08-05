@@ -89,8 +89,8 @@ function thermometer_widgetlist()
                     [1, _Tr("Yes")]
                     ];
 
-    addOption(widgets["thermometer"], "title_thermometer",      "value",            _Tr("Title"),           _Tr("Title of thermometer"),                                                                []);
-    addOption(widgets["thermometer"], "colour_label",   "colour_picker",    _Tr("Label Colour"),    _Tr("Colour of title and values"),                                                  []);
+    addOption(widgets["thermometer"], "titleThermometer",      "value",            _Tr("Title"),           _Tr("Title of thermometer"),                                                                []);
+    addOption(widgets["thermometer"], "colourLabel",   "colour_picker",    _Tr("Label Colour"),    _Tr("Colour of title and values"),                                                  []);
     addOption(widgets["thermometer"], "font",           "dropbox",          _Tr("Font used"),       _Tr("Font used"),                                                                   fontoptions);
     addOption(widgets["thermometer"], "fstyle",         "dropbox",          _Tr("Font style"),      _Tr("Font style used for display"),                                                 fstyleoptions);
     addOption(widgets["thermometer"], "fweight",        "dropbox",          _Tr("Font weight"),     _Tr("Font weight used for display"),                                                fweightoptions);
@@ -106,7 +106,7 @@ function thermometer_widgetlist()
     addOption(widgets["thermometer"], "displayminmax",  "dropbox",          _Tr("Min / Max ?"),     _Tr("Display Min. and Max. ?"),                                                     displayminmaxDropBoxOptions);
     addOption(widgets["thermometer"], "minvaluefeed",   "feedid",           _Tr("Min. feed"),       _Tr("The feed for the minimum value"),                                              []);
     addOption(widgets["thermometer"], "maxvaluefeed",   "feedid",           _Tr("Max. feed"),       _Tr("The feed for the maximum value"),                                              []);
-    addOption(widgets["thermometer"], "colour_minmax",  "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
+    addOption(widgets["thermometer"], "colourMinMax",  "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
 
 
     return widgets;
@@ -117,72 +117,72 @@ function draw_thermometer(context,
                   canvasid,
                   x_pos,              // these x and y coords seem unused?
                   y_pos,
-                  title_thermometer,
+                  titleThermometer,
                   font,
                   fstyle,
                   fweight,
                   width,
                   height,
-                  raw_value,
-                  max_value,
-                  units_string,
+                  rawValue,
+                  maxValue,
+                  unitsString,
                   decimals,
                   unitend,
-                  colour_label,
-                  static_offset,
+                  colourLabel,
+                  staticOffset,
                   graduationBool,
                   graduationQuant,
                   displayminmax,
                   minvaluefeed,
                   maxvaluefeed,
-                  colour_minmax
+                  colourMinMax
                   )
 {
     if (!context) {return;}
 
     context.clearRect(0,0,width+10,height+10); // Clear old drawing
 
-    // if (1 * max_value) == false: 3000. Else 1 * max_value
-    max_value = 1 * max_value || 3000;
-    // if units_string == false: "". Else units_string
-    units_string = units_string || "";
-    title_thermometer = title_thermometer || "";
+    // if (1 * maxValue) == false: 3000. Else 1 * maxValue
+    maxValue = 1 * maxValue || 3000;
+    // if unitsString == false: "". Else unitsString
+    unitsString = unitsString || "";
+    titleThermometer = titleThermometer || "";
     fstyle = fstyle || "2";
     fweight = fweight || "0";
     unitend = unitend || "0";
-    colour_label = colour_label || "000";
-    colour_minmax = colour_minmax || "555";
-    static_offset = 1*static_offset || 0;
-    var display_value = raw_value;
-    display_value = display_value-static_offset;
+    colourLabel = colourLabel || "000";
+    colourMinMax = colourMinMax || "555";
+    staticOffset = 1*staticOffset || 0;
+    var displayValue = rawValue;
+    displayValue = displayValue-staticOffset;
 
-    var scaled_value = (display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
-    if (scaled_value < 0){scaled_value = 0;}
+    var scaledValue = (displayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
+    if (scaledValue < 0){scaledValue = 0;}
 
-    var min_display_value = minvaluefeed;
-    min_display_value = min_display_value-static_offset;
+    var min_displayValue = minvaluefeed;
+    min_displayValue = min_displayValue-staticOffset;
 
-    var min_scaled_value = (min_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
-    if (min_scaled_value < 0){min_scaled_value = 0;}
+    var min_scaledValue = (min_displayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
+    if (min_scaledValue < 0){min_scaledValue = 0;}
 
-    var max_display_value = maxvaluefeed;
-    max_display_value = max_display_value-static_offset;
+    var max_displayValue = maxvaluefeed;
+    max_displayValue = max_displayValue-staticOffset;
 
-    var max_scaled_value = (max_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
-    if (max_scaled_value < 0){max_scaled_value = 0;}
+    var max_scaledValue = (max_displayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
+    if (max_scaledValue < 0){max_scaledValue = 0;}
 
         if (decimals<0){
-            if (raw_value>=100) {
-            raw_value = raw_value.toFixed(0);
-            } else if (raw_value>=10) {
-            raw_value = raw_value.toFixed(1);
+            if (rawValue>=100) {
+            rawValue = rawValue.toFixed(0);
+            } else if (rawValue>=10) {
+            rawValue = rawValue.toFixed(1);
             } else  {
-            raw_value = raw_value.toFixed(2);
+            rawValue = rawValue.toFixed(2);
             }
-        raw_value = parseFloat(raw_value);
+        rawValue = parseFloat(rawValue);
         }
         else {
-             raw_value = raw_value.toFixed(decimals);
+             rawValue = rawValue.toFixed(decimals);
         }
 
         if (decimals<0){
@@ -269,29 +269,29 @@ function draw_thermometer(context,
                 context.moveTo(half_width*0.3, curY);
                 context.lineTo(half_width*0.7, curY);
 
-                var unitOffset = Number(static_offset+((graduationQuant-y)*(max_value/divisions)));
+                var unitOffset = Number(staticOffset+((graduationQuant-y)*(maxValue/divisions)));
                 if (unitOffset < 1000)
                     {unitOffset = unitOffset.toFixed(1);}
                 else
                     {unitOffset = unitOffset.toFixed(0);}
-                if (unitend ==="0"){context.fillText(parseFloat(unitOffset)+units_string, half_width*0.75, curY);}
-                if (unitend ==="1"){context.fillText(units_string+parseFloat(unitOffset), half_width*0.75, curY);}
+                if (unitend ==="0"){context.fillText(parseFloat(unitOffset)+unitsString, half_width*0.75, curY);}
+                if (unitend ==="1"){context.fillText(unitsString+parseFloat(unitOffset), half_width*0.75, curY);}
             }
             context.moveTo(half_width*0.3, height*0.8);
             context.lineTo(half_width*0.7, height*0.8);
-            if (unitend ==="0"){context.fillText(static_offset+units_string, half_width*0.75, height*0.8);}
-            if (unitend ==="1"){context.fillText(units_string+static_offset, half_width*0.75, height*0.8);}
+            if (unitend ==="0"){context.fillText(staticOffset+unitsString, half_width*0.75, height*0.8);}
+            if (unitend ==="1"){context.fillText(unitsString+staticOffset, half_width*0.75, height*0.8);}
 
             context.strokeStyle = "#888";
             context.stroke();
         }
     }
 
-    if (!display_value) {display_value = 0;}  // Clamp value so we don't draw negative values.
+    if (!displayValue) {displayValue = 0;}  // Clamp value so we don't draw negative values.
 
     context.fillStyle = "#FB0000";
 
-    var thermometer_top = (height*0.8 - (scaled_value * height*0.8));
+    var thermometer_top = (height*0.8 - (scaledValue * height*0.8));
 
     if (thermometer_top < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
        {thermometer_top = height*0.05;}
@@ -329,9 +329,9 @@ function draw_thermometer(context,
 
     if(displayminmax==="1"){
 
-    if (colour_minmax.indexOf("#") === -1) {colour_minmax = "#" + colour_minmax;}  // Fix missing "#" on colour if needed
-    context.fillStyle = colour_minmax;
-    var thermometer_min = (height*0.8 - (min_scaled_value * height*0.8));
+    if (colourMinMax.indexOf("#") === -1) {colourMinMax = "#" + colourMinMax;}  // Fix missing "#" on colour if needed
+    context.fillStyle = colourMinMax;
+    var thermometer_min = (height*0.8 - (min_scaledValue * height*0.8));
 
     if (thermometer_min < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
        {thermometer_min = height*0.05;}
@@ -341,8 +341,8 @@ function draw_thermometer(context,
                     half_width*0.2 - width*0.01,
                     2);
 
-    context.fillStyle = colour_minmax;
-    var thermometer_max = (height*0.8 - (max_scaled_value * height*0.8));
+    context.fillStyle = colourMinMax;
+    var thermometer_max = (height*0.8 - (max_scaledValue * height*0.8));
 
     if (thermometer_max < height*0.05)     // Clamp value so we don't overshoot the top of the thermometergraph.
        {thermometer_max = height*0.05;}
@@ -416,24 +416,24 @@ function draw_thermometer(context,
 
     $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
 
-    if (colour_label.indexOf("#") === -1) {colour_label = "#" + colour_label;} // Fix missing "#" on colour if needed
+    if (colourLabel.indexOf("#") === -1) {colourLabel = "#" + colourLabel;} // Fix missing "#" on colour if needed
 
-    context.fillStyle = colour_label;
+    context.fillStyle = colourLabel;
     
-    var unitsandval = raw_value+units_string;
+    var unitsandval = rawValue+unitsString;
     var valsize;
     if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
     else {valsize = (size / 6) * 5.5;}
     var titlesize ;
-    if (title_thermometer.length >10) {titlesize = (size / (title_thermometer.length+2)) * 9;}
+    if (titleThermometer.length >10) {titlesize = (size / (titleThermometer.length+2)) * 9;}
     else {titlesize = (size / 12) * 9.5;}
     
     context.textAlign    = "center";
         context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
-        if (unitend ==="0"){context.fillText(raw_value+units_string, width*0.75, height*0.6);}
-        if (unitend ==="1"){context.fillText(units_string+raw_value, width*0.75, height*0.6);}
+        if (unitend ==="0"){context.fillText(rawValue+unitsString, width*0.75, height*0.6);}
+        if (unitend ==="1"){context.fillText(unitsString+rawValue, width*0.75, height*0.6);}
         context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.25)+"px "+ fontname);
-        context.fillText(title_thermometer, width*0.75, height*0.2);
+        context.fillText(titleThermometer, width*0.75, height*0.2);
 
 }
 
@@ -470,7 +470,7 @@ function thermometer_draw()
                      id,
                      0,
                      0,
-                     $(this).attr("title_thermometer"),
+                     $(this).attr("titleThermometer"),
                      $(this).attr("font"),
                      $(this).attr("fstyle"),
                      $(this).attr("fweight"),
@@ -481,14 +481,14 @@ function thermometer_draw()
                      $(this).attr("units"),
                      $(this).attr("decimals"),
                      $(this).attr("unitend"),
-                     $(this).attr("colour_label"),
+                     $(this).attr("colourLabel"),
                      $(this).attr("offset"),
                      $(this).attr("graduations"),
                      $(this).attr("gradNumber"),
                      $(this).attr("displayminmax"),
                      minval*scale,
                      maxval*scale,
-                     $(this).attr("colour_minmax")
+                     $(this).attr("colourMinMax")
                      );
         }
     });
