@@ -152,8 +152,8 @@ var designer = {
     "onbox": function(x,y){
         var box = null;
         for (z in designer.boxlist) {
-            if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]["left"]+designer.boxlist[z]["width"]+4) &&
-                y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]["top"]+designer.boxlist[z]["height"]+4))
+            if (x>designer.boxlist[z]["left"]-4 && x<(designer.boxlist[z]["left"]+designer.boxlist[z]["width"]+4) &&
+                y>designer.boxlist[z]["top"]-4 && y<(designer.boxlist[z]["top"]+designer.boxlist[z]["height"]+4))
             {
                 if (box === null) {
                     box = z;
@@ -271,10 +271,10 @@ var designer = {
                 var strokeColor = "rgba(140, 179, 255, 0.9)";
                 var selectedColor = "rgba(255, 0, 0, 0.9)";
 
-                var top = designer.boxlist[selected_box]['top'];
-                var left = designer.boxlist[selected_box]['left'];
-                var width = designer.boxlist[selected_box]['width'];
-                var height = designer.boxlist[selected_box]['height'];
+                var top = designer.boxlist[selected_box]["top"];
+                var left = designer.boxlist[selected_box]["left"];
+                var width = designer.boxlist[selected_box]["width"];
+                var height = designer.boxlist[selected_box]["height"];
 
                 designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.left ? selectedColor : strokeColor );
                 designer.ctx.strokeRect(left-4,top+(height/2)-4,8,8);
@@ -301,17 +301,17 @@ var designer = {
         for (z in designer.boxlist) {
             if (z){
                 var element = "#"+z
-                $(element).css("top", designer.boxlist[z]['top']+"px");
-                $(element).css("left", designer.boxlist[z]['left']+"px");
-                if (designer.boxlist[z]['styleUnitWidth'] == 1) {
-                    $(element).css("width", Math.round(designer.boxlist[z]['width'] / designer.page_width * 100) + "%");
+                $(element).css("top", designer.boxlist[z]["top"]+"px");
+                $(element).css("left", designer.boxlist[z]["left"]+"px");
+                if (designer.boxlist[z]["styleUnitWidth"] == 1) {
+                    $(element).css("width", Math.round(designer.boxlist[z]["width"] / designer.page_width * 100) + "%");
                 } else {
-                    $(element).css("width", designer.boxlist[z]['width']+"px");
+                    $(element).css("width", designer.boxlist[z]["width"]+"px");
                 }
-                if (designer.boxlist[z]['styleUnitHeight'] == 1) {
-                    $(element).css("height", Math.round(designer.boxlist[z]['height'] / designer.page_height * 100) + "%");
+                if (designer.boxlist[z]["styleUnitHeight"] == 1) {
+                    $(element).css("height", Math.round(designer.boxlist[z]["height"] / designer.page_height * 100) + "%");
                 } else {
-                    $(element).css("height", designer.boxlist[z]['height']+"px");
+                    $(element).css("height", designer.boxlist[z]["height"]+"px");
                 }
             }
         }
@@ -415,14 +415,14 @@ var designer = {
         }
 
         // Generic sizing options for all widgets (an hack so we dont add new options to all widgets)
-        var selPixel = (designer.boxlist[selected_box]['styleUnitWidth'] == 0 ? "selected" : "");
-        var selPercent = (designer.boxlist[selected_box]['styleUnitWidth'] == 1 ? "selected" : "");
+        var selPixel = (designer.boxlist[selected_box]["styleUnitWidth"] == 0 ? "selected" : "");
+        var selPercent = (designer.boxlist[selected_box]["styleUnitWidth"] == 1 ? "selected" : "");
         options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:80px; text-align: right;" class="add-on">'+_Tr("Width")+'</span>';
         options_html += '<select class="options" id="styleUnitWidth"><option value="0" '+selPixel+'>'+_Tr("Pixels")+'</option><option value="1" '+selPercent+'>'+_Tr("Percentage")+'</option></select>';
         options_html += '</div><span class="help-inline"><small class="muted">'+_Tr("Choose width unit")+'</small></span></div></div>';
 
-        var selPixel = (designer.boxlist[selected_box]['styleUnitHeight'] == 0 ? "selected" : "");
-        var selPercent = (designer.boxlist[selected_box]['styleUnitHeight'] == 1 ? "selected" : "");
+        var selPixel = (designer.boxlist[selected_box]["styleUnitHeight"] == 0 ? "selected" : "");
+        var selPercent = (designer.boxlist[selected_box]["styleUnitHeight"] == 1 ? "selected" : "");
         options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:80px; text-align: right;" class="add-on">'+_Tr("Height")+'</span>';
         options_html += '<select class="options" id="styleUnitHeight"><option value="0" '+selPixel+'>'+_Tr("Pixels")+'</option><option value="1" '+selPercent+'>'+_Tr("Percentage")+'</option></select>';
         options_html += '</div><span class="help-inline"><small class="muted">'+_Tr("Choose height unit")+'</small></span></div></div>';
@@ -463,7 +463,7 @@ var designer = {
         var widget_html = "";
         var select = [];
         for (z in widgets){
-            var menu = widgets[z]['menu'];
+            var menu = widgets[z]["menu"];
             if (typeof select[menu] === "undefined")
                 select[menu] = "<li><a id='"+z+"' class='widget-button'>"+z+"</a></li>";
             else
@@ -485,9 +485,9 @@ var designer = {
     "add_widget": function(mx,my,type){
         designer.start_save_undo_state();
         designer.boxi++;
-        var html = widgets[type]['html'];
+        var html = widgets[type]["html"];
         if (html == undefined) html = "";
-        $("#page").append('<div id="'+designer.boxi+'" class="'+type+'" style="position:absolute; margin: 0; top:'+designer.snap(my+widgets[type]['offsety'])+'px; left:'+designer.snap(mx+widgets[type]['offsetx'])+'px; width:'+widgets[type]['width']+'px; height:'+widgets[type]['height']+'px;" >'+html+'</div>');
+        $("#page").append('<div id="'+designer.boxi+'" class="'+type+'" style="position:absolute; margin: 0; top:'+designer.snap(my+widgets[type]["offsety"])+'px; left:'+designer.snap(mx+widgets[type]["offsetx"])+'px; width:'+widgets[type]["width"]+'px; height:'+widgets[type]["height"]+'px;" >'+html+'</div>');
 
         designer.end_save_undo_state();
         designer.selected_boxes = [designer.boxi];
@@ -552,12 +552,12 @@ var designer = {
 
         // First pass - see if anything is going to go off the edge if we do this move
         designer.selected_boxes.forEach(function(selected_box) {
-            var newCenterX = designer.boxlist[selected_box]['left'] + (designer.boxlist[selected_box]['width'] / 2) + left_shift;
+            var newCenterX = designer.boxlist[selected_box]["left"] + (designer.boxlist[selected_box]["width"] / 2) + left_shift;
             if (newCenterX < 0 || newCenterX > designer.page_width) {
                 left_shift = 0;
             }
 
-            var newCenterY = designer.boxlist[selected_box]['top'] + (designer.boxlist[selected_box]['height'] / 2) + top_shift;
+            var newCenterY = designer.boxlist[selected_box]["top"] + (designer.boxlist[selected_box]["height"] / 2) + top_shift;
             if (newCenterY < 0) {
                 top_shift = 0;
             }
@@ -566,11 +566,11 @@ var designer = {
         // Second pass - apply the changes, assuming we should actually move anything
         if (left_shift != 0 || top_shift != 0) {
             designer.selected_boxes.forEach(function(selected_box) {
-                designer.boxlist[selected_box]['left'] = designer.boxlist[selected_box]['left'] + left_shift;
-                designer.boxlist[selected_box]['top'] = designer.boxlist[selected_box]['top'] + top_shift;
+                designer.boxlist[selected_box]["left"] = designer.boxlist[selected_box]["left"] + left_shift;
+                designer.boxlist[selected_box]["top"] = designer.boxlist[selected_box]["top"] + top_shift;
     
                 // Increase the page height if we need to
-                var bottom = designer.boxlist[selected_box]['top'] + designer.boxlist[selected_box]['height'];
+                var bottom = designer.boxlist[selected_box]["top"] + designer.boxlist[selected_box]["height"];
                 if (bottom > designer.page_height - designer.grid_size) {
                     designer.page_height = bottom + designer.grid_size;
                 }
@@ -578,7 +578,7 @@ var designer = {
 
             designer.draw();
             designer.modified();
-            designer.end_save_undo_state('key'+e.keyCode);
+            designer.end_save_undo_state("key"+e.keyCode);
         
             return true;
         } else {
@@ -589,7 +589,7 @@ var designer = {
     
     "handle_delete_key_event": function(e){
         var targetTagName = e.target.tagName.toLowerCase();
-        if (targetTagName === 'input' || targetTagName === 'textarea') return false;
+        if (targetTagName === "input" || targetTagName === "textarea") return false;
 
         if (designer.selected_boxes.length > 0) {
             designer.delete_selected_boxes();
@@ -645,18 +645,18 @@ var designer = {
 
                     resize = designer.boxlist[selected_box];
 
-                    var rightedge = resize['left']+resize['width'];
-                    var bottedge = resize['top']+resize['height'];
-                    var midx = resize['left']+(resize['width']/2);
-                    var midy = resize['top']+(resize['height']/2);
+                    var rightedge = resize["left"]+resize["width"];
+                    var bottedge = resize["top"]+resize["height"];
+                    var midx = resize["left"]+(resize["width"]/2);
+                    var midy = resize["top"]+(resize["height"]/2);
 
                     if (Math.abs(mx - rightedge)<4)
                         designer.selected_edge = selected_edges.right;
-                    else if (Math.abs(mx - resize['left'])<4)
+                    else if (Math.abs(mx - resize["left"])<4)
                         designer.selected_edge = selected_edges.left;
                     else if (Math.abs(my - bottedge)<4)
                         designer.selected_edge = selected_edges.bottom;
-                    else if (Math.abs(my - resize['top'])<4)
+                    else if (Math.abs(my - resize["top"])<4)
                         designer.selected_edge = selected_edges.top;
                     else if (Math.abs(my - midy)<4 && Math.abs(mx - midx)<4)
                         designer.selected_edge = selected_edges.center;
@@ -699,31 +699,31 @@ var designer = {
                 if (mx < 0) mx = 0; else if (mx >  designer.page_width) mx = designer.page_width;
                 if (my < 0) my = 0;
 
-                var rightedge = resize['left']+resize['width'];
-                var bottedge = resize['top']+resize['height'];
+                var rightedge = resize["left"]+resize["width"];
+                var bottedge = resize["top"]+resize["height"];
 
                 switch(designer.selected_edge){
                     case selected_edges.right:
-                        designer.boxlist[selected_box]['width'] = (designer.snap(mx)-resize['left']);
+                        designer.boxlist[selected_box]["width"] = (designer.snap(mx)-resize["left"]);
                         break;
                     case selected_edges.left:
-                        designer.boxlist[selected_box]['left'] = (designer.snap(mx));
-                        designer.boxlist[selected_box]['width'] = rightedge - designer.snap(mx);
+                        designer.boxlist[selected_box]["left"] = (designer.snap(mx));
+                        designer.boxlist[selected_box]["width"] = rightedge - designer.snap(mx);
                         break;
                     case selected_edges.bottom:
-                        designer.boxlist[selected_box]['height'] = (designer.snap(my)-resize['top']);
+                        designer.boxlist[selected_box]["height"] = (designer.snap(my)-resize["top"]);
                         break;
                     case selected_edges.top:
-                        designer.boxlist[selected_box]['top'] = (designer.snap(my));
-                        designer.boxlist[selected_box]['height'] = bottedge - designer.snap(my);
+                        designer.boxlist[selected_box]["top"] = (designer.snap(my));
+                        designer.boxlist[selected_box]["height"] = bottedge - designer.snap(my);
                         break;
                     case selected_edges.center:
-                        designer.boxlist[selected_box]['left'] = (designer.snap(mx-designer.boxlist[selected_box]['width']/2));
-                        designer.boxlist[selected_box]['top'] = (designer.snap(my-designer.boxlist[selected_box]['height']/2));
+                        designer.boxlist[selected_box]["left"] = (designer.snap(mx-designer.boxlist[selected_box]["width"]/2));
+                        designer.boxlist[selected_box]["top"] = (designer.snap(my-designer.boxlist[selected_box]["height"]/2));
                         break;
                 }
-                if (designer.boxlist[selected_box]['width'] < designer.grid_size) designer.boxlist[selected_box]['width'] = designer.grid_size;    // Zero cant be selected se we default to minimal grid size
-                if (designer.boxlist[selected_box]['height'] < designer.grid_size) designer.boxlist[selected_box]['height'] = designer.grid_size;
+                if (designer.boxlist[selected_box]["width"] < designer.grid_size) designer.boxlist[selected_box]["width"] = designer.grid_size;    // Zero cant be selected se we default to minimal grid size
+                if (designer.boxlist[selected_box]["height"] < designer.grid_size) designer.boxlist[selected_box]["height"] = designer.grid_size;
                 
                 if (bottedge>designer.page_height-designer.grid_size){
                     designer.page_height = bottedge+designer.grid_size;
