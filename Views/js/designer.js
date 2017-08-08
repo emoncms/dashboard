@@ -152,8 +152,8 @@ var designer = {
     "onbox": function(x,y){
         var box = null;
         for (z in designer.boxlist) {
-            if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4) &&
-                y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4))
+            if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]["left"]+designer.boxlist[z]["width"]+4) &&
+                y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]["top"]+designer.boxlist[z]["height"]+4))
             {
                 if (box === null) {
                     box = z;
@@ -191,9 +191,9 @@ var designer = {
         if (selected_boxes_count > 0){
             $("#when-selected").show();
             if (selected_boxes_count == 1) {
-                $("#options-button").prop('disabled', false);
+                $("#options-button").prop("disabled", false);
             } else {
-                $("#options-button").prop('disabled', true);
+                $("#options-button").prop("disabled", true);
             }
         } else {
             $("#when-selected").hide();
@@ -212,14 +212,14 @@ var designer = {
                     "left":parseInt($(this).css("left")),
                     "width":parseInt($(this).css("width")),
                     "height":parseInt($(this).css("height")),
-                    "styleUnitWidth": (designer.getStyle($(this),'width').indexOf("%") > -1  ? 1 : 0 ),
-                    "styleUnitHeight": (designer.getStyle($(this),'height').indexOf("%") > -1  ? 1 : 0 )
+                    "styleUnitWidth": (designer.getStyle($(this),"width").indexOf("%") > -1  ? 1 : 0 ),
+                    "styleUnitHeight": (designer.getStyle($(this),"height").indexOf("%") > -1  ? 1 : 0 )
                 };
 
-                if (designer.boxlist[id]['width'] < designer.grid_size) {designer.boxlist[id]['width'] = designer.grid_size;}    // Zero cant be selected se we default to minimal grid size
-                if (designer.boxlist[id]['height'] < designer.grid_size) {designer.boxlist[id]['height'] = designer.grid_size;}
+                if (designer.boxlist[id]["width"] < designer.grid_size) {designer.boxlist[id]["width"] = designer.grid_size;}    // Zero cant be selected se we default to minimal grid size
+                if (designer.boxlist[id]["height"] < designer.grid_size) {designer.boxlist[id]["height"] = designer.grid_size;}
                 
-                if ((designer.boxlist[id]['top'] + designer.boxlist[id]['height'])>designer.page_height) {designer.page_height = (designer.boxlist[id]['top'] + designer.boxlist[id]['height']);}
+                if ((designer.boxlist[id]["top"] + designer.boxlist[id]["height"])>designer.page_height) {designer.page_height = (designer.boxlist[id]["top"] + designer.boxlist[id]["height"]);}
             });
         }
 
@@ -234,7 +234,7 @@ var designer = {
     
     // given an element and a style name, returns the exact style value
     "getStyle": function(element,style){
-           var stylestemp = $(element).attr('style').split(';');
+           var stylestemp = $(element).attr("style").split(';');
            var c = '';
            for (var x = 0, l = stylestemp.length; x < l; x++) {
              c = stylestemp[x].split(':');
