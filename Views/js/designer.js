@@ -137,21 +137,20 @@ var designer = {
 
     "check_undo_state": function(){
         if (designer.undostack.length > 0) {
-            $("#undo-button").prop('disabled', false);
+            $("#undo-button").prop("disabled", false);
         } else {
-            $("#undo-button").prop('disabled', true);
+            $("#undo-button").prop("disabled", true);
         }
 
         if (designer.redostack.length > 0) {
-            $("#redo-button").prop('disabled', false);
+            $("#redo-button").prop("disabled", false);
         } else {
-            $("#redo-button").prop('disabled', true);
+            $("#redo-button").prop("disabled", true);
         }
     },
 
     "onbox": function(x,y){
         var box = null;
-        var z;
         for (z in designer.boxlist) {
             if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4) &&
                 y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4))
@@ -203,7 +202,6 @@ var designer = {
 
     "scan": function(){
         var seenboxes = [];
-        var z;
         for (z in widgets){
             $("."+z).each(function(){
                 var id = 1*($(this).attr("id"));
@@ -464,7 +462,6 @@ var designer = {
     "widget_buttons": function(){
         var widget_html = "";
         var select = [];
-
         for (z in widgets){
             var menu = widgets[z]['menu'];
             if (typeof select[menu] === "undefined")
