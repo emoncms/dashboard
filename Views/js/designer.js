@@ -44,7 +44,7 @@ var designer = {
     'nextundostate': null,
     'lastundoidentifier': null,
 
-    'init': function(){
+    "init": function(){
         designer.cnvs = document.getElementById("can");
         designer.ctx = designer.cnvs.getContext("2d");
 
@@ -57,7 +57,7 @@ var designer = {
     },
 
 
-    'snap': function(pos) {
+    "snap": function(pos) {
         if (designer.grid_size > 0) {
             return Math.round(pos/designer.grid_size)*designer.grid_size;
         } else {
@@ -65,11 +65,11 @@ var designer = {
         }
     },
 
-    'modified': function(){
+    "modified": function(){
         $("#save-dashboard").attr('class','btn btn-warning').text(_Tr("Changed, press to save"));
     },
 
-    'start_save_undo_state': function(){
+    "start_save_undo_state": function(){
         if (designer.nextundostate !== null) {
             console.log("Imbalanced undo state save start/end!");
         }
@@ -77,7 +77,7 @@ var designer = {
         designer.nextundostate = newstate;
     },
 
-    'end_save_undo_state': function(identifier){
+    "end_save_undo_state": function(identifier){
         if (designer.nextundostate === null) {
             console.log("No undo state to save!");
             return;
@@ -97,11 +97,11 @@ var designer = {
         }
     },
 
-    'cancel_save_undo_state': function(){
+    "cancel_save_undo_state": function(){
         designer.nextundostate = null;
     },
 
-    'undo': function(){
+    "undo": function(){
         if (designer.undostack.length == 0) return;
 
         var currentstate = $("#page").html();
@@ -118,7 +118,7 @@ var designer = {
         designer.check_undo_state();
     },
 
-    'redo': function(){
+    "redo": function(){
         if (designer.redostack.length == 0) return;
 
         var currentstate = $("#page").html();
@@ -135,7 +135,7 @@ var designer = {
         designer.check_undo_state();
     },
 
-    'check_undo_state': function(){
+    "check_undo_state": function(){
         if (designer.undostack.length > 0) {
             $("#undo-button").prop('disabled', false);
         } else {
@@ -149,8 +149,9 @@ var designer = {
         }
     },
 
-    'onbox': function(x,y){
+    "onbox": function(x,y){
         var box = null;
+        var z;
         for (z in designer.boxlist) {
             if (x>designer.boxlist[z]['left']-4 && x<(designer.boxlist[z]['left']+designer.boxlist[z]['width']+4) &&
                 y>designer.boxlist[z]['top']-4 && y<(designer.boxlist[z]['top']+designer.boxlist[z]['height']+4))
@@ -170,7 +171,7 @@ var designer = {
         return box;
     },
 
-    'selectbox': function(box){
+    "selectbox": function(box){
         if (box === null) {
             designer.selected_boxes = [];
         } else {
@@ -200,26 +201,27 @@ var designer = {
         }
     },
 
-    'scan': function(){
+    "scan": function(){
         var seenboxes = [];
+        var z;
         for (z in widgets){
             $("."+z).each(function(){
                 var id = 1*($(this).attr("id"));
-                if (id>designer.boxi) designer.boxi = id;
+                if (id>designer.boxi) {designer.boxi = id;}
                 seenboxes.push(id);
                 designer.boxlist[id] = {
-                    'top':parseInt($(this).css("top")),
-                    'left':parseInt($(this).css("left")),
-                    'width':parseInt($(this).css("width")),
-                    'height':parseInt($(this).css("height")),
-                    'styleUnitWidth': (designer.getStyle($(this),'width').indexOf("%") > -1  ? 1 : 0 ),
-                    'styleUnitHeight': (designer.getStyle($(this),'height').indexOf("%") > -1  ? 1 : 0 )
+                    "top":parseInt($(this).css("top")),
+                    "left":parseInt($(this).css("left")),
+                    "width":parseInt($(this).css("width")),
+                    "height":parseInt($(this).css("height")),
+                    "styleUnitWidth": (designer.getStyle($(this),'width').indexOf("%") > -1  ? 1 : 0 ),
+                    "styleUnitHeight": (designer.getStyle($(this),'height').indexOf("%") > -1  ? 1 : 0 )
                 };
 
-                if (designer.boxlist[id]['width'] < designer.grid_size) designer.boxlist[id]['width'] = designer.grid_size;    // Zero cant be selected se we default to minimal grid size
-                if (designer.boxlist[id]['height'] < designer.grid_size) designer.boxlist[id]['height'] = designer.grid_size;
+                if (designer.boxlist[id]['width'] < designer.grid_size) {designer.boxlist[id]['width'] = designer.grid_size;}    // Zero cant be selected se we default to minimal grid size
+                if (designer.boxlist[id]['height'] < designer.grid_size) {designer.boxlist[id]['height'] = designer.grid_size;}
                 
-                if ((designer.boxlist[id]['top'] + designer.boxlist[id]['height'])>designer.page_height) designer.page_height = (designer.boxlist[id]['top'] + designer.boxlist[id]['height']);
+                if ((designer.boxlist[id]['top'] + designer.boxlist[id]['height'])>designer.page_height) {designer.page_height = (designer.boxlist[id]['top'] + designer.boxlist[id]['height']);}
             });
         }
 
@@ -233,7 +235,7 @@ var designer = {
     },
     
     // given an element and a style name, returns the exact style value
-    'getStyle':function(element,style){
+    "getStyle": function(element,style){
            var stylestemp = $(element).attr('style').split(';');
            var c = '';
            for (var x = 0, l = stylestemp.length; x < l; x++) {
@@ -242,7 +244,7 @@ var designer = {
            }
     },
     
-    'draw': function(){
+    "draw": function(){
         $("#page-container").css("height",designer.page_height);
         $("#can").attr("height",designer.page_height);
 
@@ -318,7 +320,7 @@ var designer = {
         redraw = 1;
     },
 
-    'draw_options': function(widget){
+    "draw_options": function(widget){
         var box_options = widgets[widget]["options"];
         var options_type = widgets[widget]["optionstype"];
         var options_name = widgets[widget]["optionsname"];
@@ -433,7 +435,7 @@ var designer = {
         $("#widget_options_body").html(options_html);
     },
 
-    'select_feed': function (id, feedlist, type, currentval){
+    "select_feed": function (id, feedlist, type, currentval){
         var feedgroups = [];
         for (f in feedlist){
             if (type == 0 || feedlist[f].datatype == type) {
@@ -459,7 +461,7 @@ var designer = {
         return out;
     },
 
-    'widget_buttons': function(){
+    "widget_buttons": function(){
         var widget_html = "";
         var select = [];
 
@@ -483,7 +485,7 @@ var designer = {
         });
     },
 
-    'add_widget': function(mx,my,type){
+    "add_widget": function(mx,my,type){
         designer.start_save_undo_state();
         designer.boxi++;
         var html = widgets[type]['html'];
@@ -498,7 +500,7 @@ var designer = {
         designer.edit_mode = true;
     },
     
-    'delete_selected_boxes': function(){
+    "delete_selected_boxes": function(){
         if (designer.selected_boxes.length > 0) {
             designer.start_save_undo_state();
             designer.selected_boxes.forEach(function(selected_box) {
@@ -512,7 +514,7 @@ var designer = {
         }
     },
 
-    'get_unified_event': function(e){
+    "get_unified_event": function(e){
         var coors;
         if (e.originalEvent.touches){  // touch
             coors = e.originalEvent.touches[0];
@@ -522,7 +524,7 @@ var designer = {
         return coors;
     },
 
-    'handle_arrow_key_event': function(e){
+    "handle_arrow_key_event": function(e){
         if (designer.selected_boxes.length == 0) return false;
 
         var targetTagName = e.target.tagName.toLowerCase();
@@ -588,7 +590,7 @@ var designer = {
         }
     },
     
-    'handle_delete_key_event': function(e){
+    "handle_delete_key_event": function(e){
         var targetTagName = e.target.tagName.toLowerCase();
         if (targetTagName === 'input' || targetTagName === 'textarea') return false;
 
@@ -599,7 +601,7 @@ var designer = {
         return false;
     },
 
-    'add_events': function(){
+    "add_events": function(){
         // Click to select
         $(this.canvas).click(function(event){
             if (designer.edit_mode) {
