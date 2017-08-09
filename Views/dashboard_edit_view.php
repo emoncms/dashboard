@@ -16,7 +16,7 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
 ?>
     <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
     <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
-	  <link href="<?php echo $path; ?>Modules/dashboard/Views/dashboardeditor.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
+    <link href="<?php echo $path; ?>Modules/dashboard/Views/dashboardeditor.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
 
     <script type="text/javascript" src="<?php echo $path; ?>Lib/flot/jquery.flot.min.js"></script>
     <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/dashboard.js?ver=<?php echo $js_css_version; ?>"></script>
@@ -44,19 +44,19 @@ if (!$dashboard['height']) $dashboard['height'] = 400;
 	<div id="separator" style="height:1.5px; background:#717171"></div>
 	<div id="Buttons" style="position:relative; top:5px; cursor:pointer">
 	<span id="dashboard-config-buttons">
-	<button id="dashboard-config-button" style="padding:4px; float:left; width:31px"  class='btn' style="float:right" href='#dashConfigModal' role='button' data-toggle='modal'><span><img title="Configure dashboard basic data" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>'></span></button>
-	<button id="undo-button" class="btn" style="padding:4px; float:left; width:31px"><span><img title="Undo last step" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>'></span></button>
-	<button id="redo-button" class="btn" style="padding:4px; float:left; width:31px"><span><img title="Redo last step" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>'></span></button>
-	<button id="view-mode" class='btn' style="float:left; padding:4px; width:31px"; onclick="window.location.href='view?id=<?php echo $dashboard['id']; ?>'"><img title="Return to view mode" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>' ></span></a></button>
+	<button id="dashboard-config-button" style="padding:4px; float:left; width:31px"  class="btn" style="float:right" href="#dashConfigModal" role="button" data-toggle="modal"><span><img title="<?php echo _('Configure dashboard basic data'); ?>" src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>"></span></button>
+	<button id="undo-button" class="btn" style="padding:4px; float:left; width:31px"><span><img title="<?php echo _('Undo last step'); ?>" src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>"></span></button>
+	<button id="redo-button" class="btn" style="padding:4px; float:left; width:31px"><span><img title="<?php echo _('Redo last step'); ?>" src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>"></span></button>
+	<button id="view-mode" class="btn" style="float:left; padding:4px; width:31px"; onclick="window.location.href='view?id=<?php echo $dashboard['id']; ?>'"><img title="<?php echo _('Return to view mode'); ?>" src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>" ></span></a></button>
 	</span>
 	<span id="when-selected">
-		<button id="options-button" class="btn" style="float:left; padding:4px; width:31px" data-toggle="modal" data-target="#widget_options"><span><img title="Configure selected item" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>'></span></button>
-		<button id="move-forward-button" class="btn" style="float:left; padding:4px; width:31px" ><span><img title="Move selected item in front of other items" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-front.png'); ?>'></span></button>
-		<button id="move-backward-button" class="btn" style="float:left; padding:4px; width:31px" ><span><img title="Move selected item to back of other items" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-back.png'); ?>'></span></button>
-		<button id="delete-button" class="btn btn-danger" style="float:left; padding:4px; width:31px" ><span><img title="Delete selected items" style="width:100%" src='<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-delete.png'); ?>'></span></button>
+		<button id="options-button" class="btn" style="float:left; padding:4px; width:31px" data-toggle="modal" data-target="#widget_options"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>" title="<?php echo _('Configure selected item'); ?>" ></span></button>
+		<button id="move-forward-button" class="btn" style="float:left; padding:4px; width:31px" ><span><img title="<?php echo _('Move selected item in front of other items'); ?>" src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-front.png'); ?>"></span></button>
+		<button id="move-backward-button" class="btn" style="float:left; padding:4px; width:31px" ><span><img title="<?php echo _('Move selected item to back of other items'); ?>" src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-back.png'); ?>"></span></button>
+		<button id="delete-button" class="btn btn-danger" style="float:left; padding:4px; width:31px" ><span><img title="<?php echo _('Delete selected items'); ?>" style="width:100%" src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-delete.png'); ?>"></span></button>
 	</span>
 	<span id="widget-buttons" ></span>
-	<span><button id="save-dashboard" class="btn btn-success" style="float:left; padding:2px; width:125px" title="Nothing to save" ><?php echo _('Not modified'); ?></button></span>
+	<span><button id="save-dashboard" class="btn btn-success" style="float:left; padding:2px; width:125px" title="<?php echo _('Nothing to save'); ?>" ><?php echo _('Not modified'); ?></button></span>
 	</div>
 
 </div>
@@ -155,6 +155,7 @@ function toolboxMove(e) {
 
         if (success) {
             $("#save-dashboard").attr('class','btn btn-success').text('<?php echo _("Saved") ?>');
+            $("#save-dashboard").attr("title","<?php echo _("Items Saved") ?>");
             lastsavecontent = currentcontent;
         } else {
             alert('ERROR: Could not save Dashboard. '+result.message);
