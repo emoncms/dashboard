@@ -25,7 +25,7 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 
  <div id="editicon" class="hidden-phone" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top:53px; right: 0px;">
-	<div id="innerbutton" style="cursor: default";>
+	<div id="innerbutton" style="cursor: default">
 		<?php echo $dashboard_editor_icon; ?>
 	</div>
 </div>
