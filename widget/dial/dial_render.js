@@ -448,7 +448,11 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
       var ch=canvas.height;
       var offsetX,offsetY;
       var mouseX,mouseY;
+      var h;
       var dx,dy;
+
+      var tt1 = document.getElementById(canvas.id + "-tooltip-1");
+      var tt2 = document.getElementById(canvas.id + "-tooltip-2");
 
       function reOffset(){
        var BB=canvas.getBoundingClientRect();
@@ -478,28 +482,28 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
        dx=mouseX-h.xspot;
        dy=mouseY-h.yspot;
        if(dx*dx+dy*dy<h.radius*h.radius){
-        div1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
-        div1.style.left = e.clientX + 15 + "px";
-        div1.style.top =  e.clientY + 15+ "px";
-        div1.style.visibility ="visible";
-        div1.innerHTML = "&nbsp;"+h.tip+"&nbsp;";
+        tt1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+        tt1.style.left = e.clientX + 15 + "px";
+        tt1.style.top =  e.clientY + 15+ "px";
+        tt1.style.visibility ="visible";
+        tt1.innerHTML = "&nbsp;"+h.tip+"&nbsp;";
        }
        else {
-         div1.style.visibility ="hidden";
+         tt1.style.visibility ="hidden";
        }
 
        h=hotspots[1];
        dx=mouseX-h.xspot;
        dy=mouseY-h.yspot;
        if(dx*dx+dy*dy<h.radius*h.radius){
-       div2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
-       div2.style.left = e.clientX + 15 + "px";
-       div2.style.top =  e.clientY + 15+ "px";
-       div2.style.visibility ="visible";
-       div2.innerHTML = "&nbsp"+h.tip+"&nbsp";
+       tt2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+       tt2.style.left = e.clientX + 15 + "px";
+       tt2.style.top =  e.clientY + 15+ "px";
+       tt2.style.visibility ="visible";
+       tt2.innerHTML = "&nbsp"+h.tip+"&nbsp";
        }
        else {
-          div2.style.visibility ="hidden";
+          tt2.style.visibility ="hidden";
        }
       }
      $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
@@ -511,12 +515,17 @@ function dial_define_tooltips(){
   $(".dial").each(function(index) {
       var id2 = "can-"+$(this).attr("id");
       var canvas2 = document.getElementById(id2);
-      div1 = document.createElement("div");      // the tool-tip div
-      div2 = document.createElement("div");      // the tool-tip div
-      parent = canvas2.parentNode;           // parent node for canvas
-
-      parent.appendChild(div1);
-      parent.appendChild(div2);
+      var parent = canvas2.parentNode;           // parent node for canvas
+      if(document.getElementById(id2 + "-tooltip-1")){}
+      else{
+      var div1 = document.createElement("div");      // the tool-tip div 1
+      div1.id = id2 + "-tooltip-1";
+      parent.appendChild(div1);}
+      if(document.getElementById(id2 + "-tooltip-2")){}
+      else{
+      var div2 = document.createElement("div");      // the tool-tip div 2
+      div2.id = id2 + "-tooltip-2";
+      parent.appendChild(div2);}
   });
 }
 

@@ -25,15 +25,22 @@ function _Tr(key)
 ?>
 //START
 // designer.js
+LANG_JS["Add a"] = '<?php echo addslashes(_("Add a")); ?>';
 LANG_JS["Changed, press to save"] = '<?php echo addslashes(_("Changed, press to save")); ?>';
 LANG_JS["Choose height unit"] = '<?php echo addslashes(_("Choose height unit")); ?>';
 LANG_JS["Choose width unit"] = '<?php echo addslashes(_("Choose width unit")); ?>';
+LANG_JS["element to the dashboard"] = '<?php echo addslashes(_("element to the dashboard")); ?>';
 LANG_JS["Height"] = '<?php echo addslashes(_("Height")); ?>';
 LANG_JS["Off"] = '<?php echo addslashes(_("Off")); ?>';
 LANG_JS["On"] = '<?php echo addslashes(_("On")); ?>';
 LANG_JS["Percentage"] = '<?php echo addslashes(_("Percentage")); ?>';
 LANG_JS["Pixels"] = '<?php echo addslashes(_("Pixels")); ?>';
 LANG_JS["Width"] = '<?php echo addslashes(_("Width")); ?>';
+
+// widgetlist.js
+LANG_JS["Html code to show"] = '<?php echo addslashes(_("Html code to show")); ?>';
+LANG_JS["Some text"] = '<?php echo addslashes(_("Some text")); ?>';
+LANG_JS["Title"] = '<?php echo addslashes(_("Title")); ?>';
 
 // bar_render.js
 LANG_JS["Automatic"] = '<?php echo addslashes(_("Automatic")); ?>';
@@ -474,6 +481,52 @@ LANG_JS["Units"] = '<?php echo addslashes(_("Units")); ?>';
 LANG_JS["Units to show"] = '<?php echo addslashes(_("Units to show")); ?>';
 LANG_JS["Value is multiplied by scale before display"] = '<?php echo addslashes(_("Value is multiplied by scale before display")); ?>';
 LANG_JS["Where should the unit be shown"] = '<?php echo addslashes(_("Where should the unit be shown")); ?>';
+
+// thermometer_render.js
+LANG_JS["Automatic"] = '<?php echo addslashes(_("Automatic")); ?>';
+LANG_JS["Back"] = '<?php echo addslashes(_("Back")); ?>';
+LANG_JS["Bold"] = '<?php echo addslashes(_("Bold")); ?>';
+LANG_JS["Colour"] = '<?php echo addslashes(_("Colour")); ?>';
+LANG_JS["Colour for min. and max. bars"] = '<?php echo addslashes(_("Colour for min. and max. bars")); ?>';
+LANG_JS["Colour of title and values"] = '<?php echo addslashes(_("Colour of title and values")); ?>';
+LANG_JS["Decimals"] = '<?php echo addslashes(_("Decimals")); ?>';
+LANG_JS["Decimals to show"] = '<?php echo addslashes(_("Decimals to show")); ?>';
+LANG_JS["Display Min. and Max. ?"] = '<?php echo addslashes(_("Display Min. and Max. ?")); ?>';
+LANG_JS["Feed"] = '<?php echo addslashes(_("Feed")); ?>';
+LANG_JS["Feed value"] = '<?php echo addslashes(_("Feed value")); ?>';
+LANG_JS["Font style"] = '<?php echo addslashes(_("Font style")); ?>';
+LANG_JS["Font style used for display"] = '<?php echo addslashes(_("Font style used for display")); ?>';
+LANG_JS["Font used"] = '<?php echo addslashes(_("Font used")); ?>';
+LANG_JS["Font weight"] = '<?php echo addslashes(_("Font weight")); ?>';
+LANG_JS["Font weight used for display"] = '<?php echo addslashes(_("Font weight used for display")); ?>';
+LANG_JS["Front"] = '<?php echo addslashes(_("Front")); ?>';
+LANG_JS["Grad. Num."] = '<?php echo addslashes(_("Grad. Num.")); ?>';
+LANG_JS["Graduations"] = '<?php echo addslashes(_("Graduations")); ?>';
+LANG_JS["How many graduation lines to draw (only relevant if graduations are on)"] = '<?php echo addslashes(_("How many graduation lines to draw (only relevant if graduations are on)")); ?>';
+LANG_JS["Italic"] = '<?php echo addslashes(_("Italic")); ?>';
+LANG_JS["Label Colour"] = '<?php echo addslashes(_("Label Colour")); ?>';
+LANG_JS["Max. feed"] = '<?php echo addslashes(_("Max. feed")); ?>';
+LANG_JS["Max value"] = '<?php echo addslashes(_("Max value")); ?>';
+LANG_JS["Max value to show"] = '<?php echo addslashes(_("Max value to show")); ?>';
+LANG_JS["Min. feed"] = '<?php echo addslashes(_("Min. feed")); ?>';
+LANG_JS["Min / Max ?"] = '<?php echo addslashes(_("Min / Max ?")); ?>';
+LANG_JS["No"] = '<?php echo addslashes(_("No")); ?>';
+LANG_JS["Normal"] = '<?php echo addslashes(_("Normal")); ?>';
+LANG_JS["Oblique"] = '<?php echo addslashes(_("Oblique")); ?>';
+LANG_JS["Offset"] = '<?php echo addslashes(_("Offset")); ?>';
+LANG_JS["Scale"] = '<?php echo addslashes(_("Scale")); ?>';
+LANG_JS["Should the graduations be shown"] = '<?php echo addslashes(_("Should the graduations be shown")); ?>';
+LANG_JS["Static offset. Subtracted from value before computing"] = '<?php echo addslashes(_("Static offset. Subtracted from value before computing")); ?>';
+LANG_JS["The feed for the maximum value"] = '<?php echo addslashes(_("The feed for the maximum value")); ?>';
+LANG_JS["The feed for the minimum value"] = '<?php echo addslashes(_("The feed for the minimum value")); ?>';
+LANG_JS["Title"] = '<?php echo addslashes(_("Title")); ?>';
+LANG_JS["Title of thermometer"] = '<?php echo addslashes(_("Title of thermometer")); ?>';
+LANG_JS["Unit position"] = '<?php echo addslashes(_("Unit position")); ?>';
+LANG_JS["Units"] = '<?php echo addslashes(_("Units")); ?>';
+LANG_JS["Units to show"] = '<?php echo addslashes(_("Units to show")); ?>';
+LANG_JS["Value is multiplied by scale before display. Defaults to 1"] = '<?php echo addslashes(_("Value is multiplied by scale before display. Defaults to 1")); ?>';
+LANG_JS["Where should the unit be shown"] = '<?php echo addslashes(_("Where should the unit be shown")); ?>';
+LANG_JS["Yes"] = '<?php echo addslashes(_("Yes")); ?>';
 
 // windrose_render.js
 LANG_JS["Feed value"] = '<?php echo addslashes(_("Feed value")); ?>';

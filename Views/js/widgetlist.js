@@ -4,24 +4,24 @@
     {
       "offsetx":-50,"offsety":-30,"width":100,"height":60,
       "menu":"Text",
-      "options":["html"],"optionstype":["html"],"optionsname":["html"],"optionshint":["Html code to show"],"html":
-      "Some text"
+      "options":["html"],"optionstype":["html"],"optionsname":["html"],"optionshint":[_Tr("Html code to show")],"html":
+      _Tr("Some text")
     },
 
     "heading": 
     {
       "offsetx":-50,"offsety":-30,"width":100,"height":60,
       "menu":"Text",
-      "options":["html"],"optionstype":["html"],"optionsname":["html"],"optionshint":["Html code to show"],"html":
-      "Title"
+      "options":["html"],"optionstype":["html"],"optionsname":["html"],"optionshint":[_Tr("Html code to show")],"html":
+      _Tr("Title")
     },
 
     "heading-center": 
     {
       "offsetx":-50,"offsety":-30,"width":100,"height":60,
       "menu":"Text",
-      "options":["html"],"optionstype":["html"],"optionsname":["html"],"optionshint":["Html code to show"],"html":
-      "Title"
+      "options":["html"],"optionstype":["html"],"optionsname":["html"],"optionshint":[_Tr("Html code to show")],"html":
+      _Tr("Title")
     },
 
     "Container-White": 
