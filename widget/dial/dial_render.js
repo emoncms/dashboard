@@ -482,7 +482,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
        dx=mouseX-h.xspot;
        dy=mouseY-h.yspot;
        if(dx*dx+dy*dy<h.radius*h.radius){
-        tt1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+        tt1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold; z-index: 100;";
         tt1.style.left = e.clientX + 15 + "px";
         tt1.style.top =  e.clientY + 15+ "px";
         tt1.style.visibility ="visible";
@@ -496,7 +496,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
        dx=mouseX-h.xspot;
        dy=mouseY-h.yspot;
        if(dx*dx+dy*dy<h.radius*h.radius){
-       tt2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+       tt2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold; z-index: 100;";
        tt2.style.left = e.clientX + 15 + "px";
        tt2.style.top =  e.clientY + 15+ "px";
        tt2.style.visibility ="visible";
