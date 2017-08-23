@@ -395,7 +395,7 @@ function draw_thermometer(context,
 
         h=hotspots[0];
         if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
-        tt1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+        tt1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold; z-index: 100;";
         tt1.style.left = e.clientX + 15 + "px";
         tt1.style.top =  e.clientY + 15+ "px";
         tt1.style.visibility ="visible";
@@ -407,7 +407,7 @@ function draw_thermometer(context,
 
         h=hotspots[1];
         if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
-        tt2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold;";
+        tt2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold; z-index: 100;";
         tt2.style.left = e.clientX + 15 + "px";
         tt2.style.top =  e.clientY + 15+ "px";
         tt2.style.visibility ="visible";
