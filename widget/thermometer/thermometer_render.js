@@ -95,6 +95,7 @@ function thermometer_widgetlist()
     addOption(widgets["thermometer"], "fstyle",         "dropbox",          _Tr("Font style"),      _Tr("Font style used for display"),                                                 fstyleoptions);
     addOption(widgets["thermometer"], "fweight",        "dropbox",          _Tr("Font weight"),     _Tr("Font weight used for display"),                                                fweightoptions);
     addOption(widgets["thermometer"], "feedid",         "feedid",           _Tr("Feed"),            _Tr("Feed value"),                                                                  []);
+    addOption(widgets["thermometer"], "min",            "value",            _Tr("Min value"),       _Tr("Min value to show"),                                                           []);
     addOption(widgets["thermometer"], "max",            "value",            _Tr("Max value"),       _Tr("Max value to show"),                                                           []);
     addOption(widgets["thermometer"], "scale",          "value",            _Tr("Scale"),           _Tr("Value is multiplied by scale before display. Defaults to 1"),                  []);
     addOption(widgets["thermometer"], "units",          "value",            _Tr("Units"),           _Tr("Units to show"),                                                               []);
@@ -124,6 +125,7 @@ function draw_thermometer(context,
                   width,
                   height,
                   rawValue,
+                  minValue,
                   maxValue,
                   unitsString,
                   decimals,
@@ -151,7 +153,8 @@ function draw_thermometer(context,
 
     var tt1 = document.getElementById(canvas.id + "-tooltip-1");
     var tt2 = document.getElementById(canvas.id + "-tooltip-2");
-
+    // if (1 * minValue) == false: 0. Else 1 * maxValue
+    minValue = 1 * minValue || 0;
     // if (1 * maxValue) == false: 3000. Else 1 * maxValue
     maxValue = 1 * maxValue || 3000;
     // if unitsString == false: "". Else unitsString
@@ -166,19 +169,19 @@ function draw_thermometer(context,
     var displayValue = rawValue;
     displayValue = displayValue-staticOffset;
 
-    var scaledValue = (displayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
+    var scaledValue = ((displayValue-minValue)/(maxValue-minValue));    // Produce a scaled 0-1 value corresponding to min-max
     if (scaledValue < 0){scaledValue = 0;}
 
     var minDisplayValue = minvaluefeed;
     minDisplayValue = minDisplayValue-staticOffset;
 
-    var minScaledValue = (minDisplayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
+    var minScaledValue = ((minDisplayValue-minValue)/(maxValue-minValue));    // Produce a scaled 0-1 value corresponding to min-max
     if (minScaledValue < 0){minScaledValue = 0;}
 
     var maxDisplayValue = maxvaluefeed;
     maxDisplayValue = maxDisplayValue-staticOffset;
 
-    var maxScaledValue = (maxDisplayValue/maxValue);    // Produce a scaled 0-1 value corresponding to min-max
+    var maxScaledValue = ((maxDisplayValue-minValue)/(maxValue-minValue));    // Produce a scaled 0-1 value corresponding to min-max
     if (maxScaledValue < 0){maxScaledValue = 0;}
 
         if (decimals<0){
@@ -273,13 +276,13 @@ function draw_thermometer(context,
 
             var divisions = Number(graduationQuant)+1;
 
-            for (var y = 0; y < graduationQuant; y++)
+            for (var y = 0; y <= graduationQuant; y++)
             {
                 curY = Number(((y+1)*step).toFixed(0))+0.5;  // Bin down so we're drawing in the middle of the pixel, so the line is exactly 1 px wide
                 context.moveTo(halfWidth*0.3, curY);
                 context.lineTo(halfWidth*0.7, curY);
 
-                var unitOffset = Number(staticOffset+((graduationQuant-y)*(maxValue/divisions)));
+                var unitOffset = Number(staticOffset+ maxValue - (y+1)*(maxValue-minValue)/divisions);
                 if (unitOffset < 1000)
                     {unitOffset = unitOffset.toFixed(1);}
                 else
@@ -289,8 +292,6 @@ function draw_thermometer(context,
             }
             context.moveTo(halfWidth*0.3, height*0.8);
             context.lineTo(halfWidth*0.7, height*0.8);
-            if (unitend ==="0"){context.fillText(staticOffset+unitsString, halfWidth*0.75, height*0.8);}
-            if (unitend ==="1"){context.fillText(unitsString+staticOffset, halfWidth*0.75, height*0.8);}
 
             context.strokeStyle = "#888";
             context.stroke();
@@ -489,6 +490,7 @@ function thermometer_draw()
                      $(this).width(),
                      $(this).height(),
                      val*scale,
+                     $(this).attr("min"),
                      $(this).attr("max"),
                      $(this).attr("units"),
                      $(this).attr("decimals"),
