@@ -481,7 +481,7 @@ function bar_draw()
         var maxval = curve_value(maxvaluefeed,dialrate).toFixed(3);
 
         // ONLY UPDATE ON CHANGE
-        if (val != (associd[feedid]["value"] * 1).toFixed(3) || redraw == 1)
+        if (val != (associd[feedid]["value"] * 1).toFixed(3) || minval != (associd[minvaluefeed]["value"] * 1).toFixed(3) || maxval != (associd[maxvaluefeed]["value"] * 1).toFixed(3) ||redraw == 1)
         {
             var id = "can-"+$(this).attr("id");
             var scale = 1*$(this).attr("scale") || 1;
