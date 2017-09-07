@@ -153,12 +153,9 @@ function draw_thermometer(context,
 
     var tt1 = document.getElementById(canvas.id + "-tooltip-1");
     var tt2 = document.getElementById(canvas.id + "-tooltip-2");
-<<<<<<< HEAD
 
-=======
     // if (1 * minValue) == false: 0. Else 1 * maxValue
     minValue = 1 * minValue || 0;
->>>>>>> origin/master
     // if (1 * maxValue) == false: 3000. Else 1 * maxValue
     maxValue = 1 * maxValue || 3000;
     // if unitsString == false: "". Else unitsString
