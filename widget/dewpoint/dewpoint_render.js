@@ -266,11 +266,11 @@ function dewpoint_draw()
     var decimals = $(this).attr("decimals");
     if (decimals===undefined) {decimals = -1;}
 
-    if (temptype === 1) { 
+    if (temptype === "1") { 
     temp = (temp - 32) * (5 / 9); // Fahrenheit to celsius
     }
     var val = dewPoint(humid,temp);
-    if (temptype === 1) {
+    if (temptype === "1") {
     val = (val * 9/5 + 32) ; // Celsius to Fahrenheit
     unit = "ºF";
     } else {
