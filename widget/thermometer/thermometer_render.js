@@ -153,7 +153,6 @@ function draw_thermometer(context,
 
     var tt1 = document.getElementById(canvas.id + "-tooltip-1");
     var tt2 = document.getElementById(canvas.id + "-tooltip-2");
-
     // if (1 * minValue) == false: 0. Else 1 * maxValue
     minValue = 1 * minValue || 0;
     // if (1 * maxValue) == false: 3000. Else 1 * maxValue
@@ -314,7 +313,7 @@ function draw_thermometer(context,
     context.arc(halfWidth/2,height*0.05 + width*0.02,halfWidth*0.1,1*Math.PI,2*Math.PI);
     context.fillStyle = "#FFF";
     context.fill();
-    context.fillRect(halfWidth*0.4,height*0.05,halfWidth*0.2,height*0.9);
+    context.fillRect(halfWidth*0.4,height*0.05,halfWidth*0.2,height*0.85);
     context.moveTo(halfWidth*0.4,height*0.05 + width*0.01);
     context.lineTo(halfWidth*0.4,height*0.9);
     context.moveTo(halfWidth*0.6,height*0.05 + width*0.01);
