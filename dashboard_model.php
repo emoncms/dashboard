@@ -89,7 +89,6 @@ class Dashboard
         $userid = (int) $userid;
         $id = (int) $id;
         $height = (int) $height;
-        $content = $this->mysqli->real_escape_string($content);
 
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid = '$userid' AND id='$id'");
         $row = $result->fetch_array();
