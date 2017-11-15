@@ -94,8 +94,13 @@ class Dashboard
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid = '$userid' AND id='$id'");
         $row = $result->fetch_array();
         if ($row) {
-            $this->mysqli->query("UPDATE dashboard SET content = '$content', height = '$height' WHERE userid='$userid' AND id='$id'");
-            if ($this->mysqli->affected_rows>0){
+            $stmt = $this->mysqli->prepare("UPDATE dashboard SET content=?, height=? WHERE userid=? AND id=?");
+            $stmt->bind_param("siii", $content, $height, $userid, $id);
+            $stmt->execute();
+            $affected_rows = $stmt->affected_rows;
+            $stmt->close();
+            
+            if ($affected_rows>0){
                 return array('success'=>true, 'message'=>'Dashboard updated');
             }
         }
@@ -114,14 +119,10 @@ class Dashboard
         // Repeat this line changing the field name to add fields that can be updated:
 
         if (isset($fields->height)) $array[] = "`height` = '".intval($fields->height)."'";
-        if (isset($fields->content)) $array[] = "`content` = '".preg_replace('/[^\p{L}_\p\{N}\s-.#<>?",;:=&\/%~]/u','',$fields->content)."'";
-
         if (isset($fields->name)) $array[] = "`name` = '".preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->name)."'";
         if (isset($fields->alias)) $array[] = "`alias` = '".preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->alias)."'";
         if (isset($fields->description)) $array[] = "`description` = '".preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->description)."'";
-
         if (isset($fields->backgroundcolor)) $array[] = "`backgroundcolor` = '".preg_replace('/[^0-9a-f]/','', strtolower($fields->backgroundcolor))."'";
-
         if (isset($fields->gridsize)) $array[] = "`gridsize` = '".preg_replace('/[^0-9]/','', $fields->gridsize)."'";
 
         if (isset($fields->main))
