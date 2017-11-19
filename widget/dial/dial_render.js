@@ -535,7 +535,9 @@ function dial_draw(){
     var minvaluefeed = $(this).attr("minvaluefeed")||"0";
     var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-
+    if (associd[minvaluefeed] === undefined) { console.log("Review config for feedid of " + $(this).attr("class")); return; }
+    if (associd[maxvaluefeed] === undefined) { console.log("Review config for feedid of " + $(this).attr("class")); return; }
+    
     var val = curve_value(feedid,dialrate).toFixed(3);
     var minval = curve_value(minvaluefeed,dialrate).toFixed(3);
     var maxval = curve_value(maxvaluefeed,dialrate).toFixed(3);
