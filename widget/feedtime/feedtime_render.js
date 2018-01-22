@@ -20,11 +20,11 @@
   widget["optionsdata"].push(optionData);
 }
 
-function feedvalue_widgetlist()
+function feedtime_widgetlist()
 {
   var widgets =
   {
-    "feedvalue":
+    "feedtime":
     {
       "offsetx":-40,"offsety":-30,"width":120,"height":60,
       "menu":"Widgets",
@@ -73,7 +73,7 @@ function feedvalue_widgetlist()
 				];
 				
 	var sizeoptions = [
-					[14, "18"], // set size 18 to the top position to be the default value for creating new feedvalue widgets otherwise size 40 would be always the default
+					[14, "18"], // set size 18 to the top position to be the default value for creating new feedtime widgets otherwise size 40 would be always the default
 					[13, "40"],
 					[12, "36"],
 					[11, "32"],
@@ -95,21 +95,20 @@ function feedvalue_widgetlist()
 					[1, _Tr("Front")]
 				];				
 
-	addOption(widgets["feedvalue"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
-	addOption(widgets["feedvalue"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
-	addOption(widgets["feedvalue"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
-	addOption(widgets["feedvalue"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
-	addOption(widgets["feedvalue"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-	addOption(widgets["feedvalue"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
-	addOption(widgets["feedvalue"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
-	addOption(widgets["feedvalue"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
-	addOption(widgets["feedvalue"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
-	addOption(widgets["feedvalue"], "timeout",      "value",   _Tr("Timeout"),    _Tr("Timeout without feed update (0 is never, empty is default"),   []);
+	addOption(widgets["feedtime"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
+	addOption(widgets["feedtime"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
+	addOption(widgets["feedtime"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
+	addOption(widgets["feedtime"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
+	addOption(widgets["feedtime"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
+	addOption(widgets["feedtime"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
+	addOption(widgets["feedtime"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
+	addOption(widgets["feedtime"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
+	addOption(widgets["feedtime"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
 
 	return widgets;
 }
 
-function draw_feedvalue(context,
+function draw_feedtime(context,
 		x_pos,				// these x and y coords seem unused?
 		y_pos,
 		font,
@@ -122,8 +121,7 @@ function draw_feedvalue(context,
 		colour,
 		decimals,
 		size,
-		unitend,
-		error_code)
+		unitend)
 		{
 			if (!context){
 			return;
@@ -215,53 +213,34 @@ function draw_feedvalue(context,
 				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
 				}
 
-			if (error_code == "1")
+			if (unitend ==="0")
 			{
-				context.fillText("TO Error", width/2 , height/2);
+			context.fillText(val+units, width/2 , height/2);
 			}
 
-			else
+			if (unitend ==="1")
 			{
-				if (unitend ==="0")
-				{
-				context.fillText(val+units, width/2 , height/2);
-				}
-	
-				if (unitend ==="1")
-				{
-				context.fillText(units+val, width/2 , height/2);
-				}
+			context.fillText(units+val, width/2 , height/2);
 			}
+
 
 			
 			
 }
 
-function feedvalue_draw()
+function feedtime_draw()
 {
-	$(".feedvalue").each(function(index)
+	$(".feedtime").each(function(index)
 		{
     
-			var error_timeout = $(this).attr("timeout");
-	        if (error_timeout == "" || error_timeout == undefined)            //Timeout parameter is empty
-	          error_timeout = 60;
-
 			var font = $(this).attr("font");
 			var feedid = $(this).attr("feedid");
 			if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-			var val = associd[feedid]["value"] * 1;
+
+			var val = ((new Date()).getTime() / 1000  - offsetofTime - (associd[feedid]["time"] * 1));
 
 			if (val===undefined) {val = 0;}
 			if (isNaN(val))  {val = 0;}
-
-			var error_code = "0";
-			if (error_timeout != 0)
-			{
-				if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > error_timeout) 
-				{
-					error_code = "1";
-				}
-			}
 
 			var size = $(this).attr("size");
 			var units = $(this).attr("units");
@@ -274,7 +253,7 @@ function feedvalue_draw()
 			{
 				var id = "can-"+$(this).attr("id");
 
-				draw_feedvalue(widgetcanvas[id],
+				draw_feedtime(widgetcanvas[id],
 					0,
 					0,
 					$(this).attr("font"),
@@ -288,22 +267,21 @@ function feedvalue_draw()
 					$(this).attr("decimals"),
 					$(this).attr("size"),
 					$(this).attr("unitend"),
-					error_code
 					);
 			}
 		});
 }
 
-function feedvalue_init()
+function feedtime_init()
 {
-	setup_widget_canvas("feedvalue");
+	setup_widget_canvas("feedtime");
 }
-function feedvalue_slowupdate()
+function feedtime_slowupdate()
 	{
-		feedvalue_draw();
+		feedtime_draw();
 	}
 
-function feedvalue_fastupdate()
+function feedtime_fastupdate()
 	{
-		feedvalue_draw();
+		feedtime_draw();
 	}

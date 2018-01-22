@@ -108,6 +108,8 @@ function bar_widgetlist()
     addOption(widgets["bar"], "minvaluefeed",   "feedid",           _Tr("Min. feed"),       _Tr("The feed for the minimum value"),                                              []);
     addOption(widgets["bar"], "maxvaluefeed",   "feedid",           _Tr("Max. feed"),       _Tr("The feed for the maximum value"),                                              []);
     addOption(widgets["bar"], "colour_minmax",  "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
+    addOption(widgets["bar"], "timeout",        "value",            _Tr("Timeout"),         _Tr("Timeout without feed update (0 is never, empty is default"),                   []);
+
 
 
     return widgets;
@@ -137,7 +139,8 @@ function draw_bar(context,
                   displayminmax,
                   minvaluefeed,
                   maxvaluefeed,
-                  colour_minmax
+                  colour_minmax,
+                  error_code
                   )
 {
     if (!context) {return;}
@@ -409,6 +412,12 @@ function draw_bar(context,
 
     context.fillStyle = colour_label;
     
+    if (error_code == "1")
+    {
+      raw_value="TO ";
+      units_string="Error";
+    }
+
     var unitsandval = raw_value+units_string;
     var valsize;
     if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
@@ -466,6 +475,10 @@ function bar_draw()
 {
     $(".bar").each(function(index)
     {
+        var error_timeout = $(this).attr("timeout");
+        if (error_timeout == "" || error_timeout == undefined)            //Timeout parameter is empty
+          error_timeout = 60;
+
         var feedid = $(this).attr("feedid");
         var minvaluefeed = $(this).attr("minvaluefeed");
         var maxvaluefeed = $(this).attr("maxvaluefeed");
@@ -480,6 +493,16 @@ function bar_draw()
         var minval = curve_value(minvaluefeed,dialrate).toFixed(3);
         var maxval = curve_value(maxvaluefeed,dialrate).toFixed(3);
 
+        var error_code = 0;
+
+        if (error_timeout != 0)
+        {
+          if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > error_timeout) 
+          {
+            error_code = "1";
+            val = 0;    
+          }
+        }
         // ONLY UPDATE ON CHANGE
         if (val != (associd[feedid]["value"] * 1).toFixed(3) || minval != (associd[minvaluefeed]["value"] * 1).toFixed(3) || maxval != (associd[maxvaluefeed]["value"] * 1).toFixed(3) ||redraw == 1)
         {
@@ -508,7 +531,8 @@ function bar_draw()
                      $(this).attr("displayminmax"),
                      minval*scale,
                      maxval*scale,
-                     $(this).attr("colour_minmax")
+                     $(this).attr("colour_minmax"),
+                     error_code
                      );
         }
     });
