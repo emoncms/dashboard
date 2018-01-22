@@ -104,7 +104,7 @@ function feedvalue_widgetlist()
 	addOption(widgets["feedvalue"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["feedvalue"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
 	addOption(widgets["feedvalue"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
-	addOption(widgets["feedvalue"], "timeout",      "value",   _Tr("Timeout"),    _Tr("Timeout without feed update (0 is never, empty is default"),   []);
+	addOption(widgets["feedvalue"], "timeout",      "value",   _Tr("Timeout"),    _Tr("Timeout without feed update in seconds (0 is never, empty defaults to 60)"),   []);
 
 	return widgets;
 }

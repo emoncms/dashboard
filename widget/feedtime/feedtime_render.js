@@ -101,7 +101,6 @@ function feedtime_widgetlist()
 	addOption(widgets["feedtime"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
 	addOption(widgets["feedtime"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
 	addOption(widgets["feedtime"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
-	addOption(widgets["feedtime"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["feedtime"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
 	addOption(widgets["feedtime"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
 
@@ -119,7 +118,6 @@ function draw_feedtime(context,
 		val,
 		units,
 		colour,
-		decimals,
 		size,
 		unitend)
 		{
@@ -179,30 +177,7 @@ function draw_feedtime(context,
 			if (fweight === "0"){fontweight = "normal";}
 			if (fweight === "1"){fontweight = "bold";}
 						
-			if (decimals<0)
-				{
-
-					if (val>=100){
-						val = val.toFixed(0);
-						}
-					else if (val>=10){
-						val = val.toFixed(1);
-						}
-					else if (val<=-100){
-						val = val.toFixed(0);
-						}
-					else if (val<=-10){
-						val = val.toFixed(1);
-						}
-					else {
-						val = val.toFixed(2);
-						}
-				val = parseFloat(val);
-				}
-			else 
-				{
-					val = val.toFixed(decimals);
-				}
+			val = val.toFixed(0);
 
 			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
 				colour = "#" + colour;	
@@ -264,7 +239,6 @@ function feedtime_draw()
 					val,
 					$(this).attr("units"),
 					$(this).attr("colour"),
-					$(this).attr("decimals"),
 					$(this).attr("size"),
 					$(this).attr("unitend"),
 					);

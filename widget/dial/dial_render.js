@@ -98,7 +98,7 @@ function dial_widgetlist(){
   addOption(widgets["dial"], "displayminmax", "dropbox", _Tr("Min / Max ?"),  _Tr("Display Min. and Max. ?"),                                               displayminmaxDropBoxOptions);
   addOption(widgets["dial"], "minvaluefeed",  "feedid",  _Tr("Min. feed"),    _Tr("The feed for the minimum value"),                                        []);
   addOption(widgets["dial"], "maxvaluefeed",  "feedid",  _Tr("Max. feed"),    _Tr("The feed for the maximum value"),                                        []);
-  addOption(widgets["dial"], "timeout",       "value",   _Tr("Timeout"),       _Tr("Timeout without feed update"),                                           []);
+  addOption(widgets["dial"], "timeout",       "value",   _Tr("Timeout"),       _Tr("Timeout without feed update in seconds (0 is never, empty defaults to 60)"),                                           []);
 
   return widgets;
 }
