@@ -215,7 +215,7 @@ function draw_feedvalue(context,
 				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
 				}
 
-			if (errorCode == "1")
+			if (errorCode === "1")
 			{
 				context.fillText("TO Error", width/2 , height/2);
 			}
@@ -243,8 +243,9 @@ function feedvalue_draw()
 		{
     
 			var errorTimeout = $(this).attr("timeout");
-	        if (errorTimeout == "" || errorTimeout == undefined)            //Timeout parameter is empty
-	          errorTimeout = 0;
+			if (errorTimeout === "" || errorTimeout === undefined){           //Timeout parameter is empty
+				errorTimeout = 0;
+	        }
 
 			var font = $(this).attr("font");
 			var feedid = $(this).attr("feedid");
@@ -255,7 +256,7 @@ function feedvalue_draw()
 			if (isNaN(val))  {val = 0;}
 
 			var errorCode = "0";
-			if (errorTimeout != 0)
+			if (errorTimeout !== 0)
 			{
 				if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
 				{

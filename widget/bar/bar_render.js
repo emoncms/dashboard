@@ -476,7 +476,7 @@ function bar_draw()
     $(".bar").each(function(index)
     {
         var errorTimeout = $(this).attr("timeout");
-        if (errorTimeout == "" || errorTimeout == undefined)            //Timeout parameter is empty
+        if (errorTimeout === "" || errorTimeout === undefined)            //Timeout parameter is empty
           errorTimeout = 0;
 
         var feedid = $(this).attr("feedid");
@@ -495,7 +495,7 @@ function bar_draw()
 
         var errorCode = 0;
 
-        if (errorTimeout != 0)
+        if (errorTimeout !== 0)
         {
           if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
           {
