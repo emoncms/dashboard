@@ -108,7 +108,7 @@ function bar_widgetlist()
     addOption(widgets["bar"], "minvaluefeed",   "feedid",           _Tr("Min. feed"),       _Tr("The feed for the minimum value"),                                              []);
     addOption(widgets["bar"], "maxvaluefeed",   "feedid",           _Tr("Max. feed"),       _Tr("The feed for the maximum value"),                                              []);
     addOption(widgets["bar"], "colour_minmax",  "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
-    addOption(widgets["bar"], "timeout",        "value",            _Tr("Timeout"),         _Tr("Timeout without feed update in seconds (0 is never, empty defaults to 60)"),   []);
+    addOption(widgets["bar"], "timeout",        "value",            _Tr("Timeout"),         _Tr("Timeout without feed update in seconds (empty is never)"),   []);
 
 
 
