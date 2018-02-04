@@ -140,7 +140,7 @@ function draw_bar(context,
                   minvaluefeed,
                   maxvaluefeed,
                   colour_minmax,
-                  error_code
+                  errorCode
                   )
 {
     if (!context) {return;}
@@ -412,7 +412,7 @@ function draw_bar(context,
 
     context.fillStyle = colour_label;
     
-    if (error_code == "1")
+    if (errorCode == "1")
     {
       raw_value="TO ";
       units_string="Error";
@@ -475,9 +475,9 @@ function bar_draw()
 {
     $(".bar").each(function(index)
     {
-        var error_timeout = $(this).attr("timeout");
-        if (error_timeout == "" || error_timeout == undefined)            //Timeout parameter is empty
-          error_timeout = 0;
+        var errorTimeout = $(this).attr("timeout");
+        if (errorTimeout == "" || errorTimeout == undefined)            //Timeout parameter is empty
+          errorTimeout = 0;
 
         var feedid = $(this).attr("feedid");
         var minvaluefeed = $(this).attr("minvaluefeed");
@@ -493,13 +493,13 @@ function bar_draw()
         var minval = curve_value(minvaluefeed,dialrate).toFixed(3);
         var maxval = curve_value(maxvaluefeed,dialrate).toFixed(3);
 
-        var error_code = 0;
+        var errorCode = 0;
 
-        if (error_timeout != 0)
+        if (errorTimeout != 0)
         {
-          if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > error_timeout) 
+          if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
           {
-            error_code = "1";
+            errorCode = "1";
             val = 0;    
           }
         }
@@ -532,7 +532,7 @@ function bar_draw()
                      minval*scale,
                      maxval*scale,
                      $(this).attr("colour_minmax"),
-                     error_code
+                     errorCode
                      );
         }
     });

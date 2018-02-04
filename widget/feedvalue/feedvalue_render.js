@@ -123,7 +123,7 @@ function draw_feedvalue(context,
 		decimals,
 		size,
 		unitend,
-		error_code)
+		errorCode)
 		{
 			if (!context){
 			return;
@@ -215,7 +215,7 @@ function draw_feedvalue(context,
 				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
 				}
 
-			if (error_code == "1")
+			if (errorCode == "1")
 			{
 				context.fillText("TO Error", width/2 , height/2);
 			}
@@ -242,9 +242,9 @@ function feedvalue_draw()
 	$(".feedvalue").each(function(index)
 		{
     
-			var error_timeout = $(this).attr("timeout");
-	        if (error_timeout == "" || error_timeout == undefined)            //Timeout parameter is empty
-	          error_timeout = 0;
+			var errorTimeout = $(this).attr("timeout");
+	        if (errorTimeout == "" || errorTimeout == undefined)            //Timeout parameter is empty
+	          errorTimeout = 0;
 
 			var font = $(this).attr("font");
 			var feedid = $(this).attr("feedid");
@@ -254,12 +254,12 @@ function feedvalue_draw()
 			if (val===undefined) {val = 0;}
 			if (isNaN(val))  {val = 0;}
 
-			var error_code = "0";
-			if (error_timeout != 0)
+			var errorCode = "0";
+			if (errorTimeout != 0)
 			{
-				if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > error_timeout) 
+				if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
 				{
-					error_code = "1";
+					errorCode = "1";
 				}
 			}
 
@@ -288,7 +288,7 @@ function feedvalue_draw()
 					$(this).attr("decimals"),
 					$(this).attr("size"),
 					$(this).attr("unitend"),
-					error_code
+					errorCode
 					);
 			}
 		});

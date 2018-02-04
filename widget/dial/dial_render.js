@@ -123,7 +123,7 @@ function polar_to_cart(mag, ang, xOff, yOff){
   }
 // X, Y are the center coordinates of the canvas
 function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed,
-    error_code){
+    errorCode){
   if (!ctx) {return;}
 
   // if (1 * maxvalue) == false: 3000. Else 1 * maxvalue
@@ -384,7 +384,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   }
     
   var dialtext;
-  if (error_code == "1")
+  if (errorCode == "1")
       {
         dialtext = "TO Error";
       }
@@ -542,12 +542,12 @@ function dial_define_tooltips(){
 function dial_draw(){
   $(".dial").each(function(index) {
     
-    var error_timeout = $(this).attr("timeout");
-        if (error_timeout == "" || error_timeout == undefined)            //Timeout parameter is empty
-          error_timeout = 0;
+    var errorTimeout = $(this).attr("timeout");
+        if (errorTimeout == "" || errorTimeout == undefined)            //Timeout parameter is empty
+          errorTimeout = 0;
 
 
-    var error_code = "0";
+    var errorCode = "0";
 
     var feedid = $(this).attr("feedid");
     var minvaluefeed = $(this).attr("minvaluefeed")||"0";
@@ -557,11 +557,11 @@ function dial_draw(){
     var val = (associd[feedid]["value"] * 1).toFixed(3);        
     var val_curve = curve_value(feedid,dialrate).toFixed(3);
 
-    if (error_timeout != 0)
+    if (errorTimeout != 0)
       {
-        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > error_timeout) 
+        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
         {
-          error_code = "1";
+          errorCode = "1";
           val_curve = 0;        }
       }
     
@@ -606,7 +606,7 @@ function dial_draw(){
                  $(this).attr("displayminmax"),
                  minval_curve*scale,
                  maxval_curve*scale,
-                 error_code
+                 errorCode
                  );
     }
   });
