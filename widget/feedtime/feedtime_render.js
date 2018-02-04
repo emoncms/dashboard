@@ -10,7 +10,7 @@
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
  */
- 
+
  function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
 {
   widget["options"    ].push(optionKey);
@@ -46,7 +46,6 @@ function feedtime_widgetlist()
         [5,    "5"],
         [6,    "6"]
     ];
-	
 
 	var fontoptions = [
 					[9, "Arial Black"],
@@ -60,18 +59,18 @@ function feedtime_widgetlist()
 					[1, "Georgia"],
 					[0, "Impact"]
 				];
-				
+
 	var fstyleoptions = [
 					[2, _Tr("Normal")],
 					[1, _Tr("Italic")],
 					[0, _Tr("Oblique")]
 				];
-				
+
 	var fweightoptions = [
 					[1, _Tr("Bold")],
 					[0, _Tr("Normal")]
 				];
-				
+
 	var sizeoptions = [
 					[14, "18"], // set size 18 to the top position to be the default value for creating new feedtime widgets otherwise size 40 would be always the default
 					[13, "40"],
@@ -93,7 +92,7 @@ function feedtime_widgetlist()
 	var unitEndOptions = [
 					[0, _Tr("Back")],
 					[1, _Tr("Front")]
-				];				
+				];
 
 	addOption(widgets["feedtime"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
 	addOption(widgets["feedtime"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
@@ -124,7 +123,7 @@ function draw_feedtime(context,
 			if (!context){
 			return;
 			}
-			
+
 			context.save();
 			context.clearRect(0,0,width,height); // Clear old drawing
 			context.restore();
@@ -165,18 +164,18 @@ function draw_feedtime(context,
 			if (font === "7"){fontname = "sans-serif";}
 			if (font === "8"){fontname = "Arial Narrow";}
 			if (font === "9"){fontname = "Arial Black";}
-			
+
 			var fontstyle;
-			
+
 			if (fstyle === "0"){fontstyle = "oblique";}
 			if (fstyle === "1"){fontstyle = "italic";}
 			if (fstyle === "2"){fontstyle = "normal";}
-			
+
 			var fontweight;
 
 			if (fweight === "0"){fontweight = "normal";}
 			if (fweight === "1"){fontweight = "bold";}
-						
+
 			val = val.toFixed(0);
 
 			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
@@ -199,15 +198,15 @@ function draw_feedtime(context,
 			}
 
 
-			
-			
+
+
 }
 
 function feedtime_draw()
 {
 	$(".feedtime").each(function(index)
 		{
-    
+
 			var font = $(this).attr("font");
 			var feedid = $(this).attr("feedid");
 			if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
@@ -220,11 +219,11 @@ function feedtime_draw()
 			var size = $(this).attr("size");
 			var units = $(this).attr("units");
 			var decimals = $(this).attr("decimals");
-			
+
 			if (decimals===undefined) {decimals = -1};
 
 			var unitend = $(this).attr("unitend");
-				
+
 			{
 				var id = "can-"+$(this).attr("id");
 
