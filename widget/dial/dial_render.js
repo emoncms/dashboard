@@ -98,6 +98,7 @@ function dial_widgetlist(){
   addOption(widgets["dial"], "displayminmax", "dropbox", _Tr("Min / Max ?"),  _Tr("Display Min. and Max. ?"),                                               displayminmaxDropBoxOptions);
   addOption(widgets["dial"], "minvaluefeed",  "feedid",  _Tr("Min. feed"),    _Tr("The feed for the minimum value"),                                        []);
   addOption(widgets["dial"], "maxvaluefeed",  "feedid",  _Tr("Max. feed"),    _Tr("The feed for the maximum value"),                                        []);
+  addOption(widgets["dial"], "timeout",       "value",   _Tr("Timeout"),       _Tr("Timeout without feed update in seconds (empty is never)"),                                           []);
 
   return widgets;
 }
@@ -121,7 +122,8 @@ function polar_to_cart(mag, ang, xOff, yOff){
     return Ergebnis;
   }
 // X, Y are the center coordinates of the canvas
-function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed){
+function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed,
+    errorCode){
   if (!ctx) {return;}
 
   // if (1 * maxvalue) == false: 3000. Else 1 * maxvalue
@@ -382,10 +384,18 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   }
     
   var dialtext;
-  if (unitend ==="0"){
-  dialtext=val+units;}
-  if (unitend ==="1"){
-  dialtext=units+val;}
+  if (errorCode == "1")
+      {
+        dialtext = "TO Error";
+      }
+  else
+  {
+      if (unitend ==="0"){
+      dialtext=val+units;}
+      if (unitend ==="1"){
+      dialtext=units+val;}
+  }
+  
   
   var textsize = (size / (dialtext.length+2)) * 6;
   
@@ -531,6 +541,15 @@ function dial_define_tooltips(){
 
 function dial_draw(){
   $(".dial").each(function(index) {
+    
+    var errorTimeout = $(this).attr("timeout");
+        if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
+          errorTimeout = 0;
+        }
+
+
+    var errorCode = "0";
+
     var feedid = $(this).attr("feedid");
     var minvaluefeed = $(this).attr("minvaluefeed")||"0";
     var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
@@ -538,6 +557,14 @@ function dial_draw(){
 
     var val = (associd[feedid]["value"] * 1).toFixed(3);        
     var val_curve = curve_value(feedid,dialrate).toFixed(3);
+
+    if (errorTimeout !== 0)
+      {
+        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
+        {
+          errorCode = "1";
+          val_curve = 0;        }
+      }
     
     // The minval and maxval feed settings default to the first feed in the feedlist 
     // which may not be public for use in public dashboards, which will then result in
@@ -579,7 +606,8 @@ function dial_draw(){
                  unitend,
                  $(this).attr("displayminmax"),
                  minval_curve*scale,
-                 maxval_curve*scale
+                 maxval_curve*scale,
+                 errorCode
                  );
     }
   });
