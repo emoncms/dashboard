@@ -244,7 +244,7 @@ function feedvalue_draw()
     
 			var error_timeout = $(this).attr("timeout");
 	        if (error_timeout == "" || error_timeout == undefined)            //Timeout parameter is empty
-	          error_timeout = 60;
+	          error_timeout = 0;
 
 			var font = $(this).attr("font");
 			var feedid = $(this).attr("feedid");
