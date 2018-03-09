@@ -239,7 +239,7 @@ function feedtime_draw()
 					$(this).attr("units"),
 					$(this).attr("colour"),
 					$(this).attr("size"),
-					$(this).attr("unitend"),
+					$(this).attr("unitend")
 					);
 			}
 		});
