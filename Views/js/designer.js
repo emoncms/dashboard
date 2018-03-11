@@ -153,25 +153,27 @@ var designer = {
         var box = null;
 
         for (z in designer.boxlist) {
-        var width = designer.boxlist[z]["width"];
-        var height = designer.boxlist[z]["height"];
-        var squareSize = 8;
-        if (width>75 && height>75){squareSize = 16;}
-        if (width>125 && height>125){squareSize = 25;}
-            if (x>designer.boxlist[z]["left"]-(squareSize/2) && x<(designer.boxlist[z]["left"]+designer.boxlist[z]["width"]+(squareSize/2)) &&
-                y>designer.boxlist[z]["top"]-(squareSize/2) && y<(designer.boxlist[z]["top"]+designer.boxlist[z]["height"]+(squareSize/2)))
-            {
-                if (box === null) {
-                    box = z;
-                } else {
-                    var z_element = $("#"+z);
-                    var box_element = $("#"+box);
-                    // Only set new box if this box is higher than the existing found element
-                    if (z_element.index() > box_element.index()) {
+        if (z){
+            var width = designer.boxlist[z]["width"];
+            var height = designer.boxlist[z]["height"];
+            var squareSize = 8;
+            if (width>75 && height>75){squareSize = 16;}
+            if (width>125 && height>125){squareSize = 25;}
+                if (x>designer.boxlist[z]["left"]-(squareSize/2) && x<(designer.boxlist[z]["left"]+designer.boxlist[z]["width"]+(squareSize/2)) &&
+                    y>designer.boxlist[z]["top"]-(squareSize/2) && y<(designer.boxlist[z]["top"]+designer.boxlist[z]["height"]+(squareSize/2)))
+                {
+                    if (box === null) {
                         box = z;
-                    }
-                }
+                    } else {
+                        var z_element = $("#"+z);
+                        var box_element = $("#"+box);
+                        // Only set new box if this box is higher than the existing found element
+                        if (z_element.index() > box_element.index()) {
+                            box = z;
+                        }
+                   }
             }
+        }
         }
         return box;
     },
