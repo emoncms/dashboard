@@ -619,6 +619,13 @@ var designer = {
                 }
             }
         });
+		
+        // Double click to display widget options
+        $(this.canvas).bind('dblclick', function(e){
+			if (designer.selected_boxes.length == 1) {
+				$('#options-button').trigger('click');
+			}
+        });
 
         $(this.canvas).bind('touchstart mousedown', function(e){
             designer.mousedown = true;
