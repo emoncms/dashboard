@@ -151,9 +151,15 @@ var designer = {
 
     "onbox": function(x,y){
         var box = null;
+
         for (z in designer.boxlist) {
-            if (x>designer.boxlist[z]["left"]-4 && x<(designer.boxlist[z]["left"]+designer.boxlist[z]["width"]+4) &&
-                y>designer.boxlist[z]["top"]-4 && y<(designer.boxlist[z]["top"]+designer.boxlist[z]["height"]+4))
+        var width = designer.boxlist[z]["width"];
+        var height = designer.boxlist[z]["height"];
+        var squareSize = 8;
+        if (width>75 && height>75){squareSize = 16;}
+        if (width>125 && height>125){squareSize = 25;}
+            if (x>designer.boxlist[z]["left"]-(squareSize/2) && x<(designer.boxlist[z]["left"]+designer.boxlist[z]["width"]+(squareSize/2)) &&
+                y>designer.boxlist[z]["top"]-(squareSize/2) && y<(designer.boxlist[z]["top"]+designer.boxlist[z]["height"]+(squareSize/2)))
             {
                 if (box === null) {
                     box = z;
@@ -275,21 +281,25 @@ var designer = {
                 var left = designer.boxlist[selected_box]["left"];
                 var width = designer.boxlist[selected_box]["width"];
                 var height = designer.boxlist[selected_box]["height"];
+                var squareSize = 8;
+                
+                if (width>75 && height>75){squareSize = 16;}
+                if (width>125 && height>125){squareSize = 25;}
 
                 designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.left ? selectedColor : strokeColor );
-                designer.ctx.strokeRect(left-4,top+(height/2)-4,8,8);
+                designer.ctx.strokeRect(left-(squareSize/2),top+(height/2)-(squareSize/2),squareSize,squareSize);
 
                 designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.right ? selectedColor : strokeColor );
-                designer.ctx.strokeRect(left+width-4,top+(height/2)-4,8,8);
+                designer.ctx.strokeRect(left+width-(squareSize/2),top+(height/2)-(squareSize/2),squareSize,squareSize);
 
                 designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.top ? selectedColor : strokeColor );
-                designer.ctx.strokeRect(left+(width/2)-4,top-4,8,8);
+                designer.ctx.strokeRect(left+(width/2)-(squareSize/2),top-(squareSize/2),squareSize,squareSize);
 
                 designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.bottom ? selectedColor : strokeColor );
-                designer.ctx.strokeRect(left+(width/2)-4,top+height-4,8,8);
+                designer.ctx.strokeRect(left+(width/2)-(squareSize/2),top+height-(squareSize/2),squareSize,squareSize);
 
                 designer.ctx.strokeStyle = (designer.selected_edge == selected_edges.center ? selectedColor : strokeColor );
-                designer.ctx.strokeRect(left+(width/2)-4,top+(height/2)-4,8,8);
+                designer.ctx.strokeRect(left+(width/2)-(squareSize/2),top+(height/2)-(squareSize/2),squareSize,squareSize);
 
                 designer.ctx.strokeStyle  = strokeColor;
                 designer.ctx.setLineDash([3]);
@@ -619,12 +629,12 @@ var designer = {
                 }
             }
         });
-		
+
         // Double click to display widget options
         $(this.canvas).bind('dblclick', function(e){
-			if (designer.selected_boxes.length == 1) {
-				$('#options-button').trigger('click');
-			}
+            if (designer.selected_boxes.length == 1) {
+                $('#options-button').trigger('click');
+            }
         });
 
         $(this.canvas).bind('touchstart mousedown', function(e){
@@ -652,20 +662,27 @@ var designer = {
 
                     resize = designer.boxlist[selected_box];
 
+                    var squareSize = 8;
+                    var width = designer.boxlist[selected_box]["width"];
+                    var height = designer.boxlist[selected_box]["height"];
+
+                    if (width>75 && height>75){squareSize = 16;}
+                    if (width>125 && height>125){squareSize = 25;}
+
                     var rightedge = resize["left"]+resize["width"];
                     var bottedge = resize["top"]+resize["height"];
                     var midx = resize["left"]+(resize["width"]/2);
                     var midy = resize["top"]+(resize["height"]/2);
 
-                    if (Math.abs(mx - rightedge)<4)
+                    if (Math.abs(mx - rightedge)<(squareSize/2) && Math.abs(my - midy)<(squareSize/2))
                         designer.selected_edge = selected_edges.right;
-                    else if (Math.abs(mx - resize["left"])<4)
+                    else if (Math.abs(mx - resize["left"])<(squareSize/2)&& Math.abs(my - midy)<(squareSize/2))
                         designer.selected_edge = selected_edges.left;
-                    else if (Math.abs(my - bottedge)<4)
+                    else if (Math.abs(my - bottedge)<(squareSize/2)&& Math.abs(mx - midx)<(squareSize/2))
                         designer.selected_edge = selected_edges.bottom;
-                    else if (Math.abs(my - resize["top"])<4)
+                    else if (Math.abs(my - resize["top"])<(squareSize/2)&& Math.abs(mx - midx)<(squareSize/2))
                         designer.selected_edge = selected_edges.top;
-                    else if (Math.abs(my - midy)<4 && Math.abs(mx - midx)<4)
+                    else if (Math.abs(my - midy)<(squareSize/2) && Math.abs(mx - midx)<(squareSize/2))
                         designer.selected_edge = selected_edges.center;
                     else
                         designer.selected_edge = selected_edges.none;
