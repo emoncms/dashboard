@@ -111,39 +111,40 @@ class Dashboard
         $userid = (int) $userid;
         $id = (int) $id;
         $fields = json_decode(stripslashes($fields));
-
-        $array = array();
-
-        // content, height, name, alias, description, main, public, published, showdescription
-        // Repeat this line changing the field name to add fields that can be updated:
-
-        if (isset($fields->height)) $array[] = "`height` = '".intval($fields->height)."'";
-        if (isset($fields->name)) $array[] = "`name` = '".preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->name)."'";
-        if (isset($fields->alias)) $array[] = "`alias` = '".preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->alias)."'";
-        if (isset($fields->description)) $array[] = "`description` = '".preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->description)."'";
-        if (isset($fields->backgroundcolor)) $array[] = "`backgroundcolor` = '".preg_replace('/[^0-9a-f]/','', strtolower($fields->backgroundcolor))."'";
-        if (isset($fields->gridsize)) $array[] = "`gridsize` = '".preg_replace('/[^0-9]/','', $fields->gridsize)."'";
-
-        if (isset($fields->main))
+        
+        $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' and `id` = '$id'");
+        if ($row = $result->fetch_object()) 
         {
-            $main = (bool)$fields->main;
-            if ($main) $this->mysqli->query("UPDATE dashboard SET main = FALSE WHERE userid='$userid' and id<>'$id'");
-            $array[] = "`main` = '".$main ."'";
+            if (isset($fields->content)) $row->content = $fields->content;
+            if (isset($fields->height)) $row->height = (int) $fields->height;
+            if (isset($fields->name)) $row->name = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->name);
+            if (isset($fields->alias)) $row->alias = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->alias);
+            if (isset($fields->description)) $row->description = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->description);
+            if (isset($fields->backgroundcolor)) $row->backgroundcolor = preg_replace('/[^0-9a-f]/','', strtolower($fields->backgroundcolor));
+            if (isset($fields->gridsize)) $row->gridsize = preg_replace('/[^0-9]/','', $fields->gridsize);
+            
+            if (isset($fields->main))
+            {
+                $main = (bool)$fields->main;
+                if ($main) $this->mysqli->query("UPDATE dashboard SET main = FALSE WHERE userid='$userid' and id<>'$id'");
+                $row->main = $main;
+            }
+
+            if (isset($fields->public)) $row->public = (bool) $fields->public;
+            if (isset($fields->published)) $row->published = (bool) $fields->published;
+            if (isset($fields->showdescription)) $row->showdescription = (bool) $fields->showdescription;
+            
+            $stmt = $this->mysqli->prepare("UPDATE dashboard SET content=?,height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,feedmode=?,main=?,public=?,published=?,showdescription=? WHERE userid=? AND id=?");
+            $stmt->bind_param("sissssisiiiiii",$row->content,$row->height,$row->name,$row->alias,$row->description,$row->backgroundcolor,$row->gridsize,$row->feedmode,$row->main,$row->public,$row->published,$row->showdescription,$userid,$id);
+            $stmt->execute();
+            $affected_rows = $stmt->affected_rows;
+            $stmt->close();
+            
+            if ($affected_rows>0){
+                return array('success'=>true, 'message'=>'Field updated');
+            }
         }
-
-        if (isset($fields->public)) $array[] = "`public` = '".((bool)$fields->public)."'";
-        if (isset($fields->published)) $array[] = "`published` = '".((bool)$fields->published)."'";
-        if (isset($fields->showdescription)) $array[] = "`showdescription` = '".((bool)$fields->showdescription)."'";
-        // Convert to a comma seperated string for the mysql query
-        $fieldstr = implode(",",$array);
-
-        $this->mysqli->query("UPDATE dashboard SET ".$fieldstr." WHERE userid='$userid' and `id` = '$id'");
-
-        if ($this->mysqli->affected_rows>0){
-            return array('success'=>true, 'message'=>'Field updated');
-        } else {
-            return array('success'=>false, 'message'=>'Field could not be updated');
-        }
+        return array('success'=>false, 'message'=>'Field could not be updated');
     }
 
     // Return the main dashboard from $userid

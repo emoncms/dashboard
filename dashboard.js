@@ -16,7 +16,7 @@ var dashboard = {
 
   'set':function(id, fields){
     var result = {};
-    $.ajax({ url: path+"dashboard/set.json", data: "id="+id+"&fields="+JSON.stringify(fields), async: false, success: function(data){result = data;} });
+    $.ajax({ type: "POST", url: path+"dashboard/set.json", data: "id="+id+"&fields="+JSON.stringify(fields), async: false, success: function(data){result = data;} });
     return result;
   },
 
