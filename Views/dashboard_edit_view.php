@@ -13,7 +13,7 @@ global $session,$path;
 $js_css_version = 1;
 
 if (!$dashboard['height']) $dashboard['height'] = 400;
-if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "tagname";
+if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
 ?>
     <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
     <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
