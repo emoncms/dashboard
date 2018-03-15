@@ -28,6 +28,14 @@
         <label><?php echo _('Grid size: '); ?></label>
         <input type="text" name="gridsize" value="<?php echo $dashboard['gridsize']; ?>" />
 
+
+        <label><?php echo _('Feed selection mode: '); ?></label>
+        <i style="font-size:12px">Note: Reset feeds in all widgets in dashboard if changing<br>this part way through a dashboard build</i><br>
+        <select name="feedmode">
+            <option value="tagname" <?php if ($dashboard['feedmode'] == "tagname") echo 'selected'; ?>>By tag:name</option> 
+            <option value="feedid" <?php if ($dashboard['feedmode'] == "feedid") echo 'selected'; ?>>By feedid</option> 
+        </select>
+        
         <label class="checkbox">
             <input type="checkbox" name="main" id="chk_main" value="1" <?php if ($dashboard['main'] == true) echo 'checked'; ?> />
             <abbr title="<?php echo _('Make this dashboard the first shown'); ?>"><?php echo _('Main'); ?></abbr>
@@ -66,7 +74,8 @@
         fields['alias']  = $("input[name=alias]").val();
         fields['description']  = $("textarea[name=description]").val();
         fields['backgroundcolor']  = $("input[name=backgroundcolor]").val().replace('#','');
-
+        fields['feedmode']  = $("select[name=feedmode]").val();
+        
         var gridsize = parseInt($("input[name=gridsize]").val());
         gridsize = Math.max(gridsize, 0);
         fields['gridsize'] = gridsize;
@@ -88,6 +97,7 @@
 
         $('#page-container').css("background-color","#"+fields['backgroundcolor']);
 
+        designer.feedmode = fields['feedmode'];
         designer.grid_size = gridsize;
         designer.draw();
     });

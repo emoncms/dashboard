@@ -13,6 +13,7 @@ global $session,$path;
 $js_css_version = 1;
 
 if (!$dashboard['height']) $dashboard['height'] = 400;
+if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "tagname";
 ?>
     <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
     <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
@@ -128,6 +129,8 @@ function toolboxMove(e) {
 
     designer.canvas = "#can";
     designer.grid_size = <?php echo $dashboard['gridsize']; ?>;
+    designer.feedmode = "<?php echo $dashboard['feedmode']; ?>";
+    console.log("designer.feedmode: "+designer.feedmode);
     designer.widgets = widgets;
     designer.init();
 
