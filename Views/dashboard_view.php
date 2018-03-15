@@ -10,7 +10,7 @@ http://openenergymonitor.org
 */
 
 global $session,$path,$dashboard_editor_icon;
-$js_css_version = 1;
+$js_css_version = 2;
 
 if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit?id='. $dashboard['id'].'"> <img src="'.$path.'Modules/dashboard/Views/icons/gear-icon-outlined.png" style="width:80%" ></a>';
 

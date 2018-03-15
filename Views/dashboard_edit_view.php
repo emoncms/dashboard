@@ -10,7 +10,7 @@ http://openenergymonitor.org
 */
 
 global $session,$path;
-$js_css_version = 1;
+$js_css_version = 2;
 
 if (!$dashboard['height']) $dashboard['height'] = 400;
 if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
