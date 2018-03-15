@@ -467,8 +467,12 @@ function thermometer_draw()
     $(".thermometer").each(function(index)
     {
         var feedid = $(this).attr("feedid");
-        var minvaluefeed = $(this).attr("minvaluefeed");
-        var maxvaluefeed = $(this).attr("maxvaluefeed");
+        if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
+        var minvaluefeed = $(this).attr("minvaluefeed")||"0";
+        if (assocfeed[minvaluefeed]!=undefined) minvaluefeed = assocfeed[minvaluefeed];
+        var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
+        if (assocfeed[maxvaluefeed]!=undefined) maxvaluefeed = assocfeed[maxvaluefeed];
+    
         if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
         var val = curve_value(feedid,dialrate).toFixed(3);
         var minval = curve_value(minvaluefeed,dialrate).toFixed(3);

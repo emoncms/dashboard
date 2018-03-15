@@ -209,6 +209,7 @@ function feedtime_draw()
 
 			var font = $(this).attr("font");
 			var feedid = $(this).attr("feedid");
+		  if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
 			if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
 
 			var val = ((new Date()).getTime() / 1000  - offsetofTime - (associd[feedid]["time"] * 1));

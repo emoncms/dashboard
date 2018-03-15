@@ -48,7 +48,9 @@ function jgauge2_draw()
   $('.jgauge2').each(function(index)
   {
     var feedid = $(this).attr("feedid");
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     var feedid2 = $(this).attr("feedid2");
+    if (assocfeed[feedid2]!=undefined) feedid2 = assocfeed[feedid2]; // convert tag:name to feedid
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     if (associd[feedid2] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var val = curve_value(feedid,dialrate).toFixed(3);

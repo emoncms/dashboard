@@ -111,6 +111,7 @@ function led_draw() {
   $(".led").each(function(index)
   {
     var feedid = $(this).attr("feedid");
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var val = associd[feedid]["value"] * 1;
     var ledstyle = $(this).attr("ledstyle")|| "1";

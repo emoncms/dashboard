@@ -550,7 +550,7 @@ function dial_draw(){
     var errorCode = "0";
 
     var feedid = $(this).attr("feedid");
-    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid];
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     var minvaluefeed = $(this).attr("minvaluefeed")||"0";
     if (assocfeed[minvaluefeed]!=undefined) minvaluefeed = assocfeed[minvaluefeed];
     var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
