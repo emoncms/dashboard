@@ -55,6 +55,10 @@
             <input type="checkbox" name="showdescription" id="chk_showdescription" value="1" <?php if ($dashboard['showdescription'] == true) echo 'checked'; ?> />
             <abbr title="<?php echo _('Shows dashboard description on mouse over dashboard name in menu project'); ?>"><?php echo _('Show description'); ?></abbr>
         </label>
+        
+        <label><?php echo _('Content: '); ?></label>
+        <i style="font-size:12px">To view content changes reload editor after saving</i>
+        <textarea name="content" style="width:100%; height:200px;"><?php echo $dashboard['content']; ?></textarea>
 
     </div>
     <div class="modal-footer">
@@ -66,6 +70,7 @@
 <script type="application/javascript">
     var dashid = <?php echo $dashboard['id']; ?>;
     var path = "<?php echo $path; ?>";
+    var height = <?php echo $dashboard['height']; ?>;
 
     $("#configure-save").click(function (){
         var fields = {};
@@ -75,7 +80,7 @@
         fields['description']  = $("textarea[name=description]").val();
         fields['backgroundcolor']  = $("input[name=backgroundcolor]").val().replace('#','');
         fields['feedmode']  = $("select[name=feedmode]").val();
-        
+
         var gridsize = parseInt($("input[name=gridsize]").val());
         gridsize = Math.max(gridsize, 0);
         fields['gridsize'] = gridsize;
@@ -86,11 +91,21 @@
             if ($("#chk_showdescription").is(":checked")) fields['showdescription'] = true; else fields['showdescription'] = false;
 
         $.ajax({
+            type: "POST",
             url :  path+"dashboard/set.json",
             data : "&id="+dashid+"&fields="+JSON.stringify(fields),
             dataType : 'json',
             async: true,
             success : function(result) {console.log(result)}
+        });
+        
+        $.ajax({
+            type: "POST",
+            url :  path+"dashboard/setcontent.json",
+            data : "&id="+dashid+'&content='+encodeURIComponent($("textarea[name=content]").val())+'&height='+height,
+            dataType: 'json',
+            async: true,
+            success : function(result) { console.log(result) }
         });
 
         $('#dashConfigModal').modal('hide');

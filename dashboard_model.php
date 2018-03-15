@@ -122,7 +122,7 @@ class Dashboard
             if (isset($fields->backgroundcolor)) $row->backgroundcolor = preg_replace('/[^0-9a-f]/','', strtolower($fields->backgroundcolor));
             if (isset($fields->gridsize)) $row->gridsize = preg_replace('/[^0-9]/','', $fields->gridsize);
             if (isset($fields->feedmode)) $row->feedmode = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->feedmode);
-            
+
             if (isset($fields->main))
             {
                 $main = (bool)$fields->main;
@@ -136,6 +136,7 @@ class Dashboard
             
             $stmt = $this->mysqli->prepare("UPDATE dashboard SET height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,feedmode=?,main=?,public=?,published=?,showdescription=? WHERE userid=? AND id=?");
             $stmt->bind_param("issssisiiiiii",$row->height,$row->name,$row->alias,$row->description,$row->backgroundcolor,$row->gridsize,$row->feedmode,$row->main,$row->public,$row->published,$row->showdescription,$userid,$id);
+
             $stmt->execute();
             $affected_rows = $stmt->affected_rows;
             $stmt->close();
