@@ -115,7 +115,6 @@ class Dashboard
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' and `id` = '$id'");
         if ($row = $result->fetch_object()) 
         {
-            if (isset($fields->content)) $row->content = $fields->content;
             if (isset($fields->height)) $row->height = (int) $fields->height;
             if (isset($fields->name)) $row->name = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->name);
             if (isset($fields->alias)) $row->alias = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->alias);
@@ -134,8 +133,8 @@ class Dashboard
             if (isset($fields->published)) $row->published = (bool) $fields->published;
             if (isset($fields->showdescription)) $row->showdescription = (bool) $fields->showdescription;
             
-            $stmt = $this->mysqli->prepare("UPDATE dashboard SET content=?,height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,feedmode=?,main=?,public=?,published=?,showdescription=? WHERE userid=? AND id=?");
-            $stmt->bind_param("sissssisiiiiii",$row->content,$row->height,$row->name,$row->alias,$row->description,$row->backgroundcolor,$row->gridsize,$row->feedmode,$row->main,$row->public,$row->published,$row->showdescription,$userid,$id);
+            $stmt = $this->mysqli->prepare("UPDATE dashboard SET height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,main=?,public=?,published=?,showdescription=? WHERE userid=? AND id=?");
+            $stmt->bind_param("issssiiiiiii",$row->height,$row->name,$row->alias,$row->description,$row->backgroundcolor,$row->gridsize,$row->main,$row->public,$row->published,$row->showdescription,$userid,$id);
             $stmt->execute();
             $affected_rows = $stmt->affected_rows;
             $stmt->close();
