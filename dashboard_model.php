@@ -84,11 +84,14 @@ class Dashboard
         return $list;
     }
 
-    public function set_content($userid, $id, $content, $height)
+    public function set_content($userid, $id, $_content, $height)
     {
         $userid = (int) $userid;
         $id = (int) $id;
         $height = (int) $height;
+        
+        $content = str_replace('script','',$_content);
+        if ($content!=$_content) return array('success'=>false, 'message'=>'Dashboard not updated');
 
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid = '$userid' AND id='$id'");
         $row = $result->fetch_array();
