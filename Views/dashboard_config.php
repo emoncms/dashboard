@@ -47,6 +47,9 @@
             <input type="checkbox" name="showdescription" id="chk_showdescription" value="1" <?php if ($dashboard['showdescription'] == true) echo 'checked'; ?> />
             <abbr title="<?php echo _('Shows dashboard description on mouse over dashboard name in menu project'); ?>"><?php echo _('Show description'); ?></abbr>
         </label>
+        
+        <label><?php echo _('Content: '); ?></label>
+        <textarea name="content" style="width:100%; height:200px;"><?php echo $dashboard['content']; ?></textarea>
 
     </div>
     <div class="modal-footer">
@@ -66,7 +69,8 @@
         fields['alias']  = $("input[name=alias]").val();
         fields['description']  = $("textarea[name=description]").val();
         fields['backgroundcolor']  = $("input[name=backgroundcolor]").val().replace('#','');
-
+        fields['content']  = $("textarea[name=content]").val();
+        
         var gridsize = parseInt($("input[name=gridsize]").val());
         gridsize = Math.max(gridsize, 0);
         fields['gridsize'] = gridsize;
