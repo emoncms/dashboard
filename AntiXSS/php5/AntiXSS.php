@@ -2888,7 +2888,7 @@ final class AntiXSS
   private function _xss_hash()
   {
     if ($this->_xss_hash === null) {
-      $rand = Bootup::get_random_bytes(16);
+      $rand = false; // Bootup::get_random_bytes(16);
 
       if (!$rand) {
         $this->_xss_hash = md5(uniqid(mt_rand(), true));
