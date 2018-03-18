@@ -98,15 +98,18 @@ class Dashboard
             require_once "$axdir/AntiXSS.php";
             $antiXss = new AntiXSS();
             $content = htmlspecialchars_decode($antiXss->xss_clean($_content));
+            if ($content!=$_content) return array('success'=>false, 'message'=>'Error: Invalid dashboard content, content not saved');
         } else {
             $content = $_content;
         }
-        
-        // if ($content!=$_content) return array('success'=>false, 'message'=>'Dashboard not updated '.$content."\n\n".$_content);
 
-        $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid = '$userid' AND id='$id'");
-        $row = $result->fetch_array();
+        $result = $this->mysqli->query("SELECT content FROM dashboard WHERE userid = '$userid' AND id='$id'");
+        $row = $result->fetch_object();
         if ($row) {
+            if ($row->content==$content) {
+                return array('success'=>false, 'message'=>'Dashboard content not updated, no changes made');
+            }
+            
             $stmt = $this->mysqli->prepare("UPDATE dashboard SET content=?, height=? WHERE userid=? AND id=?");
             $stmt->bind_param("siii", $content, $height, $userid, $id);
             $stmt->execute();

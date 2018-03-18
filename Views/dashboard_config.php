@@ -105,7 +105,18 @@
             data : "&id="+dashid+'&content='+encodeURIComponent($("textarea[name=content]").val())+'&height='+height,
             dataType: 'json',
             async: true,
-            success : function(result) { console.log(result) }
+            success : function(result) {
+                if (result.success!=undefined)
+                {
+                    if (!result.success) {
+                        alert(result.message);
+                    } else {
+                        $("#page").html($("textarea[name=content]").val());
+                        redraw = 1;
+                        reloadiframe = 0; // dont re-calculate vis iframe urls
+                    }
+                }
+            }
         });
 
         $('#dashConfigModal').modal('hide');
