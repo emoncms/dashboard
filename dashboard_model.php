@@ -98,6 +98,7 @@ class Dashboard
             require_once "$axdir/AntiXSS.php";
             $antiXss = new AntiXSS();
             $content = htmlspecialchars_decode($antiXss->xss_clean($_content));
+            $_content = htmlspecialchars_decode($_content);
             if ($content!=$_content) return array('success'=>false, 'message'=>'Error: Invalid dashboard content, content not saved');
         } else {
             $content = $_content;
