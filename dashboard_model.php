@@ -151,7 +151,9 @@ class Dashboard
             if (isset($fields->published)) $row->published = (bool) $fields->published;
             if (isset($fields->showdescription)) $row->showdescription = (bool) $fields->showdescription;
             
-            $stmt = $this->mysqli->prepare("UPDATE dashboard SET height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,feedmode=?,main=?,public=?,published=?,showdescription=? WHERE userid=? AND id=?");
+            if (!$stmt = $this->mysqli->prepare("UPDATE dashboard SET height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,feedmode=?,main=?,public=?,published=?,showdescription=? WHERE userid=? AND id=?")) {
+                return array('success'=>false, 'message'=>'Dashboard schema error, please run emoncms database update');
+            }
             $stmt->bind_param("issssisiiiiii",$row->height,$row->name,$row->alias,$row->description,$row->backgroundcolor,$row->gridsize,$row->feedmode,$row->main,$row->public,$row->published,$row->showdescription,$userid,$id);
 
             $stmt->execute();

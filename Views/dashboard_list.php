@@ -89,7 +89,10 @@
   $("#table").bind("onEdit", function(e){});
 
   $("#table").bind("onSave", function(e,id,fields_to_update){
-    dashboard.set(id,fields_to_update);
+    var result = dashboard.set(id,fields_to_update);
+    if (result.success!=undefined) {
+        if (!result.success) alert(result.message);
+    }
     if (fields_to_update.main) update();
   });
 
