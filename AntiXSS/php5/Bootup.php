@@ -1,11 +1,9 @@
 <?php
 
-defined('EMONCMS_EXEC') or die('AntiXSS modifed for emoncms');
-
-//declare(strict_types=1);
-
 /**
  * Class Bootup
+ *
+ * this is a bootstrap for the polyfills (iconv / intl / mbstring / normalizer / xml)
  *
  * @package voku\helper
  */
@@ -23,7 +21,7 @@ class Bootup
    */
   public static function filterRequestInputs($normalization_form = 4 /* n::NFC */, $leading_combining = '◌')
   {
-    $a = [
+    $a = array(
         &$_FILES,
         &$_ENV,
         &$_GET,
@@ -31,26 +29,26 @@ class Bootup
         &$_COOKIE,
         &$_SERVER,
         &$_REQUEST,
-    ];
+    );
 
     /** @noinspection ReferenceMismatchInspection */
     /** @noinspection ForeachSourceInspection */
     foreach ($a[0] as &$r) {
-      $a[] = [
+      $a[] = array(
           &$r['name'],
           &$r['type'],
-      ];
+      );
     }
     unset($r, $a[0]);
 
-    $len = \count($a) + 1;
+    $len = count($a) + 1;
     for ($i = 1; $i < $len; ++$i) {
       /** @noinspection ReferenceMismatchInspection */
       /** @noinspection ForeachSourceInspection */
       foreach ($a[$i] as &$r) {
         /** @noinspection ReferenceMismatchInspection */
         $s = $r; // $r is a reference, $s a copy
-        if (\is_array($s)) {
+        if (is_array($s)) {
           $a[$len++] = &$r;
         } else {
           $r = self::filterString($s, $normalization_form, $leading_combining);
@@ -70,7 +68,7 @@ class Bootup
    */
   public static function filterRequestUri($uri = null, $exit = true)
   {
-    if (null === $uri) {
+    if (!isset($uri)) {
 
       if (!isset($_SERVER['REQUEST_URI'])) {
         return false;
@@ -85,7 +83,7 @@ class Bootup
     // Ensures the URL is well formed UTF-8
     //
 
-    if (UTF8::is_utf8(\rawurldecode($uri)) === true) {
+    if (UTF8::is_utf8(rawurldecode($uri)) === true) {
       return $uri;
     }
 
@@ -93,18 +91,18 @@ class Bootup
     // When not, assumes Windows-1252 and redirects to the corresponding UTF-8 encoded URL
     //
 
-    $uri = (string)\preg_replace_callback(
+    $uri = preg_replace_callback(
         '/[\x80-\xFF]+/',
         function ($m) {
-          return \rawurlencode($m[0]);
+          return rawurlencode($m[0]);
         },
         $uri
     );
 
-    $uri = (string)\preg_replace_callback(
+    $uri = preg_replace_callback(
         '/(?:%[89A-F][0-9A-F])+/i',
         function ($m) {
-          return \rawurlencode(UTF8::rawurldecode($m[0]));
+          return rawurlencode(UTF8::rawurldecode($m[0]));
         },
         $uri
     );
@@ -114,13 +112,12 @@ class Bootup
         &&
         $exit === true
         &&
-        \headers_sent() === false
+        headers_sent() === false
     ) {
       // Use ob_start() to buffer content and avoid problem of headers already sent...
-      $severProtocol = 'HTTP/1.1';
-      if (isset($_SERVER['SERVER_PROTOCOL'])) $severProtocol = $_SERVER['SERVER_PROTOCOL'];
-      \header($severProtocol . ' 301 Moved Permanently');
-      \header('Location: ' . $uri);
+      $severProtocol = (isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1');
+      header($severProtocol . ' 301 Moved Permanently');
+      header('Location: ' . $uri);
       exit();
     }
 
@@ -130,25 +127,25 @@ class Bootup
   /**
    * Normalizes to UTF-8 NFC, converting from WINDOWS-1252 when needed.
    *
-   * @param mixed  $input
+   * @param string $s
    * @param int    $normalization_form
    * @param string $leading_combining
    *
-   * @return mixed
+   * @return string
    */
-  public static function filterString($input,$normalization_form = 4 /* n::NFC */,$leading_combining = '◌')
+  public static function filterString($s, $normalization_form = 4 /* n::NFC */, $leading_combining = '◌')
   {
-    return UTF8::filter($input, $normalization_form, $leading_combining);
+    return UTF8::filter($s, $normalization_form, $leading_combining);
   }
 
   /**
-   * Get random bytes via "random_bytes()"
+   * Get random bytes via "random_bytes()" (+ polyfill).
    *
-   * @param  int $length <p>output length</p>
+   * @ref https://github.com/paragonie/random_compat/
    *
-   * @return  string|false <p>false on error</p>
+   * @param  int $length Output length
    *
-   * @throws \Exception <p>If it was not possible to gather sufficient entropy.</p>
+   * @return  string|false false on error
    */
   public static function get_random_bytes($length)
   {
@@ -162,7 +159,7 @@ class Bootup
       return false;
     }
 
-    return false; // \rand($length);
+    return random_bytes($length);
   }
 
   /**
@@ -170,7 +167,7 @@ class Bootup
    */
   public static function initAll()
   {
-    \ini_set('default_charset', 'UTF-8');
+    ini_set('default_charset', 'UTF-8');
 
     // everything is init via composer, so we are done here ...
   }
@@ -189,10 +186,9 @@ class Bootup
     $version = (string)$version;
 
     if (!isset($_IS_PHP[$version])) {
-      $_IS_PHP[$version] = \version_compare(PHP_VERSION, $version, '>=');
+      $_IS_PHP[$version] = version_compare(PHP_VERSION, $version, '>=');
     }
 
     return $_IS_PHP[$version];
   }
 }
-

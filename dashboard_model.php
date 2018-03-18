@@ -92,8 +92,7 @@ class Dashboard
         
         // sudo apt-get install php-mbstring
         if (function_exists("mb_convert_encoding")) {
-            $axv = "php5";
-            $axdir = "Modules/dashboard/AntiXSS/$axv";
+            $axdir = "Modules/dashboard/AntiXSS/php5";
             require_once "$axdir/Bootup.php";
             require_once "$axdir/UTF8.php";
             require_once "$axdir/AntiXSS.php";

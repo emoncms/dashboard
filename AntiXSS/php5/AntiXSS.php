@@ -1,7 +1,5 @@
 <?php
 
-defined('EMONCMS_EXEC') or die('AntiXSS modifed for emoncms');
-
 /**
  * Anti XSS library
  *
