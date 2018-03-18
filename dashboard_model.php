@@ -90,8 +90,20 @@ class Dashboard
         $id = (int) $id;
         $height = (int) $height;
         
-        $content = str_replace('script','',$_content);
-        if ($content!=$_content) return array('success'=>false, 'message'=>'Dashboard not updated');
+        // sudo apt-get install php-mbstring
+        if (function_exists("mb_convert_encoding")) {
+            $axv = "php5";
+            $axdir = "Modules/dashboard/AntiXSS/$axv";
+            require_once "$axdir/Bootup.php";
+            require_once "$axdir/UTF8.php";
+            require_once "$axdir/AntiXSS.php";
+            $antiXss = new AntiXSS();
+            $content = htmlspecialchars_decode($antiXss->xss_clean($_content));
+        } else {
+            $content = $_content;
+        }
+        
+        // if ($content!=$_content) return array('success'=>false, 'message'=>'Dashboard not updated '.$content."\n\n".$_content);
 
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid = '$userid' AND id='$id'");
         $row = $result->fetch_array();
