@@ -568,7 +568,7 @@ function dial_draw(){
     
     // The minval and maxval feed settings default to the first feed in the feedlist 
     // which may not be public for use in public dashboards, which will then result in
-    // an error. Here we hide the min/max val feature where the feed settings are not valid
+    // an error. Here we set the min/max values to 0 where the feed settings are not valid
     
     var minval = 0;
     var minval_curve = 0; 
@@ -582,6 +582,11 @@ function dial_draw(){
     if (associd[maxvaluefeed] != undefined) {
         maxval = (associd[maxvaluefeed]["value"] * 1).toFixed(3);
         maxval_curve = curve_value(maxvaluefeed,dialrate).toFixed(3);
+    }
+    // Here we disable the min/max values feature when one of the feed settings is not valid
+    var displayminmax = $(this).attr("displayminmax")||"0";
+    if (associd[minvaluefeed] == undefined || associd[maxvaluefeed] == undefined) {
+        displayminmax = "0";
     }
     
     // ONLY UPDATE ON CHANGE
@@ -604,7 +609,7 @@ function dial_draw(){
                  $(this).attr("offset"),
                  $(this).attr("graduations"),
                  unitend,
-                 $(this).attr("displayminmax"),
+                 displayminmax,
                  minval_curve*scale,
                  maxval_curve*scale,
                  errorCode
