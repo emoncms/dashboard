@@ -470,12 +470,36 @@ function thermometer_draw()
         var minvaluefeed = $(this).attr("minvaluefeed");
         var maxvaluefeed = $(this).attr("maxvaluefeed");
         if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-        var val = curve_value(feedid,dialrate).toFixed(3);
-        var minval = curve_value(minvaluefeed,dialrate).toFixed(3);
-        var maxval = curve_value(maxvaluefeed,dialrate).toFixed(3);
+
+        var val = (associd[feedid]["value"] * 1).toFixed(3);
+        var val_curve = curve_value(feedid,dialrate).toFixed(3);
+
+        // The minval and maxval feed settings default to the first feed in the feedlist 
+        // which may not be public for use in public dashboards, which will then result in
+        // an error. Here we set the min/max values to 0 where the feed settings are not valid
+
+        var minval = 0;
+        var minval_curve = 0; 
+        if (associd[minvaluefeed] != undefined) {
+            minval = (associd[minvaluefeed]["value"] * 1).toFixed(3);
+            minval_curve = curve_value(minvaluefeed,dialrate).toFixed(3);
+        }
+
+        var maxval = 0;
+        var maxval_curve = 0;
+        if (associd[maxvaluefeed] != undefined) {
+            maxval = (associd[maxvaluefeed]["value"] * 1).toFixed(3);
+            maxval_curve = curve_value(maxvaluefeed,dialrate).toFixed(3);
+        }
+
+        // Here we disable the min/max values feature when one of the feed settings is not valid
+        var displayminmax = $(this).attr("displayminmax")||"0";
+        if (associd[minvaluefeed] == undefined || associd[maxvaluefeed] == undefined) {
+            displayminmax = "0";
+        }
 
         // ONLY UPDATE ON CHANGE
-        if (val != (associd[feedid]["value"] * 1).toFixed(3) || minval != (associd[minvaluefeed]["value"] * 1).toFixed(3) || maxval != (associd[maxvaluefeed]["value"] * 1).toFixed(3) ||redraw == 1)
+        if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval ||redraw == 1)
         {
             var id = "can-"+$(this).attr("id");
             var scale = 1*$(this).attr("scale") || 1;
@@ -499,7 +523,7 @@ function thermometer_draw()
                      $(this).attr("offset"),
                      $(this).attr("graduations"),
                      $(this).attr("gradNumber"),
-                     $(this).attr("displayminmax"),
+                     displayminmax,
                      minval*scale,
                      maxval*scale,
                      $(this).attr("colourMinMax")
