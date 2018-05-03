@@ -32,6 +32,7 @@ function button_events()
 {
   $('.button').on("click", function(event) {
     var feedid = $(this).attr("feedid");
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
 
     var invalue = $(this).attr("value");
     if (invalue == 0) outval = 1;
@@ -56,6 +57,7 @@ function button_draw()
   $('.button').each(function(index)
   {
     var feedid = $(this).attr("feedid");
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var val = associd[feedid]['value']*1;
     var id = "can-"+$(this).attr("id");

@@ -84,15 +84,33 @@ class Dashboard
         return $list;
     }
 
-    public function set_content($userid, $id, $content, $height)
+    public function set_content($userid, $id, $_content, $height)
     {
         $userid = (int) $userid;
         $id = (int) $id;
         $height = (int) $height;
+        
+        // sudo apt-get install php-mbstring
+        if (function_exists("mb_convert_encoding")) {
+            $axdir = "Modules/dashboard/AntiXSS/php5";
+            require_once "$axdir/Bootup.php";
+            require_once "$axdir/UTF8.php";
+            require_once "$axdir/AntiXSS.php";
+            $antiXss = new AntiXSS();
+            $content = htmlspecialchars_decode($antiXss->xss_clean($_content));
+            $_content = htmlspecialchars_decode($_content);
+            if ($content!=$_content) return array('success'=>false, 'message'=>'Error: Invalid dashboard content, content not saved');
+        } else {
+            $content = $_content;
+        }
 
-        $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid = '$userid' AND id='$id'");
-        $row = $result->fetch_array();
+        $result = $this->mysqli->query("SELECT content FROM dashboard WHERE userid = '$userid' AND id='$id'");
+        $row = $result->fetch_object();
         if ($row) {
+            if ($row->content==$content) {
+                return array('success'=>false, 'message'=>'Dashboard content not updated, no changes made');
+            }
+            
             $stmt = $this->mysqli->prepare("UPDATE dashboard SET content=?, height=? WHERE userid=? AND id=?");
             $stmt->bind_param("siii", $content, $height, $userid, $id);
             $stmt->execute();
@@ -121,7 +139,8 @@ class Dashboard
             if (isset($fields->description)) $row->description = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->description);
             if (isset($fields->backgroundcolor)) $row->backgroundcolor = preg_replace('/[^0-9a-f]/','', strtolower($fields->backgroundcolor));
             if (isset($fields->gridsize)) $row->gridsize = preg_replace('/[^0-9]/','', $fields->gridsize);
-            
+            if (isset($fields->feedmode)) $row->feedmode = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->feedmode);
+
             if (isset($fields->main))
             {
                 $main = (bool)$fields->main;
@@ -133,8 +152,11 @@ class Dashboard
             if (isset($fields->published)) $row->published = (bool) $fields->published;
             if (isset($fields->showdescription)) $row->showdescription = (bool) $fields->showdescription;
             
-            $stmt = $this->mysqli->prepare("UPDATE dashboard SET height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,main=?,public=?,published=?,showdescription=? WHERE userid=? AND id=?");
-            $stmt->bind_param("issssiiiiiii",$row->height,$row->name,$row->alias,$row->description,$row->backgroundcolor,$row->gridsize,$row->main,$row->public,$row->published,$row->showdescription,$userid,$id);
+            if (!$stmt = $this->mysqli->prepare("UPDATE dashboard SET height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,feedmode=?,main=?,public=?,published=?,showdescription=? WHERE userid=? AND id=?")) {
+                return array('success'=>false, 'message'=>'Dashboard schema error, please run emoncms database update');
+            }
+            $stmt->bind_param("issssisiiiiii",$row->height,$row->name,$row->alias,$row->description,$row->backgroundcolor,$row->gridsize,$row->feedmode,$row->main,$row->public,$row->published,$row->showdescription,$userid,$id);
+
             $stmt->execute();
             $affected_rows = $stmt->affected_rows;
             $stmt->close();

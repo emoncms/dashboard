@@ -104,6 +104,7 @@ function battery_init(){
 function battery_draw(){
   $(".battery").each(function(index) {
     var feedid = $(this).attr("feedid");
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var val = curve_value(feedid,dialrate).toFixed(3);
     // ONLY UPDATE ON CHANGE

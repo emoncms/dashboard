@@ -480,8 +480,12 @@ function bar_draw()
           errorTimeout = 0;
 
         var feedid = $(this).attr("feedid");
-        var minvaluefeed = $(this).attr("minvaluefeed");
-        var maxvaluefeed = $(this).attr("maxvaluefeed");
+        if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
+        var minvaluefeed = $(this).attr("minvaluefeed")||"0";
+        if (assocfeed[minvaluefeed]!=undefined) minvaluefeed = assocfeed[minvaluefeed];
+        var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
+        if (assocfeed[maxvaluefeed]!=undefined) maxvaluefeed = assocfeed[maxvaluefeed];
+    
         if($(this).attr("title")){ //transform the title property in the div by title_bar in order to avoid title tootip displayed by the browser
         title_bar=$(this).attr("title");
         $(this).removeAttr("title");

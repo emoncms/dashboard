@@ -547,12 +547,15 @@ function dial_draw(){
           errorTimeout = 0;
         }
 
-
     var errorCode = "0";
 
     var feedid = $(this).attr("feedid");
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     var minvaluefeed = $(this).attr("minvaluefeed")||"0";
+    if (assocfeed[minvaluefeed]!=undefined) minvaluefeed = assocfeed[minvaluefeed];
     var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
+    if (assocfeed[maxvaluefeed]!=undefined) maxvaluefeed = assocfeed[maxvaluefeed];
+    
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
 
     var val = (associd[feedid]["value"] * 1).toFixed(3);        

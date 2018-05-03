@@ -17,6 +17,7 @@ var selected_edges = {none : 0, left : 1, right : 2, top : 3, bottom : 4, center
 
 var designer = {
 
+    'feedmode':"feedid",
     'grid_size':20,
     'page_width':500,
     'page_height':500,
@@ -353,6 +354,7 @@ var designer = {
             options_html += '<span class="add-on" style="width:80px; text-align: right;">'+options_name[z]+'</span>';
 
             // all feeds
+
             if (options_type && options_type[z] == "feedid"){
                 options_html += designer.select_feed(box_options[z],feedlist,0,val);
             }
@@ -444,7 +446,7 @@ var designer = {
         // Fill the modal configuration window with options
         $("#widget_options_body").html(options_html);
     },
-
+    
     "select_feed": function (id, feedlist, type, currentval){
         var feedgroups = [];
         for (f in feedlist){
@@ -460,10 +462,13 @@ var designer = {
         for (f in feedgroups){
             out += "<optgroup label='"+f+"'>";
             for (p in feedgroups[f]) {
+                var feedref = feedgroups[f][p]['id']
+                if (designer.feedmode=="tagname") feedref = feedgroups[f][p]['tag']+":"+feedgroups[f][p]['name']
+                console.log("feedref:"+feedref);
                 var selected = "";
-                if (currentval == feedgroups[f][p]['id'])
+                if (currentval == feedref)
                     selected = "selected";
-                out += "<option value="+feedgroups[f][p]['id']+" "+selected+">"+feedgroups[f][p].name+"</option>";
+                out += "<option value='"+feedref+"' "+selected+">"+feedgroups[f][p].name+"</option>";
             }
             out += "</optgroup>";
         }
