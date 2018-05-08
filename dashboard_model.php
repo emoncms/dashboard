@@ -182,6 +182,14 @@ class Dashboard
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE id='$id'");
         return $result->fetch_array();
     }
+    
+    public function get_content($userid,$id)
+    {
+        $id = (int) $id;
+        $userid = (int) $userid;
+        $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' AND id='$id'");
+        return $result->fetch_object();
+    }
 
     // Returns the $id dashboard from $userid
     public function get_from_alias($userid, $alias)
