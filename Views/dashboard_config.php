@@ -71,6 +71,11 @@
     var dashid = <?php echo $dashboard['id']; ?>;
     var path = "<?php echo $path; ?>";
     var height = <?php echo $dashboard['height']; ?>;
+    
+    $("#dashboard-config-button").click(function (){
+         
+         $("textarea[name=content]").val($("#page").html());
+    });
 
     $("#configure-save").click(function (){
         var fields = {};
