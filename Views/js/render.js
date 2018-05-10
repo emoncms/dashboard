@@ -17,6 +17,7 @@
 
 // Array for all feed details by feed id
 var associd = [];
+var assocfeed = [];
 // Array for smooth change values - creation of smooth dial widget
 var assoc_curve = [];
 
@@ -86,6 +87,7 @@ function update(first_time){
     success : function(data){ 
       for (z in data){
         associd[data[z]['id']] = data[z];
+        assocfeed[data[z]['tag']+":"+data[z]['name']] = data[z]['id'];
       }
       if (!first_time){
         for (z in widget){

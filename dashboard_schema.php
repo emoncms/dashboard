@@ -13,5 +13,6 @@ $schema['dashboard'] = array(
     'published' => array('type' => 'tinyint(1)', 'default'=>'0'),
     'showdescription' => array('type' => 'tinyint(1)', 'default'=>'0'),
     'backgroundcolor' => array('type' => "varchar(6)", 'default'=>'EDF7FC'),
-    'gridsize' => array('type' => 'tinyint(1)', 'default'=>'20')
+    'gridsize' => array('type' => 'tinyint(1)', 'default'=>'20'),
+    'feedmode' => array('type' => "varchar(8)", 'default'=>'feedid')
 );

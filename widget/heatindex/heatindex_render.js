@@ -274,6 +274,7 @@ function heatindex_draw()
     var fstyle = $(this).attr("fstyle");
     var fweight = $(this).attr("fweight");
     var feedtemp = $(this).attr("feedtemp");
+    if (assocfeed[feedtemp]!=undefined) feedtemp = assocfeed[feedtemp]; // convert tag:name to feedid
     if (associd[feedtemp] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var temp = associd[feedtemp]["value"] * 1;
     if (temp===undefined) {temp = 0;}
@@ -283,6 +284,7 @@ function heatindex_draw()
     if (temptype===undefined) {temptype = 0;}
 
     var feedhumid = $(this).attr("feedhumid");
+    if (assocfeed[feedhumid]!=undefined) feedhumid = assocfeed[feedhumid]; // convert tag:name to feedid
     if (associd[feedhumid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var humid = associd[feedhumid]["value"] * 1;
     if (humid===undefined) {humid = 0;}

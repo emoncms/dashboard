@@ -10,8 +10,6 @@
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
  */
-
-
  
  function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
 {
@@ -106,6 +104,7 @@ function feedvalue_widgetlist()
 	addOption(widgets["feedvalue"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["feedvalue"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
 	addOption(widgets["feedvalue"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
+	addOption(widgets["feedvalue"], "timeout",      "value",   _Tr("Timeout"),    _Tr("Timeout without feed update in seconds (empty is never)"),   []);
 
 	return widgets;
 }
@@ -123,7 +122,8 @@ function draw_feedvalue(context,
 		colour,
 		decimals,
 		size,
-		unitend)
+		unitend,
+		errorCode)
 		{
 			if (!context){
 			return;
@@ -215,15 +215,25 @@ function draw_feedvalue(context,
 				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
 				}
 
-			if (unitend ==="0")
+			if (errorCode === "1")
+			{
+				context.fillText("TO Error", width/2 , height/2);
+			}
+
+			else
+			{
+				if (unitend ==="0")
 				{
 				context.fillText(val+units, width/2 , height/2);
 				}
 	
-			if (unitend ==="1")
+				if (unitend ==="1")
 				{
 				context.fillText(units+val, width/2 , height/2);
 				}
+			}
+
+			
 			
 }
 
@@ -232,12 +242,28 @@ function feedvalue_draw()
 	$(".feedvalue").each(function(index)
 		{
     
+			var errorTimeout = $(this).attr("timeout");
+			if (errorTimeout === "" || errorTimeout === undefined){           //Timeout parameter is empty
+				errorTimeout = 0;
+	        }
+
 			var font = $(this).attr("font");
 			var feedid = $(this).attr("feedid");
+			if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
 			if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
 			var val = associd[feedid]["value"] * 1;
+
 			if (val===undefined) {val = 0;}
 			if (isNaN(val))  {val = 0;}
+
+			var errorCode = "0";
+			if (errorTimeout !== 0)
+			{
+				if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
+				{
+					errorCode = "1";
+				}
+			}
 
 			var size = $(this).attr("size");
 			var units = $(this).attr("units");
@@ -263,7 +289,8 @@ function feedvalue_draw()
 					$(this).attr("colour"),
 					$(this).attr("decimals"),
 					$(this).attr("size"),
-					$(this).attr("unitend")
+					$(this).attr("unitend"),
+					errorCode
 					);
 			}
 		});

@@ -165,6 +165,7 @@ function isactivefeed_draw() {
   $(".isactivefeed").each(function(index)
   {
     var feedid = $(this).attr("feedid");
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     var limit1 = $(this).attr("threshold1")*1 || 60;
     var limit2 = $(this).attr("threshold2")*1 || 120;
     var colour3 = $(this).attr("colour3")|| "#F70511";

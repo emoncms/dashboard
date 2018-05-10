@@ -176,7 +176,10 @@ function cylinder_draw()
   $(".cylinder").each(function(index)
   {
     var feedid1 = $(this).attr("topfeedid");
+    if (assocfeed[feedid1]!=undefined) feedid1 = assocfeed[feedid1]; // convert tag:name to feedid
     var feedid2 = $(this).attr("botfeedid");
+    if (assocfeed[feedid2]!=undefined) feedid2 = assocfeed[feedid2]; // convert tag:name to feedid
+    
     if ((associd[feedid1] === undefined) || (associd[feedid2] === undefined)) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var cylTop = associd[feedid1]["value"]*1;
     var cylBot = associd[feedid2]["value"]*1;

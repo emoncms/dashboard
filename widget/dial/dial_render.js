@@ -98,6 +98,7 @@ function dial_widgetlist(){
   addOption(widgets["dial"], "displayminmax", "dropbox", _Tr("Min / Max ?"),  _Tr("Display Min. and Max. ?"),                                               displayminmaxDropBoxOptions);
   addOption(widgets["dial"], "minvaluefeed",  "feedid",  _Tr("Min. feed"),    _Tr("The feed for the minimum value"),                                        []);
   addOption(widgets["dial"], "maxvaluefeed",  "feedid",  _Tr("Max. feed"),    _Tr("The feed for the maximum value"),                                        []);
+  addOption(widgets["dial"], "timeout",       "value",   _Tr("Timeout"),       _Tr("Timeout without feed update in seconds (empty is never)"),                                           []);
 
   return widgets;
 }
@@ -121,7 +122,8 @@ function polar_to_cart(mag, ang, xOff, yOff){
     return Ergebnis;
   }
 // X, Y are the center coordinates of the canvas
-function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed){
+function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed,
+    errorCode){
   if (!ctx) {return;}
 
   // if (1 * maxvalue) == false: 3000. Else 1 * maxvalue
@@ -382,10 +384,18 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   }
     
   var dialtext;
-  if (unitend ==="0"){
-  dialtext=val+units;}
-  if (unitend ==="1"){
-  dialtext=units+val;}
+  if (errorCode == "1")
+      {
+        dialtext = "TO Error";
+      }
+  else
+  {
+      if (unitend ==="0"){
+      dialtext=val+units;}
+      if (unitend ==="1"){
+      dialtext=units+val;}
+  }
+  
   
   var textsize = (size / (dialtext.length+2)) * 6;
   
@@ -531,17 +541,37 @@ function dial_define_tooltips(){
 
 function dial_draw(){
   $(".dial").each(function(index) {
+    
+    var errorTimeout = $(this).attr("timeout");
+        if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
+          errorTimeout = 0;
+        }
+
+    var errorCode = "0";
+
     var feedid = $(this).attr("feedid");
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     var minvaluefeed = $(this).attr("minvaluefeed")||"0";
+    if (assocfeed[minvaluefeed]!=undefined) minvaluefeed = assocfeed[minvaluefeed];
     var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
+    if (assocfeed[maxvaluefeed]!=undefined) maxvaluefeed = assocfeed[maxvaluefeed];
+    
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
 
     var val = (associd[feedid]["value"] * 1).toFixed(3);        
     var val_curve = curve_value(feedid,dialrate).toFixed(3);
+
+    if (errorTimeout !== 0)
+      {
+        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
+        {
+          errorCode = "1";
+          val_curve = 0;        }
+      }
     
     // The minval and maxval feed settings default to the first feed in the feedlist 
     // which may not be public for use in public dashboards, which will then result in
-    // an error. Here we hide the min/max val feature where the feed settings are not valid
+    // an error. Here we set the min/max values to 0 where the feed settings are not valid
     
     var minval = 0;
     var minval_curve = 0; 
@@ -555,6 +585,11 @@ function dial_draw(){
     if (associd[maxvaluefeed] != undefined) {
         maxval = (associd[maxvaluefeed]["value"] * 1).toFixed(3);
         maxval_curve = curve_value(maxvaluefeed,dialrate).toFixed(3);
+    }
+    // Here we disable the min/max values feature when one of the feed settings is not valid
+    var displayminmax = $(this).attr("displayminmax")||"0";
+    if (associd[minvaluefeed] == undefined || associd[maxvaluefeed] == undefined) {
+        displayminmax = "0";
     }
     
     // ONLY UPDATE ON CHANGE
@@ -577,9 +612,10 @@ function dial_draw(){
                  $(this).attr("offset"),
                  $(this).attr("graduations"),
                  unitend,
-                 $(this).attr("displayminmax"),
+                 displayminmax,
                  minval_curve*scale,
-                 maxval_curve*scale
+                 maxval_curve*scale,
+                 errorCode
                  );
     }
   });
