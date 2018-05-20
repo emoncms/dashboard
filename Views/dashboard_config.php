@@ -30,10 +30,10 @@
 
 
         <label><?php echo _('Feed selection mode: '); ?></label>
-        <i style="font-size:12px">Note: Reset feeds in all widgets in dashboard if changing<br>this part way through a dashboard build</i><br>
+        <i style="font-size:12px"><?php echo _('Note: Reset feeds in all widgets in dashboard if changing'); ?><br><?php echo _('this part way through a dashboard build'); ?></i><br>
         <select name="feedmode">
-            <option value="tagname" <?php if ($dashboard['feedmode'] == "tagname") echo 'selected'; ?>>By tag:name</option> 
-            <option value="feedid" <?php if ($dashboard['feedmode'] == "feedid") echo 'selected'; ?>>By feedid</option> 
+            <option value="tagname" <?php if ($dashboard['feedmode'] == "tagname") echo 'selected'; ?>><?php echo _('By tag:name'); ?></option> 
+            <option value="feedid" <?php if ($dashboard['feedmode'] == "feedid") echo 'selected'; ?>><?php echo _('By feedid'); ?></option> 
         </select>
         
         <label class="checkbox">
@@ -57,7 +57,7 @@
         </label>
         
         <label><?php echo _('Content: '); ?></label>
-        <i style="font-size:12px">To view content changes reload editor after saving</i>
+        <i style="font-size:12px"><?php echo _('To view content changes reload editor after saving');?></i>
         <textarea name="content" style="width:100%; height:200px;"><?php echo $dashboard['content']; ?></textarea>
 
     </div>
