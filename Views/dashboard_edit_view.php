@@ -11,11 +11,15 @@ http://openenergymonitor.org
 
 global $session,$path;
 $js_css_version = 2;
+    $domain3 = "vis_messages";
+    bindtextdomain($domain3, "Modules/vis/locale");
+    bind_textdomain_codeset($domain3, 'UTF-8');
 
 if (!$dashboard['height']) $dashboard['height'] = 400;
 if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
 ?>
     <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
+    <script type="text/javascript"><?php require "Modules/vis/vis_langjs.php"; ?></script>
     <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
     <link href="<?php echo $path; ?>Modules/dashboard/Views/dashboardeditor.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
 
