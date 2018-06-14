@@ -11,11 +11,15 @@ http://openenergymonitor.org
 
 global $session,$path;
 $js_css_version = 2;
+    $domain3 = "vis_messages";
+    bindtextdomain($domain3, "Modules/vis/locale");
+    bind_textdomain_codeset($domain3, 'UTF-8');
 
 if (!$dashboard['height']) $dashboard['height'] = 400;
 if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
 ?>
     <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
+    <script type="text/javascript"><?php require "Modules/vis/vis_langjs.php"; ?></script>
     <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
     <link href="<?php echo $path; ?>Modules/dashboard/Views/dashboardeditor.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
 
@@ -106,7 +110,7 @@ function toolboxMove(e) {
   var posy = e.clientY - starty;
   if (posx < 0 ) posx = 0;
   if (posy < 50 ) posy = 50;
-	
+
   $('#toolbox').css({position: 'absolute', left: posx+'px', top: posy+'px'});
   console.log("posx:" + posx + "posy:" + posy);
 }
@@ -121,11 +125,11 @@ function toolboxMove(e) {
     var userid = <?php echo $session['userid']; ?>;
     var widget = <?php echo json_encode($widgets); ?>;
     var redraw = 0;
-    var reloadiframe = -1; // force iframes url to recalculate for all vis widgets 
+    var reloadiframe = -1; // force iframes url to recalculate for all vis widgets
 
     $('#can').width($('#dashboardpage').width());
 
-    render_widgets_init(widget); // populate widgets variable 
+    render_widgets_init(widget); // populate widgets variable
 
     designer.canvas = "#can";
     designer.grid_size = <?php echo $dashboard['gridsize']; ?>;

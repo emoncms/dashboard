@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: emoncms3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-13 23:11+0100\n"
-"PO-Revision-Date: 2018-02-13 23:23+0100\n"
+"POT-Creation-Date: 2018-05-20 22:12+0200\n"
+"PO-Revision-Date: 2018-05-20 22:27+0200\n"
 "Last-Translator: Aymeric THIBAUT\n"
 "Language-Team: Baptiste Gaultier (Télécom Bretagne) <baptiste."
 "gaultier@telecom-bretagne.eu>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Poedit-KeywordsList: _;gettext;gettext_noop;dgettext:2\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.0.7\n"
 "X-Poedit-SearchPath-0: ../../..\n"
 
 #: ../../../Views/dashboard_config.php:17
@@ -41,109 +41,141 @@ msgstr "Description : "
 msgid "Grid size: "
 msgstr "Taille grille : "
 
+#: ../../../Views/dashboard_config.php:32
+msgid "Feed selection mode: "
+msgstr "Mode de sélection du flux :"
+
 #: ../../../Views/dashboard_config.php:33
+msgid "Note: Reset feeds in all widgets in dashboard if changing"
+msgstr ""
+"Remarque : Réinitialise les flux dans tous les widgets du tableau de bord si "
+"modification"
+
+#: ../../../Views/dashboard_config.php:33
+msgid "this part way through a dashboard build"
+msgstr "de cette partie lors de la construction d'un tableau de bord"
+
+#: ../../../Views/dashboard_config.php:35
+msgid "By tag:name"
+msgstr "Par étiquette:nom"
+
+#: ../../../Views/dashboard_config.php:36
+msgid "By feedid"
+msgstr "Par ID de flux"
+
+#: ../../../Views/dashboard_config.php:41
 msgid "Make this dashboard the first shown"
 msgstr "Définir ce tableau de bord par défaut"
 
-#: ../../../Views/dashboard_config.php:33 ../../../Views/dashboard_list.php:59
+#: ../../../Views/dashboard_config.php:41 ../../../Views/dashboard_list.php:59
 msgid "Main"
 msgstr "Principal"
 
-#: ../../../Views/dashboard_config.php:38
+#: ../../../Views/dashboard_config.php:46
 msgid "Activate this dashboard"
 msgstr "Activer le tableau de bord"
 
-#: ../../../Views/dashboard_config.php:38 ../../../Views/dashboard_list.php:61
+#: ../../../Views/dashboard_config.php:46 ../../../Views/dashboard_list.php:61
 msgid "Published"
 msgstr "Actif"
 
-#: ../../../Views/dashboard_config.php:43
+#: ../../../Views/dashboard_config.php:51
 msgid "Anyone with the URL can see this dashboard"
 msgstr ""
 "Une URL permet un accès direct au tableau de bord sans authentification"
 
-#: ../../../Views/dashboard_config.php:43 ../../../Views/dashboard_list.php:60
+#: ../../../Views/dashboard_config.php:51 ../../../Views/dashboard_list.php:60
 msgid "Public"
 msgstr "Public"
 
-#: ../../../Views/dashboard_config.php:48
+#: ../../../Views/dashboard_config.php:56
 msgid ""
 "Shows dashboard description on mouse over dashboard name in menu project"
 msgstr ""
 "Affiche la description du tableau de bord en passant la souris sur son nom "
 "dans le menu projet"
 
-#: ../../../Views/dashboard_config.php:48
+#: ../../../Views/dashboard_config.php:56
 msgid "Show description"
 msgstr "Description"
 
-#: ../../../Views/dashboard_config.php:53
+#: ../../../Views/dashboard_config.php:59
+msgid "Content: "
+msgstr "Contenu :"
+
+#: ../../../Views/dashboard_config.php:60
+msgid "To view content changes reload editor after saving"
+msgstr ""
+"Pour visualiser les modifications de contenu, rechargez l'éditeur après "
+"sauvegarde"
+
+#: ../../../Views/dashboard_config.php:65
 msgid "Close"
 msgstr "Fermer"
 
-#: ../../../Views/dashboard_config.php:54
-#: ../../../Views/dashboard_edit_view.php:38
+#: ../../../Views/dashboard_config.php:66
+#: ../../../Views/dashboard_edit_view.php:39
 msgid "Save changes"
 msgstr "Enregistrer les modifications"
 
-#: ../../../Views/dashboard_edit_view.php:33
+#: ../../../Views/dashboard_edit_view.php:34
 msgid "Configure element"
 msgstr "Configurer l'élément"
 
-#: ../../../Views/dashboard_edit_view.php:37
+#: ../../../Views/dashboard_edit_view.php:38
 #: ../../../Views/dashboard_list.php:41
 msgid "Cancel"
 msgstr "Annuler"
 
-#: ../../../Views/dashboard_edit_view.php:43
+#: ../../../Views/dashboard_edit_view.php:44
 msgid "Toolbox"
 msgstr "Boîte à outils"
 
-#: ../../../Views/dashboard_edit_view.php:47
+#: ../../../Views/dashboard_edit_view.php:48
 msgid "Configure dashboard basic data"
 msgstr "Configurer les données de base du tableau de bord"
 
-#: ../../../Views/dashboard_edit_view.php:48
+#: ../../../Views/dashboard_edit_view.php:49
 msgid "Undo last step"
 msgstr "Annuler la dernière étape"
 
-#: ../../../Views/dashboard_edit_view.php:49
+#: ../../../Views/dashboard_edit_view.php:50
 msgid "Redo last step"
 msgstr "Rétablir la dernière étape"
 
-#: ../../../Views/dashboard_edit_view.php:50
+#: ../../../Views/dashboard_edit_view.php:51
 msgid "Return to view mode"
 msgstr "Retourner au mode visualisation"
 
-#: ../../../Views/dashboard_edit_view.php:53
+#: ../../../Views/dashboard_edit_view.php:54
 msgid "Configure selected item"
 msgstr "Configurer l'élément sélectionné"
 
-#: ../../../Views/dashboard_edit_view.php:54
+#: ../../../Views/dashboard_edit_view.php:55
 msgid "Move selected item in front of other items"
 msgstr "Déplacer l'élément devant les autres éléments"
 
-#: ../../../Views/dashboard_edit_view.php:55
+#: ../../../Views/dashboard_edit_view.php:56
 msgid "Move selected item to back of other items"
 msgstr "Déplacer l'élément derrière les autres éléments"
 
-#: ../../../Views/dashboard_edit_view.php:56
+#: ../../../Views/dashboard_edit_view.php:57
 msgid "Delete selected items"
 msgstr "Supprimer les éléments sélectionnés"
 
-#: ../../../Views/dashboard_edit_view.php:59
+#: ../../../Views/dashboard_edit_view.php:60
 msgid "Nothing to save"
 msgstr "Aucun élément à sauvegarder"
 
-#: ../../../Views/dashboard_edit_view.php:59
+#: ../../../Views/dashboard_edit_view.php:60
 msgid "Not modified"
 msgstr "Non modifié"
 
-#: ../../../Views/dashboard_edit_view.php:157
+#: ../../../Views/dashboard_edit_view.php:160
 msgid "Saved"
 msgstr "Sauvegardé"
 
-#: ../../../Views/dashboard_edit_view.php:158
+#: ../../../Views/dashboard_edit_view.php:161
 msgid "Items Saved"
 msgstr "Éléments sauvegardés"
 
