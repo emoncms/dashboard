@@ -12,11 +12,16 @@ http://openenergymonitor.org
 global $session,$path,$dashboard_editor_icon;
 $js_css_version = 2;
 
+    $domain3 = "vis_messages";
+    bindtextdomain($domain3, "Modules/vis/locale");
+    bind_textdomain_codeset($domain3, 'UTF-8');
+
 if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit?id='. $dashboard['id'].'"> <img src="'.$path.'Modules/dashboard/Views/icons/gear-icon-outlined.png" style="width:80%" ></a>';
 
 ?>
   <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
   <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
+  <script type="text/javascript"><?php require "Modules/vis/vis_langjs.php"; ?></script>
   <script type="text/javascript" src="<?php echo $path; ?>Lib/flot/jquery.flot.min.js"></script>
   <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/widgetlist.js?ver=<?php echo $js_css_version; ?>"></script>
   <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/render.js?ver=<?php echo $js_css_version; ?>"></script>
