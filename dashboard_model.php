@@ -128,8 +128,9 @@ class Dashboard
     {
         $userid = (int) $userid;
         $id = (int) $id;
-        $fields = json_decode(stripslashes($fields));
-        
+        $fields = json_decode($fields);
+        $fields->alias = $this->make_slug($fields->alias); // make url friendly
+        $fields->alias = substr($fields->alias,0,20); // limit to 20 chars to match the db
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' and `id` = '$id'");
         if ($row = $result->fetch_object()) 
         {
@@ -159,13 +160,16 @@ class Dashboard
 
             $stmt->execute();
             $affected_rows = $stmt->affected_rows;
+            $error = $stmt->error;
             $stmt->close();
             
             if ($affected_rows>0){
-                return array('success'=>true, 'message'=>'Field updated');
+                return array('success'=>true, 'message'=>'Field updated', 'id'=>$id, 'alias'=>$row->alias);
+            } else {
+                return array('success'=>false, 'message'=>'Nothing changed', 'id'=>$id, 'alias'=>$row->alias);
             }
         }
-        return array('success'=>false, 'message'=>'Field could not be updated');
+        return array('success'=>false, 'message'=>'Field could not be updated'. " $error");
     }
 
     // Return the main dashboard from $userid
@@ -237,6 +241,15 @@ class Dashboard
         }
         return $menu;
     }
-
+    public function make_slug( $string, $separator = '-' ) {
+        $accents_regex = '~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i';
+        $special_cases = array( '&' => 'and', "'" => '');
+        $string = mb_strtolower( trim( $string ), 'UTF-8' );
+        $string = str_replace( array_keys($special_cases), array_values( $special_cases), $string );
+        $string = preg_replace( $accents_regex, '$1', htmlentities( $string, ENT_QUOTES, 'UTF-8' ) );
+        $string = preg_replace("/[^a-z0-9]/u", "$separator", $string);
+        $string = preg_replace("/[$separator]+/u", "$separator", $string);
+        return $string;
+    }
 }
 
