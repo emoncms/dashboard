@@ -351,7 +351,7 @@ var designer = {
 
             options_html += '<div class="control-group"><div class="controls">';
             options_html += '<div class="input-prepend" style="margin-bottom: 0px;">';
-            options_html += '<span class="add-on" style="width:80px; text-align: right;">'+options_name[z]+'</span>';
+            options_html += '<span class="add-on" style="width:100px; text-align: right; font-size:12px;">'+options_name[z]+'</span>';
 
             // all feeds
 
@@ -431,13 +431,13 @@ var designer = {
         // Generic sizing options for all widgets (an hack so we dont add new options to all widgets)
         var selPixel = (designer.boxlist[selected_box]["styleUnitWidth"] == 0 ? "selected" : "");
         var selPercent = (designer.boxlist[selected_box]["styleUnitWidth"] == 1 ? "selected" : "");
-        options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:80px; text-align: right;" class="add-on">'+_Tr("Width")+'</span>';
+        options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:100px; text-align: right; font-size:12px;" class="add-on">'+_Tr("Width")+'</span>';
         options_html += '<select class="options" id="styleUnitWidth"><option value="0" '+selPixel+'>'+_Tr("Pixels")+'</option><option value="1" '+selPercent+'>'+_Tr("Percentage")+'</option></select>';
         options_html += '</div><span class="help-inline"><small class="muted">'+_Tr("Choose width unit")+'</small></span></div></div>';
 
         var selPixel = (designer.boxlist[selected_box]["styleUnitHeight"] == 0 ? "selected" : "");
         var selPercent = (designer.boxlist[selected_box]["styleUnitHeight"] == 1 ? "selected" : "");
-        options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:80px; text-align: right;" class="add-on">'+_Tr("Height")+'</span>';
+        options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:100px; text-align: right; font-size:12px;" class="add-on">'+_Tr("Height")+'</span>';
         options_html += '<select class="options" id="styleUnitHeight"><option value="0" '+selPixel+'>'+_Tr("Pixels")+'</option><option value="1" '+selPercent+'>'+_Tr("Percentage")+'</option></select>';
         options_html += '</div><span class="help-inline"><small class="muted">'+_Tr("Choose height unit")+'</small></span></div></div>';
 
@@ -445,6 +445,11 @@ var designer = {
 
         // Fill the modal configuration window with options
         $("#widget_options_body").html(options_html);
+
+        // Change the size of the text for items with class options - size initially set by bootstrap
+        // also add height of 30 px for color inputs
+        $('input, select, textarea').css('font-size','12px');
+        $("input[type='color']").css('height','30px');
     },
     
     "select_feed": function (id, feedlist, type, currentval){
