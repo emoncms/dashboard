@@ -447,9 +447,9 @@ var designer = {
         $("#widget_options_body").html(options_html);
 
         // Change the size of the text for items with class options - size initially set by bootstrap
-        // also add height of 30 px for color inputs
+        // also add height of 30 px for color inputs for Firefox
         $('input, select, textarea').css('font-size','12px');
-        $("input[type='color']").css('height','30px');
+        if (navigator.userAgent.search("Firefox") >= 0) {$("input[type='color']").css({'height':'30px', 'width':'220px'});};
     },
     
     "select_feed": function (id, feedlist, type, currentval){
