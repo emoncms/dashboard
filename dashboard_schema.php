@@ -6,7 +6,7 @@ $schema['dashboard'] = array(
     'content' => array('type' => 'text'),
     'height' => array('type' => 'int(11)', 'default'=>'600'),
     'name' => array('type' => "varchar(30)", 'default'=>'no name'),
-    'alias' => array('type' => "varchar(10)", 'default'=>''),
+    'alias' => array('type' => "varchar(20)", 'default'=>''),
     'description' => array('type' => "varchar(255)", 'default'=>'no description'),
     'main' => array('type' => 'tinyint(1)', 'default'=>'0'),
     'public' => array('type' => 'tinyint(1)', 'default'=>'0'),
