@@ -280,7 +280,6 @@ function feedvalue_draw()
             feedvalue.attr("colour"),
             feedvalue.attr("decimals"),
             feedvalue.attr("size"),
-            feedvalue.attr("unitend"),
             feedvalue.attr("align"),
             errorCode
         );
