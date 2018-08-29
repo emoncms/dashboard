@@ -95,21 +95,28 @@ function feedvalue_widgetlist()
 					[1, _Tr("Front")]
 				];				
 
-	addOption(widgets["feedvalue"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
-	addOption(widgets["feedvalue"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
+  var alignmentOptions = [
+    ["center", _Tr("Center")],
+    ["left", _Tr("Left")],
+    ["right", _Tr("Right")]
+  ];
+				
+	addOption(widgets["feedvalue"], "feedid",   "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
+	addOption(widgets["feedvalue"], "colour",   "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
 	addOption(widgets["feedvalue"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
 	addOption(widgets["feedvalue"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
-	addOption(widgets["feedvalue"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-	addOption(widgets["feedvalue"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
-	addOption(widgets["feedvalue"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
+	addOption(widgets["feedvalue"], "fweight",  "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
+	addOption(widgets["feedvalue"], "units",    "value",   _Tr("Units"),    _Tr("Units to show"),   []);
+	addOption(widgets["feedvalue"], "decimals", "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["feedvalue"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
 	addOption(widgets["feedvalue"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
-	addOption(widgets["feedvalue"], "timeout",      "value",   _Tr("Timeout"),    _Tr("Timeout without feed update in seconds (empty is never)"),   []);
+	addOption(widgets["feedvalue"], "align",    "dropbox", _Tr("Alignment"), _Tr("Alignment"), alignmentOptions);
+	addOption(widgets["feedvalue"], "timeout",  "value",   _Tr("Timeout"),    _Tr("Timeout without feed update in seconds (empty is never)"),   []);
 
 	return widgets;
 }
 
-function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,val,units,colour,decimals,size,unitend,errorCode)
+function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,val,units,colour,decimals,size,unitend,align,errorCode)
 {
     colour = colour || "4444CC";
     unitend = unitend || "0";
@@ -117,7 +124,8 @@ function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,val,units,col
     font = font || "5";
     fstyle = fstyle || "2";
     fweight = fweight || "1";
-
+    align = align || "center";
+    
     var fontsize;
 
     if (size === "0"){fontsize = 6;}
@@ -190,7 +198,7 @@ function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,val,units,col
     
     feedvalue.css({
         "color":colour, 
-        "font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname,"text-align":"center",
+        "font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname,"text-align":align,
         "line-height":height+"px"
     });
 
@@ -262,6 +270,7 @@ function feedvalue_draw()
             feedvalue.attr("decimals"),
             feedvalue.attr("size"),
             feedvalue.attr("unitend"),
+            feedvalue.attr("align"),
             errorCode
         );
     });
