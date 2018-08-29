@@ -187,7 +187,7 @@ function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,val,units,col
     if (colour.indexOf("#") === -1) {			// Fix missing "#" on colour if needed
         colour = "#" + colour;
         // italic bold 12px/30px Georgia, serif
-        feedvalue.css({"color":colour, "font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname});
+        feedvalue.css({"color":colour, "font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname,"text-align":"center","line-height":height+"px"});
         //context.fillStyle = colour;
         //context.textAlign    = "center";
         //context.textBaseline = "middle";
