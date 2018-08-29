@@ -109,203 +109,173 @@ function feedvalue_widgetlist()
 	return widgets;
 }
 
-function draw_feedvalue(context,
-		x_pos,				// these x and y coords seem unused?
-		y_pos,
-		font,
-		fstyle,
-		fweight,
-		width,
-		height,
-		val,
-		units,
-		colour,
-		decimals,
-		size,
-		unitend,
-		errorCode)
-		{
-			if (!context){
-			return;
-			}
-			
-			context.save();
-			context.clearRect(0,0,width,height); // Clear old drawing
-			context.restore();
-			colour = colour || "4444CC";
-			unitend = unitend || "0";
-			size = size || "8";
-			font = font || "5";
-			fstyle = fstyle || "2";
-			fweight = fweight || "1";
+function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,val,units,colour,decimals,size,unitend,errorCode)
+{
+    colour = colour || "4444CC";
+    unitend = unitend || "0";
+    size = size || "8";
+    font = font || "5";
+    fstyle = fstyle || "2";
+    fweight = fweight || "1";
 
-			var fontsize;
+    var fontsize;
 
-			if (size === "0"){fontsize = 6;}
-			if (size === "1"){fontsize = 8;}
-			if (size === "2"){fontsize = 10;}
-			if (size === "3"){fontsize = 12;}
-			if (size === "4"){fontsize = 14;}
-			if (size === "5"){fontsize = 16;}
-			if (size === "6"){fontsize = 18;}
-			if (size === "7"){fontsize = 20;}
-			if (size === "8"){fontsize = 22;}
-			if (size === "9"){fontsize = 24;}
-			if (size === "10"){fontsize = 28;}
-			if (size === "11"){fontsize = 32;}
-			if (size === "12"){fontsize = 36;}
-			if (size === "13"){fontsize = 40;}
-			if (size === "14"){fontsize = 18;}  //default value so that not size 40 is always the default
+    if (size === "0"){fontsize = 6;}
+    if (size === "1"){fontsize = 8;}
+    if (size === "2"){fontsize = 10;}
+    if (size === "3"){fontsize = 12;}
+    if (size === "4"){fontsize = 14;}
+    if (size === "5"){fontsize = 16;}
+    if (size === "6"){fontsize = 18;}
+    if (size === "7"){fontsize = 20;}
+    if (size === "8"){fontsize = 22;}
+    if (size === "9"){fontsize = 24;}
+    if (size === "10"){fontsize = 28;}
+    if (size === "11"){fontsize = 32;}
+    if (size === "12"){fontsize = 36;}
+    if (size === "13"){fontsize = 40;}
+    if (size === "14"){fontsize = 18;}  //default value so that not size 40 is always the default
 
-			var fontname;
+    var fontname;
 
-			if (font === "0"){fontname = "Impact";}
-			if (font === "1"){fontname = "Georgia";}
-			if (font === "2"){fontname = "Arial";}
-			if (font === "3"){fontname = "Courier New";}
-			if (font === "4"){fontname = "Comic Sans MS";}
-			if (font === "5"){fontname = "Helvetica";}
-			if (font === "6"){fontname = "Helvetica Neue";}
-			if (font === "7"){fontname = "sans-serif";}
-			if (font === "8"){fontname = "Arial Narrow";}
-			if (font === "9"){fontname = "Arial Black";}
-			
-			var fontstyle;
-			
-			if (fstyle === "0"){fontstyle = "oblique";}
-			if (fstyle === "1"){fontstyle = "italic";}
-			if (fstyle === "2"){fontstyle = "normal";}
-			
-			var fontweight;
+    if (font === "0"){fontname = "Impact";}
+    if (font === "1"){fontname = "Georgia";}
+    if (font === "2"){fontname = "Arial";}
+    if (font === "3"){fontname = "Courier New";}
+    if (font === "4"){fontname = "Comic Sans MS";}
+    if (font === "5"){fontname = "Helvetica";}
+    if (font === "6"){fontname = "Helvetica Neue";}
+    if (font === "7"){fontname = "sans-serif";}
+    if (font === "8"){fontname = "Arial Narrow";}
+    if (font === "9"){fontname = "Arial Black";}
 
-			if (fweight === "0"){fontweight = "normal";}
-			if (fweight === "1"){fontweight = "bold";}
-						
-			if (decimals<0)
-				{
+    var fontstyle;
 
-					if (val>=100){
-						val = val.toFixed(0);
-						}
-					else if (val>=10){
-						val = val.toFixed(1);
-						}
-					else if (val<=-100){
-						val = val.toFixed(0);
-						}
-					else if (val<=-10){
-						val = val.toFixed(1);
-						}
-					else {
-						val = val.toFixed(2);
-						}
-				val = parseFloat(val);
-				}
-			else 
-				{
-					val = val.toFixed(decimals);
-				}
+    if (fstyle === "0"){fontstyle = "oblique";}
+    if (fstyle === "1"){fontstyle = "italic";}
+    if (fstyle === "2"){fontstyle = "normal";}
 
-			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
-				colour = "#" + colour;	
+    var fontweight;
 
-				context.fillStyle = colour;
-				context.textAlign    = "center";
-				context.textBaseline = "middle";
-				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
-				}
+    if (fweight === "0"){fontweight = "normal";}
+    if (fweight === "1"){fontweight = "bold";}
 
-			if (errorCode === "1")
-			{
-				context.fillText("TO Error", width/2 , height/2);
-			}
+    if (decimals<0)
+    {
+        if (val>=100){
+            val = val.toFixed(0);
+        }
+        else if (val>=10){
+            val = val.toFixed(1);
+        }
+        else if (val<=-100){
+            val = val.toFixed(0);
+        }
+        else if (val<=-10){
+            val = val.toFixed(1);
+        }
+        else {
+            val = val.toFixed(2);
+        }
+        val = parseFloat(val);
+    }
+    else 
+    {
+        val = val.toFixed(decimals);
+    }
 
-			else
-			{
-				if (unitend ==="0")
-				{
-				context.fillText(val+units, width/2 , height/2);
-				}
-	
-				if (unitend ==="1")
-				{
-				context.fillText(units+val, width/2 , height/2);
-				}
-			}
+    if (colour.indexOf("#") === -1) {			// Fix missing "#" on colour if needed
+        colour = "#" + colour;
+        // italic bold 12px/30px Georgia, serif
+        feedvalue.css({"color":colour, "font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname});
+        //context.fillStyle = colour;
+        //context.textAlign    = "center";
+        //context.textBaseline = "middle";
+    }
 
-			
-			
+    if (errorCode === "1")
+    {
+        feedvalue.html("TO Error");
+    }
+    else
+    {
+        if (unitend ==="0")
+        {
+            feedvalue.html(val+units);
+        }
+
+        if (unitend ==="1")
+        {
+            feedvalue.html(units+val);
+        }
+    }
 }
 
 function feedvalue_draw()
 {
-	$(".feedvalue").each(function(index)
-		{
-    
-			var errorTimeout = $(this).attr("timeout");
-			if (errorTimeout === "" || errorTimeout === undefined){           //Timeout parameter is empty
-				errorTimeout = 0;
-	        }
+    $(".feedvalue").each(function(index)
+    {
+        var feedvalue = $(this);
 
-			var font = $(this).attr("font");
-			var feedid = $(this).attr("feedid");
-			if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
-			if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-			var val = associd[feedid]["value"] * 1;
+        var errorTimeout = feedvalue.attr("timeout");
+        if (errorTimeout === "" || errorTimeout === undefined){           //Timeout parameter is empty
+            errorTimeout = 0;
+        }
 
-			if (val===undefined) {val = 0;}
-			if (isNaN(val))  {val = 0;}
+        var font = feedvalue.attr("font");
+        var feedid = feedvalue.attr("feedid");
+        if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
+        if (associd[feedid] === undefined) { console.log("Review config for feed id of " + feedvalue.attr("class")); return; }
+        var val = associd[feedid]["value"] * 1;
 
-			var errorCode = "0";
-			if (errorTimeout !== 0)
-			{
-				if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
-				{
-					errorCode = "1";
-				}
-			}
+        if (val===undefined) {val = 0;}
+        if (isNaN(val))  {val = 0;}
 
-			var size = $(this).attr("size");
-			var units = $(this).attr("units");
-			var decimals = $(this).attr("decimals");
-			
-			if (decimals===undefined) {decimals = -1};
+        var errorCode = "0";
+        if (errorTimeout !== 0)
+        {
+            if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
+            {
+                errorCode = "1";
+            }
+        }
 
-			var unitend = $(this).attr("unitend");
-				
-			{
-				var id = "can-"+$(this).attr("id");
+        var size = feedvalue.attr("size");
+        var units = feedvalue.attr("units");
+        var decimals = feedvalue.attr("decimals");
 
-				draw_feedvalue(widgetcanvas[id],
-					0,
-					0,
-					$(this).attr("font"),
-					$(this).attr("fstyle"),
-					$(this).attr("fweight"),
-					$(this).width(),
-					$(this).height(),
-					val,
-					$(this).attr("units"),
-					$(this).attr("colour"),
-					$(this).attr("decimals"),
-					$(this).attr("size"),
-					$(this).attr("unitend"),
-					errorCode
-					);
-			}
-		});
+        if (decimals===undefined) {decimals = -1};
+
+        var unitend = feedvalue.attr("unitend");
+
+        draw_feedvalue(
+            feedvalue,
+            feedvalue.attr("font"),
+            feedvalue.attr("fstyle"),
+            feedvalue.attr("fweight"),
+            feedvalue.width(),
+            feedvalue.height(),
+            val,
+            feedvalue.attr("units"),
+            feedvalue.attr("colour"),
+            feedvalue.attr("decimals"),
+            feedvalue.attr("size"),
+            feedvalue.attr("unitend"),
+            errorCode
+        );
+    });
 }
 
 function feedvalue_init()
 {
-	setup_widget_canvas("feedvalue");
+    $(".feedvalue").html("");
 }
 function feedvalue_slowupdate()
-	{
-		feedvalue_draw();
-	}
+{
+	  feedvalue_draw();
+}
 
 function feedvalue_fastupdate()
-	{
-		feedvalue_draw();
-	}
+{
+	  feedvalue_draw();
+}
