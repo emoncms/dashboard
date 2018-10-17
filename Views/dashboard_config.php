@@ -32,10 +32,10 @@
         <label><?php echo _('Feed selection mode: '); ?></label>
         <i style="font-size:12px"><?php echo _('Note: Reset feeds in all widgets in dashboard if changing'); ?><br><?php echo _('this part way through a dashboard build'); ?></i><br>
         <select name="feedmode">
-            <option value="tagname" <?php if ($dashboard['feedmode'] == "tagname") echo 'selected'; ?>><?php echo _('By tag:name'); ?></option> 
-            <option value="feedid" <?php if ($dashboard['feedmode'] == "feedid") echo 'selected'; ?>><?php echo _('By feedid'); ?></option> 
+            <option value="tagname" <?php if ($dashboard['feedmode'] == "tagname") echo 'selected'; ?>><?php echo _('By tag:name'); ?></option>
+            <option value="feedid" <?php if ($dashboard['feedmode'] == "feedid") echo 'selected'; ?>><?php echo _('By feedid'); ?></option>
         </select>
-        
+
         <label class="checkbox">
             <input type="checkbox" name="main" id="chk_main" value="1" <?php if ($dashboard['main'] == true) echo 'checked'; ?> />
             <abbr title="<?php echo _('Make this dashboard the first shown'); ?>"><?php echo _('Main'); ?></abbr>
@@ -55,7 +55,7 @@
             <input type="checkbox" name="showdescription" id="chk_showdescription" value="1" <?php if ($dashboard['showdescription'] == true) echo 'checked'; ?> />
             <abbr title="<?php echo _('Shows dashboard description on mouse over dashboard name in menu project'); ?>"><?php echo _('Show description'); ?></abbr>
         </label>
-        
+
         <label><?php echo _('Content: '); ?></label>
         <i style="font-size:12px"><?php echo _('To view content changes reload editor after saving');?></i>
         <textarea name="content" style="width:100%; height:200px;"><?php echo $dashboard['content']; ?></textarea>
@@ -71,9 +71,9 @@
     var dashid = <?php echo $dashboard['id']; ?>;
     var path = "<?php echo $path; ?>";
     var height = <?php echo $dashboard['height']; ?>;
-    
+
     $("#dashboard-config-button").click(function (){
-         
+
          $("textarea[name=content]").val($("#page").html());
          $("textarea[name=content]").data('original', $("#page").html());// used to test for changes
     });
@@ -147,4 +147,3 @@
         designer.draw();
     });
 </script>
-
