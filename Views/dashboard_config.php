@@ -75,13 +75,15 @@
     $("#dashboard-config-button").click(function (){
 
          $("textarea[name=content]").val($("#page").html());
+         $("textarea[name=content]").data('original', $("#page").html());// used to test for changes
     });
 
     $("#configure-save").click(function (){
         var fields = {};
 
-        fields['name'] = $("input[name=name]").val();
+        fields['name'] =$("input[name=name]").val();
         fields['alias']  = $("input[name=alias]").val();
+        
         fields['description']  = $("textarea[name=description]").val();
         fields['backgroundcolor']  = $("input[name=backgroundcolor]").val().replace('#','');
         fields['feedmode']  = $("select[name=feedmode]").val();
@@ -98,33 +100,45 @@
         $.ajax({
             type: "POST",
             url :  path+"dashboard/set.json",
-            data : "&id="+dashid+"&fields="+JSON.stringify(fields),
+            data : "&id="+dashid+"&fields="+encodeURIComponent(JSON.stringify(fields)),
             dataType : 'json',
             async: true,
-            success : function(result) {console.log(result)}
-        });
-
-        $.ajax({
-            type: "POST",
-            url :  path+"dashboard/setcontent.json",
-            data : "&id="+dashid+'&content='+encodeURIComponent($("textarea[name=content]").val())+'&height='+height,
-            dataType: 'json',
-            async: true,
             success : function(result) {
-                if (result.success!=undefined)
-                {
+                if (result.success!=undefined) {
+                    if (result.alias===fields.alias) {
+                        $('#dashConfigModal').modal('hide');
+                    } else {
+                        $("input[name=alias]").val(result.alias);
+                        alert("Dashboard alias altered. Too long or not URL friendly." +
+                        "\nYou sent: \n  "+
+                        fields.alias +
+                        "\nAltered to : \n  " +
+                        result.alias);
+                    }
+                }
+            }
+        });
+        var contentChanged = $("textarea[name=content]").val() != $("textarea[name=content]").data('original');
+        if (contentChanged) {
+            $.ajax({
+                type: "POST",
+                url :  path+"dashboard/setcontent.json",
+                data : "&id="+dashid+'&content='+encodeURIComponent($("textarea[name=content]").val())+'&height='+height,
+                dataType: 'json',
+                async: true,
+                success : function(result) {
                     if (!result.success) {
                         alert(result.message);
                     } else {
                         $("#page").html($("textarea[name=content]").val());
                         redraw = 1;
                         reloadiframe = 0; // dont re-calculate vis iframe urls
+                        $('#dashConfigModal').modal('hide');
                     }
                 }
-            }
-        });
-
-        $('#dashConfigModal').modal('hide');
+            });
+        }
+        
 
         $('#page-container').css("background-color","#"+fields['backgroundcolor']);
 
