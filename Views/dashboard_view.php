@@ -49,7 +49,7 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
 
   $('body').css("background-color","#<?php echo $dashboard['backgroundcolor']; ?>");
 
-  render_widgets_init(widget); // populate widgets variable 
+  render_widgets_init(widget); // populate widgets variable
   render_widgets_start(); // start widgets refresh
 
   $(window).resize(function(){
