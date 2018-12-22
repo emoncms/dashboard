@@ -285,9 +285,12 @@ LANG_JS["Units to show"] = '<?php echo addslashes(_("Units to show")); ?>';
 LANG_JS["Where should the unit be shown"] = '<?php echo addslashes(_("Where should the unit be shown")); ?>';
 
 // feedvalue_render.js
+LANG_JS["Alignment"] = '<?php echo addslashes(_("Alignment")); ?>';
+LANG_JS["Append Text"] = '<?php echo addslashes(_("Append Text")); ?>';
+LANG_JS["Append Text (Units)"] = '<?php echo addslashes(_("Append Text (Units)")); ?>';
 LANG_JS["Automatic"] = '<?php echo addslashes(_("Automatic")); ?>';
-LANG_JS["Back"] = '<?php echo addslashes(_("Back")); ?>';
 LANG_JS["Bold"] = '<?php echo addslashes(_("Bold")); ?>';
+LANG_JS["Center"] = '<?php echo addslashes(_("Center")); ?>';
 LANG_JS["Colour"] = '<?php echo addslashes(_("Colour")); ?>';
 LANG_JS["Colour used for display"] = '<?php echo addslashes(_("Colour used for display")); ?>';
 LANG_JS["Decimals"] = '<?php echo addslashes(_("Decimals")); ?>';
@@ -300,18 +303,16 @@ LANG_JS["Font style used for display"] = '<?php echo addslashes(_("Font style us
 LANG_JS["Font used for display"] = '<?php echo addslashes(_("Font used for display")); ?>';
 LANG_JS["Font weight"] = '<?php echo addslashes(_("Font weight")); ?>';
 LANG_JS["Font weight used for display"] = '<?php echo addslashes(_("Font weight used for display")); ?>';
-LANG_JS["Front"] = '<?php echo addslashes(_("Front")); ?>';
 LANG_JS["Italic"] = '<?php echo addslashes(_("Italic")); ?>';
+LANG_JS["Left"] = '<?php echo addslashes(_("Left")); ?>';
 LANG_JS["Normal"] = '<?php echo addslashes(_("Normal")); ?>';
 LANG_JS["Oblique"] = '<?php echo addslashes(_("Oblique")); ?>';
+LANG_JS["Prepend Text"] = '<?php echo addslashes(_("Prepend Text")); ?>';
+LANG_JS["Right"] = '<?php echo addslashes(_("Right")); ?>';
 LANG_JS["Size"] = '<?php echo addslashes(_("Size")); ?>';
 LANG_JS["Text size in px to use"] = '<?php echo addslashes(_("Text size in px to use")); ?>';
 LANG_JS["Timeout"] = '<?php echo addslashes(_("Timeout")); ?>';
 LANG_JS["Timeout without feed update in seconds (empty is never)"] = '<?php echo addslashes(_("Timeout without feed update in seconds (empty is never)")); ?>';
-LANG_JS["Unit position"] = '<?php echo addslashes(_("Unit position")); ?>';
-LANG_JS["Units"] = '<?php echo addslashes(_("Units")); ?>';
-LANG_JS["Units to show"] = '<?php echo addslashes(_("Units to show")); ?>';
-LANG_JS["Where should the unit be shown"] = '<?php echo addslashes(_("Where should the unit be shown")); ?>';
 
 // frostpoint_render.js
 LANG_JS["Automatic"] = '<?php echo addslashes(_("Automatic")); ?>';
