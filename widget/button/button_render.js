@@ -37,8 +37,19 @@ function button_events()
     var invalue = $(this).attr("value");
     if (invalue == 0) outval = 1;
     if (invalue == 1) outval = 0;
-
-    feed.set(feedid,{'time':parseInt((new Date()).getTime()/1000),'value':outval});
+    
+    $.ajax({ 
+        url: path+"feed/insert.json", 
+        data: "id="+feedid+"&time="+parseInt((new Date()).getTime()/1000)+"&value="+outval, 
+        dataType: 'json', 
+        async: false, 
+        success: function(result){
+            if (result!=outval) {
+                alert(JSON.stringify(result));
+            }
+        }
+    });
+    
     $(this).attr("value",outval);
 
     var id = "can-"+$(this).attr("id");
@@ -50,6 +61,7 @@ function button_events()
 function button_init()
 {
   setup_widget_canvas('button');
+  button_draw();
 }
 
 function button_draw()
@@ -72,6 +84,7 @@ function button_slowupdate()
 
 function button_fastupdate()
 {
+  
 }
 
 
