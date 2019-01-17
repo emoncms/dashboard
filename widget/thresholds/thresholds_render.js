@@ -140,13 +140,17 @@ function thresholds_draw() {
     var colour2 = $(this).attr("colour2")|| "#FF8425";
     var colour1 = $(this).attr("colour1")|| "#019F62";
     var shapetype = $(this).attr("shapetype")|| "2";
-    var val=0; 
-    var feedvalue = associd[feedid]["value"] * 1;
-    if (feedvalue===undefined) {feedvalue = 0;}
-    if (isNaN(feedvalue))  {feedvalue = 0;}
+    var val=0;
+    var feedvalue = 0;
 
-    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-
+    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; } 
+   
+    if (associd[feedid]!=undefined && associd[feedid]["value"]!=undefined) { 
+        feedvalue = associd[feedid]["value"] * 1;
+        if (feedvalue===undefined) {feedvalue = 0;}
+        if (isNaN(feedvalue))  {feedvalue = 0;}
+    }
+    
     if (feedvalue > limit2){
         val=0;}
     else if (feedvalue > limit1){
