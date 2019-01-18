@@ -93,7 +93,7 @@ function bar_widgetlist()
     var commonUnits = function() {
         var arr = [], json = [];
         $.ajax({
-            url: '../Lib/units.php',
+            url: "../Lib/units.php",
             async: false,
             success: function(units){
                 json = units;
