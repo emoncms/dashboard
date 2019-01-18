@@ -394,6 +394,7 @@ var designer = {
             // Combobox for selecting options with "other" option
             else if (options_type && options_type[z] == "dropbox_other" && optionsdata[z]){  // Check we have optionsdata before deciding to draw a combobox
                 options_html += '<select id="' + box_options[z] + '_dropdown" class="options select-with-other">';
+                options_html += "<option value=''></option>";
                 values = [];
                 for (i in optionsdata[z])
                 {
@@ -405,7 +406,11 @@ var designer = {
                     options_html += "<option "+selected+" value=\""+optionsdata[z][i][0]+"\">"+optionsdata[z][i][1]+"</option>";
                 }
                 // if saved value not in list set the 'Other' option
-                other_selected = values.indexOf(val) === -1 ? 'selected' : '';
+                other_selected = '';
+                if (values.indexOf(val) === -1 && val !== '') {
+                    other_selected = 'selected';
+                }
+
                 other_hidden = other_selected !== 'selected' ? 'hidden' : '';
                 options_html += "<option " + other_selected + " value='__other'>"+_Tr('Other')+"</option>";
                 options_html += "</select>";
@@ -578,7 +583,7 @@ var designer = {
         }
         return arr;
     },
-    
+
     "get_unified_event": function(e){
         var coors;
         if (e.originalEvent.touches){  // touch

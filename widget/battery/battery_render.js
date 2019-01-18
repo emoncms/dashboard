@@ -84,7 +84,7 @@ function battery_widgetlist(){
   addOption(widgets["battery"], "max",              "value",         _Tr("Max value"),       _Tr("Max value to show"),                                                     []);
   addOption(widgets["battery"], "min",              "value",         _Tr("Min value"),       _Tr("Min value to show"),                                                     []); //TT
   addOption(widgets["battery"], "scale",            "value",         _Tr("Scale"),           _Tr("Value is multiplied by scale before display"),                           []);
-  addOption(widgets["battery"], "units",            "value",         _Tr("Units"),           _Tr("Units to show"),                                                         []);
+  addOption(widgets["battery"], "units",            "dropbox_other", _Tr("Units"),           _Tr("Units to show"),                                                         _SI);
   addOption(widgets["battery"], "unitend",          "dropbox",       _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                        unitEndOptions);
   addOption(widgets["battery"], "decimals",         "dropbox",       _Tr("Decimals"),        _Tr("Decimals to show"),                                                      decimalsDropBoxOptions);
   addOption(widgets["battery"], "offset",           "value",         _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing"),                 []);
