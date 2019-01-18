@@ -411,7 +411,7 @@ var designer = {
                 options_html += "</select>";
                 options_html += '</div>';
                 options_html += '<div class="input-prepend ' + other_hidden + ' other"><span class="add-on" style="width:100px; text-align: right; font-size:12px;background: none;border: none;margin-right: 1px;">' + _Tr('Other') + '</span>'
-                options_html += '<input id="' + box_options[z] + '" type="text" value="' + val + '" class="options input-is-other" style="border-radius:0 0 4px 4px;border-top:none">';
+                options_html += '<input id="' + box_options[z] + '" type="text" value="' + val + '" data-last-value="' + val + '" class="options input-is-other" style="border-radius:0 0 4px 4px;border-top:none">';
             }
 
             else if (options_type && options_type[z] == "colour_picker"){
