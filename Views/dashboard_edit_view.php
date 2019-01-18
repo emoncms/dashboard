@@ -141,7 +141,7 @@ function toolboxMove(e) {
     render_widgets_start(); // start widgets refresh
 
     var lastsavecontent = $("#page").html();
-
+    
     $("#save-dashboard").click(function (){
         var currentcontent = $("#page").html();
 

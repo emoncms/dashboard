@@ -98,7 +98,7 @@ function thermometer_widgetlist()
     addOption(widgets["thermometer"], "min",            "value",            _Tr("Min value"),       _Tr("Min value to show"),                                                           []);
     addOption(widgets["thermometer"], "max",            "value",            _Tr("Max value"),       _Tr("Max value to show"),                                                           []);
     addOption(widgets["thermometer"], "scale",          "value",            _Tr("Scale"),           _Tr("Value is multiplied by scale before display. Defaults to 1"),                  []);
-    addOption(widgets["thermometer"], "units",          "value",            _Tr("Units"),           _Tr("Units to show"),                                                               []);
+    addOption(widgets["thermometer"], "units",          "dropbox_other",    _Tr("Units"),           _Tr("Units to show"),                                                               _SI);
     addOption(widgets["thermometer"], "unitend",        "dropbox",          _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                              unitEndOptions);
     addOption(widgets["thermometer"], "decimals",       "dropbox",          _Tr("Decimals"),        _Tr("Decimals to show"),                                                            decimalsDropBoxOptions);
     addOption(widgets["thermometer"], "offset",         "value",            _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing"),                       []);
