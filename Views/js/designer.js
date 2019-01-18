@@ -562,6 +562,23 @@ var designer = {
         }
     },
 
+    get_SI: function() {
+        // return array of common units in format [value, label]
+        var arr = [], json = [];
+        $.ajax({
+            url: "../Lib/units.php",
+            async: false,
+            success: function(units){
+                json = units;
+            }
+        });
+        for(j in json) {
+            var unit = json[j];
+            arr.push([unit.short, unit.long +' ('+ unit.short + ')'])
+        }
+        return arr;
+    },
+    
     "get_unified_event": function(e){
         var coors;
         if (e.originalEvent.touches){  // touch

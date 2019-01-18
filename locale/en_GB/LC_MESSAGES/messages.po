@@ -1,450 +1,1103 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Emoncms 8.4.0 - Dashboard\n"
-"POT-Creation-Date: 2015-02-04 02:32+0100\n"
-"PO-Revision-Date: 2015-02-04 02:33+0100\n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2019-01-18 17:22+0000\n"
+"PO-Revision-Date: 2019-01-18 17:22+0000\n"
+"Last-Translator: Emrys <emrys@openenergymonitor.org>\n"
 "Language-Team: \n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.4\n"
+"X-Generator: Poedit 2.0.6\n"
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-KeywordsList: _;__;_e;_n:1,2;_n_noop:1,2;_nx:1,2;_nx_noop:1,2\n"
 "X-Poedit-SearchPath-0: ../../..\n"
 
-#: ../../../Views/dashboard_config.php:20
+#: ../../../Views/dashboard_config.php:17
 msgid "Dashboard Configuration"
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:25
+#: ../../../Views/dashboard_config.php:20
 msgid "Dashboard name: "
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:27
-msgid "Menu name: (lowercase a-z only)"
+#: ../../../Views/dashboard_config.php:22
+msgid "Alias name: "
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:29
+#: ../../../Views/dashboard_config.php:24
+msgid "Background color: "
+msgstr ""
+
+#: ../../../Views/dashboard_config.php:26
 msgid "Description: "
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:34
+#: ../../../Views/dashboard_config.php:28
+msgid "Grid size: "
+msgstr ""
+
+#: ../../../Views/dashboard_config.php:32
+msgid "Feed selection mode: "
+msgstr ""
+
+#: ../../../Views/dashboard_config.php:33
+msgid "Note: Reset feeds in all widgets in dashboard if changing"
+msgstr ""
+
+#: ../../../Views/dashboard_config.php:33
+msgid "this part way through a dashboard build"
+msgstr ""
+
+#: ../../../Views/dashboard_config.php:35
+msgid "By tag:name"
+msgstr ""
+
+#: ../../../Views/dashboard_config.php:36
+msgid "By feedid"
+msgstr ""
+
+#: ../../../Views/dashboard_config.php:41
 msgid "Make this dashboard the first shown"
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:34 ../../../Views/dashboard_list.php:54
+#: ../../../Views/dashboard_config.php:41 ../../../Views/dashboard_list.php:59
 msgid "Main"
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:39
+#: ../../../Views/dashboard_config.php:46
 msgid "Activate this dashboard"
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:39 ../../../Views/dashboard_list.php:56
+#: ../../../Views/dashboard_config.php:46 ../../../Views/dashboard_list.php:61
 msgid "Published"
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:44
+#: ../../../Views/dashboard_config.php:51
 msgid "Anyone with the URL can see this dashboard"
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:44 ../../../Views/dashboard_list.php:55
+#: ../../../Views/dashboard_config.php:51 ../../../Views/dashboard_list.php:60
 msgid "Public"
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:49
+#: ../../../Views/dashboard_config.php:56
 msgid ""
 "Shows dashboard description on mouse over dashboard name in menu project"
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:49
+#: ../../../Views/dashboard_config.php:56
 msgid "Show description"
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:55
+#: ../../../Views/dashboard_config.php:59
+msgid "Content: "
+msgstr ""
+
+#: ../../../Views/dashboard_config.php:60
+msgid "To view content changes reload editor after saving"
+msgstr ""
+
+#: ../../../Views/dashboard_config.php:65
 msgid "Close"
 msgstr ""
 
-#: ../../../Views/dashboard_config.php:56
-#: ../../../Views/dashboard_edit_view.php:39
+#: ../../../Views/dashboard_config.php:66
+#: ../../../Views/dashboard_edit_view.php:43
 msgid "Save changes"
 msgstr ""
 
-#: ../../../Views/dashboard_edit_view.php:34
+#: ../../../Views/dashboard_edit_view.php:38
 msgid "Configure element"
 msgstr ""
 
-#: ../../../Views/dashboard_edit_view.php:38
-#: ../../../Views/dashboard_list.php:35
+#: ../../../Views/dashboard_edit_view.php:42
+#: ../../../Views/dashboard_list.php:41
 msgid "Cancel"
 msgstr ""
 
-#: ../../../Views/dashboard_edit_view.php:47
-msgid "Configure"
-msgstr ""
-
 #: ../../../Views/dashboard_edit_view.php:48
-msgid "Delete"
+msgid "Toolbox"
 msgstr ""
 
-#: ../../../Views/dashboard_edit_view.php:50
+#: ../../../Views/dashboard_edit_view.php:52
+msgid "Configure dashboard basic data"
+msgstr ""
+
+#: ../../../Views/dashboard_edit_view.php:53
+msgid "Undo last step"
+msgstr ""
+
+#: ../../../Views/dashboard_edit_view.php:54
+msgid "Redo last step"
+msgstr ""
+
+#: ../../../Views/dashboard_edit_view.php:55
+msgid "Return to view mode"
+msgstr ""
+
+#: ../../../Views/dashboard_edit_view.php:58
+msgid "Configure selected item"
+msgstr ""
+
+#: ../../../Views/dashboard_edit_view.php:59
+msgid "Move selected item in front of other items"
+msgstr ""
+
+#: ../../../Views/dashboard_edit_view.php:60
+msgid "Move selected item to back of other items"
+msgstr ""
+
+#: ../../../Views/dashboard_edit_view.php:61
+msgid "Delete selected items"
+msgstr ""
+
+#: ../../../Views/dashboard_edit_view.php:64
+msgid "Nothing to save"
+msgstr ""
+
+#: ../../../Views/dashboard_edit_view.php:64
 msgid "Not modified"
 msgstr ""
 
-#: ../../../Views/dashboard_edit_view.php:106
+#: ../../../Views/dashboard_edit_view.php:164
 msgid "Saved"
 msgstr ""
 
-#: ../../../Views/dashboard_list.php:15 ../../../dashboard_menu.php:7
-msgid "Dashboard"
+#: ../../../Views/dashboard_edit_view.php:165
+msgid "Items Saved"
 msgstr ""
 
-#: ../../../Views/dashboard_list.php:19
+#: ../../../Views/dashboard_list.php:15 ../../../dashboard_menu.php:34
+#: ../../../dashboard_menu.php:37
+msgid "Dashboards"
+msgstr ""
+
+#: ../../../Views/dashboard_list.php:18
 msgid "No dashboards created"
 msgstr ""
 
-#: ../../../Views/dashboard_list.php:20
-msgid "Maybe you would like to add your first dashboard using the button"
+#: ../../../Views/dashboard_list.php:19
+msgid ""
+"Maybe you would like to add your first dashboard using the button bellow."
 msgstr ""
 
-#: ../../../Views/dashboard_list.php:29
-msgid "WARNING deleting a dashboard is permanent"
-msgstr ""
-
-#: ../../../Views/dashboard_list.php:32
-msgid "Are you sure you want to delete this dashboard?"
-msgstr ""
-
-#: ../../../Views/dashboard_list.php:36
-msgid "Delete permanently"
-msgstr ""
-
-#: ../../../Views/dashboard_list.php:50
-msgid "Id"
-msgstr ""
-
-#: ../../../Views/dashboard_list.php:51
-msgid "Name"
-msgstr ""
-
-#: ../../../Views/dashboard_list.php:52
-msgid "Alias"
-msgstr ""
-
-#: ../../../Views/dashboard_list.php:53
-msgid "Description"
-msgstr ""
-
-#: ../../../Views/dashboard_menu.php:44
-msgid "Dashboards:"
-msgstr ""
-
-#: ../../../Views/dashboard_menu.php:54
-msgid "Draw Editor"
-msgstr ""
-
-#: ../../../Views/dashboard_menu.php:58
-msgid "View mode"
-msgstr ""
-
-#: ../../../Views/dashboard_menu.php:59
-msgid "Configure dashboard"
-msgstr ""
-
-#: ../../../Views/dashboard_menu.php:62
+#: ../../../Views/dashboard_list.php:25
 msgid "New"
 msgstr ""
 
-#: ../../../Views/dashboard_menu.php:64
-msgid "List view"
+#: ../../../Views/dashboard_list.php:32
+msgid "Delete dashboard"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:91
+#: ../../../Views/dashboard_list.php:35
+msgid "Deleting a dashboard is permanent."
+msgstr ""
+
+#: ../../../Views/dashboard_list.php:37
+msgid "Are you sure you want to delete?"
+msgstr ""
+
+#: ../../../Views/dashboard_list.php:42
+msgid "Delete permanently"
+msgstr ""
+
+#: ../../../Views/dashboard_list.php:55
+msgid "Id"
+msgstr ""
+
+#: ../../../Views/dashboard_list.php:56
+msgid "Name"
+msgstr ""
+
+#: ../../../Views/dashboard_list.php:57
+msgid "Alias"
+msgstr ""
+
+#: ../../../Views/dashboard_list.php:58
+msgid "Description"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:28
+msgid "Add a"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:29
 msgid "Changed, press to save"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:94 ../../../dashboard_langjs.php:161
+#: ../../../dashboard_langjs.php:30
+msgid "Choose height unit"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:31
+msgid "Choose width unit"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:32
+msgid "element to the dashboard"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:33
+msgid "Height"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:34
+msgid "Off"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:35
+msgid "On"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:36
+msgid "Percentage"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:37
+msgid "Pixels"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:38
+msgid "Width"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:39
+msgid "Other"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:42
+msgid "Html code to show"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:43
+msgid "Some text"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:44 ../../../dashboard_langjs.php:86
+#: ../../../dashboard_langjs.php:557
+msgid "Title"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:47 ../../../dashboard_langjs.php:96
+#: ../../../dashboard_langjs.php:163 ../../../dashboard_langjs.php:179
+#: ../../../dashboard_langjs.php:208 ../../../dashboard_langjs.php:264
+#: ../../../dashboard_langjs.php:292 ../../../dashboard_langjs.php:319
+#: ../../../dashboard_langjs.php:348 ../../../dashboard_langjs.php:384
+#: ../../../dashboard_langjs.php:486 ../../../dashboard_langjs.php:519
+msgid "Automatic"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:48 ../../../dashboard_langjs.php:97
+#: ../../../dashboard_langjs.php:164 ../../../dashboard_langjs.php:180
+#: ../../../dashboard_langjs.php:209 ../../../dashboard_langjs.php:265
+#: ../../../dashboard_langjs.php:320 ../../../dashboard_langjs.php:349
+#: ../../../dashboard_langjs.php:487 ../../../dashboard_langjs.php:520
+msgid "Back"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:49 ../../../dashboard_langjs.php:99
+#: ../../../dashboard_langjs.php:181 ../../../dashboard_langjs.php:266
+#: ../../../dashboard_langjs.php:293 ../../../dashboard_langjs.php:321
+#: ../../../dashboard_langjs.php:350 ../../../dashboard_langjs.php:385
+#: ../../../dashboard_langjs.php:461 ../../../dashboard_langjs.php:488
+#: ../../../dashboard_langjs.php:521
+msgid "Bold"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:50 ../../../dashboard_langjs.php:143
+#: ../../../dashboard_langjs.php:182 ../../../dashboard_langjs.php:267
+#: ../../../dashboard_langjs.php:295 ../../../dashboard_langjs.php:322
+#: ../../../dashboard_langjs.php:351 ../../../dashboard_langjs.php:386
+#: ../../../dashboard_langjs.php:522
 msgid "Colour"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:95
+#: ../../../dashboard_langjs.php:51 ../../../dashboard_langjs.php:523
+msgid "Colour for min. and max. bars"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:52 ../../../dashboard_langjs.php:524
+msgid "Colour of title and values"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:53
 msgid "Colour to draw bar in"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:96 ../../../dashboard_langjs.php:112
-#: ../../../dashboard_langjs.php:119 ../../../dashboard_langjs.php:123
-#: ../../../dashboard_langjs.php:141 ../../../dashboard_langjs.php:147
-#: ../../../dashboard_langjs.php:154 ../../../dashboard_langjs.php:170
+#: ../../../dashboard_langjs.php:54 ../../../dashboard_langjs.php:102
+#: ../../../dashboard_langjs.php:166 ../../../dashboard_langjs.php:184
+#: ../../../dashboard_langjs.php:212 ../../../dashboard_langjs.php:297
+#: ../../../dashboard_langjs.php:324 ../../../dashboard_langjs.php:353
+#: ../../../dashboard_langjs.php:388 ../../../dashboard_langjs.php:491
+#: ../../../dashboard_langjs.php:525
+msgid "Decimals"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:55 ../../../dashboard_langjs.php:103
+#: ../../../dashboard_langjs.php:167 ../../../dashboard_langjs.php:185
+#: ../../../dashboard_langjs.php:213 ../../../dashboard_langjs.php:298
+#: ../../../dashboard_langjs.php:325 ../../../dashboard_langjs.php:354
+#: ../../../dashboard_langjs.php:389 ../../../dashboard_langjs.php:492
+#: ../../../dashboard_langjs.php:526
+msgid "Decimals to show"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:56 ../../../dashboard_langjs.php:214
+#: ../../../dashboard_langjs.php:527
+msgid "Display Min. and Max. ?"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:57 ../../../dashboard_langjs.php:105
+#: ../../../dashboard_langjs.php:134 ../../../dashboard_langjs.php:215
+#: ../../../dashboard_langjs.php:269 ../../../dashboard_langjs.php:299
+#: ../../../dashboard_langjs.php:416 ../../../dashboard_langjs.php:429
+#: ../../../dashboard_langjs.php:454 ../../../dashboard_langjs.php:466
+#: ../../../dashboard_langjs.php:493 ../../../dashboard_langjs.php:528
+#: ../../../dashboard_langjs.php:574
 msgid "Feed"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:97 ../../../dashboard_langjs.php:124
-#: ../../../dashboard_langjs.php:142 ../../../dashboard_langjs.php:155
+#: ../../../dashboard_langjs.php:58 ../../../dashboard_langjs.php:106
+#: ../../../dashboard_langjs.php:216 ../../../dashboard_langjs.php:270
+#: ../../../dashboard_langjs.php:300 ../../../dashboard_langjs.php:417
+#: ../../../dashboard_langjs.php:455 ../../../dashboard_langjs.php:467
+#: ../../../dashboard_langjs.php:494 ../../../dashboard_langjs.php:529
+#: ../../../dashboard_langjs.php:575 ../../../dashboard_langjs.php:587
 msgid "Feed value"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:98 ../../../dashboard_langjs.php:125
+#: ../../../dashboard_langjs.php:59 ../../../dashboard_langjs.php:108
+#: ../../../dashboard_langjs.php:187 ../../../dashboard_langjs.php:272
+#: ../../../dashboard_langjs.php:302 ../../../dashboard_langjs.php:327
+#: ../../../dashboard_langjs.php:357 ../../../dashboard_langjs.php:391
+#: ../../../dashboard_langjs.php:469 ../../../dashboard_langjs.php:496
+#: ../../../dashboard_langjs.php:530
+msgid "Font style"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:60 ../../../dashboard_langjs.php:109
+#: ../../../dashboard_langjs.php:188 ../../../dashboard_langjs.php:273
+#: ../../../dashboard_langjs.php:303 ../../../dashboard_langjs.php:328
+#: ../../../dashboard_langjs.php:358 ../../../dashboard_langjs.php:392
+#: ../../../dashboard_langjs.php:470 ../../../dashboard_langjs.php:497
+#: ../../../dashboard_langjs.php:531
+msgid "Font style used for display"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:61 ../../../dashboard_langjs.php:532
+msgid "Font used"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:62 ../../../dashboard_langjs.php:110
+#: ../../../dashboard_langjs.php:190 ../../../dashboard_langjs.php:275
+#: ../../../dashboard_langjs.php:305 ../../../dashboard_langjs.php:330
+#: ../../../dashboard_langjs.php:360 ../../../dashboard_langjs.php:394
+#: ../../../dashboard_langjs.php:471 ../../../dashboard_langjs.php:498
+#: ../../../dashboard_langjs.php:533
+msgid "Font weight"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:63 ../../../dashboard_langjs.php:111
+#: ../../../dashboard_langjs.php:191 ../../../dashboard_langjs.php:276
+#: ../../../dashboard_langjs.php:306 ../../../dashboard_langjs.php:331
+#: ../../../dashboard_langjs.php:361 ../../../dashboard_langjs.php:395
+#: ../../../dashboard_langjs.php:472 ../../../dashboard_langjs.php:499
+#: ../../../dashboard_langjs.php:534
+msgid "Font weight used for display"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:64 ../../../dashboard_langjs.php:112
+#: ../../../dashboard_langjs.php:170 ../../../dashboard_langjs.php:192
+#: ../../../dashboard_langjs.php:217 ../../../dashboard_langjs.php:277
+#: ../../../dashboard_langjs.php:332 ../../../dashboard_langjs.php:364
+#: ../../../dashboard_langjs.php:500 ../../../dashboard_langjs.php:535
+msgid "Front"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:65 ../../../dashboard_langjs.php:536
+msgid "Grad. Num."
+msgstr ""
+
+#: ../../../dashboard_langjs.php:66 ../../../dashboard_langjs.php:218
+#: ../../../dashboard_langjs.php:537
 msgid "Graduations"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:99
+#: ../../../dashboard_langjs.php:67 ../../../dashboard_langjs.php:538
 msgid "How many graduation lines to draw (only relevant if graduations are on)"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:100 ../../../dashboard_langjs.php:126
-#: ../../../dashboard_langjs.php:148
+#: ../../../dashboard_langjs.php:68 ../../../dashboard_langjs.php:113
+#: ../../../dashboard_langjs.php:194 ../../../dashboard_langjs.php:278
+#: ../../../dashboard_langjs.php:307 ../../../dashboard_langjs.php:334
+#: ../../../dashboard_langjs.php:367 ../../../dashboard_langjs.php:397
+#: ../../../dashboard_langjs.php:473 ../../../dashboard_langjs.php:501
+#: ../../../dashboard_langjs.php:539
+msgid "Italic"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:69 ../../../dashboard_langjs.php:540
+msgid "Label Colour"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:70 ../../../dashboard_langjs.php:235
+#: ../../../dashboard_langjs.php:541
+msgid "Max. feed"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:71 ../../../dashboard_langjs.php:115
+#: ../../../dashboard_langjs.php:236 ../../../dashboard_langjs.php:430
+#: ../../../dashboard_langjs.php:443 ../../../dashboard_langjs.php:475
+#: ../../../dashboard_langjs.php:503 ../../../dashboard_langjs.php:542
 msgid "Max value"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:101 ../../../dashboard_langjs.php:127
-#: ../../../dashboard_langjs.php:149
+#: ../../../dashboard_langjs.php:72 ../../../dashboard_langjs.php:116
+#: ../../../dashboard_langjs.php:237 ../../../dashboard_langjs.php:431
+#: ../../../dashboard_langjs.php:444 ../../../dashboard_langjs.php:476
+#: ../../../dashboard_langjs.php:504 ../../../dashboard_langjs.php:543
 msgid "Max value to show"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:102
-msgid "Num Graduations"
+#: ../../../dashboard_langjs.php:73 ../../../dashboard_langjs.php:238
+#: ../../../dashboard_langjs.php:544
+msgid "Min. feed"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:103 ../../../dashboard_langjs.php:128
+#: ../../../dashboard_langjs.php:74 ../../../dashboard_langjs.php:239
+#: ../../../dashboard_langjs.php:545
+msgid "Min / Max ?"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:75 ../../../dashboard_langjs.php:240
+#: ../../../dashboard_langjs.php:548
+msgid "No"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:76 ../../../dashboard_langjs.php:119
+#: ../../../dashboard_langjs.php:195 ../../../dashboard_langjs.php:279
+#: ../../../dashboard_langjs.php:309 ../../../dashboard_langjs.php:335
+#: ../../../dashboard_langjs.php:368 ../../../dashboard_langjs.php:398
+#: ../../../dashboard_langjs.php:477 ../../../dashboard_langjs.php:505
+#: ../../../dashboard_langjs.php:549
+msgid "Normal"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:77 ../../../dashboard_langjs.php:120
+#: ../../../dashboard_langjs.php:196 ../../../dashboard_langjs.php:280
+#: ../../../dashboard_langjs.php:310 ../../../dashboard_langjs.php:336
+#: ../../../dashboard_langjs.php:369 ../../../dashboard_langjs.php:399
+#: ../../../dashboard_langjs.php:478 ../../../dashboard_langjs.php:506
+#: ../../../dashboard_langjs.php:550
+msgid "Oblique"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:78 ../../../dashboard_langjs.php:121
+#: ../../../dashboard_langjs.php:241 ../../../dashboard_langjs.php:479
+#: ../../../dashboard_langjs.php:507 ../../../dashboard_langjs.php:551
 msgid "Offset"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:104 ../../../dashboard_langjs.php:129
+#: ../../../dashboard_langjs.php:79 ../../../dashboard_langjs.php:122
+#: ../../../dashboard_langjs.php:247 ../../../dashboard_langjs.php:434
+#: ../../../dashboard_langjs.php:447 ../../../dashboard_langjs.php:480
+#: ../../../dashboard_langjs.php:508 ../../../dashboard_langjs.php:552
+#: ../../../dashboard_langjs.php:589
 msgid "Scale"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:105
+#: ../../../dashboard_langjs.php:80 ../../../dashboard_langjs.php:553
 msgid "Should the graduations be shown"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:106
-msgid ""
-"Static offset. Subtracted from value before computing position (default 0)"
+#: ../../../dashboard_langjs.php:81 ../../../dashboard_langjs.php:123
+#: ../../../dashboard_langjs.php:482 ../../../dashboard_langjs.php:511
+#: ../../../dashboard_langjs.php:554
+msgid "Static offset. Subtracted from value before computing"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:107 ../../../dashboard_langjs.php:134
-#: ../../../dashboard_langjs.php:143 ../../../dashboard_langjs.php:150
-#: ../../../dashboard_langjs.php:198
+#: ../../../dashboard_langjs.php:82 ../../../dashboard_langjs.php:250
+#: ../../../dashboard_langjs.php:555
+msgid "The feed for the maximum value"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:83 ../../../dashboard_langjs.php:251
+#: ../../../dashboard_langjs.php:556
+msgid "The feed for the minimum value"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:84 ../../../dashboard_langjs.php:157
+#: ../../../dashboard_langjs.php:252 ../../../dashboard_langjs.php:315
+msgid "Timeout"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:85 ../../../dashboard_langjs.php:253
+#: ../../../dashboard_langjs.php:316
+msgid "Timeout without feed update in seconds (empty is never)"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:87
+msgid "Title of bar"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:88 ../../../dashboard_langjs.php:125
+#: ../../../dashboard_langjs.php:174 ../../../dashboard_langjs.php:203
+#: ../../../dashboard_langjs.php:256 ../../../dashboard_langjs.php:283
+#: ../../../dashboard_langjs.php:343 ../../../dashboard_langjs.php:379
+#: ../../../dashboard_langjs.php:512 ../../../dashboard_langjs.php:559
+msgid "Unit position"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:89 ../../../dashboard_langjs.php:126
+#: ../../../dashboard_langjs.php:257 ../../../dashboard_langjs.php:284
+#: ../../../dashboard_langjs.php:436 ../../../dashboard_langjs.php:449
+#: ../../../dashboard_langjs.php:513 ../../../dashboard_langjs.php:560
+#: ../../../dashboard_langjs.php:591
 msgid "Units"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:108
-msgid "Unit type to show after value. Ex: <br>\"{Reading}{unit-string}\""
+#: ../../../dashboard_langjs.php:90 ../../../dashboard_langjs.php:127
+#: ../../../dashboard_langjs.php:258 ../../../dashboard_langjs.php:285
+#: ../../../dashboard_langjs.php:437 ../../../dashboard_langjs.php:450
+#: ../../../dashboard_langjs.php:514 ../../../dashboard_langjs.php:561
+msgid "Units to show"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:109
+#: ../../../dashboard_langjs.php:91 ../../../dashboard_langjs.php:562
 msgid "Value is multiplied by scale before display. Defaults to 1"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:113
+#: ../../../dashboard_langjs.php:92 ../../../dashboard_langjs.php:129
+#: ../../../dashboard_langjs.php:176 ../../../dashboard_langjs.php:205
+#: ../../../dashboard_langjs.php:260 ../../../dashboard_langjs.php:286
+#: ../../../dashboard_langjs.php:345 ../../../dashboard_langjs.php:381
+#: ../../../dashboard_langjs.php:516 ../../../dashboard_langjs.php:563
+msgid "Where should the unit be shown"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:93 ../../../dashboard_langjs.php:261
+#: ../../../dashboard_langjs.php:564
+msgid "Yes"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:98
+msgid "Battery title"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:100 ../../../dashboard_langjs.php:462
+#: ../../../dashboard_langjs.php:489
+msgid "Color of the label"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:101 ../../../dashboard_langjs.php:464
+#: ../../../dashboard_langjs.php:490
+msgid "Colour label"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:104 ../../../dashboard_langjs.php:453
+msgid "Display style"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:107 ../../../dashboard_langjs.php:186
+#: ../../../dashboard_langjs.php:271 ../../../dashboard_langjs.php:301
+#: ../../../dashboard_langjs.php:326 ../../../dashboard_langjs.php:356
+#: ../../../dashboard_langjs.php:390 ../../../dashboard_langjs.php:468
+#: ../../../dashboard_langjs.php:495
+msgid "Font"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:114 ../../../dashboard_langjs.php:474
+#: ../../../dashboard_langjs.php:502
+msgid "Label font"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:117 ../../../dashboard_langjs.php:432
+#: ../../../dashboard_langjs.php:445 ../../../dashboard_langjs.php:546
+msgid "Min value"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:118 ../../../dashboard_langjs.php:433
+#: ../../../dashboard_langjs.php:446 ../../../dashboard_langjs.php:547
+msgid "Min value to show"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:124 ../../../dashboard_langjs.php:456
+msgid "Style"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:128 ../../../dashboard_langjs.php:259
+#: ../../../dashboard_langjs.php:483 ../../../dashboard_langjs.php:515
+msgid "Value is multiplied by scale before display"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:130 ../../../dashboard_langjs.php:457
+msgid "With colour gradients"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:131 ../../../dashboard_langjs.php:458
+msgid "Without colour gradients"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:135
 msgid ""
 "Feed to set, control with caution, make sure device being controlled can "
 "operate safely in event of emoncms failure."
 msgstr ""
 
-#: ../../../dashboard_langjs.php:114
+#: ../../../dashboard_langjs.php:136
 msgid "Starting value"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:115
+#: ../../../dashboard_langjs.php:137
 msgid "Value"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:118 ../../../dashboard_langjs.php:160
-msgid "Bottom feed value"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:120 ../../../dashboard_langjs.php:195
-msgid "Top feed value"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:130
-msgid "Should the graduation limits be shown"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:131
-msgid "Static offset. Subtracted from value before computing needle position"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:132
-msgid "Type"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:133
-msgid "Type to show"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:135 ../../../dashboard_langjs.php:144
-#: ../../../dashboard_langjs.php:151 ../../../dashboard_langjs.php:200
-msgid "Units to show"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:136
-msgid "Value is multiplied by scale before display"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:139
-msgid "Decimals"
-msgstr ""
-
 #: ../../../dashboard_langjs.php:140
-msgid "Decimals to show"
+msgid "0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:141
+msgid "Button Text"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:142
+msgid "Caption"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:144
+msgid "Confirmation"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:145
+msgid "Confirmation Box: yes/no"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:146
+msgid "Data to send"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:147
+msgid "Do you want to continue?"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:148
+msgid "GET/POST"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:149
+msgid "HTTPS"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:150
+msgid "in milliseconds"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:151
+msgid "IP"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:152
+msgid "IP address of server"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:153
+msgid "Listen port of server"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:154
+msgid "Method"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:155
+msgid "Payload"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:156
+msgid "Port"
 msgstr ""
 
 #: ../../../dashboard_langjs.php:158
-msgid "0 = before value, 1 = after value"
+msgid "URL"
 msgstr ""
 
 #: ../../../dashboard_langjs.php:159
-msgid "Bottom"
+msgid "URL example: node/param"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:162
-msgid "Consumption"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:163
-msgid "Consumption feed value"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:164
-msgid "Currency"
+#: ../../../dashboard_langjs.php:160
+msgid "yes/no"
 msgstr ""
 
 #: ../../../dashboard_langjs.php:165
-msgid "Currency position"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:166
-msgid "Currency to show"
-msgstr ""
-
-#: ../../../dashboard_langjs.php:167
-msgid "Decimal points"
+msgid "Bottom feed value"
 msgstr ""
 
 #: ../../../dashboard_langjs.php:168
-msgid "delta"
+msgid "Feed Bottom"
 msgstr ""
 
 #: ../../../dashboard_langjs.php:169
-msgid "dp"
+msgid "Feed Top"
 msgstr ""
 
 #: ../../../dashboard_langjs.php:171
-msgid "Feed source"
+msgid "No display"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:172
-msgid "Fill"
+#: ../../../dashboard_langjs.php:172 ../../../dashboard_langjs.php:201
+#: ../../../dashboard_langjs.php:341 ../../../dashboard_langjs.php:377
+#: ../../../dashboard_langjs.php:404
+msgid "Temp unit"
 msgstr ""
 
 #: ../../../dashboard_langjs.php:173
-msgid "Fill value"
+msgid "Top feed value"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:174
-msgid "interval"
+#: ../../../dashboard_langjs.php:175 ../../../dashboard_langjs.php:204
+#: ../../../dashboard_langjs.php:344 ../../../dashboard_langjs.php:380
+#: ../../../dashboard_langjs.php:406
+msgid "Units of the choosen temp feed"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:175
-msgid ""
-"Interval (seconds)-you can set \"d\" for day, \"m\" for month, or \"y\" for "
-"year"
+#: ../../../dashboard_langjs.php:183 ../../../dashboard_langjs.php:268
+#: ../../../dashboard_langjs.php:296 ../../../dashboard_langjs.php:323
+#: ../../../dashboard_langjs.php:352 ../../../dashboard_langjs.php:387
+msgid "Colour used for display"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:176
-msgid "kwhd"
+#: ../../../dashboard_langjs.php:189 ../../../dashboard_langjs.php:274
+#: ../../../dashboard_langjs.php:304 ../../../dashboard_langjs.php:329
+#: ../../../dashboard_langjs.php:359 ../../../dashboard_langjs.php:393
+msgid "Font used for display"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:177
-msgid "kwhd source"
+#: ../../../dashboard_langjs.php:193 ../../../dashboard_langjs.php:333
+#: ../../../dashboard_langjs.php:366 ../../../dashboard_langjs.php:396
+msgid "Humidity"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:178
-msgid "Kwh price"
+#: ../../../dashboard_langjs.php:197 ../../../dashboard_langjs.php:337
+#: ../../../dashboard_langjs.php:370 ../../../dashboard_langjs.php:400
+msgid "Relative humidity in %"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:179
-msgid "Line colour in hex. Blank is use default."
+#: ../../../dashboard_langjs.php:198 ../../../dashboard_langjs.php:281
+#: ../../../dashboard_langjs.php:313 ../../../dashboard_langjs.php:338
+#: ../../../dashboard_langjs.php:373 ../../../dashboard_langjs.php:401
+msgid "Size"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:180
-msgid "Mid"
+#: ../../../dashboard_langjs.php:199 ../../../dashboard_langjs.php:339
+#: ../../../dashboard_langjs.php:374 ../../../dashboard_langjs.php:402
+msgid "Temperature"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:181
-msgid "Mid value"
+#: ../../../dashboard_langjs.php:200 ../../../dashboard_langjs.php:340
+#: ../../../dashboard_langjs.php:376 ../../../dashboard_langjs.php:403
+msgid "Temperature feed"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:182
-msgid "Power"
+#: ../../../dashboard_langjs.php:202 ../../../dashboard_langjs.php:282
+#: ../../../dashboard_langjs.php:314 ../../../dashboard_langjs.php:342
+#: ../../../dashboard_langjs.php:378 ../../../dashboard_langjs.php:405
+msgid "Text size in px to use"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:183
-msgid "Power to show"
+#: ../../../dashboard_langjs.php:210
+msgid "Black <-> White, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:184
-msgid "scale"
+#: ../../../dashboard_langjs.php:211
+msgid "Blue <-> Red, Zero at upper-left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:185
-msgid "Scale by"
+#: ../../../dashboard_langjs.php:219
+msgid "Green <-> Red, Zero at center"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:186
-msgid "Set kwh price"
+#: ../../../dashboard_langjs.php:220
+msgid "Green <-> Red, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:187
-msgid "Solar"
+#: ../../../dashboard_langjs.php:221
+msgid "Green center <-> orange edges, Zero at center"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:188
-msgid "Solar feed value"
+#: ../../../dashboard_langjs.php:222
+msgid "Light <-> dark blue, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:189
-msgid ""
-"St to \"1\" to show diff between each bar. It displays an ever-increasing Wh "
-"feed as a daily\\/montly\\/yeayly kWh feed (set interval to \"d\", or \"m\", "
-"or \"y\" )"
+#: ../../../dashboard_langjs.php:223
+msgid "Light <-> dark cyan, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:190
-msgid "Threshold A"
+#: ../../../dashboard_langjs.php:224
+msgid "Light <-> dark green, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:191
-msgid "Threshold A used"
+#: ../../../dashboard_langjs.php:225
+msgid "Light <-> dark grey, alternating, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:192
-msgid "Threshold B"
+#: ../../../dashboard_langjs.php:226
+msgid "Light <-> dark lime, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:193
-msgid "Threshold B used"
+#: ../../../dashboard_langjs.php:227
+msgid "Light <-> dark mint, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:194
-msgid "Top"
+#: ../../../dashboard_langjs.php:228
+msgid "Light <-> dark orange, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:196
-msgid "Ufac"
+#: ../../../dashboard_langjs.php:229
+msgid "Light <-> dark pink, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:197
-msgid "Ufac value"
+#: ../../../dashboard_langjs.php:230
+msgid "Light <-> dark purple, Zero at left"
 msgstr ""
 
-#: ../../../dashboard_langjs.php:199
-msgid "units"
+#: ../../../dashboard_langjs.php:231
+msgid "Light <-> dark red, Zero at left"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:232
+msgid "Light <-> dark royal blue, Zero at left"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:233
+msgid "Light <-> dark yellow, Zero at left"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:234
+msgid "Light blue <-> Red, Zero at mid-left"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:242
+msgid "Rainbow!, Zero at left"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:243
+msgid "Red <-> Dark Red, Zero at left"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:244
+msgid "Red <-> Green, Zero at center"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:245
+msgid "Red <-> Green, Zero at left"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:246
+msgid "Reverse Rainbow!, Zero at left"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:248
+msgid "Should the graduation limits be shown"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:249
+msgid "Static offset. Subtracted from value before computing needle position"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:254
+msgid "Type"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:255
+msgid "Type to show"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:289
+msgid "Alignment"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:290
+msgid "Append Text"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:291
+msgid "Append Text (Units)"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:294
+msgid "Center"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:308
+msgid "Left"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:311
+msgid "Prepend Text"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:312
+msgid "Right"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:355
+msgid "Display Nothing"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:362
+msgid "Formula applied for T between 50°F and aproximately 80°F"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:363
+msgid "Formula applied for T lower than 50°F"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:365
+msgid "Heat Index"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:371
+msgid "Rule 1"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:372
+msgid "Rule 2"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:375
+msgid "Temperature Feed"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:409 ../../../dashboard_langjs.php:567
+msgid "Circle"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:410 ../../../dashboard_langjs.php:568
+msgid "Colour1"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:411 ../../../dashboard_langjs.php:569
+msgid "Colour2"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:412 ../../../dashboard_langjs.php:570
+msgid "Colour3"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:413 ../../../dashboard_langjs.php:571
+msgid "Colour for range above Threshold2"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:414 ../../../dashboard_langjs.php:572
+msgid "Colour for range below Threshold1"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:415 ../../../dashboard_langjs.php:573
+msgid "Colour for range between Threshold1 and Threshold2"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:418 ../../../dashboard_langjs.php:576
+msgid "Shape"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:419 ../../../dashboard_langjs.php:577
+msgid "Square"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:420 ../../../dashboard_langjs.php:578
+msgid "Star 5 spikes"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:421 ../../../dashboard_langjs.php:579
+msgid "Star 6 spikes"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:422 ../../../dashboard_langjs.php:580
+msgid "Threshold1"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:423
+msgid "Threshold1 in seconds"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:424 ../../../dashboard_langjs.php:582
+msgid "Threshold2"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:425
+msgid "Threshold2 in seconds"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:426 ../../../dashboard_langjs.php:584
+msgid "Triangle"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:435 ../../../dashboard_langjs.php:448
+#: ../../../dashboard_langjs.php:590
+msgid "Scale applied to value"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:440
+msgid "Feed 1"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:441
+msgid "Feed 2"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:442
+msgid "Feed 2 (Min/Max for example)"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:463
+msgid "Color of the signal"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:465
+msgid "Colour signal"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:481
+msgid "Signal title"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:509
+msgid "Solar title"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:510
+msgid "solar title"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:558
+msgid "Title of thermometer"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:581
+msgid "Threshold1 value"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:583
+msgid "Threshold2 value"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:588
+msgid "Feed Wind"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:592
+msgid "Units to show for value"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:593
+msgid "Value shown (wind speed)"
+msgstr ""
+
+#: ../../../dashboard_langjs.php:594
+msgid "Wind direction"
 msgstr ""
 
 #: ../../../dashboard_model.php:52
