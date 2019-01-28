@@ -66,9 +66,11 @@ function dashboard_controller()
     }
     else if ($route->format == 'json')
     {
-        if ($session['write']) {
+        if ($session['read']) {
             if ($route->action=='list') $result = $dashboard->get_list($session['userid'], false, false);
-            else if ($route->action=='set') $result = $dashboard->set($session['userid'],prop('id'),prop('fields'));
+        }
+        else if ($session['write']) {
+            if ($route->action=='set') $result = $dashboard->set($session['userid'],prop('id'),prop('fields'));
             else if ($route->action=='getcontent') $result = $dashboard->get_content($session['userid'],get('id'));
             else if ($route->action=='setcontent') $result = $dashboard->set_content($session['userid'],post('id'),post('content'),post('height'));
             else if ($route->action=='create') $result = $dashboard->create($session['userid']);
