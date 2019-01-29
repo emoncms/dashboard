@@ -97,7 +97,7 @@ function bar_widgetlist()
     addOption(widgets["bar"], "feedid",         "feedid",           _Tr("Feed"),            _Tr("Feed value"),                                                                  []);
     addOption(widgets["bar"], "max",            "value",            _Tr("Max value"),       _Tr("Max value to show"),                                                           []);
     addOption(widgets["bar"], "scale",          "value",            _Tr("Scale"),           _Tr("Value is multiplied by scale before display. Defaults to 1"),                  []);
-    addOption(widgets["bar"], "units",          "value",            _Tr("Units"),           _Tr("Units to show"),                                                               []);
+    addOption(widgets["bar"], "units",          "dropbox_other",    _Tr("Units"),           _Tr("Units to show"),                                                               _SI);
     addOption(widgets["bar"], "unitend",        "dropbox",          _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                              unitEndOptions);
     addOption(widgets["bar"], "decimals",       "dropbox",          _Tr("Decimals"),        _Tr("Decimals to show"),                                                            decimalsDropBoxOptions);
     addOption(widgets["bar"], "offset",         "value",            _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing"),                       []);

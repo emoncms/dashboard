@@ -76,7 +76,7 @@ function sun_widgetlist(){
   addOption(widgets["sun"],   "feedid",       "feedid",          _Tr("Feed"),          _Tr("Feed value"),                                            []);
   addOption(widgets["sun"],   "max",          "value",           _Tr("Max value"),     _Tr("Max value to show"),                                     []);
   addOption(widgets["sun"],   "scale",        "value",           _Tr("Scale"),         _Tr("Value is multiplied by scale before display"),           []);
-  addOption(widgets["sun"],   "units",        "value",           _Tr("Units"),         _Tr("Units to show"),                                         []);
+  addOption(widgets["sun"],   "units",        "dropbox_other",   _Tr("Units"),         _Tr("Units to show"),                                         _SI);
   addOption(widgets["sun"],   "unitend",      "dropbox",         _Tr("Unit position"), _Tr("Where should the unit be shown"),                        unitEndOptions);
   addOption(widgets["sun"],   "decimals",     "dropbox",         _Tr("Decimals"),      _Tr("Decimals to show"),                                      decimalsDropBoxOptions);
   addOption(widgets["sun"],   "offset",       "value",           _Tr("Offset"),        _Tr("Static offset. Subtracted from value before computing"), []);

@@ -126,7 +126,7 @@ function toolboxMove(e) {
     var widget = <?php echo json_encode($widgets); ?>;
     var redraw = 0;
     var reloadiframe = -1; // force iframes url to recalculate for all vis widgets
-
+    var _SI = designer.get_SI(); // get a list of International System of Units (SI)
     $('#can').width($('#dashboardpage').width());
 
     render_widgets_init(widget); // populate widgets variable
@@ -141,7 +141,7 @@ function toolboxMove(e) {
     render_widgets_start(); // start widgets refresh
 
     var lastsavecontent = $("#page").html();
-
+    
     $("#save-dashboard").click(function (){
         var currentcontent = $("#page").html();
 

@@ -36,6 +36,7 @@ LANG_JS["On"] = '<?php echo addslashes(_("On")); ?>';
 LANG_JS["Percentage"] = '<?php echo addslashes(_("Percentage")); ?>';
 LANG_JS["Pixels"] = '<?php echo addslashes(_("Pixels")); ?>';
 LANG_JS["Width"] = '<?php echo addslashes(_("Width")); ?>';
+LANG_JS["Other"] = '<?php echo addslashes(_("Other")); ?>';
 
 // widgetlist.js
 LANG_JS["Html code to show"] = '<?php echo addslashes(_("Html code to show")); ?>';

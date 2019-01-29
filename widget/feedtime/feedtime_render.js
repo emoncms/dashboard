@@ -94,14 +94,14 @@ function feedtime_widgetlist()
 					[1, _Tr("Front")]
 				];
 
-	addOption(widgets["feedtime"], "feedid",     "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
-	addOption(widgets["feedtime"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
-	addOption(widgets["feedtime"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
-	addOption(widgets["feedtime"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
-	addOption(widgets["feedtime"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-	addOption(widgets["feedtime"], "units",      "value",   _Tr("Units"),    _Tr("Units to show"),   []);
-	addOption(widgets["feedtime"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
-	addOption(widgets["feedtime"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
+	addOption(widgets["feedtime"], "feedid",  "feedid",        _Tr("Feed"),          _Tr("Feed value"),                     []);
+	addOption(widgets["feedtime"], "colour",  "colour_picker", _Tr("Colour"),        _Tr("Colour used for display"),        []);
+	addOption(widgets["feedtime"], "font",    "dropbox",       _Tr("Font"),          _Tr("Font used for display"),          fontoptions);
+	addOption(widgets["feedtime"], "fstyle",  "dropbox",       _Tr("Font style"),    _Tr("Font style used for display"),    fstyleoptions);
+	addOption(widgets["feedtime"], "fweight", "dropbox",       _Tr("Font weight"),   _Tr("Font weight used for display"),   fweightoptions);
+	addOption(widgets["feedtime"], "units",   "dropbox_other", _Tr("Units"),         _Tr("Units to show"),                  _SI);
+	addOption(widgets["feedtime"], "size",    "dropbox",       _Tr("Size"),          _Tr("Text size in px to use"),         sizeoptions);
+	addOption(widgets["feedtime"], "unitend", "dropbox",       _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
 
 	return widgets;
 }
@@ -210,7 +210,10 @@ function feedtime_draw()
 			var font = $(this).attr("font");
 			var feedid = $(this).attr("feedid");
 		  if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
-			if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
+			if (associd[feedid] === undefined) { 
+                // console.log("Review config for feed id of " + $(this).attr("class"));
+                return; 
+            }
 
 			var val = ((new Date()).getTime() / 1000  - offsetofTime - (associd[feedid]["time"] * 1));
 
