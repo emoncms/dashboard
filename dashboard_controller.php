@@ -69,7 +69,8 @@ function dashboard_controller()
         if ($session['read']) {
             if ($route->action=='list') $result = $dashboard->get_list($session['userid'], false, false);
         }
-        else if ($session['write']) {
+        
+        if ($session['write']) {
             if ($route->action=='set') $result = $dashboard->set($session['userid'],prop('id'),prop('fields'));
             else if ($route->action=='getcontent') $result = $dashboard->get_content($session['userid'],get('id'));
             else if ($route->action=='setcontent') $result = $dashboard->set_content($session['userid'],post('id'),post('content'),post('height'));
