@@ -105,14 +105,14 @@ function feedvalue_widgetlist()
 	addOption(widgets["feedvalue"], "append",  "value", _Tr("Append Text"), _Tr("Append Text (Units)"), []);
 	addOption(widgets["feedvalue"], "decimals", "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["feedvalue"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
-
 	addOption(widgets["feedvalue"], "align",    "dropbox", _Tr("Alignment"), _Tr("Alignment"), alignmentOptions);
 	addOption(widgets["feedvalue"], "timeout",  "value",   _Tr("Timeout"),    _Tr("Timeout without feed update in seconds (empty is never)"),   []);
+	addOption(widgets["feedvalue"], "errormessagedisplayed",    "value",  _Tr("Error Message"),   _Tr("Error message displayed when timeout is reached"),   []);
 
 	return widgets;
 }
 
-function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,append,colour,decimals,size,align,errorCode)
+function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,append,colour,decimals,size,align,errorCode,errorMessage)
 {
     colour = colour || "4444CC";
     size = size || "8";
@@ -199,7 +199,7 @@ function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,a
 
     if (errorCode === "1")
     {
-        feedvalue.html("TO Error");
+        feedvalue.html(errorMessage);
     }
     else
     {
@@ -212,7 +212,10 @@ function feedvalue_draw()
     $(".feedvalue").each(function(index)
     {
         var feedvalue = $(this);
-
+        var errorMessage = $(this).attr("errormessagedisplayed");
+        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
+          errorMessage = "TO Error";
+        }
         var errorTimeout = feedvalue.attr("timeout");
         if (errorTimeout === "" || errorTimeout === undefined){           //Timeout parameter is empty
             errorTimeout = 0;
@@ -281,7 +284,8 @@ function feedvalue_draw()
             feedvalue.attr("decimals"),
             feedvalue.attr("size"),
             feedvalue.attr("align"),
-            errorCode
+            errorCode,
+            errorMessage
         );
     });
 }

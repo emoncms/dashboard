@@ -89,8 +89,8 @@ function thermometer_widgetlist()
                     [1, _Tr("Yes")]
                     ];
 
-    addOption(widgets["thermometer"], "titleThermometer",      "value",            _Tr("Title"),           _Tr("Title of thermometer"),                                                                []);
-    addOption(widgets["thermometer"], "colourLabel",   "colour_picker",    _Tr("Label Colour"),    _Tr("Colour of title and values"),                                                  []);
+    addOption(widgets["thermometer"], "titleThermometer",      "value",            _Tr("Title"),     _Tr("Title of thermometer"),                                                                []);
+    addOption(widgets["thermometer"], "colourLabel",   "colour_picker",     _Tr("Label Colour"),    _Tr("Colour of title and values"),                                                  []);
     addOption(widgets["thermometer"], "font",           "dropbox",          _Tr("Font used"),       _Tr("Font used"),                                                                   fontoptions);
     addOption(widgets["thermometer"], "fstyle",         "dropbox",          _Tr("Font style"),      _Tr("Font style used for display"),                                                 fstyleoptions);
     addOption(widgets["thermometer"], "fweight",        "dropbox",          _Tr("Font weight"),     _Tr("Font weight used for display"),                                                fweightoptions);
@@ -98,7 +98,7 @@ function thermometer_widgetlist()
     addOption(widgets["thermometer"], "min",            "value",            _Tr("Min value"),       _Tr("Min value to show"),                                                           []);
     addOption(widgets["thermometer"], "max",            "value",            _Tr("Max value"),       _Tr("Max value to show"),                                                           []);
     addOption(widgets["thermometer"], "scale",          "value",            _Tr("Scale"),           _Tr("Value is multiplied by scale before display. Defaults to 1"),                  []);
-    addOption(widgets["thermometer"], "units",          "value",            _Tr("Units"),           _Tr("Units to show"),                                                               []);
+    addOption(widgets["thermometer"], "units",          "dropbox_other",    _Tr("Units"),           _Tr("Units to show"),                                                               _SI);
     addOption(widgets["thermometer"], "unitend",        "dropbox",          _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                              unitEndOptions);
     addOption(widgets["thermometer"], "decimals",       "dropbox",          _Tr("Decimals"),        _Tr("Decimals to show"),                                                            decimalsDropBoxOptions);
     addOption(widgets["thermometer"], "offset",         "value",            _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing"),                       []);
@@ -107,7 +107,9 @@ function thermometer_widgetlist()
     addOption(widgets["thermometer"], "displayminmax",  "dropbox",          _Tr("Min / Max ?"),     _Tr("Display Min. and Max. ?"),                                                     displayminmaxDropBoxOptions);
     addOption(widgets["thermometer"], "minvaluefeed",   "feedid",           _Tr("Min. feed"),       _Tr("The feed for the minimum value"),                                              []);
     addOption(widgets["thermometer"], "maxvaluefeed",   "feedid",           _Tr("Max. feed"),       _Tr("The feed for the maximum value"),                                              []);
-    addOption(widgets["thermometer"], "colourMinMax",  "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
+    addOption(widgets["thermometer"], "colourMinMax",  "colour_picker",     _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
+    addOption(widgets["thermometer"], "timeout",       "value",             _Tr("Timeout"),         _Tr("Timeout without feed update in seconds (empty is never)"),                                           []);
+    addOption(widgets["thermometer"], "errormessagedisplayed",       "value",        _Tr("Error Message"),         _Tr("Error message displayed when timeout is reached"),                                           []);
 
 
     return widgets;
@@ -137,7 +139,9 @@ function draw_thermometer(context,
                   displayminmax,
                   minvaluefeed,
                   maxvaluefeed,
-                  colourMinMax
+                  colourMinMax,
+                  errorCode,
+                  errorMessage
                   )
 {
     if (!context) {return;}
@@ -197,7 +201,6 @@ function draw_thermometer(context,
         else {
              rawValue = rawValue.toFixed(decimals);
         }
-
         if (decimals<0){
             if (minvaluefeed>=100) {
             minvaluefeed = minvaluefeed.toFixed(0);
@@ -332,12 +335,12 @@ function draw_thermometer(context,
     context.arc(halfWidth/2,height*0.9 - width*0.01,halfWidth*0.2-width*0.02,0,2*Math.PI);
     context.fillStyle = "#FB0000";
     context.fill();
-
-    context.fillRect(halfWidth*0.4 + width*0.02,
+    if(errorCode != "1"){                // Do not display the value if timeout is reached
+        context.fillRect(halfWidth*0.4 + width*0.02,
                     thermometerTop,
                     halfWidth*0.2 - width*0.04,
                     height*0.9 - thermometerTop);
-
+    }
     var thermometerMin=0;
     var thermometerMax=0;
 
@@ -428,9 +431,18 @@ function draw_thermometer(context,
 
     context.fillStyle = colourLabel;
     
-    var unitsandval = rawValue+unitsString;
+    var thermometertext;
+    if (errorCode === "1")
+      {
+        thermometertext = errorMessage;
+      }
+  else
+     {
+      if (unitend ==="0"){thermometertext= rawValue+unitsString;}
+      if (unitend ==="1"){thermometertext= unitsString+rawValue;}
+     }
     var valsize;
-    if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
+    if (thermometertext.length >4){ valsize = (size / (thermometertext.length+2)) * 5.5;}
     else {valsize = (size / 6) * 5.5;}
     var titlesize ;
     if (titleThermometer.length >10) {titlesize = (size / (titleThermometer.length+2)) * 9;}
@@ -438,8 +450,7 @@ function draw_thermometer(context,
     
     context.textAlign    = "center";
         context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
-        if (unitend ==="0"){context.fillText(rawValue+unitsString, width*0.75, height*0.6);}
-        if (unitend ==="1"){context.fillText(unitsString+rawValue, width*0.75, height*0.6);}
+        context.fillText(thermometertext, width*0.75, height*0.6);
         context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.25)+"px "+ fontname);
         context.fillText(titleThermometer, width*0.75, height*0.2);
 
@@ -466,6 +477,15 @@ function thermometer_draw()
 {
     $(".thermometer").each(function(index)
     {
+        var errorMessage = $(this).attr("errormessagedisplayed");
+        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
+          errorMessage = "TO Error";
+        }
+        var errorTimeout = $(this).attr("timeout");
+        if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
+          errorTimeout = 0;
+        }
+        var errorCode = "0";
         var feedid = $(this).attr("feedid");
         if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
         var minvaluefeed = $(this).attr("minvaluefeed")||"0";
@@ -477,7 +497,13 @@ function thermometer_draw()
 
         var val = (associd[feedid]["value"] * 1).toFixed(3);
         var val_curve = curve_value(feedid,dialrate).toFixed(3);
-
+        if (errorTimeout !== 0)
+        {
+          if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
+          {
+          errorCode = "1";
+          }
+        }
         // The minval and maxval feed settings default to the first feed in the feedlist 
         // which may not be public for use in public dashboards, which will then result in
         // an error. Here we set the min/max values to 0 where the feed settings are not valid
@@ -503,7 +529,7 @@ function thermometer_draw()
         }
 
         // ONLY UPDATE ON CHANGE
-        if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval ||redraw == 1)
+        if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval ||redraw == 1 || errorTimeout != 0)
         {
             var id = "can-"+$(this).attr("id");
             var scale = 1*$(this).attr("scale") || 1;
@@ -530,7 +556,9 @@ function thermometer_draw()
                      displayminmax,
                      minval*scale,
                      maxval*scale,
-                     $(this).attr("colourMinMax")
+                     $(this).attr("colourMinMax"),
+                     errorCode,
+                     errorMessage
                      );
         }
     });

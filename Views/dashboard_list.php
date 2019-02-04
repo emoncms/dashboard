@@ -77,11 +77,11 @@
     table.draw();
     if (table.data.length != 0) {
       $("#nodashboards").hide();
-      $("#localheading").show();
+      //$("#localheading").show();
       $("#bottomtoolbar").show();
     } else {
       $("#nodashboards").show();
-      $("#localheading").hide();
+      //$("#localheading").hide();
       $("#bottomtoolbar").show();
     };
   }
