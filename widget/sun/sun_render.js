@@ -251,9 +251,11 @@ function sun_draw(){
       context.fillStyle = color;
       context.textAlign = "center";
       context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.50)+"px "+ fontname);
+      if (errorCode === "1"){context.fillText(errorMessage, start_x + sun_width/2, start_y + centerY - radius*0.2);}
+      else{
       if (unitend ==="0"){context.fillText(data + units, start_x + sun_width/2, start_y + centerY - radius*0.2);}
       if (unitend ==="1"){context.fillText(units + data, start_x + sun_width/2, start_y + centerY - radius*0.2);}
-
+      }
       if(title)
       {
         context.fillStyle = color;
