@@ -60,16 +60,18 @@ function signal_widgetlist(){
 
   ];
 
-  addOption(widgets["signal"], "feedid",         "feedid",         _Tr("Feed"),           _Tr("Feed value"),                                            []);
-  addOption(widgets["signal"], "max",            "value",          _Tr("Max value"),      _Tr("Max value to show"),                                     []);
-  addOption(widgets["signal"], "scale",          "value",          _Tr("Scale"),          _Tr("Value is multiplied by scale before display"),           []);
-  addOption(widgets["signal"], "offset",         "value",          _Tr("Offset"),         _Tr("Static offset. Subtracted from value before computing"), []);
-  addOption(widgets["signal"], "signal_title",   "value",          _Tr("Signal title"),   _Tr("Signal title"),                                          []);
-  addOption(widgets["signal"], "colour1",        "colour_picker",  _Tr("Colour signal"),  _Tr("Color of the signal"),                                   []);
-  addOption(widgets["signal"], "colour",         "colour_picker",  _Tr("Colour label"),   _Tr("Color of the label"),                                    []);
-  addOption(widgets["signal"], "font",           "dropbox",        _Tr("Font"),           _Tr("Label font"),                                            fontoptions);
-  addOption(widgets["signal"], "fstyle",         "dropbox",        _Tr("Font style"),     _Tr("Font style used for display"),                           fstyleoptions);
-  addOption(widgets["signal"], "fweight",        "dropbox",        _Tr("Font weight"),    _Tr("Font weight used for display"),                          fweightoptions);
+  addOption(widgets["signal"], "feedid",                "feedid",         _Tr("Feed"),           _Tr("Feed value"),                                             []);
+  addOption(widgets["signal"], "max",                   "value",          _Tr("Max value"),      _Tr("Max value to show"),                                      []);
+  addOption(widgets["signal"], "scale",                 "value",          _Tr("Scale"),          _Tr("Value is multiplied by scale before display"),            []);
+  addOption(widgets["signal"], "offset",                "value",          _Tr("Offset"),         _Tr("Static offset. Subtracted from value before computing"),  []);
+  addOption(widgets["signal"], "signal_title",          "value",          _Tr("Signal title"),   _Tr("Signal title"),                                           []);
+  addOption(widgets["signal"], "colour1",               "colour_picker",  _Tr("Colour signal"),  _Tr("Color of the signal"),                                    []);
+  addOption(widgets["signal"], "colour",                "colour_picker",  _Tr("Colour label"),   _Tr("Color of the label"),                                     []);
+  addOption(widgets["signal"], "font",                  "dropbox",        _Tr("Font"),           _Tr("Label font"),                                             fontoptions);
+  addOption(widgets["signal"], "fstyle",                "dropbox",        _Tr("Font style"),     _Tr("Font style used for display"),                            fstyleoptions);
+  addOption(widgets["signal"], "fweight",               "dropbox",        _Tr("Font weight"),    _Tr("Font weight used for display"),                           fweightoptions);
+  addOption(widgets["signal"], "timeout",               "value",          _Tr("Timeout"),        _Tr("Timeout without feed update in seconds (empty is never)"),[]);
+  addOption(widgets["signal"], "errormessagedisplayed", "value",          _Tr("Error Message"),  _Tr("Error message displayed when timeout is reached"),        []);
 
   return widgets;
 }
@@ -80,12 +82,31 @@ function signal_init(){
 
 function signal_draw(){
   $(".signal").each(function(index) {
+    var errorMessage = $(this).attr("errormessagedisplayed");
+        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
+          errorMessage = "TO Error";
+        }
+    var errorTimeout = $(this).attr("timeout");
+        if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
+          errorTimeout = 0;
+        }
+
+    var errorCode = "0";
+
     var feedid = $(this).attr("feedid");
     if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var val = curve_value(feedid,dialrate).toFixed(3);
+
+    if (errorTimeout !== 0)
+      {
+        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
+        {
+          errorCode = "1";
+        }
+      }
     // ONLY UPDATE ON CHANGE
-    if (val != (associd[feedid]["value"] * 1).toFixed(3) || redraw == 1)
+    if (val != (associd[feedid]["value"] * 1).toFixed(3) || redraw == 1|| errorTimeout != 0)
     {
       var id = "can-"+$(this).attr("id");
       var scale = 1*$(this).attr("scale") || 1;
@@ -165,13 +186,17 @@ function signal_draw(){
 
       var signal_bars = Math.ceil(number_of_blocks*(data/max_val));
 
+  if (errorCode == "1")
+  {
+     signal_bars=0;
+  }
+
       for(var i=0; i<number_of_blocks; i++)
       {
         var angle = 0;
         arc_radius -= block_width;
         if(arc_radius < 0){break;}
 
-        
         context.beginPath();
         context.arc(start_x + centerX, start_y + centerY, arc_radius, (1.25+angle) * Math.PI, (1.75-angle) * Math.PI, false);
 
@@ -194,6 +219,16 @@ function signal_draw(){
         context.textAlign = "center";
         context.font = (fontstyle+ " "+ fontweight+ " "+ (titlesize*0.70)+"px "+ fontname);
         context.fillText(title, start_x + signal_width/2, start_y + centerY - radius*0.6);
+      }
+  if (errorCode == "1")
+      {
+        var errorMessagesize ;
+        if (errorMessage.length >10) {errorMessagesize = (size / (errorMessage.length+2)) * 9;}
+        else {errorMessagesize = (size / 12) * 9.5;}
+        context.fillStyle = color;
+        context.textAlign = "center";
+        context.font = (fontstyle+ " "+ fontweight+ " "+ (errorMessagesize*0.70)+"px "+ fontname);
+        context.fillText(errorMessage, start_x + signal_width/2, start_y + centerY - radius*0.3);
       }
     }
   });
