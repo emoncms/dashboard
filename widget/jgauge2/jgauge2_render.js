@@ -17,10 +17,10 @@ function jgauge2_widgetlist()
     {
       "offsetx":-80,"offsety":-80,"width":160,"height":160,
       "menu":"Widgets",
-      "options":["feedid", "feedid2", "scale", "max", "min", "units"],
-      "optionstype":["feedid","feedid","value","value","value"],
-      "optionsname":[_Tr("Feed 1"),_Tr("Feed 2"),_Tr("Scale"),_Tr("Max value"),_Tr("Min value"),_Tr("Units")],
-      "optionshint":[_Tr("Feed 1"),_Tr("Feed 2 (Min/Max for example)"),_Tr("Scale applied to value"),_Tr("Max value to show"),_Tr("Min value to show"),_Tr("Units to show")]
+      "options":["feedid", "feedid2", "scale", "max", "min", "units","timeout","errormessagedisplayed"],
+      "optionstype":["feedid","feedid","value","value","value","value","value"],
+      "optionsname":[_Tr("Feed 1"),_Tr("Feed 2"),_Tr("Scale"),_Tr("Max value"),_Tr("Min value"),_Tr("Units"),_Tr("Timeout"),_Tr("Error Message")],
+      "optionshint":[_Tr("Feed 1"),_Tr("Feed 2 (Min/Max for example)"),_Tr("Scale applied to value"),_Tr("Max value to show"),_Tr("Min value to show"),_Tr("Units to show"),_Tr("Timeout without feed update in seconds (empty is never)"),_Tr("Error message displayed when timeout is reached")]
 
     }
   }
@@ -47,6 +47,17 @@ function jgauge2_draw()
 {
   $('.jgauge2').each(function(index)
   {
+    var errorMessage = $(this).attr("errormessagedisplayed");
+        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
+          errorMessage = "TO Error";
+        }
+    var errorTimeout = $(this).attr("timeout");
+        if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
+          errorTimeout = 0;
+        }
+
+    var errorCode = "0";
+
     var feedid = $(this).attr("feedid");
     if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     var feedid2 = $(this).attr("feedid2");
@@ -55,14 +66,22 @@ function jgauge2_draw()
     if (associd[feedid2] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var val = curve_value(feedid,dialrate).toFixed(3);
     var val2 = curve_value(feedid2, dialrate).toFixed(3);
+
+    if (errorTimeout !== 0)
+      {
+        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
+        {
+          errorCode = "1";
+        }
+      }
     // ONLY UPDATE ON CHANGE
     if (val != (associd[feedid]['value'] * 1).toFixed(3) || 
         val2 != (associd[feedid2]['value'] * 1).toFixed(3) ||
-        redraw == 1)
+        redraw == 1 || errorTimeout != 0)
     {
       var id = "can-"+$(this).attr("id");
       var scale = 1*$(this).attr("scale") || 1;
-      draw_jgauge2(widgetcanvas[id],0,0,$(this).width(),$(this).height(),val*scale,val2*scale,$(this).attr("max"),$(this).attr("min"),$(this).attr("units"));
+      draw_jgauge2(widgetcanvas[id],0,0,$(this).width(),$(this).height(),val*scale,val2*scale,$(this).attr("max"),$(this).attr("min"),$(this).attr("units"),errorCode,errorMessage);
     }
   });
 }
@@ -77,7 +96,7 @@ function jgauge2_fastupdate()
   jgauge2_draw();
 }
 
-function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units)
+function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units,errorCode,errorMessage)
 {
   if (!max) max = 1000;
   if (!min) min = 0;
@@ -145,9 +164,14 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units)
   ctx.font = "14pt Calibri,Geneva,Arial";
   ctx.strokeStyle = "rgb(255,255,255)";
   ctx.fillStyle = "rgb(255,255,255)";
+  if (errorCode!= "1"){
   value = Number(value.toFixed(decimalPlaces));
   ctx.fillText(value+units, 50*(size/100), 88*(size/100));
-
+  }
+  else
+  {
+  ctx.fillText(errorMessage, 50*(size/100), 85*(size/100));
+  }
   // max label
   ctx.font = "10pt Calibri,Geneva,Arial";
   ctx.strokeStyle = "rgb(255,255,255)";
@@ -163,7 +187,9 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units)
   // Rotate around this point
   ctx.rotate((position + offset) * (Math.PI / 180));
   // Draw the image back and up
+  if (errorCode!= "1"){
   ctx.drawImage(needle_jgauge2, -(size/2), -(size/2), size, size);
+  }
   // Restore the previous drawing state
   ctx.restore(); 
 
