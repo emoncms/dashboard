@@ -97,13 +97,13 @@ function feedvalue_widgetlist()
   ];
 				
 	addOption(widgets["feedvalue"], "feedid",   "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
+	addOption(widgets["feedvalue"], "prepend",    "value",   _Tr("Prepend Text"),    _Tr("Prepend Text"),   []);
+	addOption(widgets["feedvalue"], "append",  "value", _Tr("Append Text"), _Tr("Append Text (Units)"), []);
+	addOption(widgets["feedvalue"], "decimals", "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["feedvalue"], "colour",   "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
 	addOption(widgets["feedvalue"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
 	addOption(widgets["feedvalue"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
 	addOption(widgets["feedvalue"], "fweight",  "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-	addOption(widgets["feedvalue"], "prepend",    "value",   _Tr("Prepend Text"),    _Tr("Prepend Text"),   []);
-	addOption(widgets["feedvalue"], "append",  "value", _Tr("Append Text"), _Tr("Append Text (Units)"), []);
-	addOption(widgets["feedvalue"], "decimals", "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["feedvalue"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
 	addOption(widgets["feedvalue"], "align",    "dropbox", _Tr("Alignment"), _Tr("Alignment"), alignmentOptions);
 	addOption(widgets["feedvalue"], "timeout",  "value",   _Tr("Timeout"),    _Tr("Timeout without feed update in seconds (empty is never)"),   []);
