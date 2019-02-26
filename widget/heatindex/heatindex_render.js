@@ -131,6 +131,12 @@ function heatindex_widgetlist()
 					[0, _Tr("Temperature Feed")],
 					[1, _Tr("Display Nothing")]
 				];	
+  var alignmentOptions = [
+    ["center", _Tr("Center")],
+    ["left", _Tr("Left")],
+    ["right", _Tr("Right")]
+  ];
+
     
     addOption(widgets["heatindex"], "feedhumid", "feedid",        _Tr("Humidity"),      _Tr("Relative humidity in %"),                      []);
     addOption(widgets["heatindex"], "feedtemp",  "feedid",        _Tr("Temperature"),   _Tr("Temperature feed"),                            []);
@@ -143,11 +149,12 @@ function heatindex_widgetlist()
     addOption(widgets["heatindex"], "fstyle",    "dropbox",       _Tr("Font style"),    _Tr("Font style used for display"),                 fstyleoptions);
     addOption(widgets["heatindex"], "fweight",   "dropbox",       _Tr("Font weight"),   _Tr("Font weight used for display"),                fweightoptions);
     addOption(widgets["heatindex"], "size",      "dropbox",       _Tr("Size"),          _Tr("Text size in px to use"),                      sizeoptions);
+    addOption(widgets["heatindex"], "align",     "dropbox",       _Tr("Alignment"),     _Tr("Alignment"),                                   alignmentOptions);
     addOption(widgets["heatindex"], "unitend",   "dropbox",       _Tr("Unit position"), _Tr("Where should the unit be shown"),              unitEndOptions);
     return widgets;
 }
 
-function draw_heatindex(context,
+function draw_heatindex(feedvalue,
 		x_pos,				// these x and y coords seem unused?
 		y_pos,
 		font,
@@ -161,20 +168,15 @@ function draw_heatindex(context,
 		colour,
 		decimals,
 		size,
+		align,
 		unitend)
-		{
-			if (!context){
-			return;
-			}
-			
-			context.save();
-			context.clearRect(0,0,width,height); // Clear old drawing
-			context.restore();
+{
 			colour = colour || "4444CC";
 			size = size || "8";
 			font = font || "5";
 			fstyle = fstyle || "2";
 			fweight = fweight || "1";
+			align = align || "center";
 
 			var fontsize;
 
@@ -247,21 +249,22 @@ function draw_heatindex(context,
 		
 			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
 				colour = "#" + colour;	
-
-				context.fillStyle = colour;
-				context.textAlign    = "center";
-				context.textBaseline = "middle";
-				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
 				}
+
+			feedvalue.css({
+				"color":colour, 
+				"font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname,"text-align":align,
+				"line-height":height+"px"
+			});
 
 			if (unitend ==="0")
 				{
-				context.fillText(val+unit, width/2 , height/2);
+				feedvalue.html(val+unit);
 				}
 	
 			if (unitend ==="1")
 				{
-				context.fillText(unit+val, width/2 , height/2);
+				feedvalue.html(unit+val);
 				}
 			
 }
@@ -270,6 +273,7 @@ function heatindex_draw()
 {
   $(".heatindex").each(function(index)
   {
+    var feedvalue = $(this);
     var font = $(this).attr("font");
     var fstyle = $(this).attr("fstyle");
     var fweight = $(this).attr("fweight");
@@ -319,7 +323,7 @@ function heatindex_draw()
     {
 		var id = "can-"+$(this).attr("id");
 
-		draw_heatindex(widgetcanvas[id],
+		draw_heatindex(feedvalue,
 			0,
 			0,
 			$(this).attr("font"),
@@ -333,6 +337,7 @@ function heatindex_draw()
 			$(this).attr("colour"),
 			$(this).attr("decimals"),
 			$(this).attr("size"),
+			$(this).attr("align"),
 			$(this).attr("unitend")
 			);
 		}
@@ -342,7 +347,7 @@ function heatindex_draw()
 
 
 function heatindex_init(){
-	setup_widget_canvas("heatindex");
+	$(".feedvalue").html("");
 }
 
 function heatindex_slowupdate() { heatindex_draw();}
