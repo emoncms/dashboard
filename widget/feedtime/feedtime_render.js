@@ -93,6 +93,12 @@ function feedtime_widgetlist()
 					[0, _Tr("Back")],
 					[1, _Tr("Front")]
 				];
+  var alignmentOptions = [
+    ["center", _Tr("Center")],
+    ["left", _Tr("Left")],
+    ["right", _Tr("Right")]
+  ];
+			
 
 	addOption(widgets["feedtime"], "feedid",  "feedid",        _Tr("Feed"),          _Tr("Feed value"),                     []);
 	addOption(widgets["feedtime"], "colour",  "colour_picker", _Tr("Colour"),        _Tr("Colour used for display"),        []);
@@ -101,12 +107,13 @@ function feedtime_widgetlist()
 	addOption(widgets["feedtime"], "fweight", "dropbox",       _Tr("Font weight"),   _Tr("Font weight used for display"),   fweightoptions);
 	addOption(widgets["feedtime"], "units",   "dropbox_other", _Tr("Units"),         _Tr("Units to show"),                  _SI);
 	addOption(widgets["feedtime"], "size",    "dropbox",       _Tr("Size"),          _Tr("Text size in px to use"),         sizeoptions);
+	addOption(widgets["feedtime"], "align",    "dropbox", _Tr("Alignment"), _Tr("Alignment"), alignmentOptions);
 	addOption(widgets["feedtime"], "unitend", "dropbox",       _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
 
 	return widgets;
 }
 
-function draw_feedtime(context,
+function draw_feedtime(feedvalue,
 		x_pos,				// these x and y coords seem unused?
 		y_pos,
 		font,
@@ -118,21 +125,16 @@ function draw_feedtime(context,
 		units,
 		colour,
 		size,
+		align,
 		unitend)
 		{
-			if (!context){
-			return;
-			}
-
-			context.save();
-			context.clearRect(0,0,width,height); // Clear old drawing
-			context.restore();
 			colour = colour || "4444CC";
 			unitend = unitend || "0";
 			size = size || "8";
 			font = font || "5";
 			fstyle = fstyle || "2";
 			fweight = fweight || "1";
+			align = align || "center";
 
 			var fontsize;
 
@@ -180,21 +182,22 @@ function draw_feedtime(context,
 
 			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
 				colour = "#" + colour;	
+			}
 
-				context.fillStyle = colour;
-				context.textAlign    = "center";
-				context.textBaseline = "middle";
-				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
-				}
+			feedvalue.css({
+				"color":colour, 
+				"font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname,"text-align":align,
+				"line-height":height+"px"
+			});
 
 			if (unitend ==="0")
 			{
-			context.fillText(val+units, width/2 , height/2);
+			feedvalue.html(val+units);
 			}
 
 			if (unitend ==="1")
 			{
-			context.fillText(units+val, width/2 , height/2);
+			feedvalue.html(units+val);
 			}
 
 
@@ -206,10 +209,10 @@ function feedtime_draw()
 {
 	$(".feedtime").each(function(index)
 		{
-
+			var feedvalue = $(this);
 			var font = $(this).attr("font");
 			var feedid = $(this).attr("feedid");
-		  if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
+			if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
 			if (associd[feedid] === undefined) { 
                 // console.log("Review config for feed id of " + $(this).attr("class"));
                 return; 
@@ -231,7 +234,7 @@ function feedtime_draw()
 			{
 				var id = "can-"+$(this).attr("id");
 
-				draw_feedtime(widgetcanvas[id],
+				draw_feedtime(feedvalue,
 					0,
 					0,
 					$(this).attr("font"),
@@ -243,6 +246,7 @@ function feedtime_draw()
 					$(this).attr("units"),
 					$(this).attr("colour"),
 					$(this).attr("size"),
+					$(this).attr("align"),
 					$(this).attr("unitend")
 					);
 			}
@@ -251,7 +255,7 @@ function feedtime_draw()
 
 function feedtime_init()
 {
-	setup_widget_canvas("feedtime");
+	$(".feedvalue").html("");
 }
 function feedtime_slowupdate()
 	{
