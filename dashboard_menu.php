@@ -6,28 +6,27 @@
     // Contains a list for the drop down with dashboards available for user session type
     $listmenu = $dashboard->build_menu_array('view');
 
-
+    
     // sidebar nav
     foreach ($listmenu as $dash) {
-        $menu['dashboard'][] = array(
+        $menu['sidebar']['dashboard'][] = array(
             'title' => $dash['desc'],
             'text' => $dash['name'],
-            'path' => $dash['path'],
-            'icon' => 'dashboard'
+            'path' => str_replace('dashboard/view&id','dashboard/view?id',$dash['path']),
+            'order' => $dash['order']
         );
     }
-    $menu['category'][] = array(
-        'li_class'=>'btn-li',
+    $menu['tabs'][] = array(
         'icon'=>'dashboard',
         'title'=> _("Dashboards"),
         'path'=> 'dashboard/view',
         'active'=> 'dashboard',
-        'sort' => 3
+        'order' => 3,
+        'data'=> array('sidebar' => '#sidebar_dashboard')
     );
-    $menu['dashboard'][] = array(
-        'li_class'=>'btn-li',
+    $menu['sidebar']['dashboard'][] = array(
         'text'=> _("All Dashboards"),
         'path'=> 'dashboard/list',
         'active'=> 'dashboard',
-        'sort' => 1
+        'order' => 1
     );
