@@ -12,9 +12,7 @@ http://openenergymonitor.org
 global $session,$path,$dashboard_editor_icon;
 $js_css_version = 2;
 
-    $domain3 = "vis_messages";
-    bindtextdomain($domain3, "Modules/vis/locale");
-    bind_textdomain_codeset($domain3, 'UTF-8');
+load_language_files("Modules/vis/locale", "vis_messages");
 
 if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit?id='. $dashboard['id'].'"> <img src="'.$path.'Modules/dashboard/Views/icons/gear-icon-outlined.png" style="width:80%" ></a>';
 
@@ -29,7 +27,7 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
 
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 
- <div id="editicon" class="hidden-phone" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top:53px; right: 0px;">
+ <div id="editicon" class="hidden-phone" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top: 5rem; right: 1rem;">
 	<div id="innerbutton" style="cursor: default">
 		<?php echo $dashboard_editor_icon; ?>
 	</div>
