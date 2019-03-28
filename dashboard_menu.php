@@ -13,6 +13,7 @@
             'title' => $dash['desc'],
             'text' => $dash['name'],
             'path' => str_replace('dashboard/view&id','dashboard/view?id',$dash['path']),
+            'active' => str_replace('dashboard/view&id','dashboard/edit?id',$dash['path']),
             'order' => $dash['order']
         );
     }
@@ -20,13 +21,11 @@
         'icon'=>'dashboard',
         'title'=> _("Dashboards"),
         'path'=> 'dashboard/view',
-        'active'=> 'dashboard',
         'order' => 3,
         'data'=> array('sidebar' => '#sidebar_dashboard')
     );
     $menu['sidebar']['dashboard'][] = array(
         'text'=> _("All Dashboards"),
         'path'=> 'dashboard/list',
-        'active'=> 'dashboard',
         'order' => 1
     );
