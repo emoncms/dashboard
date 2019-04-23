@@ -19,7 +19,7 @@
         <p><?php echo _('Maybe you would like to add your first dashboard using the button bellow.') ?></p>
     </div>
 
-    <div id="table"><div align='center'>loading...</div></div>
+    <div id="table"><div>loading...</div></div>
 
     <div id="bottomtoolbar" class="hide"><hr>
         <button id="addnewdashboard" class="btn btn-small"><i class="icon-plus-sign" ></i>&nbsp;<?php echo _("New"); ?></button>
@@ -56,9 +56,9 @@
     'name':{'title':"<?php echo _('Name'); ?>", 'type':"text"},
     'alias':{'title':"<?php echo _('Alias'); ?>", 'type':"text"},
      // 'description':{'title':"<?php echo _('Description'); ?>", 'type':"text"},
-    'main':{'title':"<?php echo _('Main'); ?>", 'type':"icon", 'trueicon':"icon-star", 'falseicon':"icon-star-empty"},
+    'main':{'title':"<?php echo _('Default'); ?>", 'type':"icon", 'trueicon':"icon-star", 'falseicon':"icon-star-empty"},
     'public':{'title':"<?php echo _('Public'); ?>", 'type':"icon", 'trueicon':"icon-globe", 'falseicon':"icon-lock"},
-    'published':{'title':"<?php echo _('Published'); ?>", 'type':"icon", 'trueicon':"icon-ok", 'falseicon':"icon-remove"},
+    // 'published':{'title':"<?php echo _('Bookmarked'); ?>", 'type':"icon", 'trueicon':"icon-ok", 'falseicon':"icon-remove"},
 
     // Actions
     'clone-action':{'title':'', 'type':"iconbasic", 'icon':'icon-random'},
