@@ -10,7 +10,7 @@ http://openenergymonitor.org
 */
 
 global $session,$path,$dashboard_editor_icon;
-$js_css_version = 2;
+$js_css_version = 3;
 
 load_language_files("Modules/vis/locale", "vis_messages");
 
