@@ -10,10 +10,9 @@ http://openenergymonitor.org
 */
 
 global $session,$path;
-$js_css_version = 2;
-    $domain3 = "vis_messages";
-    bindtextdomain($domain3, "Modules/vis/locale");
-    bind_textdomain_codeset($domain3, 'UTF-8');
+$js_css_version = 3;
+
+load_language_files("Modules/vis/locale", "vis_messages");
 
 if (!$dashboard['height']) $dashboard['height'] = 400;
 if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
@@ -45,7 +44,7 @@ if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
     </div>
 </div>
 
-<div id="toolbox" style="cursor:move; text-align: center; background-color:#ddd; padding-left:5px; padding-right:5px; padding-bottom:15px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top:55px; right: 30px;"><?php echo _('Toolbox'); ?>
+<div id="toolbox" style="cursor:move; text-align: center; background-color:#ddd; padding-left:5px; padding-right:5px; padding-bottom:15px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top: 5rem; right: 1rem;"><?php echo _('Toolbox'); ?>
 	<div id="separator" style="height:1.5px; background:#717171"></div>
 	<div id="Buttons" style="position:relative; top:5px; cursor:pointer">
 	<span id="dashboard-config-buttons">

@@ -10,15 +10,23 @@ http://openenergymonitor.org
 */
 
 global $session,$path,$dashboard_editor_icon;
-$js_css_version = 2;
+$js_css_version = 3;
 
-    $domain3 = "vis_messages";
-    bindtextdomain($domain3, "Modules/vis/locale");
-    bind_textdomain_codeset($domain3, 'UTF-8');
+load_language_files("Modules/vis/locale", "vis_messages");
 
 if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit?id='. $dashboard['id'].'"> <img src="'.$path.'Modules/dashboard/Views/icons/gear-icon-outlined.png" style="width:80%" ></a>';
 
 ?>
+  <style>
+  #editicon{
+    text-align: center;
+    position: fixed;
+    z-index: 1;
+    width: 2rem;
+    top: 3.5rem;
+    right: .25rem;
+  }
+  </style>
   <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
   <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
   <script type="text/javascript"><?php require "Modules/vis/vis_langjs.php"; ?></script>
@@ -29,7 +37,7 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
 
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 
- <div id="editicon" class="hidden-phone" style="text-align:center; position:fixed;z-index:1; width: 35px; height: 35px; top:53px; right: 0px;">
+ <div id="editicon" class="hidden-phone">
 	<div id="innerbutton" style="cursor: default">
 		<?php echo $dashboard_editor_icon; ?>
 	</div>
@@ -40,7 +48,7 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
 
 <script type="application/javascript">
   var dashid = <?php echo $dashboard['id']; ?>;
-  var path = "<?php echo $path; ?>";
+//   var path = "<?php echo $path; ?>";
   var widget = <?php echo json_encode($widgets); ?>;
   var apikey = "<?php echo get('apikey'); ?>";
   var userid = <?php echo $session['userid']; ?>;
