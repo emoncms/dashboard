@@ -2,6 +2,7 @@
     global $mysqli,$route,$session;
     require_once "Modules/dashboard/dashboard_model.php";
     $dashboard = new Dashboard($mysqli);
+    load_language_files("Modules/dashboard/locale", "dashboard_messages");
 
     // get the default dashboard 
     $default = array();
@@ -14,7 +15,7 @@
     // navbar link
     $menu['tabs'][] = array(
         'icon'=>'dashboard',
-        'title'=> _("Dashboards"),
+        'title'=> dgettext("dashboard_messages","Dashboards"),
         'path'=> 'dashboard/view',
         'order' => 3,
         'data'=> array('sidebar' => '#sidebar_dashboard')
@@ -42,7 +43,7 @@
     }
 
     $menu['sidebar']['dashboard'][] = array(
-        'text'=> _("All Dashboards"),
+        'text'=> dgettext("dashboard_messages","All Dashboards"),
         'path'=> 'dashboard/list',
         'order' => 1
     );
