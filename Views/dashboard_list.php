@@ -1,5 +1,6 @@
 <?php
     global $path;
+    load_language_files("Modules/dashboard/locale", "dashboard_messages");
 ?>
 
 <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/dashboard.js"></script>
@@ -12,11 +13,11 @@
 </style>
 
 <div class="container">
-    <div id="localheading"><h2><?php echo _('Dashboards'); ?></h2></div>
+    <div id="localheading"><h2><?php echo dgettext('dashboard_messages','Dashboards'); ?></h2></div>
 
     <div id="nodashboards" class="alert alert-block hide">
-        <h4 class="alert-heading"><?php echo _('No dashboards created'); ?></h4>
-        <p><?php echo _('Maybe you would like to add your first dashboard using the button bellow.') ?></p>
+        <h4 class="alert-heading"><?php echo dgettext('dashboard_messages','No dashboards created'); ?></h4>
+        <p><?php echo dgettext('dashboard_messages','Maybe you would like to add your first dashboard using the button bellow.') ?></p>
     </div>
 
     <div id="table"><div>loading...</div></div>
@@ -29,17 +30,17 @@
 <div id="myModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel"><?php echo _('Delete dashboard') ?></h3>
+        <h3 id="myModalLabel"><?php echo dgettext('dashboard_messages','Delete dashboard') ?></h3>
     </div>
     <div class="modal-body">
-        <p><?php echo _('Deleting a dashboard is permanent.'); ?>
+        <p><?php echo dgettext('dashboard_messages','Deleting a dashboard is permanent.'); ?>
            <br><br>
-           <?php echo _('Are you sure you want to delete?'); ?>
+           <?php echo dgettext('dashboard_messages','Are you sure you want to delete?'); ?>
         </p>
     </div>
     <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo _('Cancel'); ?></button>
-        <button id="confirmdelete" class="btn btn-primary"><?php echo _('Delete permanently'); ?></button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo dgettext('dashboard_messages','Cancel'); ?></button>
+        <button id="confirmdelete" class="btn btn-primary"><?php echo dgettext('dashboard_messages','Delete permanently'); ?></button>
     </div>
 </div>
 
@@ -52,13 +53,13 @@
   table.element = "#table";
 
   table.fields = {
-    'id':{'title':"<?php echo _('Id'); ?>", 'type':"fixed"},
-    'name':{'title':"<?php echo _('Name'); ?>", 'type':"text"},
-    'alias':{'title':"<?php echo _('Alias'); ?>", 'type':"text"},
-     // 'description':{'title':"<?php echo _('Description'); ?>", 'type':"text"},
-    'main':{'title':"<?php echo _('Default'); ?>", 'type':"icon", 'trueicon':"icon-star", 'falseicon':"icon-star-empty"},
-    'public':{'title':"<?php echo _('Public'); ?>", 'type':"icon", 'trueicon':"icon-globe", 'falseicon':"icon-lock"},
-    // 'published':{'title':"<?php echo _('Bookmarked'); ?>", 'type':"icon", 'trueicon':"icon-ok", 'falseicon':"icon-remove"},
+    'id':{'title':"<?php echo dgettext('dashboard_messages','Id'); ?>", 'type':"fixed"},
+    'name':{'title':"<?php echo dgettext('dashboard_messages','Name'); ?>", 'type':"text"},
+    'alias':{'title':"<?php echo dgettext('dashboard_messages','Alias'); ?>", 'type':"text"},
+     // 'description':{'title':"<?php echo dgettext('dashboard_messages','Description'); ?>", 'type':"text"},
+    'main':{'title':"<?php echo dgettext('dashboard_messages','Default'); ?>", 'type':"icon", 'trueicon':"icon-star", 'falseicon':"icon-star-empty"},
+    'public':{'title':"<?php echo dgettext('dashboard_messages','Public'); ?>", 'type':"icon", 'trueicon':"icon-globe", 'falseicon':"icon-lock"},
+    // 'published':{'title':"<?php echo dgettext('dashboard_messages','Bookmarked'); ?>", 'type':"icon", 'trueicon':"icon-ok", 'falseicon':"icon-remove"},
 
     // Actions
     'clone-action':{'title':'', 'type':"iconbasic", 'icon':'icon-random'},
