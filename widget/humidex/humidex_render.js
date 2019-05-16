@@ -103,19 +103,26 @@ function humidex_widgetlist()
 					[1, "8"],
 					[0, "6"]
 				];
-    
+
+  var alignmentOptions = [
+    ["center", _Tr("Center")],
+    ["left", _Tr("Left")],
+    ["right", _Tr("Right")]
+  ];
+
     addOption(widgets["humidex"], "feedhumid", "feedid",  _Tr("Humidity"),    _Tr("Relative humidity in %"),          []);
     addOption(widgets["humidex"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
     addOption(widgets["humidex"], "temptype",  "dropbox", _Tr("Temp unit"),   _Tr("Units of the choosen temp feed"),  tempDropBoxOptions);
+	addOption(widgets["humidex"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["humidex"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
 	addOption(widgets["humidex"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
 	addOption(widgets["humidex"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
 	addOption(widgets["humidex"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-	addOption(widgets["humidex"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["humidex"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
+	addOption(widgets["humidex"], "align",    "dropbox", _Tr("Alignment"), _Tr("Alignment"), alignmentOptions);
     return widgets;
 }
-function draw_humidex(context,
+function draw_humidex(feedvalue,
 		x_pos,				// these x and y coords seem unused?
 		y_pos,
 		font,
@@ -126,20 +133,15 @@ function draw_humidex(context,
 		val,
 		colour,
 		decimals,
-		size)
+		size,
+		align)
 		{
-			if (!context){
-			return;
-			}
-			
-			context.save();
-			context.clearRect(0,0,width,height); // Clear old drawing
-			context.restore();
 			colour = colour || "4444CC";
 			size = size || "8";
 			font = font || "5";
 			fstyle = fstyle || "2";
 			fweight = fweight || "1";
+			align = align || "center";
 
 			var fontsize;
 
@@ -210,15 +212,14 @@ function draw_humidex(context,
 
 			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
 				colour = "#" + colour;	
-
-			
-				context.fillStyle = colour;
-				context.textAlign    = "center";
-				context.textBaseline = "middle";
-				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
 				}
 
-				context.fillText(val, width/2 , height/2);
+			feedvalue.css({
+				"color":colour, 
+				"font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname,"text-align":align,
+				"line-height":height+"px"
+			});
+			feedvalue.html(val);
 
 			
 }
@@ -227,9 +228,10 @@ function humidex_draw()
 {
   $(".humidex").each(function(index)
   {
+    var feedvalue = $(this);
     var font = $(this).attr("font");
-	  var fstyle = $(this).attr("fstyle");
-	  var fweight = $(this).attr("fweight");
+    var fstyle = $(this).attr("fstyle");
+    var fweight = $(this).attr("fweight");
     var feedtemp = $(this).attr("feedtemp");
     if (assocfeed[feedtemp]!=undefined) feedtemp = assocfeed[feedtemp]; // convert tag:name to feedid
     if (associd[feedtemp] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
@@ -258,7 +260,7 @@ function humidex_draw()
     {
 		var id = "can-"+$(this).attr("id");
 
-		draw_humidex(widgetcanvas[id],
+		draw_humidex(feedvalue,
 			0,
 			0,
 			$(this).attr("font"),
@@ -269,7 +271,8 @@ function humidex_draw()
 			val,
 			$(this).attr("colour"),
 			$(this).attr("decimals"),
-			$(this).attr("size")
+			$(this).attr("size"),
+			$(this).attr("align")
 			);
 		}
 	});
@@ -277,7 +280,7 @@ function humidex_draw()
 
 
 function humidex_init(){
-	setup_widget_canvas("humidex");
+	$(".feedvalue").html("");
 }
 
 function humidex_slowupdate() { humidex_draw();}

@@ -107,7 +107,13 @@ function dewpoint_widgetlist()
 	var unitEndOptions = [
 					[0, _Tr("Back")],
 					[1, _Tr("Front")]
-				];				
+				];
+  var alignmentOptions = [
+    ["center", _Tr("Center")],
+    ["left", _Tr("Left")],
+    ["right", _Tr("Right")]
+  ];
+
     
     addOption(widgets["dewpoint"], "feedhumid", "feedid",  _Tr("Humidity"),    _Tr("Relative humidity in %"),          []);
     addOption(widgets["dewpoint"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
@@ -117,12 +123,13 @@ function dewpoint_widgetlist()
     addOption(widgets["dewpoint"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
     addOption(widgets["dewpoint"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
     addOption(widgets["dewpoint"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-    addOption(widgets["dewpoint"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
+    addOption(widgets["dewpoint"], "size",   "dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
+    addOption(widgets["dewpoint"], "align",    "dropbox", _Tr("Alignment"), _Tr("Alignment"), alignmentOptions);
     addOption(widgets["dewpoint"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
     return widgets;
 }
 
-function draw_dewpoint(context,
+function draw_dewpoint(feedvalue,
 		x_pos,				// these x and y coords seem unused?
 		y_pos,
 		font,
@@ -136,20 +143,15 @@ function draw_dewpoint(context,
 		colour,
 		decimals,
 		size,
+		align,
 		unitend)
 		{
-			if (!context){
-			return;
-			}
-			
-			context.save();
-			context.clearRect(0,0,width,height); // Clear old drawing
-			context.restore();
 			colour = colour || "4444CC";
 			size = size || "8";
 			font = font || "5";
 			fstyle = fstyle || "2";
 			fweight = fweight || "1";
+			align = align || "center";
 
 			var fontsize;
 
@@ -221,21 +223,22 @@ function draw_dewpoint(context,
 		
 			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
 				colour = "#" + colour;	
-
-				context.fillStyle = colour;
-				context.textAlign    = "center";
-				context.textBaseline = "middle";
-				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
 				}
+
+			feedvalue.css({
+				"color":colour, 
+				"font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname,"text-align":align,
+				"line-height":height+"px"
+			});
 
 			if (unitend ==="0")
 				{
-				context.fillText(val+unit, width/2 , height/2);
+				feedvalue.html(val+unit);
 				}
 	
 			if (unitend ==="1")
 				{
-				context.fillText(unit+val, width/2 , height/2);
+				feedvalue.html(unit+val);
 				}
 			
 }
@@ -244,6 +247,7 @@ function dewpoint_draw()
 {
   $(".dewpoint").each(function(index)
   {
+    var feedvalue = $(this);
     var font = $(this).attr("font");
     var fstyle = $(this).attr("fstyle");
     var fweight = $(this).attr("fweight");
@@ -284,7 +288,7 @@ function dewpoint_draw()
     {
 		var id = "can-"+$(this).attr("id");
 
-		draw_dewpoint(widgetcanvas[id],
+		draw_dewpoint(feedvalue,
 			0,
 			0,
 			$(this).attr("font"),
@@ -298,6 +302,7 @@ function dewpoint_draw()
 			$(this).attr("colour"),
 			$(this).attr("decimals"),
 			$(this).attr("size"),
+			$(this).attr("align"),
 			$(this).attr("unitend")
 			);
 		}
@@ -307,7 +312,7 @@ function dewpoint_draw()
 
 
 function dewpoint_init(){
-	setup_widget_canvas("dewpoint");
+	$(".feedvalue").html("");
 }
 
 function dewpoint_slowupdate() { dewpoint_draw();}

@@ -135,12 +135,12 @@ class Dashboard
         if ($row = $result->fetch_object()) 
         {
             if (isset($fields->height)) $row->height = (int) $fields->height;
-            if (isset($fields->name)) $row->name = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->name);
-            if (isset($fields->alias)) $row->alias = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->alias);
-            if (isset($fields->description)) $row->description = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->description);
+            if (isset($fields->name)) $row->name = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->name);
+            if (isset($fields->alias)) $row->alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->alias);
+            if (isset($fields->description)) $row->description = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->description);
             if (isset($fields->backgroundcolor)) $row->backgroundcolor = preg_replace('/[^0-9a-f]/','', strtolower($fields->backgroundcolor));
             if (isset($fields->gridsize)) $row->gridsize = preg_replace('/[^0-9]/','', $fields->gridsize);
-            if (isset($fields->feedmode)) $row->feedmode = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->feedmode);
+            if (isset($fields->feedmode)) $row->feedmode = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->feedmode);
 
             if (isset($fields->main))
             {
@@ -199,7 +199,7 @@ class Dashboard
     public function get_from_alias($userid, $alias)
     {
         $userid = (int) $userid;
-        $alias = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$alias);
+        $alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$alias);
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' and alias='$alias'");
         return $result->fetch_array();
     }
