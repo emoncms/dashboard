@@ -37,7 +37,7 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
   <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js?ver=<?php echo $js_css_version; ?>"></script>
 
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
-
+<h2 class="d-none"><?php echo $dashboard['name'] ?></h2>
  <div id="editicon" class="hidden-phone">
 	<div id="innerbutton" style="cursor: default">
 		<?php echo $dashboard_editor_icon; ?>
