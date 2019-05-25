@@ -45,8 +45,6 @@
 </div>
 
 <script>
-  var path = "<?php echo $path; ?>";
-
   // Extend table library field types
   for (z in customtablefields) table.fieldtypes[z] = customtablefields[z];
 
