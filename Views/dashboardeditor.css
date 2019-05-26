@@ -60,3 +60,6 @@ http://openenergymonitor.org
   background: rgba(0, 0, 0, 0.5);
 }
 
+body.dashboard.dashboard-edit #page-container{
+    height: initial;
+}

@@ -10,7 +10,6 @@ http://openenergymonitor.org
 */
 
 global $session,$path;
-$js_css_version = 3;
 
 load_language_files("Modules/vis/locale", "vis_messages");
 load_language_files("Modules/dashboard/locale", "dashboard_messages");
@@ -172,4 +171,12 @@ function toolboxMove(e) {
     $(window).resize(function(){
         designer.draw();
     });
+</script>
+
+<script>
+// $(function(){
+//     if(typeof dashboard_v2._resizePageContainer === 'function') {
+//         dashboard_v2._resizePageContainer();
+//     }
+// })
 </script>

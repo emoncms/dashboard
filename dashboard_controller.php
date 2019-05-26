@@ -18,8 +18,9 @@ function dashboard_controller()
 
     require "Modules/dashboard/dashboard_model.php";
     $dashboard = new Dashboard($mysqli);
-
     // id, userid, content, height, name, alias, description, main, public, published, showdescription
+    
+    $js_css_version = 4;
 
     $result = false; $submenu = '';
 
@@ -27,7 +28,7 @@ function dashboard_controller()
     {
         if ($route->action == "list" && $session['write'])
         {
-            $result = view("Modules/dashboard/Views/dashboard_list.php",array());
+            $result = view("Modules/dashboard/Views/dashboard_list.php",array('js_css_version'=>$js_css_version));
         }
 
         else if ($route->action == "view")
@@ -43,13 +44,13 @@ function dashboard_controller()
             if (isset($dash)){
                 if ($dash['public'] || ($session['read'] && $session['userid']>0 && $dash['userid']==$session['userid'] && !isset($session['profile']) )) {
                     if (!$session['userid']) { $session['userid'] =  $dash['userid']; } // Required for passing userid to feed api
-                    $result = view("Modules/dashboard/Views/dashboard_view.php",array('dashboard'=>$dash));
+                    $result = view("Modules/dashboard/Views/dashboard_view.php",array('dashboard'=>$dash, 'js_css_version'=>$js_css_version));
                 } else if ($session['read'] && !isset($session['profile'])) {
-                    $result = view("Modules/dashboard/Views/dashboard_list.php",array());
+                    $result = view("Modules/dashboard/Views/dashboard_list.php", array('js_css_version'=>$js_css_version));
                 }
             }
             if ($session['write']) {
-                $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'], 'type'=>"view"));
+                $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'], 'type'=>"view", 'js_css_version'=>$js_css_version));
             }
         }
 
@@ -58,10 +59,10 @@ function dashboard_controller()
             if ($route->subaction) $dash = $dashboard->get_from_alias($session['userid'],$route->subaction);
             elseif (isset($_GET['id'])) $dash = $dashboard->get(get('id'));
 
-            $result = view("Modules/dashboard/Views/dashboard_edit_view.php",array('dashboard'=>$dash));
-            $result .= view("Modules/dashboard/Views/dashboard_config.php", array('dashboard'=>$dash));
+            $result = view("Modules/dashboard/Views/dashboard_edit_view.php",array('dashboard'=>$dash, 'js_css_version'=>$js_css_version));
+            $result .= view("Modules/dashboard/Views/dashboard_config.php", array('dashboard'=>$dash, 'js_css_version'=>$js_css_version));
 
-            $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'],'type'=>"edit"));
+            $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'],'type'=>"edit", 'js_css_version'=>$js_css_version));
         }
     }
     else if ($route->format == 'json')
