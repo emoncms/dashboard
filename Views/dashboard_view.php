@@ -65,11 +65,3 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
     redraw = 1;
   });
 </script>
-
-<script>
-// $(function(){
-//     if(typeof dashboard_v2._resizePageContainer === 'function') {
-//         dashboard_v2._resizePageContainer();
-//     }
-// })
-</script>

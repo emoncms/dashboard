@@ -172,11 +172,3 @@ function toolboxMove(e) {
         designer.draw();
     });
 </script>
-
-<script>
-// $(function(){
-//     if(typeof dashboard_v2._resizePageContainer === 'function') {
-//         dashboard_v2._resizePageContainer();
-//     }
-// })
-</script>
