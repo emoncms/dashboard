@@ -59,7 +59,3 @@ http://openenergymonitor.org
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.5);
 }
-
-body.dashboard.dashboard-edit #page-container{
-    height: initial;
-}
