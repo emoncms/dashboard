@@ -163,30 +163,6 @@ var dashboard_v2 = {
             deferred.reject(jqXHR, status, error);
         });
         return promise;
-    },
-
-
-    _resizePageContainer: function(){
-        return;
-        var maxBottom = 0;
-        // Loop through elements children to find & set the biggest height
-        
-        $("#page *").each(function(){
-            // If this elements height is bigger than the maxBottom
-            let $this = $(this);
-            let offset = $this.offset();
-            let offset_top = offset.top + $this.outerHeight() + 40;
-            if (offset_top > maxBottom ) {
-                // Set the maxBottom to this offset
-                maxBottom = offset_top;
-            }
-        });
-        
-        // Set the container height
-        $('#footer').css({
-            position: 'absolute',
-            top: maxBottom,
-            width: '100%'
-        })
     }
 }
+
