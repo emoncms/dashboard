@@ -44,7 +44,6 @@
             )
         );
     }
-    var_dump($menu);exit();
 
     $menu['sidebar']['dashboard'][] = array(
         'text'=> dgettext("dashboard_messages","All Dashboards"),
