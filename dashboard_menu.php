@@ -32,7 +32,7 @@
         $menu['sidebar']['dashboard'][] = array(
             'title' => $dash['desc'],
             'text' => $dash['name'],
-            'path' => $dash['path'],
+            'path' => str_replace('dashboard/view&id','dashboard/view?id',$dash['path']),
             'active' => array(
                 sprintf('dashboard/edit?id=%s',$id),
                 sprintf('dashboard/view?id=%s',$id)
@@ -44,6 +44,7 @@
             )
         );
     }
+    var_dump($menu);exit();
 
     $menu['sidebar']['dashboard'][] = array(
         'text'=> dgettext("dashboard_messages","All Dashboards"),
