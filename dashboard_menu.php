@@ -26,14 +26,17 @@
     $listmenu = $dashboard->build_menu_array('view');
 
     foreach ($listmenu as $dash) {
-        preg_match('#dashboard\/view\&id=(\d+)#', $dash['path'], $matches);
-        $id = !empty($matches[1]) ? (int) $matches[1]: '';
+        $id = $dash['id'];
+
         $icon = !empty($default['id']) && $default['id'] === $id ? 'star': '';
         $menu['sidebar']['dashboard'][] = array(
             'title' => $dash['desc'],
             'text' => $dash['name'],
             'path' => str_replace('dashboard/view&id','dashboard/view?id',$dash['path']),
-            'active' => str_replace('dashboard/view&id','dashboard/edit?id',$dash['path']),
+            'active' => array(
+                sprintf('dashboard/edit?id=%s',$id),
+                sprintf('dashboard/view?id=%s',$id)
+            ),
             'order' => $dash['order'],
             'icon' => $icon,
             'data' => array(
