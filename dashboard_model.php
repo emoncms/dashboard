@@ -237,7 +237,14 @@ class Dashboard
             }
 
             // Build the menu item
-            $menu[] = array('name' => $dashboard['name'], 'desc'=> $desc, 'published'=> $dashboard['published'], 'path' => $dashpath.$aliasurl, 'order' => "-1".$dashboard['name']);
+            $menu[] = array(
+                'id' => $dashboard['id'],
+                'name' => $dashboard['name'],
+                'desc'=> $desc,
+                'published'=> $dashboard['published'],
+                'path' => $dashpath.$aliasurl,
+                'order' => "-1".$dashboard['name']
+            );
         }
         return $menu;
     }
