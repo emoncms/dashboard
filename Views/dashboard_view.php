@@ -10,7 +10,6 @@ http://openenergymonitor.org
 */
 
 global $session,$path,$dashboard_editor_icon;
-$js_css_version = 3;
 
 load_language_files("Modules/vis/locale", "vis_messages");
 load_language_files("Modules/dashboard/locale", "dashboard_messages");
@@ -35,7 +34,6 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
   <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/widgetlist.js?ver=<?php echo $js_css_version; ?>"></script>
   <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/render.js?ver=<?php echo $js_css_version; ?>"></script>
   <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js?ver=<?php echo $js_css_version; ?>"></script>
-
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 <h2 class="d-none"><?php echo $dashboard['name'] ?></h2>
  <div id="editicon" class="hidden-phone">
