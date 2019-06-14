@@ -39,14 +39,27 @@
         padding-right: 4px;
         padding-left:  4px;
     }
-    .form-control[type="search"]{
-        width: 8rem;
+    .table .control-group{
+        margin:0
+    }
+    .table .control-group {
+        position: relative;
+    }
+    .table .control-group .help-inline{
+        display: block;
+        top: 0;
+        position: absolute;
+        font-size: 11px;
+        opacity: .8;
+        width: 96%;
+        user-select: none;
+        -moz-user-select: none;
     }
     .table .form-control{
         cursor: pointer;
         border: 1px solid transparent;
         box-shadow: none;
-        width: 60%;
+        width: 80%;
         min-width: 1rem;
     }
     .table-hover tbody tr:hover {
@@ -83,6 +96,10 @@
     .position-relative {
         position: relative!important;
     }
+    .table .form-control .fade{
+        opacity: 0!important;
+        transition-delay: 2s
+    }
     /* small devices */
     @media (min-width: 576px) {
         .btn-sm-md {
@@ -107,9 +124,6 @@
         }
         .d-sm-table-cell {
             display: table-cell!important;
-        }
-        .form-control[type="search"]{
-            width: 206px;
         }
     }
     @media (min-width: 767px) {
@@ -140,7 +154,7 @@
         </h3>
         <form id="search" class="form-inline position-relative mb-0">
             <div class="form-group">
-                <input id="search-box" name="query" v-model="searchQuery" type="search" class="form-control mb-0" aria-describedby="searchHelp" placeholder="<?php echo _('Search') ?>" title="<?php echo _('Search the data by any column') ?>">
+                <input id="search-box" name="query" v-model="searchQuery" type="search" class="form-control input-medium mb-0" aria-describedby="searchHelp" placeholder="<?php echo _('Search') ?>" title="<?php echo _('Search the data by any column') ?>">
                 <button id="searchclear" @click.prevent="searchQuery = ''"style="right:0" class="btn btn-link position-absolute" :class="{'d-none':searchQuery.length===0}"><svg class="icon"><use xlink:href="#icon-close"></use></svg></button>
             </div>
         </form>
@@ -148,7 +162,7 @@
 
     <!-- custom component to display grid data-->
     <grid-data :grid-data="gridData" :columns="gridColumns"
-        :filter-key="searchQuery" :caption="status.title"
+        :filter-key="searchQuery" :status="status"
         @update:total="status=arguments[0]"
     >
     </grid-data>
@@ -171,6 +185,8 @@
     function getTranslations(){
         return {
             'Error': "<?php echo _('Error') ?>",
+            'Save': "<?php echo _('Save') ?>",
+            'Done': "<?php echo _('Done') ?>",
             'Error loading': "<?php echo _('Error loading') ?>",
             'Found %s entries': "<?php echo _('Found %s entries') ?>",
             'JS Error': "<?php echo _('JS Error') ?>",
@@ -178,7 +194,7 @@
             'Loading': "<?php echo _('Loading') ?>…",
             'Saving': "<?php echo _('Saving') ?>…",
             'Label this dashboard with a name': "<?php echo _('Label this dashboard with a name') ?>",
-            'Short title to use in URL.\neg \"roof-solar\"': "<?php echo _('Short title to use in URL.\neg \"roof-solar\"') ?>",
+            'Must be unique. Short title to use in URL.\neg \"roof-solar\"': "<?php echo _('Must be unique. Short title to use in URL.\neg \"roof-solar\"') ?>",
             'Adds a \"Default Dashboard\" bookmark in the sidebar.\nAlso visible at \"dashboard/view\"': "<?php echo _('Adds a \"Default Dashboard\" bookmark in the sidebar.\nAlso visible at \"dashboard/view\"') ?>",
             'Allow this Dashboard to be viewed by anyone': "<?php echo _('Allow this Dashboard to be viewed by anyone') ?>",
             'Clone the layout of this dashboard to a new Dashboard': "<?php echo _('Clone the layout of this dashboard to a new Dashboard') ?>",
@@ -211,6 +227,9 @@
             if(typeof _DEBUG_ !== 'undefined' && _DEBUG_) {
                 console.error('Error')
                 console.trace.apply(this, arguments);
+            } else {
+                console.log(arguments[0],'Set _debug=true to see more')
+                console.log(this.error.caller)
             }
         }
     }
@@ -223,7 +242,22 @@
         el: "#app",
         data: {
             wait: 800, // time to wait before sending data
-            statusData: {}, // store app status information
+            timeouts: {},
+            classes: { // css class names
+                success: 'success',
+                error: 'error',
+                warning: 'warning',
+                fade: 'fade',
+                buttonActive: 'active btn-primary',
+                button: 'btn-light'
+            },
+            statusData: { // store app status information
+                title: '',
+                message: '',
+                fade: false,
+                success: true,
+                total: 0
+            },
             searchQuery: "", // search string
             gridData: [{ // variable to store api response. example of api response items
                 "id": 0,
@@ -255,24 +289,80 @@
                     sort: true,
                     input: true,
                     title: _('Label this dashboard with a name'),
-                    handler: function(event, item, property, value, success, error) {
+                    handler: function(event, item, property, value, success, error, always) {
                         try {
-                            app.Set_field_delayed(event, item, property, value, success, error)
+                            let vm = app;
+                            let changed = true;
+                            let timeout_key = item.id+'_'+property;
+                            property = 'name';
+
+                            vm.gridData.forEach(function(row, i) {
+                                if (row.id === item.id && row[property] === value) {
+                                    changed = false
+                                }
+                            })
+                            if (!changed) {
+                                // do nothing if content unchanged
+                                window.clearTimeout(vm.timeouts[timeout_key]);
+                            } else {
+                                vm.Set_field_delayed(event, item, property, value, success, error, always)
+                            }
                         } catch (error) {
                             _debug.error (_('JS Error'), property, error, arguments);
                         }
+                    },
+                    messages: {
+                        success: _('Saved'),
+                        error: _('Error'),
+                        always: _('Done')
                     }
                 },
                 alias: {
                     sort: true,
                     input: true,
-                    title: _('Short title to use in URL.\neg \"roof-solar\"'),
-                    handler: function(event, item, property, value, success, error) {
+                    title: _('Must be unique. Short title to use in URL.\neg \"roof-solar\"'),
+                    handler: function(event, item, property, value, success, error, always) {
                         try {
-                            app.Set_field_delayed(event, item, property, value, success, error)
+                            let vm = app;
+                            let changed = true;
+                            let unique = true;
+                            let timeout_key = item.id+'_'+property;
+                            let container = event.target.parentNode.parentNode;
+                            let feedback = event.target.parentNode.querySelector('.help-inline')
+
+                            vm.gridData.forEach(function(row, i) {
+                                if (row.id === item.id && row[property] === value) {
+                                    changed = false
+                                }
+                                if (row.id !== item.id && row[property] === value && value.length > 0) {
+                                    unique = false;
+                                }
+                            })
+                            if (!changed) {
+                                // do nothing if content unchanged
+                                window.clearTimeout(vm.timeouts[timeout_key]);
+                            } else if(!unique) {
+                                container.classList.add('error')
+                                feedback.innerText = _('Not unique');
+                                window.clearTimeout(vm.timeouts[timeout_key]);
+                            } else {
+                                success2 = function(event, data) {
+                                    if (typeof success === 'function') {
+                                        success.call(this, arguments);
+                                    }
+                                    // update the app datastore
+                                    if (data.hasOwnProperty(property)) item[property] = data[property];
+                                }
+                                vm.Set_field_delayed(event, item, property, value, success2, error, always)
+                            }
                         } catch (error) {
-                            _debug.error (_('JS Error'), field, error, arguments);
+                            _debug.error (_('JS Error'), property, error, arguments);
                         }
+                    },
+                    messages: {
+                        success: _('Saved'),
+                        error: _('Error'),
+                        always: _('Done')
                     }
                 },
                 main: {
@@ -283,12 +373,11 @@
                     handler: function(event, item) {
                         // "..there can be only one..!" -Highlander '86
                         try {
-                            var vm = app;
-                            var id = item.id
-                            var field = 'main';
-                            var value = !item[field];
+                            let vm = app;
+                            let id = item.id
+                            let field = 'main';
+                            let value = !item[field];
 
-                            // only modify view on success
                             dashboard_v2.set(field, id, value).then(function() {
                                 // remove all default entries
                                 vm.gridData.forEach(function(row, i){
@@ -297,8 +386,7 @@
                                 // set this one to default
                                 item[field] = value;
                             });
-
-
+                            
                         } catch (error) {
                             _debug.error (_('JS Error'), field, error, arguments);
                         }
@@ -311,9 +399,9 @@
                     handler: function(event, item) {
                         // toggle public status
                         try {
-                            var id = item.id
-                            var field = 'public';
-                            var value = !item[field];
+                            let id = item.id
+                            let field = 'public';
+                            let value = !item[field];
                             // only modify view on success
                             dashboard_v2.set(field, id, value).then(function() {
                                 item[field] = value;
@@ -430,46 +518,40 @@
             // on load request server data
             let vm = this;
             vm.Notify(_('Loading'), true)
-            dashboard_v2.list().then(function(data){
-                // handle success - populate gridData[] array
-                // add urls for edit and view
-                data.forEach(function(v,i){
-                    let id = data[i].id;
-                    data[i].view = path + 'dashboard/view?id=' + id;
-                    data[i].edit = path + 'dashboard/edit?id=' + id;
-                });
-                vm.gridData = data;
+            dashboard_v2.list().then(
+                function(data){
+                    // handle success - populate gridData[] array
+                    // add urls for edit and view
+                    data.forEach(function(v,i){
+                        let id = data[i].id;
+                        data[i].view = path + 'dashboard/view?id=' + id;
+                        data[i].edit = path + 'dashboard/edit?id=' + id;
+                    });
+                    vm.gridData = data;
 
-            }, function(xhr,message){
-                vm.Notify = ({
-                    success: false,
-                    title: _('Error loading.'),
-                    message: message,
-                    total: 0,
-                    url: this.url
-                }, true)
-            })
-            this._timeouts = {}
+                }, function(xhr,message) {
+                    // handle error - notify user
+                    vm.Notify = ({
+                        success: false,
+                        title: _('Error loading.'),
+                        message: message,
+                        total: 0,
+                        url: this.url
+                    }, true)
+                }
+            )
         },
         created: function () {
             // pass on root event handler to relevant function
-            this.$root.$on('event:handler', function(event, item, property, value, success, error) {
-                if (typeof success === 'function') {
-                    success = function(){
-                        item[property] = value;// set the global dataStore
-                        success();
-                    }
-                } else {
-                    success = function() {
-                        item[property] = value;// set the global dataStore
-                    }
+            this.$root.$on('event:handler', function(event, item, property, value, success, error, always) {
+                success2 = function() {
+                    if (typeof success === 'function') success.call(this, arguments);
+                    item[property] = value;// set the global dataStore
                 }
-                // pass on the event to relevant function
                 if(this.gridColumns[property] && this.gridColumns[property].handler && typeof this.gridColumns[property].handler === 'function') {
-                    // call the fields' function, passing the dataGrid[] item that matches the index
-                    this.gridColumns[property].handler(event, item, property, value, success, error);
+                    this.gridColumns[property].handler(event, item, property, value, success2, error, always);
                 }
-            })
+            });
         },
         methods : {
             // ----------
@@ -481,46 +563,69 @@
              * 
              * wait for pause in user input before sending data to server
              */
-            Set_field_delayed: function(event, item, property, value, success, error){
+            Set_field_delayed: function(event, item, property, value, success_callback, error_callback, always_callback) {
                 var vm = this;
                 var timeout_key = item.id+'_'+property;
-                window.clearTimeout(vm._timeouts[timeout_key]);
-                vm._timeouts[timeout_key] = window.setTimeout( function() {
+                window.clearTimeout(vm.timeouts[timeout_key]);
+                vm.timeouts[timeout_key] = window.setTimeout( function() {
                     vm.Notify('…')
-                    dashboard_v2.set(property, item.id, value).then(
-                        function(data, success_message, xhr){
-                            _debug.log (_('SUCCESS'), success_message, arguments);
-                            window.clearTimeout(vm._timeouts[timeout_key])
-                            vm.Notify(_('Saved'))
-                            if (typeof success == 'function') {
-                                success(event)
-                            }
-                        },
-                        function(xhr, error_message) {
-                            vm.Notify(error_message)
-                            if (typeof error == 'function') {
-                                error(event)
-                            }
+                    // set the property and call the callbacks
+                    success = function(data, success_message, xhr) {
+                        // execute on successful save
+                        _debug.log (_('set_field_delayed() SUCCESS'), success_message, arguments);
+                        window.clearTimeout(vm.timeouts[timeout_key])
+                        vm.Notify(data.message)
+                        if (typeof success_callback == 'function') {
+                            success_callback(event,data);
+                        }
+                    }
+                    error = function(xhr, error_message) {
+                        // execute on save failure
+                        vm.Notify(error_message, true);
+                        
+                        if (typeof error_callback == 'function') {
+                            error_callback(event)
+                        }
+                        if (typeof _DEBUG_ !== 'undefined' && _DEBUG_) {
                             throw ['500_'+property, error_message].join(' ');
                         }
-                    )
+                    }
+                    always = function () {
+                        // execute this function on success or failure
+                        if (typeof always_callback === 'function') always_callback()
+                    }
+                    // call the dashboard.set() and supply promise function
+                    dashboard_v2.set(property, item.id, value).then(success, error).then(always)
                 }, vm.wait);
+
             },
             /**
-             * display feedback to user
+             * modify app status object and display feedback to user
+             * @param mixed status [String] === title only | [Number] === total only | [Object] === overwrite all 
              */
             Notify: function(status, persist) {
-                // display message to user
-                this.status = status
+                // 
                 vm = this
+                if (typeof status === 'number') {
+                    status = Object.assign({}, vm.status, {total:status, fade: true})
+                    persist = true
+                } else if (typeof status === 'string') {
+                    status = Object.assign({}, vm.status, {title:status, fade: true})
+                } else if (typeof status !== 'object') {
+                    status = Object.assign({}, vm.status, {fade: true})
+                } 
                 // stop previous delay
                 window.clearTimeout(this.statusTimeout);
                 if(!persist) {
-                    // wait until status is reset
+                    vm.status = status
+                    // wait then reset status 
                     this.statusTimeout = window.setTimeout(function(){
-                        // reset to show the total
-                        vm.status = vm.status.total;
+                        // reset to show just the total
+                        vm.status = vm.status.total
                     }, this.wait * 3);
+                } else {
+                    if (typeof status === 'object') status.fade = false
+                    vm.status = status
                 }
             }
         }
