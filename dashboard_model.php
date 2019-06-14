@@ -129,8 +129,10 @@ class Dashboard
         $userid = (int) $userid;
         $id = (int) $id;
         $fields = json_decode($fields);
-        $fields->alias = $this->make_slug($fields->alias); // make url friendly
-        $fields->alias = substr($fields->alias,0,20); // limit to 20 chars to match the db
+        if(!empty($fields->alias)){
+            $fields->alias = $this->make_slug($fields->alias); // make url friendly
+            $fields->alias = substr($fields->alias,0,20); // limit to 20 chars to match the db
+        }
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' and `id` = '$id'");
         if ($row = $result->fetch_object()) 
         {
@@ -237,7 +239,14 @@ class Dashboard
             }
 
             // Build the menu item
-            $menu[] = array('name' => $dashboard['name'], 'desc'=> $desc, 'published'=> $dashboard['published'], 'path' => $dashpath.$aliasurl, 'order' => "-1".$dashboard['name']);
+            $menu[] = array(
+                'id' => $dashboard['id'],
+                'name' => $dashboard['name'],
+                'desc'=> $desc,
+                'published'=> $dashboard['published'],
+                'path' => $dashpath.$aliasurl,
+                'order' => "-1".$dashboard['name']
+            );
         }
         return $menu;
     }
