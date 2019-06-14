@@ -45,7 +45,7 @@ var dashboard = {
 
 // ASYNC : TRUE 
 // ----------------------------------------------------
-// Should return a promise object for callee to run .done(),.fail() etc
+// Should return a promise object for calling function to run .done(),.fail() etc
 // the v1 version was not asyncronus and blocked page rendering
 /*
 eg:
@@ -59,6 +59,7 @@ however
 calling the v1 version would block the page render until complete:
 `   alert('found %s results'.replace('%s', dashboard.list().length))
 
+@todo: remove v1 and replace for v2
 */
 
 var dashboard_v2 = {
@@ -75,7 +76,11 @@ var dashboard_v2 = {
     },
 
     list: function(){
-        return dashboard_v2._fetch(path + "dashboard/list.json");
+        let url = path + "dashboard/list.json";
+        let options = {}
+        let promise = dashboard_v2._fetch(url, options)
+        promise.url = url;
+        return promise;
     },
 
     set: function(column, id, value){
@@ -151,7 +156,7 @@ var dashboard_v2 = {
         // on ajax success check response for error message
         jqxhr.success(function(data, status, xhr) {
             // reject if data has property success set to false
-            if (!data || (data.success && !data.success)) {
+            if (!data || data.hasOwnProperty('success') && data.success === false) {
                 deferred.reject(jqxhr, data.message || 'error');
             } else {
                 deferred.resolve(data, status, xhr);
@@ -162,6 +167,7 @@ var dashboard_v2 = {
         jqxhr.error(function(jqXHR, status, error) {
             deferred.reject(jqXHR, status, error);
         });
+        
         return promise;
     }
 }

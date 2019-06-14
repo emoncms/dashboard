@@ -48,5 +48,6 @@
     $menu['sidebar']['dashboard'][] = array(
         'text'=> dgettext("dashboard_messages","All Dashboards"),
         'path'=> 'dashboard/list',
-        'order' => 1
+        'order' => 1,
+        'icon' => 'dashboard'
     );

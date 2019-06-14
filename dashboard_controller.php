@@ -14,7 +14,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
 function dashboard_controller()
 {
-    global $mysqli, $session, $route;
+    global $mysqli, $session, $route, $path;
 
     require "Modules/dashboard/dashboard_model.php";
     $dashboard = new Dashboard($mysqli);
@@ -28,7 +28,12 @@ function dashboard_controller()
     {
         if ($route->action == "list" && $session['write'])
         {
-            $result = view("Modules/dashboard/Views/dashboard_list.php",array('js_css_version'=>$js_css_version));
+            load_language_files("Modules/dashboard/locale", "dashboard_messages");
+            $result = view("Modules/dashboard/Views/dashboard_list.php", array(
+                'js_css_version' => $js_css_version,
+                'path' => $path,
+                'gridjs' => view('Lib/gridjs/grid.html')
+            ));
         }
 
         else if ($route->action == "view")
