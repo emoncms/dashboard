@@ -248,7 +248,7 @@
                 error: 'error',
                 warning: 'warning',
                 fade: 'fade',
-                buttonActive: 'active btn-primary',
+                buttonActive: 'btn-primary',
                 button: 'btn-light'
             },
             statusData: { // store app status information
