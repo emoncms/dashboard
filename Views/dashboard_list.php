@@ -149,7 +149,7 @@
     <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
             <h3><?php echo _('Dashboards') ?></h3>
-            <button class="btn btn-primary ml-3" @click="addNew"><?php echo _('New') ?>  <svg class="icon"><use xlink:href="#icon-plus"></use></svg> </button>
+            <button class="btn btn-light ml-3" @click="addNew"><?php echo _('New') ?>  <svg class="icon"><use xlink:href="#icon-plus"></use></svg> </button>
         </div>
         <form v-if="gridData.length > 0" id="search" class="form-inline position-relative mb-0">
             <div class="form-group">
