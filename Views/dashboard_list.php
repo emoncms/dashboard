@@ -138,8 +138,8 @@
 
 
 
-<div id="app" class="container-fluid">
-    <div class="alert" :class="{'alert-warning':true}" v-if="status.message" v-cloak>
+<div id="app" class="container-fluid" v-cloak>
+    <div class="alert mt-2" :class="{'alert-warning':true}" v-if="status.message">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -147,12 +147,11 @@
         {{ status.message }}
     </div>
     <div class="d-flex justify-content-between align-items-center">
-        <h3><?php echo _('Dashboards') ?> <svg class="icon text-info"><use xlink:href="#icon-dashboard"></use></svg> 
-        <a v-if="gridData.length === 0" href="<?php echo $path ?>dashboard/list" class="btn btn-info btn-small btn-sm" :title="_('Reload') + '&hellip;'">
-            <svg class="icon"><use xlink:href="#icon-spinner11"></use></svg>
-        </a>
-        </h3>
-        <form id="search" class="form-inline position-relative mb-0">
+        <div class="d-flex align-items-center">
+            <h3><?php echo _('Dashboards') ?></h3>
+            <button class="btn btn-primary ml-3" @click="addNew"><?php echo _('New') ?>  <svg class="icon"><use xlink:href="#icon-plus"></use></svg> </button>
+        </div>
+        <form v-if="gridData.length > 0" id="search" class="form-inline position-relative mb-0">
             <div class="form-group">
                 <input id="search-box" name="query" v-model="searchQuery" type="search" class="form-control input-medium mb-0" aria-describedby="searchHelp" placeholder="<?php echo _('Search') ?>" title="<?php echo _('Search the data by any column') ?>">
                 <button id="searchclear" @click.prevent="searchQuery = ''"style="right:0" class="btn btn-link position-absolute" :class="{'d-none':searchQuery.length===0}"><svg class="icon"><use xlink:href="#icon-close"></use></svg></button>
@@ -164,6 +163,7 @@
     <grid-data :grid-data="gridData" :columns="gridColumns"
         :filter-key="searchQuery" :status="status"
         @update:total="status=arguments[0]"
+        v-if="gridData.length > 0"
     >
     </grid-data>
 </div>
@@ -216,7 +216,7 @@
 
 <script>
     // debugging functions
-    var _DEBUG_ = false; // output debug messages
+    var _DEBUG_ = 1; // output debug messages
     var _debug = {
         log: function(){
             if(typeof _DEBUG_ !== 'undefined' && _DEBUG_) {
@@ -516,30 +516,7 @@
         },
         mounted: function () {
             // on load request server data
-            let vm = this;
-            vm.Notify(_('Loading'), true)
-            dashboard_v2.list().then(
-                function(data){
-                    // handle success - populate gridData[] array
-                    // add urls for edit and view
-                    data.forEach(function(v,i){
-                        let id = data[i].id;
-                        data[i].view = path + 'dashboard/view?id=' + id;
-                        data[i].edit = path + 'dashboard/edit?id=' + id;
-                    });
-                    vm.gridData = data;
-
-                }, function(xhr,message) {
-                    // handle error - notify user
-                    vm.Notify = ({
-                        success: false,
-                        title: _('Error loading.'),
-                        message: message,
-                        total: 0,
-                        url: this.url
-                    }, true)
-                }
-            )
+            this.update();
         },
         created: function () {
             // pass on root event handler to relevant function
@@ -627,6 +604,46 @@
                     if (typeof status === 'object') status.fade = false
                     vm.status = status
                 }
+            },
+            addNew: function() {
+                let vm = this;
+                dashboard_v2.add().then(function(){
+                    vm.update();
+                })
+            },
+            update: function() {
+                let vm = this;
+                vm.Notify(_('Loading'), true)
+                dashboard_v2.list().then(
+                    function(data){
+                        // handle success - populate gridData[] array
+                        // add urls for edit and view
+                        data.forEach(function(v,i){
+                            let id = data[i].id;
+                            data[i].view = path + 'dashboard/view?id=' + id;
+                            data[i].edit = path + 'dashboard/edit?id=' + id;
+                        });
+                        if(data.length === 0) {
+                            vm.gridData = [];
+                            vm.Notify({
+                                'title': _('No dashboards created'),
+                                'message': _('Maybe you would like to add your first dashboard using the button bellow.')
+                            }, true)
+                        } else {
+                            vm.gridData = data;
+                        }
+
+                    }, function(xhr,message) {
+                        // handle error - notify user
+                        vm.Notify = ({
+                            success: false,
+                            title: _('Error loading.'),
+                            message: message,
+                            total: 0,
+                            url: this.url
+                        }, true)
+                    }
+                )
             }
         }
     });
