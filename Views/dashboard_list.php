@@ -216,7 +216,7 @@
 
 <script>
     // debugging functions
-    var _DEBUG_ = 1; // output debug messages
+    var _DEBUG_ = false; // output debug messages
     var _debug = {
         log: function(){
             if(typeof _DEBUG_ !== 'undefined' && _DEBUG_) {
