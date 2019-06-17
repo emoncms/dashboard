@@ -160,7 +160,7 @@
     </div>
 
     <!-- custom component to display grid data-->
-    <grid-data :grid-data="gridData" :columns="gridColumns"
+    <grid-data :grid-data="gridData" :columns="gridColumns" default-sort="id"
         :filter-key="searchQuery" :status="status"
         @update:total="status=arguments[0]"
         v-if="gridData.length > 0"
@@ -173,8 +173,8 @@
 
 
 <script src="<?php echo $path; ?>Modules/dashboard/dashboard.js"></script>
-<!-- <script src="<?php echo $path; ?>Lib/vue.min.js"></script> -->
-<script src="/emoncms/Modules/config/vue.js"></script>
+<script src="<?php echo $path; ?>Lib/vue.min.js"></script>
+<!-- <script src="/emoncms/Modules/config/vue.js"></script> -->
 
 <script src="<?php echo $path; ?>Lib/misc/gettext.js"></script>
 <script>
