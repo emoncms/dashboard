@@ -44,7 +44,7 @@ function dashboard_controller()
             } else if ($session['read']) {
                 if ($route->subaction) $dash = $dashboard->get_from_alias($session['userid'],$route->subaction);
                 else $dash = $dashboard->get_main($session['userid']);
-            } else {
+            } else if (!$session['read']) {
                 if ($route->subaction) $dash = $dashboard->get_from_public_alias($route->subaction);
             }
             if (isset($dash)){
