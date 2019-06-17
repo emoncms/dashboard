@@ -41,10 +41,11 @@ function dashboard_controller()
             $dashid =(int) get('id');
             if ($dashid) {
                 $dash = $dashboard->get($dashid);
-            }
-            else if ($session['read']) {
+            } else if ($session['read']) {
                 if ($route->subaction) $dash = $dashboard->get_from_alias($session['userid'],$route->subaction);
                 else $dash = $dashboard->get_main($session['userid']);
+            } else {
+                if ($route->subaction) $dash = $dashboard->get_from_public_alias($route->subaction);
             }
             if (isset($dash)){
                 if ($dash['public'] || ($session['read'] && $session['userid']>0 && $dash['userid']==$session['userid'] && !isset($session['profile']) )) {
@@ -53,9 +54,6 @@ function dashboard_controller()
                 } else if ($session['read'] && !isset($session['profile'])) {
                     $result = view("Modules/dashboard/Views/dashboard_list.php", array('js_css_version'=>$js_css_version));
                 }
-            }
-            if ($session['write']) {
-                $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'], 'type'=>"view", 'js_css_version'=>$js_css_version));
             }
         }
 
