@@ -201,7 +201,9 @@
             'Edit this dashboard layout': "<?php echo _('Edit this dashboard layout') ?>",
             'Delete this dashboard': "<?php echo _('Delete this dashboard') ?>…",
             'View this dashboard': "<?php echo _('View this dashboard') ?>…",
-            'Edit Layout': "<?php echo _('Edit Layout') ?>"
+            'Edit Layout': "<?php echo _('Edit Layout') ?>",
+            'No dashboards created': "<?php echo _('No dashboards created') ?>",
+            'Maybe you would like to add your first dashboard using the button bellow.': "<?php echo _('Maybe you would like to add your first dashboard using the button bellow.') ?>"
         }
     }
 </script>
@@ -216,7 +218,7 @@
 
 <script>
     // debugging functions
-    var _DEBUG_ = true; // output debug messages
+    var _DEBUG_ = false; // output debug messages
     var _debug = {
         log: function(){
             if(typeof _DEBUG_ !== 'undefined' && _DEBUG_) {
@@ -351,7 +353,11 @@
                                         success.call(this, arguments);
                                     }
                                     // update the app datastore
-                                    if (data.hasOwnProperty(property)) item[property] = data[property];
+                                    if (data.hasOwnProperty(property)) {
+                                        item[property] = data[property];
+                                        item.view = path + 'dashboard/view';
+                                        item.view += item.alias.length > 0 ? '/' + item.alias: '?id=' + id;
+                                    }
                                 }
                                 vm.Set_field_delayed(event, item, property, value, success2, error, always)
                             }
@@ -620,8 +626,9 @@
                         // add urls for edit and view
                         data.forEach(function(v,i){
                             let id = data[i].id;
-                            data[i].view = path + 'dashboard/view?id=' + id;
                             data[i].edit = path + 'dashboard/edit?id=' + id;
+                            data[i].view = path + 'dashboard/view';
+                            data[i].view += v.alias.length > 0 ? '/' + v.alias: '?id=' + id;
                         });
                         if(data.length === 0) {
                             vm.gridData = [];
