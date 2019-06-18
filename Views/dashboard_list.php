@@ -613,13 +613,14 @@
             },
             addNew: function() {
                 let vm = this;
-                dashboard_v2.add().then(function(){
-                    vm.update();
+                dashboard_v2.add().then(function() {
+                    vm.update(_('Added'));
                 })
             },
-            update: function() {
+            update: function(message) {
                 let vm = this;
-                vm.Notify(_('Loading'), true)
+                message = message ? message: _('Loading');
+                vm.Notify(message, true)
                 dashboard_v2.list().then(
                     function(data){
                         // handle success - populate gridData[] array
