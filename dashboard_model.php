@@ -49,7 +49,7 @@ class Dashboard
         $row = $result->fetch_array();
 
         // Name for cloned dashboard
-        $name = $row['name']._(' clone');
+        $name = sprintf('%s %s', $row['name'], _('clone'));
 
         $this->mysqli->query("INSERT INTO dashboard (`userid`,`content`,`name`,`description`,`height`) VALUES ('$userid','{$row['content']}','$name','{$row['description']}','{$row['height']}')");
 
@@ -205,7 +205,25 @@ class Dashboard
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' and alias='$alias'");
         return $result->fetch_array();
     }
-
+    /**
+     * Get the public dashboard from $alias
+     * return array of fields for found database
+     * @param string $alias
+     */
+    public function get_from_public_alias($alias)
+    {
+        $alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$alias);
+        // access to public dashboards
+        if(!empty($alias)) {
+            $stmt = $this->mysqli->prepare("SELECT * FROM dashboard WHERE alias=?");
+            $stmt->bind_param("s",$alias);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $stmt->free_result();
+            $stmt->close();
+            return $result->fetch_array();
+        }
+    }
     public function build_menu_array($location)
     {
         global $session;
