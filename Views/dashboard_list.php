@@ -139,12 +139,12 @@
 
 
 <div id="app" class="container-fluid" v-cloak>
-    <div class="alert mt-2" :class="{'alert-warning':true}" v-if="status.message">
+    <div class="alert mt-2" :class="{'alert-warning':true}" v-if="gridData.length === 0">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="alert-heading" if="status.title">{{ status.title }}</h4>
-        {{ status.message }}
+        <h4 class="alert-heading" if="status.title"><?php echo _('No dashboards created') ?></h4>
+        <?php echo _('Maybe you would like to add your first dashboard using the button below&hellip;') ?>
     </div>
     <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
@@ -201,9 +201,7 @@
             'Edit this dashboard layout': "<?php echo _('Edit this dashboard layout') ?>",
             'Delete this dashboard': "<?php echo _('Delete this dashboard') ?>…",
             'View this dashboard': "<?php echo _('View this dashboard') ?>…",
-            'Edit Layout': "<?php echo _('Edit Layout') ?>",
-            'No dashboards created': "<?php echo _('No dashboards created') ?>",
-            'Maybe you would like to add your first dashboard using the button bellow.': "<?php echo _('Maybe you would like to add your first dashboard using the button bellow.') ?>"
+            'Edit Layout': "<?php echo _('Edit Layout') ?>"
         }
     }
 </script>
@@ -613,13 +611,14 @@
             },
             addNew: function() {
                 let vm = this;
-                dashboard_v2.add().then(function(){
-                    vm.update();
+                dashboard_v2.add().then(function() {
+                    vm.update({title:_('Added')});
                 })
             },
-            update: function() {
+            update: function(message) {
                 let vm = this;
-                vm.Notify(_('Loading'), true)
+                message = message ? message: _('Loading');
+                vm.Notify(message, true)
                 dashboard_v2.list().then(
                     function(data){
                         // handle success - populate gridData[] array
@@ -632,10 +631,6 @@
                         });
                         if(data.length === 0) {
                             vm.gridData = [];
-                            vm.Notify({
-                                'title': _('No dashboards created'),
-                                'message': _('Maybe you would like to add your first dashboard using the button bellow.')
-                            }, true)
                         } else {
                             vm.gridData = data;
                         }
