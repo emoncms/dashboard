@@ -125,15 +125,32 @@ function fast_update(){
   }
   redraw = 0;
 }
-
-function curve_value(feed,rate){
-  var val = 0;
-  if (feed){
-    if (assoc_curve[feed] === undefined) assoc_curve[feed] = 0;
-    if (associd[feed] !== undefined) assoc_curve[feed] = assoc_curve[feed] + ((parseFloat(associd[feed]['value']) - assoc_curve[feed]) * rate);
-    val = assoc_curve[feed] * 1;
-  }
-  return val;
+/**
+ * returns a modified feed value. if values not found 0 is returned
+ * @requires {Array} associd
+ * @param {Number} feedid int a feed id
+ * @param {Number} rate a rate value
+ * @return {Number}
+ */
+function curve_value(feedid,rate){
+    var val = 0;
+    rate = rate || 1;
+    if (typeof feedid !== 'undefined') {
+        if (isNaN(assoc_curve[feedid]) || typeof assoc_curve[feedid] === 'undefined') {
+            assoc_curve[feedid] = 0;
+        }
+        if (associd[feedid] && typeof associd[feedid] !== 'undefined') {
+            let parsedAssocid = 0;
+            if(associd[feedid]['value']) {
+                parsedAssocid = parseFloat(associd[feedid]['value'])
+            }
+            assoc_curve[feedid] = assoc_curve[feedid] + ((parsedAssocid - assoc_curve[feedid]) * rate);
+        }
+    }
+    if(typeof assoc_curve[feedid] !== 'undefined') {
+        val = assoc_curve[feedid];
+    }
+    return val;
 }
 
 function setup_widget_canvas(elementclass){
