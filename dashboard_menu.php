@@ -45,9 +45,11 @@
         );
     }
 
+    if ($session["write"]) {
     $menu['sidebar']['dashboard'][] = array(
         'text'=> dgettext("dashboard_messages","All Dashboards"),
         'path'=> 'dashboard/list',
         'order' => 1,
         'icon' => 'dashboard'
     );
+    }
