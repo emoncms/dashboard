@@ -15,7 +15,7 @@
     // navbar link
     $menu['tabs'][] = array(
         'icon'=>'dashboard',
-        'title'=> dgettext("dashboard_messages","Dashboards"),
+        'text'=> dgettext("dashboard_messages","Dashboards"),
         'path'=> 'dashboard/view',
         'order' => 3,
         'data'=> array('sidebar' => '#sidebar_dashboard')
