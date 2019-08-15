@@ -29,6 +29,7 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
   /* fill width when sidebar hidden */
   body.dashboard.has-sidebar.collapsed #wrap .content-container .content{
     width: 100%;
+    max-width: initial;
   }
   </style>
   <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
