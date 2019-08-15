@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: emoncms3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-03 12:30+0200\n"
-"PO-Revision-Date: 2019-05-03 12:32+0200\n"
+"POT-Creation-Date: 2019-06-29 16:35+0200\n"
+"PO-Revision-Date: 2019-06-29 17:18+0200\n"
 "Last-Translator: Aymeric THIBAUT\n"
 "Language-Team: Baptiste Gaultier (Télécom Bretagne) <baptiste."
 "gaultier@telecom-bretagne.eu>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Poedit-KeywordsList: _;gettext;gettext_noop;dgettext:2\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 2.2.3\n"
 "X-Poedit-SearchPath-0: ../../..\n"
 
 #: ../../../Views/dashboard_config.php:17
@@ -84,7 +84,8 @@ msgid "Anyone with the URL can see this dashboard"
 msgstr ""
 "Une URL permet un accès direct au tableau de bord sans authentification"
 
-#: ../../../Views/dashboard_config.php:51 ../../../Views/dashboard_list.php:61
+#: ../../../Views/dashboard_config.php:51
+#: ../../../Views/dashboard_list.old.php:59
 msgid "Public"
 msgstr "Public"
 
@@ -114,138 +115,236 @@ msgid "Close"
 msgstr "Fermer"
 
 #: ../../../Views/dashboard_config.php:66
-#: ../../../Views/dashboard_edit_view.php:43
+#: ../../../Views/dashboard_edit_view.php:42
 msgid "Save changes"
 msgstr "Enregistrer les modifications"
 
-#: ../../../Views/dashboard_edit_view.php:38
+#: ../../../Views/dashboard_edit_view.php:37
 msgid "Configure element"
 msgstr "Configurer l'élément"
 
-#: ../../../Views/dashboard_edit_view.php:42
-#: ../../../Views/dashboard_list.php:42
+#: ../../../Views/dashboard_edit_view.php:41
+#: ../../../Views/dashboard_list.old.php:42
 msgid "Cancel"
 msgstr "Annuler"
 
-#: ../../../Views/dashboard_edit_view.php:48
+#: ../../../Views/dashboard_edit_view.php:47
 msgid "Toolbox"
 msgstr "Boîte à outils"
 
-#: ../../../Views/dashboard_edit_view.php:52
+#: ../../../Views/dashboard_edit_view.php:51
 msgid "Configure dashboard basic data"
 msgstr "Configurer les données de base du tableau de bord"
 
-#: ../../../Views/dashboard_edit_view.php:53
+#: ../../../Views/dashboard_edit_view.php:52
 msgid "Undo last step"
 msgstr "Annuler la dernière étape"
 
-#: ../../../Views/dashboard_edit_view.php:54
+#: ../../../Views/dashboard_edit_view.php:53
 msgid "Redo last step"
 msgstr "Rétablir la dernière étape"
 
-#: ../../../Views/dashboard_edit_view.php:55
+#: ../../../Views/dashboard_edit_view.php:54
 msgid "Return to view mode"
 msgstr "Retourner au mode visualisation"
 
-#: ../../../Views/dashboard_edit_view.php:58
+#: ../../../Views/dashboard_edit_view.php:57
 msgid "Configure selected item"
 msgstr "Configurer l'élément sélectionné"
 
-#: ../../../Views/dashboard_edit_view.php:59
+#: ../../../Views/dashboard_edit_view.php:58
 msgid "Move selected item in front of other items"
 msgstr "Déplacer l'élément devant les autres éléments"
 
-#: ../../../Views/dashboard_edit_view.php:60
+#: ../../../Views/dashboard_edit_view.php:59
 msgid "Move selected item to back of other items"
 msgstr "Déplacer l'élément derrière les autres éléments"
 
-#: ../../../Views/dashboard_edit_view.php:61
+#: ../../../Views/dashboard_edit_view.php:60
 msgid "Delete selected items"
 msgstr "Supprimer les éléments sélectionnés"
 
-#: ../../../Views/dashboard_edit_view.php:64
+#: ../../../Views/dashboard_edit_view.php:63
 msgid "Nothing to save"
 msgstr "Aucun élément à sauvegarder"
 
-#: ../../../Views/dashboard_edit_view.php:64
+#: ../../../Views/dashboard_edit_view.php:63
 msgid "Not modified"
 msgstr "Non modifié"
 
-#: ../../../Views/dashboard_edit_view.php:164
+#: ../../../Views/dashboard_edit_view.php:163
 msgid "Saved"
 msgstr "Sauvegardé"
 
-#: ../../../Views/dashboard_edit_view.php:165
+#: ../../../Views/dashboard_edit_view.php:164
 msgid "Items Saved"
 msgstr "Éléments sauvegardés"
 
-#: ../../../Views/dashboard_list.php:16 ../../../dashboard_menu.php:18
+#: ../../../Views/dashboard_list.old.php:16
+#: ../../../Views/dashboard_list.php:151 ../../../dashboard_menu.php:18
 msgid "Dashboards"
 msgstr "Tableaux de bord"
 
-#: ../../../Views/dashboard_list.php:19
+#: ../../../Views/dashboard_list.old.php:19
+#: ../../../Views/dashboard_list.php:146
 msgid "No dashboards created"
 msgstr "Aucun Tableau de bord créé"
 
-#: ../../../Views/dashboard_list.php:20
+#: ../../../Views/dashboard_list.old.php:20
 msgid ""
 "Maybe you would like to add your first dashboard using the button bellow."
 msgstr ""
 "Vous pouvez ajouter votre premier tableau de bord en cliquant sur le bouton "
 "ci-dessous."
 
-#: ../../../Views/dashboard_list.php:26
+#: ../../../Views/dashboard_list.old.php:26
+#: ../../../Views/dashboard_list.php:152
 msgid "New"
 msgstr "Nouveau"
 
-#: ../../../Views/dashboard_list.php:33
+#: ../../../Views/dashboard_list.old.php:33
 msgid "Delete dashboard"
 msgstr "Supprimer le tableau de bord"
 
-#: ../../../Views/dashboard_list.php:36
+#: ../../../Views/dashboard_list.old.php:36
 msgid "Deleting a dashboard is permanent."
 msgstr ""
 "ATTENTION ! La suppression d'un tableau de bord est une action définitive."
 
-#: ../../../Views/dashboard_list.php:38
+#: ../../../Views/dashboard_list.old.php:38
 msgid "Are you sure you want to delete?"
 msgstr "Êtes vous sûr de vouloir supprimer ? "
 
-#: ../../../Views/dashboard_list.php:43
+#: ../../../Views/dashboard_list.old.php:43
 msgid "Delete permanently"
 msgstr "Supprimer définitivement"
 
-#: ../../../Views/dashboard_list.php:56
+#: ../../../Views/dashboard_list.old.php:54
 msgid "Id"
 msgstr "Id"
 
-#: ../../../Views/dashboard_list.php:57
+#: ../../../Views/dashboard_list.old.php:55
 msgid "Name"
 msgstr "Nom"
 
-#: ../../../Views/dashboard_list.php:58
+#: ../../../Views/dashboard_list.old.php:56
 msgid "Alias"
 msgstr "Alias"
 
-#: ../../../Views/dashboard_list.php:59
+#: ../../../Views/dashboard_list.old.php:57
 msgid "Description"
 msgstr "Description"
 
-#: ../../../Views/dashboard_list.php:60
+#: ../../../Views/dashboard_list.old.php:58
 msgid "Default"
 msgstr "Par défaut"
 
-#: ../../../Views/dashboard_list.php:62
+#: ../../../Views/dashboard_list.old.php:60
 msgid "Bookmarked"
 msgstr "Mis en favori"
 
+#: ../../../Views/dashboard_list.php:147
+msgid ""
+"Maybe you would like to add your first dashboard using the button "
+"below&hellip;"
+msgstr ""
+"Vous aimeriez peut-être ajouter votre premier tableau de bord en cliquant "
+"sur le bouton ci-dessous &hellip;"
+
+#: ../../../Views/dashboard_list.php:156
+msgid "Search"
+msgstr "Rechercher"
+
+#: ../../../Views/dashboard_list.php:156
+msgid "Search the data by any column"
+msgstr "Rechercher les données depuis n'importe quelle colonne"
+
+#: ../../../Views/dashboard_list.php:187
+msgid "Error"
+msgstr "Erreur"
+
+#: ../../../Views/dashboard_list.php:188
+msgid "Save"
+msgstr "Sauvegarder"
+
+#: ../../../Views/dashboard_list.php:189
+msgid "Done"
+msgstr "Effectué"
+
+#: ../../../Views/dashboard_list.php:190
+msgid "Error loading"
+msgstr "Erreur chargement"
+
+#: ../../../Views/dashboard_list.php:191
+#, php-format
+msgid "Found %s entries"
+msgstr "%s entrées trouvées"
+
+#: ../../../Views/dashboard_list.php:192
+msgid "JS Error"
+msgstr "Erreur JS"
+
+#: ../../../Views/dashboard_list.php:193
+msgid "Reload"
+msgstr "Rechargement"
+
+#: ../../../Views/dashboard_list.php:194
+msgid "Loading"
+msgstr "Chargement"
+
+#: ../../../Views/dashboard_list.php:195
+msgid "Saving"
+msgstr "Sauvegarde"
+
+#: ../../../Views/dashboard_list.php:196
+msgid "Label this dashboard with a name"
+msgstr "Étiquette ce tableau de bord avec un nom"
+
+#: ../../../Views/dashboard_list.php:197
+msgid "Must be unique. Short title to use in URL.\\neg \\\"roof-solar\\\""
+msgstr ""
+"Doit être unique. Titre court à utiliser dans l'URL\\neg \\\"roof-solar\\\""
+
+#: ../../../Views/dashboard_list.php:198
+msgid ""
+"Adds a \\\"Default Dashboard\\\" bookmark in the sidebar.\\nAlso visible at "
+"\\\"dashboard/view\\\""
+msgstr ""
+"Ajoute un signet  \\\"Tableau de bord par défaut\\\" dans la barre latérale."
+"\\nÉgalement visible dans \\\"dashboard/view\\\""
+
+#: ../../../Views/dashboard_list.php:199
+msgid "Allow this Dashboard to be viewed by anyone"
+msgstr "Permet la visualisation du tableau de bord par n'importe qui"
+
+#: ../../../Views/dashboard_list.php:200
+msgid "Clone the layout of this dashboard to a new Dashboard"
+msgstr ""
+"Clone la disposition de ce tableau de bord pour un nouveau tableau de bord"
+
+#: ../../../Views/dashboard_list.php:201
+msgid "Edit this dashboard layout"
+msgstr "Éditer la disposition du tableau de bord"
+
+#: ../../../Views/dashboard_list.php:202
+msgid "Delete this dashboard"
+msgstr "Supprimer ce tableau de bord"
+
+#: ../../../Views/dashboard_list.php:203
+msgid "View this dashboard"
+msgstr "Visualiser ce tableau de bord"
+
+#: ../../../Views/dashboard_list.php:204
+msgid "Edit Layout"
+msgstr "Éditer disposition"
+
 #: ../../../dashboard_langjs.php:28
 msgid "Add a"
-msgstr "Ajouter un élément"
+msgstr "Ajouter un"
 
 #: ../../../dashboard_langjs.php:29
 msgid "Changed, press to save"
-msgstr "Modifié, cliquez pour sauvegarder"
+msgstr "Modifié, cliquer pour sauvegarder"
 
 #: ../../../dashboard_langjs.php:30
 msgid "Choose height unit"
@@ -257,7 +356,7 @@ msgstr "Choisir unité de largeur"
 
 #: ../../../dashboard_langjs.php:32
 msgid "element to the dashboard"
-msgstr "au tableau de bord"
+msgstr "élément vers le tableau de bord"
 
 #: ../../../dashboard_langjs.php:33
 msgid "Height"
@@ -1125,13 +1224,13 @@ msgstr "Valeur affichée (vitesse du vent)"
 msgid "Wind direction"
 msgstr "Direction du vent"
 
-#: ../../../dashboard_menu.php:46
+#: ../../../dashboard_menu.php:49
 msgid "All Dashboards"
 msgstr "Tous les tableaux de bord"
 
 #: ../../../dashboard_model.php:52
-msgid " clone"
-msgstr " cloner"
+msgid "clone"
+msgstr "cloner"
 
 #~ msgid "Top"
 #~ msgstr "Haut"
