@@ -26,6 +26,10 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
     top: 3.5rem;
     right: .25rem;
   }
+  /* fill width when sidebar hidden */
+  body.dashboard.has-sidebar.collapsed #wrap .content-container .content{
+    width: 100%;
+  }
   </style>
   <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
   <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
