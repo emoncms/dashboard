@@ -118,7 +118,6 @@ function toolboxMove(e) {
 <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/designer.js"></script>
 <script type="application/javascript">
     var dashid = <?php echo $dashboard['id']; ?>;
-    var path = "<?php echo $path; ?>";
     var apikey = "";
     var feedlist = feed.list();
     var userid = <?php echo $session['userid']; ?>;
