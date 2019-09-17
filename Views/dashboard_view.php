@@ -47,7 +47,6 @@ if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit
 
 <script type="application/javascript">
   var dashid = <?php echo $dashboard['id']; ?>;
-//   var path = "<?php echo $path; ?>";
   var widget = <?php echo json_encode($widgets); ?>;
   var apikey = "<?php echo get('apikey'); ?>";
   var userid = <?php echo $session['userid']; ?>;
