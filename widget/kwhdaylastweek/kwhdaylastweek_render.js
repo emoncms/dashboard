@@ -99,7 +99,7 @@ function kwhdaylastweek_widgetlist()
   ];
 				
 	addOption(widgets["kwhdaylastweek"], "feedid",   "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
-	addOption(widgets["kwhdaylastweek"], "offset",    "value",   _Tr("Period offset"),    _Tr("Period offset seconds"),   []);
+	addOption(widgets["kwhdaylastweek"], "offset",    "value",   _Tr("Period offset"),    _Tr("Period offset hours"),   []);
 	addOption(widgets["kwhdaylastweek"], "prepend",    "value",   _Tr("Prepend Text"),    _Tr("Prepend Text"),   []);
 	addOption(widgets["kwhdaylastweek"], "append",  "value", _Tr("Append Text"), _Tr("Append Text (Units)"), []);
 	addOption(widgets["kwhdaylastweek"], "decimals", "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
@@ -224,33 +224,31 @@ function kwhdaylastweek_draw()
             errorTimeout = 0;
         }
 
-        var oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
+        
+        
         var font = kwhdaylastweek.attr("font");
         var feedid = kwhdaylastweek.attr("feedid");
         if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
         if (associd[feedid] === undefined) { console.log("Review config for feed id of " + kwhdaylastweek.attr("class")); return; }
-        var val = feed.get_value(feedid, oneWeekAgo*1000);
         // var val = associd[feedid]["value"] * 1;
-        
-        var offset = kwhdaylastweek.attr("offset")*1;
-        if (offset===undefined) offset = 0;
-        if (isNaN(offset)) offset = 0;
-        
-        // Pull in value at given time to subtract
-        var oneWeekAgo_midnight = new Date();
-        oneWeekAgo_midnight.setDate(oneWeekAgo.getDate() - 7);
-        oneWeekAgo_midnight.setHours(0,0,0,0);
-        var period_time = oneWeekAgo_midnight.getTime()*0.001 + offset;
 
-        if (kwhdaylastweek_start[period_time]==undefined) {
-            var result = feed.get_value(feedid, period_time*1000);
-            kwhdaylastweek_start[period_time] = result[1];
-        }
-        val -= kwhdaylastweek_start[period_time]
-        
-        console.log(val);
+        // pull in value from one week ago.
+        var oneWeekAgo = new Date();
+        oneWeekAgo.setDate(now.getDate() - 7);
+        var result = feed.get_value(feedid, oneWeekAgo);
+        var val = result;
+
+         // Pull in value at given time a week ago to subtract
+         oneWeekAgo.setHours(0,0,0,0);
+         var period_start_time = oneWeekAgo.getTime()*0.001/3600 + offset;
+         
+         if (kwhdaylastweek_start[period_start_time]==undefined) {
+             var result = feed.get_value(feedid, period_start_time*1000*3600);
+             kwhdaylastweek_start[period_start_time] = result[1];
+         }
+         val -= kwhdaylastweek_start[period_start_time]
+         
+         console.log(val);
 
         if (val===undefined) {val = 0;}
         if (isNaN(val))  {val = 0;}
