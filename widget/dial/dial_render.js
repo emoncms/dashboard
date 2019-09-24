@@ -86,19 +86,20 @@ function dial_widgetlist(){
           [1, _Tr("Yes")]
         ];
 
-  addOption(widgets["dial"], "feedid",        "feedid",  _Tr("Feed"),         _Tr("Feed value"),                                                            []);
-  addOption(widgets["dial"], "max",           "value",   _Tr("Max value"),    _Tr("Max value to show"),                                                     []);
-  addOption(widgets["dial"], "scale",         "value",   _Tr("Scale"),        _Tr("Value is multiplied by scale before display"),                           []);
-  addOption(widgets["dial"], "units",         "value",   _Tr("Units"),        _Tr("Units to show"),                                                         []);
-  addOption(widgets["dial"], "decimals",      "dropbox", _Tr("Decimals"),     _Tr("Decimals to show"),                                                      decimalsDropBoxOptions);
-  addOption(widgets["dial"], "offset",        "value",   _Tr("Offset"),       _Tr("Static offset. Subtracted from value before computing needle position"), []);
-  addOption(widgets["dial"], "type",          "dropbox", _Tr("Type"),         _Tr("Type to show"),                                                          typeDropBoxOptions);
-  addOption(widgets["dial"], "graduations",   "dropbox", _Tr("Graduations"),  _Tr("Should the graduation limits be shown"),                                 graduationDropBoxOptions);
-  addOption(widgets["dial"], "unitend",       "dropbox", _Tr("Unit position"),_Tr("Where should the unit be shown"),                                        unitDropBoxOptions);
-  addOption(widgets["dial"], "displayminmax", "dropbox", _Tr("Min / Max ?"),  _Tr("Display Min. and Max. ?"),                                               displayminmaxDropBoxOptions);
-  addOption(widgets["dial"], "minvaluefeed",  "feedid",  _Tr("Min. feed"),    _Tr("The feed for the minimum value"),                                        []);
-  addOption(widgets["dial"], "maxvaluefeed",  "feedid",  _Tr("Max. feed"),    _Tr("The feed for the maximum value"),                                        []);
-  addOption(widgets["dial"], "timeout",       "value",   _Tr("Timeout"),       _Tr("Timeout without feed update in seconds (empty is never)"),                                           []);
+  addOption(widgets["dial"], "feedid",                "feedid",         _Tr("Feed"),          _Tr("Feed value"),                                                            []);
+  addOption(widgets["dial"], "max",                   "value",          _Tr("Max value"),     _Tr("Max value to show"),                                                     []);
+  addOption(widgets["dial"], "scale",                 "value",          _Tr("Scale"),         _Tr("Value is multiplied by scale before display"),                           []);
+  addOption(widgets["dial"], "units",                 "dropbox_other",  _Tr("Units"),         _Tr("Units to show"),                                                         _SI);
+  addOption(widgets["dial"], "decimals",              "dropbox",        _Tr("Decimals"),      _Tr("Decimals to show"),                                                      decimalsDropBoxOptions);
+  addOption(widgets["dial"], "offset",                "value",          _Tr("Offset"),        _Tr("Static offset. Subtracted from value before computing needle position"), []);
+  addOption(widgets["dial"], "type",                  "dropbox",        _Tr("Type"),          _Tr("Type to show"),                                                          typeDropBoxOptions);
+  addOption(widgets["dial"], "graduations",           "dropbox",        _Tr("Graduations"),   _Tr("Should the graduation limits be shown"),                                 graduationDropBoxOptions);
+  addOption(widgets["dial"], "unitend",               "dropbox",        _Tr("Unit position"), _Tr("Where should the unit be shown"),                                        unitDropBoxOptions);
+  addOption(widgets["dial"], "displayminmax",         "dropbox",        _Tr("Min / Max ?"),   _Tr("Display Min. and Max. ?"),                                               displayminmaxDropBoxOptions);
+  addOption(widgets["dial"], "minvaluefeed",          "feedid",         _Tr("Min. feed"),     _Tr("The feed for the minimum value"),                                        []);
+  addOption(widgets["dial"], "maxvaluefeed",          "feedid",         _Tr("Max. feed"),     _Tr("The feed for the maximum value"),                                        []);
+  addOption(widgets["dial"], "timeout",               "value",          _Tr("Timeout"),       _Tr("Timeout without feed update in seconds (empty is never)"),               []);
+  addOption(widgets["dial"], "errormessagedisplayed", "value",          _Tr("Error Message"), _Tr("Error message displayed when timeout is reached"),                       []);
 
   return widgets;
 }
@@ -123,7 +124,7 @@ function polar_to_cart(mag, ang, xOff, yOff){
   }
 // X, Y are the center coordinates of the canvas
 function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed,
-    errorCode){
+    errorCode,errorMessage){
   if (!ctx) {return;}
 
   // if (1 * maxvalue) == false: 3000. Else 1 * maxvalue
@@ -315,6 +316,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
 
   ctx.lineWidth = (size*0.052).toFixed(0);
   //---------------------------------------------------------------
+  if (errorCode != "1"){
   ctx.beginPath();
   ctx.moveTo(x+Math.sin(Math.PI*needle-0.2)*inner,y+Math.cos(Math.PI*needle-0.2)*inner);
   ctx.lineTo(x+Math.sin(Math.PI*needle)*size,y+Math.cos(Math.PI*needle)*size);
@@ -323,7 +325,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
-  
+  }
 
   
   if (isNaN(val)){
@@ -386,7 +388,7 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   var dialtext;
   if (errorCode == "1")
       {
-        dialtext = "TO Error";
+        dialtext = errorMessage;
       }
   else
   {
@@ -541,7 +543,10 @@ function dial_define_tooltips(){
 
 function dial_draw(){
   $(".dial").each(function(index) {
-    
+    var errorMessage = $(this).attr("errormessagedisplayed");
+        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
+          errorMessage = "TO Error";
+        }
     var errorTimeout = $(this).attr("timeout");
         if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
           errorTimeout = 0;
@@ -566,7 +571,7 @@ function dial_draw(){
         if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
         {
           errorCode = "1";
-          val_curve = 0;        }
+        }
       }
     
     // The minval and maxval feed settings default to the first feed in the feedlist 
@@ -593,7 +598,7 @@ function dial_draw(){
     }
     
     // ONLY UPDATE ON CHANGE
-    if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval ||redraw == 1)
+    if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval ||redraw == 1 || errorTimeout != 0)
     {
       var id = "can-"+$(this).attr("id");
       var scale = 1*$(this).attr("scale") || 1;
@@ -615,7 +620,8 @@ function dial_draw(){
                  displayminmax,
                  minval_curve*scale,
                  maxval_curve*scale,
-                 errorCode
+                 errorCode,
+                 errorMessage
                  );
     }
   });

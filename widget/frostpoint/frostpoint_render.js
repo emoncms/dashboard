@@ -103,26 +103,34 @@ function frostpoint_widgetlist()
 	var unitEndOptions = [
 					[0, _Tr("Back")],
 					[1, _Tr("Front")]
-				];				
+				];
+				
+	var alignmentOptions = [
+		["center", _Tr("Center")],
+		["left", _Tr("Left")],
+		["right", _Tr("Right")]
+  ];
 	addOption(widgets["frostpoint"], "feedhumid", "feedid",  _Tr("Humidity"),    _Tr("Relative humidity in %"),          []);
 	addOption(widgets["frostpoint"], "feedtemp",  "feedid",  _Tr("Temperature"), _Tr("Temperature feed"),                []);
 	addOption(widgets["frostpoint"], "temptype",  "dropbox", _Tr("Temp unit"),   _Tr("Units of the choosen temp feed"),  tempDropBoxOptions);
+	addOption(widgets["frostpoint"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["frostpoint"], "colour",     "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
 	addOption(widgets["frostpoint"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
 	addOption(widgets["frostpoint"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
 	addOption(widgets["frostpoint"], "fweight",   "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-	addOption(widgets["frostpoint"], "decimals",   "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
 	addOption(widgets["frostpoint"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
+	addOption(widgets["frostpoint"], "align",    "dropbox", _Tr("Alignment"), _Tr("Alignment"), alignmentOptions);
 	addOption(widgets["frostpoint"], "unitend",  "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitEndOptions);
     return widgets;
 }
 
-function draw_frostpoint(context,
+function draw_frostpoint(feedvalue,
 		x_pos,				// these x and y coords seem unused?
 		y_pos,
 		font,
 		fstyle,
 		fweight,
+		align,
 		width,
 		height,
 		val,
@@ -133,19 +141,12 @@ function draw_frostpoint(context,
 		size,
 		unitend)
 		{
-			if (!context){
-			return;
-			}
-			
-			context.save();
-			context.clearRect(0,0,width,height); // Clear old drawing
-			context.restore();
 			colour = colour || "4444CC";
 			size = size || "8";
 			font = font || "5";
 			fstyle = fstyle || "2";
 			fweight = fweight || "1";
-
+			align = align || "center";
 			var fontsize;
 
 			if (size === "0"){fontsize = 6;}
@@ -219,21 +220,22 @@ function draw_frostpoint(context,
 		
 			if (colour.indexOf("#") === -1){			// Fix missing "#" on colour if needed
 				colour = "#" + colour;	
+			}
 
-				context.fillStyle = colour;
-				context.textAlign    = "center";
-				context.textBaseline = "middle";
-				context.font = (fontstyle+ " "+ fontweight+ " "+ fontsize+"px "+ fontname);
-				}
+    feedvalue.css({
+        "color":colour, 
+        "font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname,"text-align":align,
+        "line-height":height+"px"
+    });
 
 			if (unitend ==="0")
 				{
-				context.fillText(val+unit, width/2 , height/2);
+				feedvalue.html(val+unit);
 				}
 	
 			if (unitend ==="1")
 				{
-				context.fillText(unit+val, width/2 , height/2);
+				feedvalue.html(unit+val);
 				}
 			
 }
@@ -242,6 +244,7 @@ function frostpoint_draw()
 {
   $(".frostpoint").each(function(index)
   {
+    var feedvalue = $(this);
     var font = $(this).attr("font");
     var fstyle = $(this).attr("fstyle");
     var fweight = $(this).attr("fweight");
@@ -281,12 +284,13 @@ function frostpoint_draw()
     {
 		var id = "can-"+$(this).attr("id");
 
-		draw_frostpoint(widgetcanvas[id],
+		draw_frostpoint(feedvalue,
 			0,
 			0,
 			$(this).attr("font"),
 			$(this).attr("fstyle"),
 			$(this).attr("fweight"),
+			$(this).attr("align"),
 			$(this).width(),
 			$(this).height(),
 			val,
@@ -300,12 +304,8 @@ function frostpoint_draw()
 		}
 	});
 } 
-
-
 function frostpoint_init(){
-	setup_widget_canvas("frostpoint");
+    $(".feedvalue").html("");
 }
-
 function frostpoint_slowupdate() { frostpoint_draw();}
-
 function frostpoint_fastupdate() { frostpoint_draw();}

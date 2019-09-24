@@ -237,6 +237,7 @@ function kwhperiod_draw()
         // Pull in value at given time to subtract
         var now = new Date();
         now.setHours(0,0,0,0);
+
         var period_start_time = now.getTime()*0.001/3600 + offset;
         
         if (kwhperiod_start[period_start_time]==undefined) {
@@ -247,6 +248,7 @@ function kwhperiod_draw()
         
         console.log(val);
 
+      
         if (val===undefined) {val = 0;}
         if (isNaN(val))  {val = 0;}
 

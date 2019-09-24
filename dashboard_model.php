@@ -49,7 +49,7 @@ class Dashboard
         $row = $result->fetch_array();
 
         // Name for cloned dashboard
-        $name = $row['name']._(' clone');
+        $name = sprintf('%s %s', $row['name'], _('clone'));
 
         $this->mysqli->query("INSERT INTO dashboard (`userid`,`content`,`name`,`description`,`height`) VALUES ('$userid','{$row['content']}','$name','{$row['description']}','{$row['height']}')");
 
@@ -129,18 +129,20 @@ class Dashboard
         $userid = (int) $userid;
         $id = (int) $id;
         $fields = json_decode($fields);
-        $fields->alias = $this->make_slug($fields->alias); // make url friendly
-        $fields->alias = substr($fields->alias,0,20); // limit to 20 chars to match the db
+        if(!empty($fields->alias)){
+            $fields->alias = $this->make_slug($fields->alias); // make url friendly
+            $fields->alias = substr($fields->alias,0,20); // limit to 20 chars to match the db
+        }
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' and `id` = '$id'");
         if ($row = $result->fetch_object()) 
         {
             if (isset($fields->height)) $row->height = (int) $fields->height;
-            if (isset($fields->name)) $row->name = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->name);
-            if (isset($fields->alias)) $row->alias = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->alias);
-            if (isset($fields->description)) $row->description = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->description);
+            if (isset($fields->name)) $row->name = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->name);
+            if (isset($fields->alias)) $row->alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->alias);
+            if (isset($fields->description)) $row->description = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->description);
             if (isset($fields->backgroundcolor)) $row->backgroundcolor = preg_replace('/[^0-9a-f]/','', strtolower($fields->backgroundcolor));
             if (isset($fields->gridsize)) $row->gridsize = preg_replace('/[^0-9]/','', $fields->gridsize);
-            if (isset($fields->feedmode)) $row->feedmode = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->feedmode);
+            if (isset($fields->feedmode)) $row->feedmode = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->feedmode);
 
             if (isset($fields->main))
             {
@@ -199,11 +201,29 @@ class Dashboard
     public function get_from_alias($userid, $alias)
     {
         $userid = (int) $userid;
-        $alias = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$alias);
+        $alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$alias);
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' and alias='$alias'");
         return $result->fetch_array();
     }
-
+    /**
+     * Get the public dashboard from $alias
+     * return array of fields for found database
+     * @param string $alias
+     */
+    public function get_from_public_alias($alias)
+    {
+        $alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$alias);
+        // access to public dashboards
+        if(!empty($alias)) {
+            $stmt = $this->mysqli->prepare("SELECT * FROM dashboard WHERE alias=?");
+            $stmt->bind_param("s",$alias);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $stmt->free_result();
+            $stmt->close();
+            return $result->fetch_array();
+        }
+    }
     public function build_menu_array($location)
     {
         global $session;
@@ -237,7 +257,14 @@ class Dashboard
             }
 
             // Build the menu item
-            $menu[] = array('name' => $dashboard['name'], 'desc'=> $desc, 'published'=> $dashboard['published'], 'path' => $dashpath.$aliasurl, 'order' => "-1".$dashboard['name']);
+            $menu[] = array(
+                'id' => $dashboard['id'],
+                'name' => $dashboard['name'],
+                'desc'=> $desc,
+                'published'=> $dashboard['published'],
+                'path' => $dashpath.$aliasurl,
+                'order' => "-1".$dashboard['name']
+            );
         }
         return $menu;
     }

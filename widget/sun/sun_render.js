@@ -73,18 +73,20 @@ function sun_widgetlist(){
     [1, _Tr("Front")]
   ];
 
-  addOption(widgets["sun"],   "feedid",       "feedid",          _Tr("Feed"),          _Tr("Feed value"),                                            []);
-  addOption(widgets["sun"],   "max",          "value",           _Tr("Max value"),     _Tr("Max value to show"),                                     []);
-  addOption(widgets["sun"],   "scale",        "value",           _Tr("Scale"),         _Tr("Value is multiplied by scale before display"),           []);
-  addOption(widgets["sun"],   "units",        "value",           _Tr("Units"),         _Tr("Units to show"),                                         []);
-  addOption(widgets["sun"],   "unitend",      "dropbox",         _Tr("Unit position"), _Tr("Where should the unit be shown"),                        unitEndOptions);
-  addOption(widgets["sun"],   "decimals",     "dropbox",         _Tr("Decimals"),      _Tr("Decimals to show"),                                      decimalsDropBoxOptions);
-  addOption(widgets["sun"],   "offset",       "value",           _Tr("Offset"),        _Tr("Static offset. Subtracted from value before computing"), []);
-  addOption(widgets["sun"],   "solar_title",  "value",           _Tr("solar title"),   _Tr("Solar title"),                                           []);
-  addOption(widgets["sun"],   "colour",       "colour_picker",   _Tr("Colour label"),  _Tr("Color of the label"),                                    []);
-  addOption(widgets["sun"],   "font",         "dropbox",         _Tr("Font"),          _Tr("Label font"),                                            fontoptions);
-  addOption(widgets["sun"],   "fstyle",       "dropbox",         _Tr("Font style"),    _Tr("Font style used for display"),                           fstyleoptions);
-  addOption(widgets["sun"],   "fweight",      "dropbox",         _Tr("Font weight"),   _Tr("Font weight used for display"),                          fweightoptions);
+  addOption(widgets["sun"],   "feedid",                "feedid",          _Tr("Feed"),          _Tr("Feed value"),                                            []);
+  addOption(widgets["sun"],   "max",                   "value",           _Tr("Max value"),     _Tr("Max value to show"),                                     []);
+  addOption(widgets["sun"],   "scale",                 "value",           _Tr("Scale"),         _Tr("Value is multiplied by scale before display"),           []);
+  addOption(widgets["sun"],   "units",                 "dropbox_other",   _Tr("Units"),         _Tr("Units to show"),                                         _SI);
+  addOption(widgets["sun"],   "unitend",               "dropbox",         _Tr("Unit position"), _Tr("Where should the unit be shown"),                        unitEndOptions);
+  addOption(widgets["sun"],   "decimals",              "dropbox",         _Tr("Decimals"),      _Tr("Decimals to show"),                                      decimalsDropBoxOptions);
+  addOption(widgets["sun"],   "offset",                "value",           _Tr("Offset"),        _Tr("Static offset. Subtracted from value before computing"), []);
+  addOption(widgets["sun"],   "solar_title",           "value",           _Tr("solar title"),   _Tr("Solar title"),                                           []);
+  addOption(widgets["sun"],   "colour",                "colour_picker",   _Tr("Colour label"),  _Tr("Color of the label"),                                    []);
+  addOption(widgets["sun"],   "font",                  "dropbox",         _Tr("Font"),          _Tr("Label font"),                                            fontoptions);
+  addOption(widgets["sun"],   "fstyle",                "dropbox",         _Tr("Font style"),    _Tr("Font style used for display"),                           fstyleoptions);
+  addOption(widgets["sun"],   "fweight",               "dropbox",         _Tr("Font weight"),   _Tr("Font weight used for display"),                          fweightoptions);
+  addOption(widgets["sun"],   "timeout",               "value",           _Tr("Timeout"),       _Tr("Timeout without feed update in seconds (empty is never)"),[]);
+  addOption(widgets["sun"],   "errormessagedisplayed", "value",           _Tr("Error Message"), _Tr("Error message displayed when timeout is reached"),        []);
 
   return widgets;
 }
@@ -95,12 +97,31 @@ function sun_init(){
 
 function sun_draw(){
   $('.sun').each(function(index) {
+    var errorMessage = $(this).attr("errormessagedisplayed");
+        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
+          errorMessage = "TO Error";
+        }
+    var errorTimeout = $(this).attr("timeout");
+        if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
+          errorTimeout = 0;
+        }
+
+    var errorCode = "0";
+
     var feedid = $(this).attr("feedid");
     if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
     var val = curve_value(feedid,dialrate).toFixed(3);
+
+    if (errorTimeout !== 0)
+      {
+        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
+        {
+          errorCode = "1";
+        }
+      }
     // ONLY UPDATE ON CHANGE
-    if (val != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1)
+    if (val != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1 || errorTimeout != 0)
     {
       var id = "can-"+$(this).attr("id");
       var scale = 1*$(this).attr("scale") || 1;
@@ -173,7 +194,7 @@ function sun_draw(){
       var bar_length = 10;
       var bar_width = 5;
       var number_of_bars = 5;
-	  
+
       var radius = Math.max(Math.min(sun_width/2,sun_height) - bar_length - bar_width,0);
   
       var centerX = sun_width / 2;
@@ -215,6 +236,10 @@ function sun_draw(){
 
       var size = radius;
 
+      if(errorCode == "1")
+      {
+      data = errorMessage;
+      }
       var unitsandval = data +units;
       var valsize;
       if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
@@ -226,9 +251,11 @@ function sun_draw(){
       context.fillStyle = color;
       context.textAlign = "center";
       context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.50)+"px "+ fontname);
+      if (errorCode === "1"){context.fillText(errorMessage, start_x + sun_width/2, start_y + centerY - radius*0.2);}
+      else{
       if (unitend ==="0"){context.fillText(data + units, start_x + sun_width/2, start_y + centerY - radius*0.2);}
       if (unitend ==="1"){context.fillText(units + data, start_x + sun_width/2, start_y + centerY - radius*0.2);}
-	  
+      }
       if(title)
       {
         context.fillStyle = color;
