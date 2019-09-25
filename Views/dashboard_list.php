@@ -623,12 +623,16 @@
                     function(data){
                         // handle success - populate gridData[] array
                         // add urls for edit and view
-                        data.forEach(function(v,i){
-                            let id = data[i].id;
-                            data[i].edit = path + 'dashboard/edit?id=' + id;
-                            data[i].view = path + 'dashboard/view';
-                            data[i].view += v.alias.length > 0 ? '/' + v.alias: '?id=' + id;
-                        });
+                        for(n in data) {
+                            let item = data[n];
+                            if (item) {
+                                let id = item.id;
+                                item.edit = path + 'dashboard/edit?id=' + id;
+                                item.view = path + 'dashboard/view';
+                                if (!item.alias) item.alias = "";
+                                item.view += item.alias.length > 0 ? '/' + item.alias: '?id=' + id;
+                            }
+                        };
                         if(data.length === 0) {
                             vm.gridData = [];
                         } else {
