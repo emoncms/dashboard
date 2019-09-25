@@ -294,8 +294,9 @@ function feedvalue_slowupdate()
 {
 	  feedvalue_draw();
 }
-
+/*
 function feedvalue_fastupdate()
 {
 	  feedvalue_draw();
 }
+*/

@@ -237,15 +237,15 @@ function kwhperiod_draw()
         // Pull in value at given time to subtract
         var now = new Date();
         now.setHours(0,0,0,0);
-        var period_start_time = now.getTime()*0.001/3600 + offset;
+        var period_time = now.getTime()/3600000 + offset;
         
-        if (kwhperiod_start[period_start_time]==undefined) {
-            var result = feed.get_value(feedid, period_start_time*1000*3600);
-            kwhperiod_start[period_start_time] = result[1];
+        if (kwhperiod_start[period_time]==undefined) {
+            var result = feed.get_value(feedid, period_time*3600000);
+            kwhperiod_start[period_time] = result[1];
         }
-        val -= kwhperiod_start[period_start_time]
+        val -= kwhperiod_start[period_time];
         
-        console.log(val);
+        //console.log(val);
 
         if (val===undefined) {val = 0;}
         if (isNaN(val))  {val = 0;}
@@ -315,11 +315,6 @@ function kwhperiod_init()
     $(".kwhperiod").html("");
 }
 function kwhperiod_slowupdate()
-{
-	  kwhperiod_draw();
-}
-
-function kwhperiod_fastupdate()
 {
 	  kwhperiod_draw();
 }

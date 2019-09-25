@@ -223,32 +223,47 @@ function kwhdaylastweek_draw()
         if (errorTimeout === "" || errorTimeout === undefined){           //Timeout parameter is empty
             errorTimeout = 0;
         }
-
-        
         
         var font = kwhdaylastweek.attr("font");
         var feedid = kwhdaylastweek.attr("feedid");
         if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
         if (associd[feedid] === undefined) { console.log("Review config for feed id of " + kwhdaylastweek.attr("class")); return; }
-        // var val = associd[feedid]["value"] * 1;
+        //var val = associd[feedid]["value"] * 1;
 
-        // pull in value from one week ago.
         var oneWeekAgo = new Date();
-        oneWeekAgo.setDate(now.getDate() - 7);
-        var result = feed.get_value(feedid, oneWeekAgo);
-        var val = result;
+        var pastDate = oneWeekAgo.getDate() - 7;
+        oneWeekAgo.setDate(pastDate);
+        var period_time = oneWeekAgo.getTime();
+        /*
+        var oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        //oneWeekAgo.setHours(0,0,0,0);
+        var period_time = oneWeekAgo.getTime();
+        */
+        if (kwhdaylastweek_start[period_time]==undefined) {
+            var result = feed.get_value(feedid, period_time);
+            kwhdaylastweek_start[period_time] = result[1];
+        }
 
-         // Pull in value at given time a week ago to subtract
-         oneWeekAgo.setHours(0,0,0,0);
-         var period_start_time = oneWeekAgo.getTime()*0.001/3600 + offset;
-         
-         if (kwhdaylastweek_start[period_start_time]==undefined) {
-             var result = feed.get_value(feedid, period_start_time*1000*3600);
-             kwhdaylastweek_start[period_start_time] = result[1];
-         }
-         val -= kwhdaylastweek_start[period_start_time]
-         
-         console.log(val);
+        var val = kwhdaylastweek_start[period_time]
+
+        var offset = kwhdaylastweek.attr("offset")*1;
+        if (offset===undefined) offset = 0;
+        if (isNaN(offset)) offset = 0;
+       
+        //var oneWeekAgo = new Date();
+        //oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        oneWeekAgo.setHours(0,0,0,0);
+        var period_time = oneWeekAgo.getTime()/3600000 + offset;
+        
+        if (kwhdaylastweek_start[period_time]==undefined) {
+            var result = feed.get_value(feedid, period_time*3600000);
+            kwhdaylastweek_start[period_time] = result[1];
+        }
+
+        val -= kwhdaylastweek_start[period_time]
+        
+        //console.log(val);
 
         if (val===undefined) {val = 0;}
         if (isNaN(val))  {val = 0;}
@@ -318,11 +333,6 @@ function kwhdaylastweek_init()
     $(".kwhdaylastweek").html("");
 }
 function kwhdaylastweek_slowupdate()
-{
-	  kwhdaylastweek_draw();
-}
-
-function kwhdaylastweek_fastupdate()
 {
 	  kwhdaylastweek_draw();
 }
