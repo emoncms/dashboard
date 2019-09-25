@@ -247,6 +247,7 @@ function kwhperiod_draw()
         
         //console.log(val);
 
+      
         if (val===undefined) {val = 0;}
         if (isNaN(val))  {val = 0;}
 

@@ -391,6 +391,33 @@ var designer = {
                 }
                 options_html += "</select>";
             }
+            // Combobox for selecting options with "other" option
+            else if (options_type && options_type[z] == "dropbox_other" && optionsdata[z]){  // Check we have optionsdata before deciding to draw a combobox
+                options_html += '<select id="' + box_options[z] + '_dropdown" class="options select-with-other">';
+                options_html += "<option value=''></option>";
+                values = [];
+                for (i in optionsdata[z])
+                {
+                    values.push(optionsdata[z][i][0]);
+                    var selected = "";
+                    if (val + "" === optionsdata[z][i][0] + "") {
+                        selected = "selected";
+                    }
+                    options_html += "<option "+selected+" value=\""+optionsdata[z][i][0]+"\">"+optionsdata[z][i][1]+"</option>";
+                }
+                // if saved value not in list set the 'Other' option
+                other_selected = '';
+                if (values.indexOf(val) === -1 && val !== '') {
+                    other_selected = 'selected';
+                }
+
+                other_hidden = other_selected !== 'selected' ? 'hidden' : '';
+                options_html += "<option " + other_selected + " value='__other'>"+_Tr('Other')+"</option>";
+                options_html += "</select>";
+                options_html += '</div>';
+                options_html += '<div class="input-prepend ' + other_hidden + ' other"><span class="add-on" style="width:100px; text-align: right; font-size:12px;background: none;border: none;margin-right: 1px;">' + _Tr('Other') + '</span>'
+                options_html += '<input id="' + box_options[z] + '" type="text" value="' + val + '" data-last-value="' + val + '" class="options input-is-other" style="border-radius:0 0 4px 4px;border-top:none">';
+            }
 
             else if (options_type && options_type[z] == "colour_picker"){
                  options_html += "<input  type='color' class='options' id='"+box_options[z]+"'  value='#"+val+"'/ >"
@@ -450,6 +477,13 @@ var designer = {
         // also add height of 30 px for color inputs for Firefox
         $('input, select, textarea').css('font-size','12px');
         if (navigator.userAgent.search("Firefox") >= 0) {$("input[type='color']").css({'height':'30px', 'width':'220px'});};
+
+        // pre-select units dropdown
+        $('.select-with-other').each(function(index, elem) {
+            var select = $(elem);
+            var other = select.parent().next();
+            var input = other.find('input');
+        })
     },
     
     "select_feed": function (id, feedlist, type, currentval){
@@ -469,7 +503,7 @@ var designer = {
             for (p in feedgroups[f]) {
                 var feedref = feedgroups[f][p]['id']
                 if (designer.feedmode=="tagname") feedref = feedgroups[f][p]['tag']+":"+feedgroups[f][p]['name']
-                console.log("feedref:"+feedref);
+                // console.log("select_feed() - feedref:"+feedref);
                 var selected = "";
                 if (currentval == feedref)
                     selected = "selected";
@@ -531,6 +565,23 @@ var designer = {
             designer.modified();
             $("#when-selected").hide();
         }
+    },
+
+    get_SI: function() {
+        // return array of common units in format [value, label]
+        var arr = [], json = [];
+        $.ajax({
+            url: "../Lib/units.php",
+            async: false,
+            success: function(units){
+                json = units;
+            }
+        });
+        for(j in json) {
+            var unit = json[j];
+            arr.push([unit.short, unit.long +' ('+ unit.short + ')'])
+        }
+        return arr;
     },
 
     "get_unified_event": function(e){
@@ -898,5 +949,28 @@ var designer = {
                 }
             }
         });
+        
+        $(document).on('keyup', '.input-is-other', function(event) {
+            var input = $(event.target);
+            var select = input.parent().prev().find('select');
+            if (select.val() === '__other') {
+                input.data('last-value', input.val());
+            }
+        });
+        $(document).on('change', '.select-with-other', function(event) {
+            var select = $(event.target);
+            var other = select.parent().next('.other');
+            var input = other.find('input');
+            var last_val = input.data('last-value');
+            // if user selected "Other" option, show text box
+            if (select.val() === '__other') {
+                other.removeClass('hidden');
+                if (last_val) input.val(last_val);
+                input.focus();
+            } else {
+                input.val(select.val());
+                other.addClass('hidden');
+            }
+        })
     }
 }

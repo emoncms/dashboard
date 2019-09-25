@@ -97,7 +97,7 @@ function bar_widgetlist()
     addOption(widgets["bar"], "feedid",         "feedid",           _Tr("Feed"),            _Tr("Feed value"),                                                                  []);
     addOption(widgets["bar"], "max",            "value",            _Tr("Max value"),       _Tr("Max value to show"),                                                           []);
     addOption(widgets["bar"], "scale",          "value",            _Tr("Scale"),           _Tr("Value is multiplied by scale before display. Defaults to 1"),                  []);
-    addOption(widgets["bar"], "units",          "value",            _Tr("Units"),           _Tr("Units to show"),                                                               []);
+    addOption(widgets["bar"], "units",          "dropbox_other",    _Tr("Units"),           _Tr("Units to show"),                                                               _SI);
     addOption(widgets["bar"], "unitend",        "dropbox",          _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                              unitEndOptions);
     addOption(widgets["bar"], "decimals",       "dropbox",          _Tr("Decimals"),        _Tr("Decimals to show"),                                                            decimalsDropBoxOptions);
     addOption(widgets["bar"], "offset",         "value",            _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing"),                       []);
@@ -108,8 +108,8 @@ function bar_widgetlist()
     addOption(widgets["bar"], "minvaluefeed",   "feedid",           _Tr("Min. feed"),       _Tr("The feed for the minimum value"),                                              []);
     addOption(widgets["bar"], "maxvaluefeed",   "feedid",           _Tr("Max. feed"),       _Tr("The feed for the maximum value"),                                              []);
     addOption(widgets["bar"], "colour_minmax",  "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
-    addOption(widgets["bar"], "timeout",        "value",            _Tr("Timeout"),         _Tr("Timeout without feed update in seconds (empty is never)"),   []);
-
+    addOption(widgets["bar"], "timeout",        "value",            _Tr("Timeout"),         _Tr("Timeout without feed update in seconds (empty is never)"),                     []);
+    addOption(widgets["bar"], "errormessagedisplayed",    "value",  _Tr("Error Message"),   _Tr("Error message displayed when timeout is reached"),                             []);
 
 
     return widgets;
@@ -140,7 +140,8 @@ function draw_bar(context,
                   minvaluefeed,
                   maxvaluefeed,
                   colour_minmax,
-                  errorCode
+                  errorCode,
+                  errorMessage
                   )
 {
     if (!context) {return;}
@@ -412,15 +413,19 @@ function draw_bar(context,
 
     context.fillStyle = colour_label;
     
-    if (errorCode == "1")
-    {
-      raw_value="TO ";
-      units_string="Error";
-    }
+    var bartext;
+    if (errorCode === "1")
+      {
+        bartext = errorMessage;
+      }
+  else
+     {
+      if (unitend ==="0"){bartext= raw_value+units_string;}
+      if (unitend ==="1"){bartext= units_string+raw_value;}
+     }
 
-    var unitsandval = raw_value+units_string;
     var valsize;
-    if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
+    if (bartext.length >4){ valsize = (size / (bartext.length+2)) * 5.5;}
     else {valsize = (size / 6) * 5.5;}
     var titlesize ;
     if (title_bar.length >10) {titlesize = (size / (title_bar.length+2)) * 9;}
@@ -430,22 +435,19 @@ function draw_bar(context,
     context.textAlign    = "start";
         if (title_bar) {
             context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.3)+"px "+ fontname);
-            if (unitend ==="0"){context.fillText(raw_value+units_string, bar_border_space, height + (size*0.42))}
-            if (unitend ==="1"){context.fillText(units_string+raw_value, bar_border_space, height + (size*0.42))}
+            context.fillText(bartext, bar_border_space, height + (size*0.42))
             context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.35)+"px "+ fontname);
             context.fillText(title_bar, bar_border_space, height + (size * 0.2));
         } else {
             context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
-            if (unitend ==="0"){context.fillText(raw_value+units_string, bar_border_space, height + (size*0.3));}
-            if (unitend ==="1"){context.fillText(units_string+raw_value, bar_border_space, height + (size*0.3));}
+            context.fillText(bartext, bar_border_space, height + (size*0.3));
         }
     }
     else
     {
     context.textAlign    = "center";
         context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.5)+"px "+ fontname);
-        if (unitend ==="0"){context.fillText(raw_value+units_string, half_width, height/2 + (size*0.2));}
-        if (unitend ==="1"){context.fillText(units_string+raw_value, half_width, height/2 + (size*0.2));}
+        context.fillText(bartext, half_width, height/2 + (size*0.2));
         context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.4)+"px "+ fontname);
         context.fillText(title_bar, half_width, height/7 + (size *0.1));
     }
@@ -475,6 +477,10 @@ function bar_draw()
 {
     $(".bar").each(function(index)
     {
+        var errorMessage = $(this).attr("errormessagedisplayed");
+        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
+          errorMessage = "TO Error";
+        }
         var errorTimeout = $(this).attr("timeout");
         if (errorTimeout === "" || errorTimeout === undefined)            //Timeout parameter is empty
           errorTimeout = 0;
@@ -531,7 +537,7 @@ function bar_draw()
           }
         }
         // ONLY UPDATE ON CHANGE
-        if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval ||redraw == 1)
+        if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval ||redraw == 1 || errorTimeout != 0)
         {
             var id = "can-"+$(this).attr("id");
             var scale = 1*$(this).attr("scale") || 1;
@@ -559,7 +565,8 @@ function bar_draw()
                      minval*scale,
                      maxval*scale,
                      $(this).attr("colour_minmax"),
-                     errorCode
+                     errorCode,
+                     errorMessage
                      );
         }
     });
