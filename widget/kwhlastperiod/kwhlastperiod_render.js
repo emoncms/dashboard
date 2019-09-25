@@ -11,7 +11,7 @@
     http://openenergymonitor.org/emon/forum
  */
  
-var kwhperiod_start = []
+var kwhlastperiod_start = []
  
  function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
 {
@@ -22,11 +22,11 @@ var kwhperiod_start = []
   widget["optionsdata"].push(optionData);
 }
 
-function kwhperiod_widgetlist()
+function kwhlastperiod_widgetlist()
 {
   var widgets =
   {
-    "kwhperiod":
+    "kwhlastperiod":
     {
       "offsetx":-40,"offsety":-30,"width":120,"height":60,
       "menu":"Widgets",
@@ -75,7 +75,7 @@ function kwhperiod_widgetlist()
 				];
 				
 	var sizeoptions = [
-					[14, "18"], // set size 18 to the top position to be the default value for creating new kwhperiod widgets otherwise size 40 would be always the default
+					[14, "18"], // set size 18 to the top position to be the default value for creating new kwhlastperiod widgets otherwise size 40 would be always the default
 					[13, "40"],
 					[12, "36"],
 					[11, "32"],
@@ -98,24 +98,24 @@ function kwhperiod_widgetlist()
     ["right", _Tr("Right")]
   ];
 				
-	addOption(widgets["kwhperiod"], "feedid",   "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
-	addOption(widgets["kwhperiod"], "offset",    "value",   _Tr("Period offset"),    _Tr("Period offset hours"),   []);
-	addOption(widgets["kwhperiod"], "prepend",    "value",   _Tr("Prepend Text"),    _Tr("Prepend Text"),   []);
-	addOption(widgets["kwhperiod"], "append",  "value", _Tr("Append Text"), _Tr("Append Text (Units)"), []);
-	addOption(widgets["kwhperiod"], "decimals", "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
-	addOption(widgets["kwhperiod"], "colour",   "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
-	addOption(widgets["kwhperiod"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
-	addOption(widgets["kwhperiod"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
-	addOption(widgets["kwhperiod"], "fweight",  "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
-	addOption(widgets["kwhperiod"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
-	addOption(widgets["kwhperiod"], "align",    "dropbox", _Tr("Alignment"), _Tr("Alignment"), alignmentOptions);
-	addOption(widgets["kwhperiod"], "timeout",  "value",   _Tr("Timeout"),    _Tr("Timeout without feed update in seconds (empty is never)"),   []);
-	addOption(widgets["kwhperiod"], "errormessagedisplayed",    "value",  _Tr("Error Message"),   _Tr("Error message displayed when timeout is reached"),   []);
+	addOption(widgets["kwhlastperiod"], "feedid",   "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
+	addOption(widgets["kwhlastperiod"], "offset",    "value",   _Tr("Period offset"),    _Tr("Period offset hours"),   []);
+	addOption(widgets["kwhlastperiod"], "prepend",    "value",   _Tr("Prepend Text"),    _Tr("Prepend Text"),   []);
+	addOption(widgets["kwhlastperiod"], "append",  "value", _Tr("Append Text"), _Tr("Append Text (Units)"), []);
+	addOption(widgets["kwhlastperiod"], "decimals", "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
+	addOption(widgets["kwhlastperiod"], "colour",   "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
+	addOption(widgets["kwhlastperiod"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
+	addOption(widgets["kwhlastperiod"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
+	addOption(widgets["kwhlastperiod"], "fweight",  "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
+	addOption(widgets["kwhlastperiod"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
+	addOption(widgets["kwhlastperiod"], "align",    "dropbox", _Tr("Alignment"), _Tr("Alignment"), alignmentOptions);
+	addOption(widgets["kwhlastperiod"], "timeout",  "value",   _Tr("Timeout"),    _Tr("Timeout without feed update in seconds (empty is never)"),   []);
+	addOption(widgets["kwhlastperiod"], "errormessagedisplayed",    "value",  _Tr("Error Message"),   _Tr("Error message displayed when timeout is reached"),   []);
 
 	return widgets;
 }
 
-function draw_kwhperiod(kwhperiod,font,fstyle,fweight,width,height,prepend,val,append,colour,decimals,size,align,errorCode,errorMessage)
+function draw_kwhlastperiod(kwhlastperiod,font,fstyle,fweight,width,height,prepend,val,append,colour,decimals,size,align,errorCode,errorMessage)
 {
     colour = colour || "4444CC";
     size = size || "8";
@@ -194,7 +194,7 @@ function draw_kwhperiod(kwhperiod,font,fstyle,fweight,width,height,prepend,val,a
         colour = "#" + colour;
     }
     
-    kwhperiod.css({
+    kwhlastperiod.css({
         "color":colour, 
         "font":fontstyle+" "+ fontweight+" "+ fontsize+"px "+fontname,"text-align":align,
         "line-height":height+"px"
@@ -202,50 +202,50 @@ function draw_kwhperiod(kwhperiod,font,fstyle,fweight,width,height,prepend,val,a
 
     if (errorCode === "1")
     {
-        kwhperiod.html(errorMessage);
+        kwhlastperiod.html(errorMessage);
     }
     else
     {
-        kwhperiod.html(prepend+val+append);
+        kwhlastperiod.html(prepend+val+append);
     }
 }
 
-function kwhperiod_draw()
+function kwhlastperiod_draw()
 {
-    $(".kwhperiod").each(function(index)
+    $(".kwhlastperiod").each(function(index)
     {
-        var kwhperiod = $(this);
+        var kwhlastperiod = $(this);
         var errorMessage = $(this).attr("errormessagedisplayed");
         if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
           errorMessage = "TO Error";
         }
-        var errorTimeout = kwhperiod.attr("timeout");
+        var errorTimeout = kwhlastperiod.attr("timeout");
         if (errorTimeout === "" || errorTimeout === undefined){           //Timeout parameter is empty
             errorTimeout = 0;
         }
-
-        var font = kwhperiod.attr("font");
-        var feedid = kwhperiod.attr("feedid");
-        if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
-        if (associd[feedid] === undefined) { console.log("Review config for feed id of " + kwhperiod.attr("class")); return; }
-        var val = associd[feedid]["value"] * 1;
         
-        var offset = kwhperiod.attr("offset")*1;
+        var font = kwhlastperiod.attr("font");
+        var feedid = kwhlastperiod.attr("feedid");
+        if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
+        if (associd[feedid] === undefined) { console.log("Review config for feed id of " + kwhlastperiod.attr("class")); return; }
+        
+        var offset = kwhlastperiod.attr("offset")*1;
         if (offset===undefined) offset = 0;
         if (isNaN(offset)) offset = 0;
-        
-        // Pull in value at given time to subtract
-        var now = new Date();
-        now.setHours(0,0,0,0);
-        var period_time = now.getTime()/3600000 + offset;
-        
-        if (kwhperiod_start[period_time]==undefined) {
-            var result = feed.get_value(feedid, period_time*3600000);
-            kwhperiod_start[period_time] = result[1];
-        }
-        val -= kwhperiod_start[period_time]
 
-      
+        var date = new Date();
+        date.setHours(0,0,0,0);
+        date.setDate(date.getDate() - 7);
+        var period_time = date.getTime() + offset*3600*1000;
+
+        if (kwhlastperiod_start[period_time]==undefined) {
+            var result1 = feed.get_value(feedid, period_time);
+            var result2 = feed.get_value(feedid, period_time+(3600*24*1000));
+            kwhlastperiod_start[period_time] = result2[1]-result1[1];
+        }
+
+        var val = kwhlastperiod_start[period_time]
+        
         if (val===undefined) {val = 0;}
         if (isNaN(val))  {val = 0;}
 
@@ -258,20 +258,20 @@ function kwhperiod_draw()
             }
         }
 
-        var size = kwhperiod.attr("size");
+        var size = kwhlastperiod.attr("size");
 
-        var decimals = kwhperiod.attr("decimals");
+        var decimals = kwhlastperiod.attr("decimals");
 
         if (decimals===undefined) {decimals = -1};
 
 
         // backwards compatibility
-        var unitend = kwhperiod.attr("unitend");
-        var units = kwhperiod.attr("units");
+        var unitend = kwhlastperiod.attr("unitend");
+        var units = kwhlastperiod.attr("units");
         
         // new options
-        var prepend = kwhperiod.attr("prepend");
-        var append = kwhperiod.attr("append");
+        var prepend = kwhlastperiod.attr("prepend");
+        var append = kwhlastperiod.attr("append");
         
         // check if new options are undefined: use old
         if (prepend==undefined && append==undefined) {
@@ -289,35 +289,35 @@ function kwhperiod_draw()
             }
         }
 
-        draw_kwhperiod(
-            kwhperiod,
-            kwhperiod.attr("font"),
-            kwhperiod.attr("fstyle"),
-            kwhperiod.attr("fweight"),
-            kwhperiod.width(),
-            kwhperiod.height(),
+        draw_kwhlastperiod(
+            kwhlastperiod,
+            kwhlastperiod.attr("font"),
+            kwhlastperiod.attr("fstyle"),
+            kwhlastperiod.attr("fweight"),
+            kwhlastperiod.width(),
+            kwhlastperiod.height(),
             prepend,
             val,
             append,
-            kwhperiod.attr("colour"),
-            kwhperiod.attr("decimals"),
-            kwhperiod.attr("size"),
-            kwhperiod.attr("align"),
+            kwhlastperiod.attr("colour"),
+            kwhlastperiod.attr("decimals"),
+            kwhlastperiod.attr("size"),
+            kwhlastperiod.attr("align"),
             errorCode,
             errorMessage
         );
     });
 }
 
-function kwhperiod_init()
+function kwhlastperiod_init()
 {
-    $(".kwhperiod").html("");
+    $(".kwhlastperiod").html("");
 }
-function kwhperiod_slowupdate()
+function kwhlastperiod_slowupdate()
 {
-	  kwhperiod_draw();
+	  kwhlastperiod_draw();
 }
-function kwhperiod_fastupdate()
+function kwhlastperiod_fastupdate()
 {
-	  kwhperiod_draw();
+	  kwhlastperiod_draw();
 }
