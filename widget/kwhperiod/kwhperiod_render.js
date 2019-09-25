@@ -244,8 +244,6 @@ function kwhperiod_draw()
             kwhperiod_start[period_time] = result[1];
         }
         val -= kwhperiod_start[period_time]
-        
-        console.log(val);
 
         if (val===undefined) {val = 0;}
         if (isNaN(val))  {val = 0;}

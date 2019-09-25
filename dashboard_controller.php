@@ -20,7 +20,7 @@ function dashboard_controller()
     $dashboard = new Dashboard($mysqli);
     // id, userid, content, height, name, alias, description, main, public, published, showdescription
     
-    $js_css_version = 4;
+    $js_css_version = 5;
 
     $result = false; $submenu = '';
 
