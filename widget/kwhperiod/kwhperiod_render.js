@@ -6,12 +6,15 @@
     http://openenergymonitor.org
 
     Author: Trystan Lea: trystan.lea@googlemail.com
-	Enhancements done by: Andreas Messerli firefox7518@gmail.com
+    Enhancements done by: Andreas Messerli firefox7518@gmail.com
+    kWPeriod widget instigated by: Daniel Bates @danbates2
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
  */
  
-var kwhperiod_start = []
+var kwhperiod_cache = []
+var kwhperiod_lastupdate = 0
+var kwhperiod_lastvalue = 0
  
  function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
 {
@@ -48,7 +51,14 @@ function kwhperiod_widgetlist()
         [5,    "5"],
         [6,    "6"]
     ];
-	
+
+  var periodDropBoxOptions = [        // Options for the type combobox. Each item is [typeID, "description"]
+        [0,   "Hour (useage in hour just been)"],
+        [1,   "Day (since midnight + offset)"],
+        [2,   "Week (7 days exactly"],
+        [3,   "Month (28 days exactly)"],
+        [4,   "Year (usage in one year exactly"]
+    ];
 
 	var fontoptions = [
 					[9, "Arial Black"],
@@ -62,13 +72,13 @@ function kwhperiod_widgetlist()
 					[1, "Georgia"],
 					[0, "Impact"]
 				];
-				
+
 	var fstyleoptions = [
 					[2, _Tr("Normal")],
 					[1, _Tr("Italic")],
 					[0, _Tr("Oblique")]
 				];
-				
+
 	var fweightoptions = [
 					[1, _Tr("Bold")],
 					[0, _Tr("Normal")]
@@ -99,12 +109,13 @@ function kwhperiod_widgetlist()
   ];
 				
 	addOption(widgets["kwhperiod"], "feedid",   "feedid",  _Tr("Feed"),     _Tr("Feed value"),      []);
-	addOption(widgets["kwhperiod"], "offset",    "value",   _Tr("Period offset"),    _Tr("Period offset hours"),   []);
+	addOption(widgets["kwhperiod"], "period",   "dropbox",  _Tr("Period"),     _Tr("Period range"), periodDropBoxOptions);
+	addOption(widgets["kwhperiod"], "offset",    "value",   _Tr("Period offset"),    _Tr("Period offset hours, 'day' period only"),   []);
 	addOption(widgets["kwhperiod"], "prepend",    "value",   _Tr("Prepend Text"),    _Tr("Prepend Text"),   []);
 	addOption(widgets["kwhperiod"], "append",  "value", _Tr("Append Text"), _Tr("Append Text (Units)"), []);
-	addOption(widgets["kwhperiod"], "decimals", "dropbox", _Tr("Decimals"), _Tr("Decimals to show"),    decimalsDropBoxOptions);
+	addOption(widgets["kwhperiod"], "decimals", "dropbox", _Tr("Decimals"), _Tr("Decimals to show"), decimalsDropBoxOptions);
 	addOption(widgets["kwhperiod"], "colour",   "colour_picker",  _Tr("Colour"),     _Tr("Colour used for display"),      []);
-	addOption(widgets["kwhperiod"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),      fontoptions);
+	addOption(widgets["kwhperiod"], "font",     "dropbox",  _Tr("Font"),     _Tr("Font used for display"),     fontoptions);
 	addOption(widgets["kwhperiod"], "fstyle",   "dropbox", _Tr("Font style"), _Tr("Font style used for display"),    fstyleoptions);
 	addOption(widgets["kwhperiod"], "fweight",  "dropbox", _Tr("Font weight"), _Tr("Font weight used for display"),    fweightoptions);
 	addOption(widgets["kwhperiod"], "size",   	"dropbox", _Tr("Size"), _Tr("Text size in px to use"),    sizeoptions);
@@ -190,6 +201,7 @@ function draw_kwhperiod(kwhperiod,font,fstyle,fweight,width,height,prepend,val,a
         val = val.toFixed(decimals);
     }
 
+
     if (colour.indexOf("#") === -1) {			// Fix missing "#" on colour if needed
         colour = "#" + colour;
     }
@@ -217,7 +229,7 @@ function kwhperiod_draw()
         var kwhperiod = $(this);
         var errorMessage = $(this).attr("errormessagedisplayed");
         if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
-          errorMessage = "TO Error";
+          errorMessage = "Feed Timeout";
         }
         var errorTimeout = kwhperiod.attr("timeout");
         if (errorTimeout === "" || errorTimeout === undefined){           //Timeout parameter is empty
@@ -229,41 +241,103 @@ function kwhperiod_draw()
         if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
         if (associd[feedid] === undefined) { console.log("Review config for feed id of " + kwhperiod.attr("class")); return; }
         var val = associd[feedid]["value"] * 1;
-        
-        var offset = kwhperiod.attr("offset")*1;
+
+        var offset = kwhperiod.attr("offset") * 1;
         if (offset===undefined) offset = 0;
         if (isNaN(offset)) offset = 0;
-        
-        // Pull in value at given time to subtract
-        var now = new Date();
-        now.setHours(0,0,0,0);
-        var period_time = now.getTime()/3600000 + offset;
-        
-        if (kwhperiod_start[period_time]==undefined) {
-            var result = feed.get_value(feedid, period_time*3600000);
-            kwhperiod_start[period_time] = result[1];
-        }
-        val -= kwhperiod_start[period_time]
 
-      
+        var period = kwhperiod.attr("period") * 1;
+        if (period===undefined) period = 1; // "day" period default
+        if (isNaN(period)) period = 1;
+        
+        var now = new Date();
+
+        // Pull in value at given time to subtract (HOUR)
+        if (period===0) {
+            //	var now = new Date();
+            now.setHours(now.getHours() - 1);
+            var period_time = now.getTime()/1000;
+            
+            if ((period_time-kwhperiod_lastupdate)>60.0) {
+                kwhperiod_lastupdate = period_time
+                var result = feed.get_value(feedid, period_time*1000);
+                kwhperiod_lastvalue = result[1];
+            }
+            val -= kwhperiod_lastvalue
+        }
+
+        // Pull in value at given time to subtract (DAY + offset)
+        else if (period===1) {
+            now.setHours(0,0,0,0);
+            var period_time = now.getTime()/3600000 + offset;
+
+            if (kwhperiod_cache[period_time]==undefined) {
+                var result = feed.get_value(feedid, period_time * 3600000);
+                kwhperiod_cache[period_time] = result[1];
+            }
+            val -= kwhperiod_cache[period_time]
+        }
+
+        // Pull in value at given time to subtract (WEEK)
+        else if (period===2) {
+            now.setDate(now.getDate() - 7);
+	    now.setSeconds(0,0);
+            var period_time = now.getTime();
+
+            if (kwhperiod_cache[period_time]==undefined) {
+                var result = feed.get_value(feedid, period_time);
+                kwhperiod_cache[period_time] = result[1];
+            }
+            val -= kwhperiod_cache[period_time]
+        }
+
+        // Pull in value at given time to subtract (MONTH)
+        else if (period===3) {
+            now.setDate(now.getDate() - 28);
+	    now.setSeconds(0,0);
+            var period_time = now.getTime();
+
+            if (kwhperiod_cache[period_time]==undefined) {
+                var result = feed.get_value(feedid, period_time);
+                kwhperiod_cache[period_time] = result[1];
+            }
+            val -= kwhperiod_cache[period_time]
+        }
+
+        // Pull in value at given time to subtract (YEAR)
+        else if (period===4) {
+            now.setDate(now.getDate() - 365);
+	    now.setSeconds(0,0);
+            var period_time = now.getTime();
+
+            if (kwhperiod_cache[period_time]==undefined) {
+                var result = feed.get_value(feedid, period_time);
+                kwhperiod_cache[period_time] = result[1];
+            }
+            val -= kwhperiod_cache[period_time]
+        }
+
         if (val===undefined) {val = 0;}
         if (isNaN(val))  {val = 0;}
 
-        var errorCode = "0";
-        if (errorTimeout !== 0)
+	var latest_feedtime = (associd[feedid]["time"] * 1);
+	var errorCode = "0";
+
+	var unix_now = Date.now() / 1000;
+	var errorTime = parseInt(latest_feedtime) + parseInt(errorTimeout);
+//	console.log(unix_now - errorTime);
+
+	if (errorTimeout > 0 && unix_now >= errorTime)
         {
-            if ((time - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
-            {
-                errorCode = "1";
-            }
+	  errorCode = "1";
         }
+	//console.log(errorCode);
 
         var size = kwhperiod.attr("size");
 
         var decimals = kwhperiod.attr("decimals");
 
         if (decimals===undefined) {decimals = -1};
-
 
         // backwards compatibility
         var unitend = kwhperiod.attr("unitend");
@@ -311,13 +385,14 @@ function kwhperiod_draw()
 
 function kwhperiod_init()
 {
-    $(".kwhperiod").html("");
+	$(".kwhperiod").html("");
+	kwhperiod_draw();
 }
 function kwhperiod_slowupdate()
 {
-	  kwhperiod_draw();
+	kwhperiod_draw();
 }
 function kwhperiod_fastupdate()
 {
-	  kwhperiod_draw();
+	//kwhperiod_draw();
 }
