@@ -7,7 +7,7 @@
 
     Author: Trystan Lea: trystan.lea@googlemail.com
     Enhancements done by: Andreas Messerli firefox7518@gmail.com
-    kWPeriod widget instigated by: Daniel Bates @danbates2
+    kWhPeriod widget implemented by: Daniel Bates dgbates@mail.uk
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
  */
