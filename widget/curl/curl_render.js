@@ -19,7 +19,7 @@ function curl_widgetlist()
       "menu":"Widgets",
       "options":["ip","port","url","payload","method", "https","timeout","colour","caption","confirm"],
       "optionsname":[_Tr("IP"),_Tr("Port"),_Tr("URL"),_Tr("Payload"),_Tr("Method"),_Tr("HTTPS"),_Tr("Timeout"),_Tr("Colour"),_Tr("Caption"),_Tr("Confirmation")],
-      "optionshint":[_Tr("IP address of server"),_Tr("Listen port of server"),_Tr("URL example: node/param"),_Tr("Data to send"),_Tr("GET/POST"),_Tr("yes/no"),_Tr("in milliseconds"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Button Text"),_Tr("Confirmation Box: yes/no")]
+      "optionshint":[_Tr("IP address of server (server must have cross origin allowed to work, will not generally work on servers other than localhost)"),_Tr("Listen port of server"),_Tr("URL example: node/param"),_Tr("Data to send"),_Tr("GET/POST"),_Tr("yes/no"),_Tr("in milliseconds"),_Tr("0=rd, 1=gn, 2=gy, 3=bu, 4=vio, 5=ye, >5=bk"),_Tr("Button Text"),_Tr("Confirmation Box: yes/no")]
     }
   };
 
