@@ -12,7 +12,12 @@
         }
     }
 
-    // navbar link
+    // sidebar nav list
+    // Contains a list for the drop down with dashboards available for user session type
+    $listmenu = $dashboard->build_menu_array('view');
+
+    //navbar link
+    if(!empty($listmenu) || $session["write"]) { //if the dashboard menu isn't empty, or if the session is write, show the menu
     $menu['tabs'][] = array(
         'icon'=>'dashboard',
         'text'=> dgettext("dashboard_messages","Dashboards"),
@@ -20,10 +25,7 @@
         'order' => 3,
         'data'=> array('sidebar' => '#sidebar_dashboard')
     );
-
-    // sidebar nav list
-    // Contains a list for the drop down with dashboards available for user session type
-    $listmenu = $dashboard->build_menu_array('view');
+    }
 
     foreach ($listmenu as $dash) {
         $id = $dash['id'];
