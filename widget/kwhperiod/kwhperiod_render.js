@@ -13,6 +13,11 @@
  */
 
 const msToDayConversion = 1000*60*60*24
+const refreshPeriod = 4000 // milliseconds
+var previous_refresh
+if (!previous_refresh) {
+  previous_refresh = new Date();
+}
 
 function addOption (
   widget,
@@ -518,6 +523,7 @@ function kwhperiod_draw () {
     var lastperiodEndTime
     var thisperiodStartTime
     var now = new Date()
+    var now2 = new Date()
     now.setMinutes(now.getMinutes() - 1) // clock error compensation
     //console.log(now, 'hia-now')
 
@@ -712,7 +718,10 @@ function kwhperiod_draw () {
     thisperiod_start_value
     now
     */
-
+   var t11 = now2.getTime()
+   var t22 = previous_refresh.getTime()
+   if (t11 - t22 >= refreshPeriod) {
+    previous_refresh = new Date(now2)
     if (periods_ago > 0 || use_last_year) {
       // lastperiod_end_value
       var result = feed.get_value(feedid, lastperiodEndTime.getTime())
@@ -732,13 +741,11 @@ function kwhperiod_draw () {
       }
     } else {
       // thisperiod_end_value
-      //now.setSeconds(0,0)
       var result = feed.get_value(feedid, now.getTime())
       console.log(result, 'recent period end / now')
       var thisperiod_end_value = result[1]
 
       // thisperiod_start_value
-      //thisperiodStartTime.setSeconds(0,0)
       var result = feed.get_value(feedid, thisperiodStartTime.getTime())
       console.log(result, 'recent period start')
       var thisperiod_start_value = result[1]
@@ -750,9 +757,9 @@ function kwhperiod_draw () {
         val = (period_millis/msToDayConversion)*val // convert kWh to kWhperday
       }
     }
-
+  }
     //------------------------------------------
-    // End kWh Period Implementation, DB2019.
+    // End kWh Period Implementation, DBates2019.
     //------------------------------------------
 
 
@@ -806,24 +813,26 @@ function kwhperiod_draw () {
         append = ''
       }
     }
-
-    draw_kwhperiod(
-      kwhperiod,
-      kwhperiod.attr('font'),
-      kwhperiod.attr('fstyle'),
-      kwhperiod.attr('fweight'),
-      kwhperiod.width(),
-      kwhperiod.height(),
-      prepend,
-      val,
-      append,
-      kwhperiod.attr('colour'),
-      kwhperiod.attr('decimals'),
-      kwhperiod.attr('size'),
-      kwhperiod.attr('align'),
-      errorCode,
-      errorMessage
-    )
+    
+    
+      draw_kwhperiod(
+        kwhperiod,
+        kwhperiod.attr('font'),
+        kwhperiod.attr('fstyle'),
+        kwhperiod.attr('fweight'),
+        kwhperiod.width(),
+        kwhperiod.height(),
+        prepend,
+        val,
+        append,
+        kwhperiod.attr('colour'),
+        kwhperiod.attr('decimals'),
+        kwhperiod.attr('size'),
+        kwhperiod.attr('align'),
+        errorCode,
+        errorMessage
+      )
+    
   })
 }
 
