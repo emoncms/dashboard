@@ -523,8 +523,8 @@ function kwhperiod_draw () {
     var lastperiodEndTime
     var thisperiodStartTime
     var now = new Date()
-    var now2 = new Date()
-    now.setMinutes(now.getMinutes() - 1) // clock error compensation
+    //var now2 = new Date()
+    //now.setMinutes(now.getMinutes() - 1) // clock error compensation
     //console.log(now, 'hia-now')
 
     if (period_length === 0) {
@@ -718,12 +718,12 @@ function kwhperiod_draw () {
     thisperiod_start_value
     now
     */
-   var t11 = now2.getTime()
-   var t22 = previous_refresh.getTime()
+   var t1refresh = now.getTime()
+   var t2refresh = previous_refresh.getTime()
    var refreshFix
-   if (t11 - t22 >= refreshPeriod || refreshFix === undefined) {
+   if (t1refresh - t2refresh >= refreshPeriod || refreshFix === undefined) {
      refreshFix = 1
-    previous_refresh = new Date(now2)
+    previous_refresh = new Date(now)
     if (periods_ago > 0 || use_last_year) {
       // lastperiod_end_value
       var result = feed.get_value(feedid, lastperiodEndTime.getTime())
@@ -743,17 +743,20 @@ function kwhperiod_draw () {
       }
     } else {
       // thisperiod_end_value
+      /*
       var result = feed.get_value(feedid, now.getTime())
       console.log(result, 'recent period end / now')
       var thisperiod_end_value = result[1]
-
+      */
       // thisperiod_start_value
       var result = feed.get_value(feedid, thisperiodStartTime.getTime())
-      console.log(result, 'recent period start')
+      console.log(result, 'recent period start value')
       var thisperiod_start_value = result[1]
 
       // ... and calculate the result of our time window.
-      val = thisperiod_end_value - thisperiod_start_value
+      console.log(val, 'value now')
+      val -= thisperiod_start_value
+      
       if (kwh_per_dayConversion) {
         var period_millis = now.getTime() - thisperiodStartTime.getTime()
         val = (period_millis/msToDayConversion)*val // convert kWh to kWhperday
