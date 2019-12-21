@@ -720,7 +720,9 @@ function kwhperiod_draw () {
     */
    var t11 = now2.getTime()
    var t22 = previous_refresh.getTime()
-   if (t11 - t22 >= refreshPeriod) {
+   var refreshFix
+   if (t11 - t22 >= refreshPeriod || refreshFix === undefined) {
+     refreshFix = 1
     previous_refresh = new Date(now2)
     if (periods_ago > 0 || use_last_year) {
       // lastperiod_end_value
