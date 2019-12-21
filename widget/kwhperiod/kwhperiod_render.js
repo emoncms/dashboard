@@ -159,7 +159,7 @@ function kwhperiod_widgetlist () {
     'value',
     _Tr('Period multiplier'),
     _Tr(
-      'Number of Periods, this defines the width of the time window. 0 and 1 default to length of period.'
+      'Number of Periods, this defines the width of the time window. 0 and 1 are the same, both default to the length of period.'
     ),
     []
   )
@@ -187,7 +187,7 @@ function kwhperiod_widgetlist () {
     widgets['kwhperiod'],
     'period_quantisation',
     'dropbox',
-    _Tr('Period quantisation'),
+    _Tr('Period quantise'),
     _Tr(
       "True sets the start of the time window according to the common requirement as per period length, i.e. the beginning of the day i.e. hour starts from x:00 minutes, day from 00:00 hours, week from Monday 00:00, Month from 1st of the Month 00:00, and Year from 1st of January 00:00. No quantisation will result in a time window with a start point in the past strictly as units of the period length, i.e today at 13:30 -> yesterday at 13:30."
     ),
@@ -205,7 +205,7 @@ function kwhperiod_widgetlist () {
     widgets['kwhperiod'],
     'use_last_year',
     'dropbox',
-    _Tr("Use last year's data"),
+    _Tr("Past year data"),
     _Tr("Set to True to use last year's data"),
     lastYearDropBoxOptions
   )
