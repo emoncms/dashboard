@@ -14,9 +14,9 @@
 
 const msToDayConversion = 1000*60*60*24
 const refreshPeriod = 4000 // milliseconds
-var previous_refresh
-if (!previous_refresh) {
-  previous_refresh = new Date();
+var previousRefresh
+if (!previousRefresh) {
+  previousRefresh = new Date();
 }
 
 function addOption (
@@ -147,7 +147,7 @@ function kwhperiod_widgetlist () {
   )
   addOption(
     widgets['kwhperiod'],
-    'period_length',
+    'periodLength',
     'dropbox',
     _Tr('Period length'),
     _Tr('Period length'),
@@ -155,7 +155,7 @@ function kwhperiod_widgetlist () {
   )
   addOption(
     widgets['kwhperiod'],
-    'period_multiplier',
+    'periodMultiplier',
     'value',
     _Tr('Period multiplier'),
     _Tr(
@@ -165,7 +165,7 @@ function kwhperiod_widgetlist () {
   )
   addOption(
     widgets['kwhperiod'],
-    'periods_ago',
+    'periodsAgo',
     'value',
     _Tr('Periods ago'),
     _Tr(
@@ -175,7 +175,7 @@ function kwhperiod_widgetlist () {
   )
   addOption(
     widgets['kwhperiod'],
-    'period_offset',
+    'periodOffset',
     'value',
     _Tr('Period offset'),
     _Tr(
@@ -185,7 +185,7 @@ function kwhperiod_widgetlist () {
   )
   addOption(
     widgets['kwhperiod'],
-    'period_quantisation',
+    'periodQuantise',
     'dropbox',
     _Tr('Period quantise'),
     _Tr(
@@ -195,7 +195,7 @@ function kwhperiod_widgetlist () {
   )
   addOption(
     widgets['kwhperiod'],
-    'kwh_per_dayConversion',
+    'kwhPerDayConversion',
     'dropbox',
     _Tr("Period kWh/day"),
     _Tr("Convert the periodic energy use to kWh per Day"),
@@ -203,7 +203,7 @@ function kwhperiod_widgetlist () {
   )
   addOption(
     widgets['kwhperiod'],
-    'use_last_year',
+    'useLastYear',
     'dropbox',
     _Tr("Annual data"),
     _Tr("Set to True to use last year's data"),
@@ -486,225 +486,225 @@ function kwhperiod_draw () {
     }
     var val = associd[feedid]['value'] * 1
 
-    var period_length = kwhperiod.attr('period_length') * 1
-    if (period_length === undefined) period_length = 1 // "day" period default
-    if (isNaN(period_length)) period_length = 1
+    var periodLength = kwhperiod.attr('periodLength') * 1
+    if (periodLength === undefined) periodLength = 1 // "day" period default
+    if (isNaN(periodLength)) periodLength = 1
 
-    var period_multiplier = kwhperiod.attr('period_multiplier') * 1
-    if (period_multiplier === 0) period_multiplier = 1
-    if (period_multiplier === undefined) period_multiplier = 1 // zero and 1 do the same thing, no multiplier by default, time window width equal to period length itself.
-    if (isNaN(period_multiplier)) period_multiplier = 1
+    var periodMultiplier = kwhperiod.attr('periodMultiplier') * 1
+    if (periodMultiplier === 0) periodMultiplier = 1
+    if (periodMultiplier === undefined) periodMultiplier = 1 // zero and 1 do the same thing, no multiplier by default, time window width equal to period length itself.
+    if (isNaN(periodMultiplier)) periodMultiplier = 1
 
-    var periods_ago = kwhperiod.attr('periods_ago') * 1
-    if (periods_ago === undefined) periods_ago = 0 // defaults to the most recent period.
-    if (isNaN(periods_ago)) periods_ago = 0
+    var periodsAgo = kwhperiod.attr('periodsAgo') * 1
+    if (periodsAgo === undefined) periodsAgo = 0 // defaults to the most recent period.
+    if (isNaN(periodsAgo)) periodsAgo = 0
 
-    var period_offset = kwhperiod.attr('period_offset') * 1
-    if (period_offset === undefined) period_offset = 0 // default offset is 0
-    if (isNaN(period_offset)) period_offset = 0
+    var periodOffset = kwhperiod.attr('periodOffset') * 1
+    if (periodOffset === undefined) periodOffset = 0 // default offset is 0
+    if (isNaN(periodOffset)) periodOffset = 0
 
-    var period_quantisation = kwhperiod.attr('period_quantisation') * 1
-    if (period_quantisation === undefined) period_quantisation = 1 // default is true
-    if (isNaN(period_quantisation)) period_quantisation = 1
+    var periodQuantise = kwhperiod.attr('periodQuantise') * 1
+    if (periodQuantise === undefined) periodQuantise = 1 // default is true
+    if (isNaN(periodQuantise)) periodQuantise = 1
 
-    var kwh_per_dayConversion = kwhperiod.attr('kwh_per_dayConversion') * 1
-    if (kwh_per_dayConversion === undefined) kwh_per_dayConversion = 0 // default is false
-    if (isNaN(kwh_per_dayConversion)) kwh_per_dayConversion = 0
+    var kwhPerDayConversion = kwhperiod.attr('kwhPerDayConversion') * 1
+    if (kwhPerDayConversion === undefined) kwhPerDayConversion = 0 // default is false
+    if (isNaN(kwhPerDayConversion)) kwhPerDayConversion = 0
 
-    var use_last_year = kwhperiod.attr('use_last_year') * 1
-    if (use_last_year === undefined) use_last_year = 0 // default is false
-    if (isNaN(use_last_year)) use_last_year = 0
+    var useLastYear = kwhperiod.attr('useLastYear') * 1
+    if (useLastYear === undefined) useLastYear = 0 // default is false
+    if (isNaN(useLastYear)) useLastYear = 0
 
     //------------------------------------------
     // Find period times in milliseconds.
     //------------------------------------------
 
-    var pastperiodStartTime
+    var pastPeriodStartTime
     var pastperiodEndTime
-    var thisperiodStartTime
+    var thisPeriodStartTime
     var now = new Date()
     //var now2 = new Date()
     //now.setMinutes(now.getMinutes() - 1) // clock error compensation
     //console.log(now, 'hia-now')
 
-    if (period_length === 0) {
+    if (periodLength === 0) {
       // hour
-      if (period_quantisation) {
-        thisperiodStartTime = new Date(now)
-        thisperiodStartTime.setMinutes(0, 0, 0) // reset minutes and seconds of current hour
-        //console.log(thisperiodStartTime, 'hia-quantised')
+      if (periodQuantise) {
+        thisPeriodStartTime = new Date(now)
+        thisPeriodStartTime.setMinutes(0, 0, 0) // reset minutes and seconds of current hour
+        //console.log(thisPeriodStartTime, 'hia-quantised')
       } else {
-        thisperiodStartTime = new Date(now)
-        thisperiodStartTime.setHours(thisperiodStartTime.getHours() - 1) // go back one hour exactly
-        //console.log(thisperiodStartTime, 'hia-not-quantised')
+        thisPeriodStartTime = new Date(now)
+        thisPeriodStartTime.setHours(thisPeriodStartTime.getHours() - 1) // go back one hour exactly
+        //console.log(thisPeriodStartTime, 'hia-not-quantised')
       }
 
-      thisperiodStartTime.setHours(
-        thisperiodStartTime.getHours() - (period_multiplier - 1)
+      thisPeriodStartTime.setHours(
+        thisPeriodStartTime.getHours() - (periodMultiplier - 1)
       ) // apply multiplier
-      //console.log(thisperiodStartTime, 'hia-multiplier')
+      //console.log(thisPeriodStartTime, 'hia-multiplier')
 
-      thisperiodStartTime.setSeconds(
-        thisperiodStartTime.getSeconds() + period_offset
+      thisPeriodStartTime.setSeconds(
+        thisPeriodStartTime.getSeconds() + periodOffset
       ) // apply offset
-      //console.log(thisperiodStartTime, 'hia-offset')
+      //console.log(thisPeriodStartTime, 'hia-offset')
 
-      pastperiodStartTime = new Date(thisperiodStartTime)
-      pastperiodStartTime.setHours(pastperiodStartTime.getHours() - periods_ago)
-      if (use_last_year)
-        pastperiodStartTime.setFullYear(pastperiodStartTime.getFullYear() - 1)
-      //console.log(pastperiodStartTime, 'hia-pastperiodStartTime')
+      pastPeriodStartTime = new Date(thisPeriodStartTime)
+      pastPeriodStartTime.setHours(pastPeriodStartTime.getHours() - periodsAgo)
+      if (useLastYear)
+        pastPeriodStartTime.setFullYear(pastPeriodStartTime.getFullYear() - 1)
+      //console.log(pastPeriodStartTime, 'hia-pastPeriodStartTime')
 
-      pastperiodEndTime = new Date(pastperiodStartTime)
+      pastperiodEndTime = new Date(pastPeriodStartTime)
       pastperiodEndTime.setHours(
-        pastperiodEndTime.getHours() + period_multiplier
+        pastperiodEndTime.getHours() + periodMultiplier
       )
       //console.log(pastperiodEndTime, 'hia-pastperiodEndTime')
-    } else if (period_length === 1) {
+    } else if (periodLength === 1) {
       // day
-      if (period_quantisation) {
-        thisperiodStartTime = new Date(now)
-        thisperiodStartTime.setHours(0, 0, 0, 0)
-        //console.log(thisperiodStartTime, 'hia-quantised')
+      if (periodQuantise) {
+        thisPeriodStartTime = new Date(now)
+        thisPeriodStartTime.setHours(0, 0, 0, 0)
+        //console.log(thisPeriodStartTime, 'hia-quantised')
       } else {
-        thisperiodStartTime = new Date(now)
-        thisperiodStartTime.setDate(thisperiodStartTime.getDate() - 1)
-        //console.log(thisperiodStartTime, 'hia-not-quantised')
+        thisPeriodStartTime = new Date(now)
+        thisPeriodStartTime.setDate(thisPeriodStartTime.getDate() - 1)
+        //console.log(thisPeriodStartTime, 'hia-not-quantised')
       }
 
-      thisperiodStartTime.setDate(
-        thisperiodStartTime.getDate() - (period_multiplier - 1)
+      thisPeriodStartTime.setDate(
+        thisPeriodStartTime.getDate() - (periodMultiplier - 1)
       ) // apply multiplier
-      //console.log(thisperiodStartTime, 'hia-multiplier')
-      thisperiodStartTime.setSeconds(
-        thisperiodStartTime.getSeconds() + period_offset
+      //console.log(thisPeriodStartTime, 'hia-multiplier')
+      thisPeriodStartTime.setSeconds(
+        thisPeriodStartTime.getSeconds() + periodOffset
       ) // apply offset
-      //console.log(thisperiodStartTime, 'hia-offset')
+      //console.log(thisPeriodStartTime, 'hia-offset')
 
-      pastperiodStartTime = new Date(thisperiodStartTime)
-      pastperiodStartTime.setDate(pastperiodStartTime.getDate() - periods_ago)
-      if (use_last_year) {
-        pastperiodStartTime.setFullYear(pastperiodStartTime.getFullYear() - 1)
+      pastPeriodStartTime = new Date(thisPeriodStartTime)
+      pastPeriodStartTime.setDate(pastPeriodStartTime.getDate() - periodsAgo)
+      if (useLastYear) {
+        pastPeriodStartTime.setFullYear(pastPeriodStartTime.getFullYear() - 1)
       }
-      //console.log(pastperiodStartTime, 'hia-pastperiodStartTime')
+      //console.log(pastPeriodStartTime, 'hia-pastPeriodStartTime')
 
-      pastperiodEndTime = new Date(pastperiodStartTime)
+      pastperiodEndTime = new Date(pastPeriodStartTime)
       pastperiodEndTime.setDate(
-        pastperiodStartTime.getDate() + period_multiplier
+        pastPeriodStartTime.getDate() + periodMultiplier
       )
       //console.log(pastperiodEndTime, 'hia-pastperiodEndTime')
-    } else if (period_length === 2) {
+    } else if (periodLength === 2) {
       // week
-      if (period_quantisation) {
-        thisperiodStartTime = new Date(now)
+      if (periodQuantise) {
+        thisPeriodStartTime = new Date(now)
         // https://stackoverflow.com/a/4156562
         day = now.getDay() || 7 // day is equal to 1 on a Monday, Sunday is converted to a 7.
         if (day !== 1) {
           // only if not Monday
-          thisperiodStartTime.setHours((day - 1) * -24) // Set to Monday
+          thisPeriodStartTime.setHours((day - 1) * -24) // Set to Monday
         }
-        thisperiodStartTime.setHours(0, 0, 0, 0) // Set to midnight
-        //console.log(thisperiodStartTime, 'hia-quantised')
+        thisPeriodStartTime.setHours(0, 0, 0, 0) // Set to midnight
+        //console.log(thisPeriodStartTime, 'hia-quantised')
       } else {
-        thisperiodStartTime = new Date(now)
-        thisperiodStartTime.setHours(now.getHours() - 7 * 24)
-        //console.log(thisperiodStartTime, 'hia-not-quantised')
+        thisPeriodStartTime = new Date(now)
+        thisPeriodStartTime.setHours(now.getHours() - 7 * 24)
+        //console.log(thisPeriodStartTime, 'hia-not-quantised')
       }
 
-      thisperiodStartTime.setDate(
-        thisperiodStartTime.getDate() - (period_multiplier - 1) * 7
+      thisPeriodStartTime.setDate(
+        thisPeriodStartTime.getDate() - (periodMultiplier - 1) * 7
       ) // apply multiplier
-      //console.log(thisperiodStartTime, 'hia-multiplier')
+      //console.log(thisPeriodStartTime, 'hia-multiplier')
 
-      thisperiodStartTime.setSeconds(
-        thisperiodStartTime.getSeconds() + period_offset
+      thisPeriodStartTime.setSeconds(
+        thisPeriodStartTime.getSeconds() + periodOffset
       ) // apply offset
-      //console.log(thisperiodStartTime, 'hia-offset')
+      //console.log(thisPeriodStartTime, 'hia-offset')
 
-      pastperiodStartTime = new Date(thisperiodStartTime)
-      pastperiodStartTime.setDate(
-        thisperiodStartTime.getDate() - periods_ago * 7
+      pastPeriodStartTime = new Date(thisPeriodStartTime)
+      pastPeriodStartTime.setDate(
+        thisPeriodStartTime.getDate() - periodsAgo * 7
       )
-      if (use_last_year)
-        pastperiodStartTime.setFullYear(pastperiodStartTime.getFullYear() - 1)
-      //console.log(pastperiodStartTime, 'hia-pastperiodStartTime')
-      pastperiodEndTime = new Date(pastperiodStartTime)
+      if (useLastYear)
+        pastPeriodStartTime.setFullYear(pastPeriodStartTime.getFullYear() - 1)
+      //console.log(pastPeriodStartTime, 'hia-pastPeriodStartTime')
+      pastperiodEndTime = new Date(pastPeriodStartTime)
       pastperiodEndTime.setDate(
-        pastperiodStartTime.getDate() + period_multiplier * 7
+        pastPeriodStartTime.getDate() + periodMultiplier * 7
       )
       //console.log(pastperiodEndTime, 'hia-pastperiodEndTime')
-    } else if (period_length === 3) {
+    } else if (periodLength === 3) {
       // month, calendar month (30 days worth implementing?)
-      if (period_quantisation) {
-        thisperiodStartTime = new Date(now)
-        thisperiodStartTime.setDate(1) //
-        thisperiodStartTime.setHours(0, 0, 0, 0)
-        //console.log(thisperiodStartTime, 'hia-quantised')
+      if (periodQuantise) {
+        thisPeriodStartTime = new Date(now)
+        thisPeriodStartTime.setDate(1) //
+        thisPeriodStartTime.setHours(0, 0, 0, 0)
+        //console.log(thisPeriodStartTime, 'hia-quantised')
       } else {
-        thisperiodStartTime = new Date(now)
-        thisperiodStartTime.setMonth(now.getMonth() - 1)
-        //console.log(thisperiodStartTime, 'hia-not-quantised')
+        thisPeriodStartTime = new Date(now)
+        thisPeriodStartTime.setMonth(now.getMonth() - 1)
+        //console.log(thisPeriodStartTime, 'hia-not-quantised')
       }
 
-      thisperiodStartTime.setMonth(
-        thisperiodStartTime.getMonth() - (period_multiplier - 1)
+      thisPeriodStartTime.setMonth(
+        thisPeriodStartTime.getMonth() - (periodMultiplier - 1)
       ) // apply multiplier
-      //console.log(thisperiodStartTime, 'hia-multiplier')
+      //console.log(thisPeriodStartTime, 'hia-multiplier')
 
-      thisperiodStartTime.setSeconds(
-        thisperiodStartTime.getSeconds() + period_offset
+      thisPeriodStartTime.setSeconds(
+        thisPeriodStartTime.getSeconds() + periodOffset
       ) // apply offset
-      //console.log(thisperiodStartTime, 'hia-offset')
+      //console.log(thisPeriodStartTime, 'hia-offset')
 
-      pastperiodStartTime = new Date(thisperiodStartTime)
-      pastperiodStartTime.setMonth(thisperiodStartTime.getMonth() - periods_ago)
-      if (use_last_year)
-        pastperiodStartTime.setFullYear(pastperiodStartTime.getFullYear() - 1)
+      pastPeriodStartTime = new Date(thisPeriodStartTime)
+      pastPeriodStartTime.setMonth(thisPeriodStartTime.getMonth() - periodsAgo)
+      if (useLastYear)
+        pastPeriodStartTime.setFullYear(pastPeriodStartTime.getFullYear() - 1)
 
-      //console.log(pastperiodStartTime, 'hia-pastperiodStartTime')
+      //console.log(pastPeriodStartTime, 'hia-pastPeriodStartTime')
 
-      pastperiodEndTime = new Date(pastperiodStartTime)
+      pastperiodEndTime = new Date(pastPeriodStartTime)
       pastperiodEndTime.setMonth(
-        pastperiodStartTime.getMonth() + period_multiplier
+        pastPeriodStartTime.getMonth() + periodMultiplier
       )
       //console.log(pastperiodEndTime, 'hia-pastperiodEndTime')
-    } else if (period_length === 4) {
+    } else if (periodLength === 4) {
       // year
-      if (period_quantisation) {
-        thisperiodStartTime = new Date(now)
-        thisperiodStartTime.setMonth(0, 1)
-        thisperiodStartTime.setHours(0, 0, 0, 0)
-        //console.log(thisperiodStartTime, 'hia-quantised')
+      if (periodQuantise) {
+        thisPeriodStartTime = new Date(now)
+        thisPeriodStartTime.setMonth(0, 1)
+        thisPeriodStartTime.setHours(0, 0, 0, 0)
+        //console.log(thisPeriodStartTime, 'hia-quantised')
       } else {
-        thisperiodStartTime = new Date(now)
-        thisperiodStartTime.setFullYear(now.getFullYear() - 1)
+        thisPeriodStartTime = new Date(now)
+        thisPeriodStartTime.setFullYear(now.getFullYear() - 1)
         // //console.log(now.getFullYear(),'hia-not-quantised')
 
-        //console.log(thisperiodStartTime, 'hia-not-quantised')
+        //console.log(thisPeriodStartTime, 'hia-not-quantised')
       }
 
-      thisperiodStartTime.setFullYear(
-        thisperiodStartTime.getFullYear() - (period_multiplier - 1)
+      thisPeriodStartTime.setFullYear(
+        thisPeriodStartTime.getFullYear() - (periodMultiplier - 1)
       ) // apply multiplier
-      //console.log(thisperiodStartTime, 'hia-multiplier')
+      //console.log(thisPeriodStartTime, 'hia-multiplier')
 
-      thisperiodStartTime.setSeconds(
-        thisperiodStartTime.getSeconds() + period_offset
+      thisPeriodStartTime.setSeconds(
+        thisPeriodStartTime.getSeconds() + periodOffset
       ) // apply offset
-      //console.log(thisperiodStartTime, 'hia-offset')
+      //console.log(thisPeriodStartTime, 'hia-offset')
 
-      pastperiodStartTime = new Date(thisperiodStartTime)
-      pastperiodStartTime.setFullYear(
-        thisperiodStartTime.getFullYear() - periods_ago
+      pastPeriodStartTime = new Date(thisPeriodStartTime)
+      pastPeriodStartTime.setFullYear(
+        thisPeriodStartTime.getFullYear() - periodsAgo
       )
-      if (use_last_year)
-        pastperiodStartTime.setFullYear(pastperiodStartTime.getFullYear() - 1)
+      if (useLastYear)
+        pastPeriodStartTime.setFullYear(pastPeriodStartTime.getFullYear() - 1)
 
-      //console.log(pastperiodStartTime, 'hia-pastperiodStartTime')
+      //console.log(pastPeriodStartTime, 'hia-pastPeriodStartTime')
 
-      pastperiodEndTime = new Date(pastperiodStartTime)
+      pastperiodEndTime = new Date(pastPeriodStartTime)
       pastperiodEndTime.setFullYear(
-        pastperiodStartTime.getFullYear() + period_multiplier
+        pastPeriodStartTime.getFullYear() + periodMultiplier
       )
       //console.log(pastperiodEndTime, 'hia-pastperiodEndTime')
     }
@@ -713,53 +713,53 @@ function kwhperiod_draw () {
     // Fetch Values and calculate results.
     //------------------------------------------
     /*
-    pastperiod_end_value
-    pastperiod_start_value
-    thisperiod_start_value
+    pastPeriodEndValue
+    pastPeriodStartValue
+    thisPeriodStartValue
     now
     */
    var t1refresh = now.getTime()
-   var t2refresh = previous_refresh.getTime()
+   var t2refresh = previousRefresh.getTime()
    var refreshFix
    if (t1refresh - t2refresh >= refreshPeriod || refreshFix === undefined) {
      refreshFix = 1
-    previous_refresh = new Date(now)
-    if (periods_ago > 0 || use_last_year) {
-      // pastperiod_end_value
+    previousRefresh = new Date(now)
+    if (periodsAgo > 0 || useLastYear) {
+      // pastPeriodEndValue
       var result = feed.get_value(feedid, pastperiodEndTime.getTime())
       console.log(result, 'past period end')
-      var pastperiod_end_value = result[1]
+      var pastPeriodEndValue = result[1]
 
-      // pastperiod_start_value
-      var result = feed.get_value(feedid, pastperiodStartTime.getTime())
+      // pastPeriodStartValue
+      var result = feed.get_value(feedid, pastPeriodStartTime.getTime())
       console.log(result, 'past period start')
-      var pastperiod_start_value = result[1]
+      var pastPeriodStartValue = result[1]
 
       // ... and calculate the result of our time window.
-      val = pastperiod_end_value - pastperiod_start_value
-      if (kwh_per_dayConversion) {
-        var period_millis = pastperiodEndTime.getTime() - pastperiodStartTime.getTime()
-        val = (period_millis/msToDayConversion)*val // convert kWh to kWhperday
+      val = pastPeriodEndValue - pastPeriodStartValue
+      if (kwhPerDayConversion) {
+        var periodMillis = pastperiodEndTime.getTime() - pastPeriodStartTime.getTime()
+        val = (periodMillis/msToDayConversion)*val // convert kWh to kWhperday
       }
     } else {
-      // thisperiod_end_value
+      // thisperiodEndValue
       /*
       var result = feed.get_value(feedid, now.getTime())
       console.log(result, 'recent period end / now')
-      var thisperiod_end_value = result[1]
+      var thisperiodEndValue = result[1]
       */
-      // thisperiod_start_value
-      var result = feed.get_value(feedid, thisperiodStartTime.getTime())
+      // thisPeriodStartValue
+      var result = feed.get_value(feedid, thisPeriodStartTime.getTime())
       console.log(result, 'recent period start value')
-      var thisperiod_start_value = result[1]
+      var thisPeriodStartValue = result[1]
 
       // ... and calculate the result of our time window.
       console.log(val, 'value now')
-      val -= thisperiod_start_value
+      val -= thisPeriodStartValue
       
-      if (kwh_per_dayConversion) {
-        var period_millis = now.getTime() - thisperiodStartTime.getTime()
-        val = (period_millis/msToDayConversion)*val // convert kWh to kWhperday
+      if (kwhPerDayConversion) {
+        var periodMillis = now.getTime() - thisPeriodStartTime.getTime()
+        val = (periodMillis/msToDayConversion)*val // convert kWh to kWhperday
       }
     }
   }
