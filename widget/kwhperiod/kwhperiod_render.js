@@ -205,7 +205,7 @@ function kwhperiod_widgetlist () {
     widgets['kwhperiod'],
     'use_last_year',
     'dropbox',
-    _Tr("Past year data"),
+    _Tr("Annual data"),
     _Tr("Set to True to use last year's data"),
     lastYearDropBoxOptions
   )
@@ -519,8 +519,8 @@ function kwhperiod_draw () {
     // Find period times in milliseconds.
     //------------------------------------------
 
-    var lastperiodStartTime
-    var lastperiodEndTime
+    var pastperiodStartTime
+    var pastperiodEndTime
     var thisperiodStartTime
     var now = new Date()
     //var now2 = new Date()
@@ -549,17 +549,17 @@ function kwhperiod_draw () {
       ) // apply offset
       //console.log(thisperiodStartTime, 'hia-offset')
 
-      lastperiodStartTime = new Date(thisperiodStartTime)
-      lastperiodStartTime.setHours(lastperiodStartTime.getHours() - periods_ago)
+      pastperiodStartTime = new Date(thisperiodStartTime)
+      pastperiodStartTime.setHours(pastperiodStartTime.getHours() - periods_ago)
       if (use_last_year)
-        lastperiodStartTime.setFullYear(lastperiodStartTime.getFullYear() - 1)
-      //console.log(lastperiodStartTime, 'hia-lastperiodStartTime')
+        pastperiodStartTime.setFullYear(pastperiodStartTime.getFullYear() - 1)
+      //console.log(pastperiodStartTime, 'hia-pastperiodStartTime')
 
-      lastperiodEndTime = new Date(lastperiodStartTime)
-      lastperiodEndTime.setHours(
-        lastperiodEndTime.getHours() + period_multiplier
+      pastperiodEndTime = new Date(pastperiodStartTime)
+      pastperiodEndTime.setHours(
+        pastperiodEndTime.getHours() + period_multiplier
       )
-      //console.log(lastperiodEndTime, 'hia-lastperiodEndTime')
+      //console.log(pastperiodEndTime, 'hia-pastperiodEndTime')
     } else if (period_length === 1) {
       // day
       if (period_quantisation) {
@@ -581,18 +581,18 @@ function kwhperiod_draw () {
       ) // apply offset
       //console.log(thisperiodStartTime, 'hia-offset')
 
-      lastperiodStartTime = new Date(thisperiodStartTime)
-      lastperiodStartTime.setDate(lastperiodStartTime.getDate() - periods_ago)
+      pastperiodStartTime = new Date(thisperiodStartTime)
+      pastperiodStartTime.setDate(pastperiodStartTime.getDate() - periods_ago)
       if (use_last_year) {
-        lastperiodStartTime.setFullYear(lastperiodStartTime.getFullYear() - 1)
+        pastperiodStartTime.setFullYear(pastperiodStartTime.getFullYear() - 1)
       }
-      //console.log(lastperiodStartTime, 'hia-lastperiodStartTime')
+      //console.log(pastperiodStartTime, 'hia-pastperiodStartTime')
 
-      lastperiodEndTime = new Date(lastperiodStartTime)
-      lastperiodEndTime.setDate(
-        lastperiodStartTime.getDate() + period_multiplier
+      pastperiodEndTime = new Date(pastperiodStartTime)
+      pastperiodEndTime.setDate(
+        pastperiodStartTime.getDate() + period_multiplier
       )
-      //console.log(lastperiodEndTime, 'hia-lastperiodEndTime')
+      //console.log(pastperiodEndTime, 'hia-pastperiodEndTime')
     } else if (period_length === 2) {
       // week
       if (period_quantisation) {
@@ -621,18 +621,18 @@ function kwhperiod_draw () {
       ) // apply offset
       //console.log(thisperiodStartTime, 'hia-offset')
 
-      lastperiodStartTime = new Date(thisperiodStartTime)
-      lastperiodStartTime.setDate(
+      pastperiodStartTime = new Date(thisperiodStartTime)
+      pastperiodStartTime.setDate(
         thisperiodStartTime.getDate() - periods_ago * 7
       )
       if (use_last_year)
-        lastperiodStartTime.setFullYear(lastperiodStartTime.getFullYear() - 1)
-      //console.log(lastperiodStartTime, 'hia-lastperiodStartTime')
-      lastperiodEndTime = new Date(lastperiodStartTime)
-      lastperiodEndTime.setDate(
-        lastperiodStartTime.getDate() + period_multiplier * 7
+        pastperiodStartTime.setFullYear(pastperiodStartTime.getFullYear() - 1)
+      //console.log(pastperiodStartTime, 'hia-pastperiodStartTime')
+      pastperiodEndTime = new Date(pastperiodStartTime)
+      pastperiodEndTime.setDate(
+        pastperiodStartTime.getDate() + period_multiplier * 7
       )
-      //console.log(lastperiodEndTime, 'hia-lastperiodEndTime')
+      //console.log(pastperiodEndTime, 'hia-pastperiodEndTime')
     } else if (period_length === 3) {
       // month, calendar month (30 days worth implementing?)
       if (period_quantisation) {
@@ -656,18 +656,18 @@ function kwhperiod_draw () {
       ) // apply offset
       //console.log(thisperiodStartTime, 'hia-offset')
 
-      lastperiodStartTime = new Date(thisperiodStartTime)
-      lastperiodStartTime.setMonth(thisperiodStartTime.getMonth() - periods_ago)
+      pastperiodStartTime = new Date(thisperiodStartTime)
+      pastperiodStartTime.setMonth(thisperiodStartTime.getMonth() - periods_ago)
       if (use_last_year)
-        lastperiodStartTime.setFullYear(lastperiodStartTime.getFullYear() - 1)
+        pastperiodStartTime.setFullYear(pastperiodStartTime.getFullYear() - 1)
 
-      //console.log(lastperiodStartTime, 'hia-lastperiodStartTime')
+      //console.log(pastperiodStartTime, 'hia-pastperiodStartTime')
 
-      lastperiodEndTime = new Date(lastperiodStartTime)
-      lastperiodEndTime.setMonth(
-        lastperiodStartTime.getMonth() + period_multiplier
+      pastperiodEndTime = new Date(pastperiodStartTime)
+      pastperiodEndTime.setMonth(
+        pastperiodStartTime.getMonth() + period_multiplier
       )
-      //console.log(lastperiodEndTime, 'hia-lastperiodEndTime')
+      //console.log(pastperiodEndTime, 'hia-pastperiodEndTime')
     } else if (period_length === 4) {
       // year
       if (period_quantisation) {
@@ -693,28 +693,28 @@ function kwhperiod_draw () {
       ) // apply offset
       //console.log(thisperiodStartTime, 'hia-offset')
 
-      lastperiodStartTime = new Date(thisperiodStartTime)
-      lastperiodStartTime.setFullYear(
+      pastperiodStartTime = new Date(thisperiodStartTime)
+      pastperiodStartTime.setFullYear(
         thisperiodStartTime.getFullYear() - periods_ago
       )
       if (use_last_year)
-        lastperiodStartTime.setFullYear(lastperiodStartTime.getFullYear() - 1)
+        pastperiodStartTime.setFullYear(pastperiodStartTime.getFullYear() - 1)
 
-      //console.log(lastperiodStartTime, 'hia-lastperiodStartTime')
+      //console.log(pastperiodStartTime, 'hia-pastperiodStartTime')
 
-      lastperiodEndTime = new Date(lastperiodStartTime)
-      lastperiodEndTime.setFullYear(
-        lastperiodStartTime.getFullYear() + period_multiplier
+      pastperiodEndTime = new Date(pastperiodStartTime)
+      pastperiodEndTime.setFullYear(
+        pastperiodStartTime.getFullYear() + period_multiplier
       )
-      //console.log(lastperiodEndTime, 'hia-lastperiodEndTime')
+      //console.log(pastperiodEndTime, 'hia-pastperiodEndTime')
     }
 
     //------------------------------------------
     // Fetch Values and calculate results.
     //------------------------------------------
     /*
-    lastperiod_end_value
-    lastperiod_start_value
+    pastperiod_end_value
+    pastperiod_start_value
     thisperiod_start_value
     now
     */
@@ -725,20 +725,20 @@ function kwhperiod_draw () {
      refreshFix = 1
     previous_refresh = new Date(now)
     if (periods_ago > 0 || use_last_year) {
-      // lastperiod_end_value
-      var result = feed.get_value(feedid, lastperiodEndTime.getTime())
+      // pastperiod_end_value
+      var result = feed.get_value(feedid, pastperiodEndTime.getTime())
       console.log(result, 'past period end')
-      var lastperiod_end_value = result[1]
+      var pastperiod_end_value = result[1]
 
-      // lastperiod_start_value
-      var result = feed.get_value(feedid, lastperiodStartTime.getTime())
+      // pastperiod_start_value
+      var result = feed.get_value(feedid, pastperiodStartTime.getTime())
       console.log(result, 'past period start')
-      var lastperiod_start_value = result[1]
+      var pastperiod_start_value = result[1]
 
       // ... and calculate the result of our time window.
-      val = lastperiod_end_value - lastperiod_start_value
+      val = pastperiod_end_value - pastperiod_start_value
       if (kwh_per_dayConversion) {
-        var period_millis = lastperiodEndTime.getTime() - lastperiodStartTime.getTime()
+        var period_millis = pastperiodEndTime.getTime() - pastperiodStartTime.getTime()
         val = (period_millis/msToDayConversion)*val // convert kWh to kWhperday
       }
     } else {
