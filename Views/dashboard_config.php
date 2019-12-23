@@ -56,6 +56,11 @@
             <abbr title="<?php echo dgettext('dashboard_messages','Shows dashboard description on mouse over dashboard name in menu project'); ?>"><?php echo dgettext('dashboard_messages','Show description'); ?></abbr>
         </label>
 
+        <label class="checkbox">
+            <input type="checkbox" name="fullscreen" id="chk_fullscreen" value="1" <?php if ($dashboard['fullscreen'] == true) echo 'checked'; ?> />
+            <abbr title="<?php echo dgettext('dashboard_messages','Hide menus on dashboard. Make full screen.'); ?>"><?php echo dgettext('dashboard_messages','Hide Menus'); ?></abbr>
+        </label>
+
         <label><?php echo dgettext('dashboard_messages','Content: '); ?></label>
         <i style="font-size:12px"><?php echo dgettext('dashboard_messages','To view content changes reload editor after saving');?></i>
         <textarea name="content" style="width:100%; height:200px;"><?php echo $dashboard['content']; ?></textarea>
@@ -95,6 +100,7 @@
             if ($("#chk_public").is(":checked")) fields['public'] = true; else fields['public'] = false;
         if ($("#chk_published").is(":checked")) fields['published'] = true; else fields['published'] = false;
             if ($("#chk_showdescription").is(":checked")) fields['showdescription'] = true; else fields['showdescription'] = false;
+        fields['fullscreen'] = $("#chk_fullscreen").is(":checked");
 
         $.ajax({
             type: "POST",

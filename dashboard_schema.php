@@ -14,5 +14,6 @@ $schema['dashboard'] = array(
     'showdescription' => array('type' => 'tinyint(1)', 'default'=>'0'),
     'backgroundcolor' => array('type' => "varchar(6)", 'default'=>'EDF7FC'),
     'gridsize' => array('type' => 'tinyint(1)', 'default'=>'20'),
+    'fullscreen' => array('type' => 'tinyint(1)', 'default'=>'0'),
     'feedmode' => array('type' => "varchar(8)", 'default'=>'feedid')
 );
