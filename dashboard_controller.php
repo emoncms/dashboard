@@ -18,7 +18,7 @@ function dashboard_controller()
 
     require "Modules/dashboard/dashboard_model.php";
     $dashboard = new Dashboard($mysqli);
-    // id, userid, content, height, name, alias, description, main, public, published, showdescription
+    // id, userid, content, height, name, alias, description, main, public, published, showdescription, fullscreen
     
     $js_css_version = 5;
 
@@ -61,7 +61,6 @@ function dashboard_controller()
         {
             if ($route->subaction) $dash = $dashboard->get_from_alias($session['userid'],$route->subaction);
             elseif (isset($_GET['id'])) $dash = $dashboard->get(get('id'));
-
             $result = view("Modules/dashboard/Views/dashboard_edit_view.php",array('dashboard'=>$dash, 'js_css_version'=>$js_css_version));
             $result .= view("Modules/dashboard/Views/dashboard_config.php", array('dashboard'=>$dash, 'js_css_version'=>$js_css_version));
 

@@ -63,7 +63,7 @@ class Dashboard
         $qB = ""; $qC = "";
         if ($public==true) $qB = " and public=1";
         if ($published==true) $qC = " and published=1";
-        if (!$result = $this->mysqli->query("SELECT id, name, alias, description, main, published, public, showdescription FROM dashboard WHERE userid='$userid'".$qB.$qC)) {
+        if (!$result = $this->mysqli->query("SELECT id, name, alias, description, main, published, public, showdescription, fullscreen FROM dashboard WHERE userid='$userid'".$qB.$qC)) {
           return array();
         }
         
@@ -152,13 +152,14 @@ class Dashboard
             }
 
             if (isset($fields->public)) $row->public = (bool) $fields->public;
+            if (isset($fields->fullscreen)) $row->fullscreen = (bool) $fields->fullscreen;
             if (isset($fields->published)) $row->published = (bool) $fields->published;
             if (isset($fields->showdescription)) $row->showdescription = (bool) $fields->showdescription;
             
-            if (!$stmt = $this->mysqli->prepare("UPDATE dashboard SET height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,feedmode=?,main=?,public=?,published=?,showdescription=? WHERE userid=? AND id=?")) {
+            if (!$stmt = $this->mysqli->prepare("UPDATE dashboard SET height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,feedmode=?,main=?,public=?,published=?,showdescription=?,fullscreen=? WHERE userid=? AND id=?")) {
                 return array('success'=>false, 'message'=>'Dashboard schema error, please run emoncms database update');
             }
-            $stmt->bind_param("issssisiiiiii",$row->height,$row->name,$row->alias,$row->description,$row->backgroundcolor,$row->gridsize,$row->feedmode,$row->main,$row->public,$row->published,$row->showdescription,$userid,$id);
+            $stmt->bind_param("issssisiiiiiii",$row->height,$row->name,$row->alias,$row->description,$row->backgroundcolor,$row->gridsize,$row->feedmode,$row->main,$row->public,$row->published,$row->showdescription,$row->fullscreen,$userid,$id);
 
             $stmt->execute();
             $affected_rows = $stmt->affected_rows;

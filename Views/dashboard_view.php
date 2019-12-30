@@ -16,7 +16,30 @@ load_language_files("Modules/dashboard/locale", "dashboard_messages");
 
 if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit?id='. $dashboard['id'].'"> <img src="'.$path.'Modules/dashboard/Views/icons/gear-icon-outlined.png" style="width:80%" ></a>';
 
-?>
+if($dashboard['fullscreen']): ?>
+
+<script>
+    /**
+     * if the dashboard's property "fullscreen" is true
+     * hide the menus and shift the content up and left
+     */
+    $(function(){
+        // hide menus
+        $('#emoncms-navbar, #sidebar').hide();
+        // shift content
+        $('.content-container').css({margin:0});
+        // fit footer to botttom of screen
+        $('#footer').css({
+            bottom: 0,
+            position: 'absolute',
+            width: '100vw'
+        });
+        // shift edit icon up
+        $('#editicon').css({top: '.5rem'});
+    })
+</script>
+
+<?php endif; ?>
   <style>
   #editicon{
     text-align: center;
