@@ -481,7 +481,7 @@ function kwhperiod_draw () {
     var feedid = kwhperiod.attr('feedid')
     if (assocfeed[feedid] != undefined) feedid = assocfeed[feedid] // convert tag:name to feedid
     if (associd[feedid] === undefined) {
-      console.log('Review config for feed id of ' + kwhperiod.attr('class'))
+      //console.log('Review config for feed id of ' + kwhperiod.attr('class'))
       return
     }
     var val = associd[feedid]['value'] * 1
@@ -727,12 +727,12 @@ function kwhperiod_draw () {
     if (periodsAgo > 0 || useLastYear) {
       // pastPeriodEndValue
       var result = feed.get_value(feedid, pastperiodEndTime.getTime())
-      console.log(result, 'past period end')
+      //console.log(result, 'past period end')
       var pastPeriodEndValue = result[1]
 
       // pastPeriodStartValue
       var result = feed.get_value(feedid, pastPeriodStartTime.getTime())
-      console.log(result, 'past period start')
+      //console.log(result, 'past period start')
       var pastPeriodStartValue = result[1]
 
       // ... and calculate the result of our time window.
