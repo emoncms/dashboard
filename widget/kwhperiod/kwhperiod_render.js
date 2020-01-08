@@ -727,16 +727,23 @@ function kwhperiod_draw () {
     if (periodsAgo > 0 || useLastYear) {
       // pastPeriodEndValue
       var result = feed.get_value(feedid, pastperiodEndTime.getTime())
-      console.log(result, 'past period end')
+      //console.log(result, 'past period end')
       var pastPeriodEndValue = result[1]
 
       // pastPeriodStartValue
       var result = feed.get_value(feedid, pastPeriodStartTime.getTime())
-      console.log(result, 'past period start')
+      //console.log(result, 'past period start')
       var pastPeriodStartValue = result[1]
 
       // ... and calculate the result of our time window.
-      val = pastPeriodEndValue - pastPeriodStartValue
+      
+      if (pastPeriodStartValue === null || pastPeriodEndValue === null) {
+        val = 0
+      }
+      else {
+        val = pastPeriodEndValue - pastPeriodStartValue
+      }
+
       if (kwhPerDayConversion) {
         var periodMillis = pastperiodEndTime.getTime() - pastPeriodStartTime.getTime()
         val = (periodMillis/msToDayConversion)*val // convert kWh to kWhperday
@@ -750,13 +757,17 @@ function kwhperiod_draw () {
       */
       // thisPeriodStartValue
       var result = feed.get_value(feedid, thisPeriodStartTime.getTime())
-      console.log(result, 'recent period start value')
+      //console.log(result, 'recent period start value')
       var thisPeriodStartValue = result[1]
 
       // ... and calculate the result of our time window.
-      console.log(val, 'value now')
+      //console.log(val, 'value now')
+      if (thisPeriodStartValue === null) {
+        val = 0
+      }
+      else {
       val -= thisPeriodStartValue
-      
+      }
       if (kwhPerDayConversion) {
         var periodMillis = now.getTime() - thisPeriodStartTime.getTime()
         val = (periodMillis/msToDayConversion)*val // convert kWh to kWhperday
