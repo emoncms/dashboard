@@ -481,7 +481,7 @@ function kwhperiod_draw () {
     var feedid = kwhperiod.attr('feedid')
     if (assocfeed[feedid] != undefined) feedid = assocfeed[feedid] // convert tag:name to feedid
     if (associd[feedid] === undefined) {
-      console.log('Review config for feed id of ' + kwhperiod.attr('class'))
+      //console.log('Review config for feed id of ' + kwhperiod.attr('class'))
       return
     }
     var val = associd[feedid]['value'] * 1
