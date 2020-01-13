@@ -29,7 +29,16 @@ if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
     <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js?ver=<?php echo $js_css_version; ?>"></script>
 
     <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
-
+    <script>
+    // @see: Lib/misc/gettext.js
+    function getTranslations() {
+        return Object.assign({
+            "Saved": "<?php echo _("Saved") ?>",
+            "Could not save Dashboard": "<?php echo _("Could not save Dashboard") ?>",
+            "Items Saved": "<?php echo _("Items Saved") ?>"
+        }, LANG_JS);
+    }
+    </script>
 <div id="dashboardpage">
     <div id="widget_options" class="modal hide keyboard" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
         <div class="modal-header">
@@ -142,30 +151,29 @@ function toolboxMove(e) {
     
     $("#save-dashboard").click(function (){
         var currentcontent = $("#page").html();
-
-        var success = false;
         if (currentcontent === lastsavecontent) {
             // If it's not changed, just bypass actual saving and assume success
-            success = true;
+            showSuccess();
         } else {
             //recalculate the height so the page_height is shrunk to the minimum but still wrapping all components
             //otherwise a user can drag a component far down then up again and a too high value will be stored to db.
             designer.page_height = 0;
             designer.scan();
             designer.draw();
-            console.log("Dashboard HTML content: " + currentcontent);
-            var result=dashboard.setcontent(dashid,currentcontent,designer.page_height)
-            success = result.success;
-        }
-
-        if (success) {
-            $("#save-dashboard").attr('class','btn btn-success').text('<?php echo _("Saved") ?>');
-            $("#save-dashboard").attr("title","<?php echo _("Items Saved") ?>");
-            lastsavecontent = currentcontent;
-        } else {
-            alert('ERROR: Could not save Dashboard. '+result.message);
+            
+            dashboard_v2.setcontent(dashid,currentcontent,designer.page_height)
+              .done(showSuccess)
+              .fail(showError)
         }
     });
+    function showError(xhr,status) {
+        throw(new Error(_("Could not save Dashboard. ") + status));
+    }
+    function showSuccess() {
+        $("#save-dashboard").attr("class","btn btn-success").text(_("Saved"));
+        $("#save-dashboard").attr("title",_("Items Saved"));
+        lastsavecontent = $("#page").html();
+    }
 
     $(window).resize(function(){
         designer.draw();
