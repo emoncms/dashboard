@@ -16,7 +16,7 @@ load_language_files("Modules/dashboard/locale", "dashboard_messages");
 
 if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit?id='. $dashboard['id'].'"> <img src="'.$path.'Modules/dashboard/Views/icons/gear-icon-outlined.png" style="width:80%" ></a>';
 
-if($dashboard['fullscreen']): ?>
+if(isset($dashboard['fullscreen']) && $dashboard['fullscreen']): ?>
 
 <script>
     /**
