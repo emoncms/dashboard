@@ -226,7 +226,9 @@ function battery_draw(){
       
       var last_block = Math.ceil((number_of_blocks*(data-min_val))/(max_val - min_val));
       var green_val = Math.floor(((data-min_val)*255)/(max_val - min_val));
-
+      if (green_val<0) green_val = 0;
+      if (green_val>255) green_val = 255;
+      if (isNaN(green_val)) green_val = 0;
 
       var red_val = 255 - green_val;
       if (errorCode !== "1"){
