@@ -34,27 +34,26 @@ function button_events()
     var feedid = $(this).attr("feedid");
     if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
 
-    var invalue = $(this).attr("value");
-    if (invalue == 0) outval = 1;
-    if (invalue == 1) outval = 0;
+    var value = $(this).attr("value");
+    if (value == 0) value = 1; else value = 0;
     
     $.ajax({ 
         url: path+"feed/insert.json", 
-        data: "id="+feedid+"&time="+parseInt((new Date()).getTime()/1000)+"&value="+outval, 
+        data: "id="+feedid+"&time="+parseInt((new Date()).getTime()/1000)+"&value="+value, 
         dataType: 'json', 
         async: false, 
         success: function(result){
-            if (result!=outval) {
+            if (result!=value) {
                 alert(JSON.stringify(result));
             }
         }
     });
     
-    $(this).attr("value",outval);
+    $(this).attr("value",value);
 
     var id = "can-"+$(this).attr("id");
-    draw_button(widgetcanvas[id], outval);
-    associd[feedid]['value'] = outval;
+    draw_button(widgetcanvas[id], value);
+    associd[feedid]['value'] = value;
   });
 }
 
