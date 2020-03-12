@@ -108,7 +108,11 @@ function feedvalue_widgetlist()
 	addOption(widgets["feedvalue"], "align",    "dropbox", _Tr("Alignment"), _Tr("Alignment"), alignmentOptions);
 	addOption(widgets["feedvalue"], "timeout",  "value",   _Tr("Timeout"),    _Tr("Timeout without feed update in seconds (empty is never)"),   []);
 	addOption(widgets["feedvalue"], "errormessagedisplayed",    "value",  _Tr("Error Message"),   _Tr("Error message displayed when timeout is reached"),   []);
-
+	addOption(widgets["feedvalue"], "threshold1",  "value",   _Tr("Threshold1"),    _Tr("Threshold1 value"),   []);
+	addOption(widgets["feedvalue"], "threshold2",  "value",   _Tr("Threshold2"),    _Tr("Threshold2 value"),   []);
+	addOption(widgets["feedvalue"], "colour1",   "colour_picker",  _Tr("Colour1"),     _Tr("Colour for range below Threshold1"),      []);
+	addOption(widgets["feedvalue"], "colour2",   "colour_picker",  _Tr("Colour2"),     _Tr("Colour for range between Threshold1 and Threshold2"),      []);
+	addOption(widgets["feedvalue"], "colour3",   "colour_picker",  _Tr("Colour3"),     _Tr("Colour for range above Threshold2"),      []);
 	return widgets;
 }
 
@@ -270,6 +274,20 @@ function feedvalue_draw()
             }
         }
 
+        var textcolor = feedvalue.attr("colour");
+
+        if($(this).attr("threshold1")!=undefined && $(this).attr("threshold1")!="" && $(this).attr("threshold2")!=undefined && $(this).attr("threshold2")!=""){
+            var limit1 = $(this).attr("threshold1")*1 || 60;
+            var limit2 = $(this).attr("threshold2")*2 || 120;
+            if (val< limit1){
+               textcolor = feedvalue.attr("colour1")|| "#019F62";
+            } else if(val > limit2){
+               textcolor = feedvalue.attr("colour3")|| "#F70511";
+            } else{
+               textcolor = feedvalue.attr("colour2")|| "#FF8425";
+            }
+        }
+
         draw_feedvalue(
             feedvalue,
             feedvalue.attr("font"),
@@ -280,7 +298,7 @@ function feedvalue_draw()
             prepend,
             val,
             append,
-            feedvalue.attr("colour"),
+            textcolor,
             feedvalue.attr("decimals"),
             feedvalue.attr("size"),
             feedvalue.attr("align"),
