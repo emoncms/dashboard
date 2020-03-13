@@ -14,9 +14,12 @@ function addOption(widget, optionKey, optionType, optionName, optionHint, option
     widget["optionshint"].push(optionHint);
     widget["optionsdata"].push(optionData);
 }
-	var shapeOptions = [
+	var shapeOptionsIsActive = [
     [2, _Tr("Circle")],
-    [1, _Tr("Triangle")],
+    [1, _Tr("Triangle &#9650;")],
+    [5, _Tr("Triangle &#9654;")],
+    [6, _Tr("Triangle &#9660;")],
+    [7, _Tr("Triangle &#x25C0;")],
     [0, _Tr("Square")],
     [3, _Tr("Star 5 spikes")],
     [4, _Tr("Star 6 spikes")]
@@ -42,7 +45,7 @@ function isactivefeed_widgetlist()
   addOption(widgets["isactivefeed"], "colour1",     "colour_picker",  _Tr("Colour1"),    _Tr("Colour for range below Threshold1"),                  []);
   addOption(widgets["isactivefeed"], "colour2",     "colour_picker",  _Tr("Colour2"),    _Tr("Colour for range between Threshold1 and Threshold2"), []);
   addOption(widgets["isactivefeed"], "colour3",     "colour_picker",  _Tr("Colour3"),    _Tr("Colour for range above Threshold2"),                  []);
-  addOption(widgets["isactivefeed"], "shapetype",   "dropbox",        _Tr("Shape"),      _Tr("Shape"),                                              shapeOptions);
+  addOption(widgets["isactivefeed"], "shapetype",   "dropbox",        _Tr("Shape"),      _Tr("Shape"),                                              shapeOptionsIsActive);
   return widgets;
 }
 function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, colour) {
@@ -105,15 +108,41 @@ if (shapetype==="2"){ // Circle
       shape.fill();
 }
 
-  if (shapetype==="1"){ //Triangle
+   if (shapetype==="1"){ //Triangle 1
 
       shape.beginPath();
       shape.fillStyle=fillcolor;
       shape.moveTo(offsetx, offsety+dimension);
       shape.lineTo(offsetx+dimension, offsety+dimension);
       shape.lineTo(offsetx+dimension/2,offsety);
-      shape.fill();
-}
+      shape.fill();}
+
+  if (shapetype==="5"){ //Triangle 2
+
+      shape.beginPath();
+      shape.fillStyle=fillcolor;
+      shape.moveTo(offsetx,offsety);
+      shape.lineTo(offsetx+dimension, offsety+dimension/2);
+      shape.lineTo(offsetx,offsety+dimension);
+      shape.fill();}
+
+  if (shapetype==="6"){ //Triangle 3
+
+      shape.beginPath();
+      shape.fillStyle=fillcolor;
+      shape.moveTo(offsetx, offsety);
+      shape.lineTo(offsetx+dimension, offsety);
+      shape.lineTo(offsetx+dimension/2,offsety+dimension);
+      shape.fill();}
+
+  if (shapetype==="7"){ //Triangle 4
+
+      shape.beginPath();
+      shape.fillStyle=fillcolor;
+      shape.moveTo(offsetx+dimension,offsety);
+      shape.lineTo(offsetx, offsety+dimension/2);
+      shape.lineTo(offsetx+dimension,offsety+dimension);
+      shape.fill();}
 
   if (shapetype==="0"){ //Square
 
