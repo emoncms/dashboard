@@ -113,10 +113,11 @@ function feedvalue_widgetlist()
 	addOption(widgets["feedvalue"], "colour1",   "colour_picker",  _Tr("Colour1"),     _Tr("Colour for range below Threshold1"),      []);
 	addOption(widgets["feedvalue"], "colour2",   "colour_picker",  _Tr("Colour2"),     _Tr("Colour for range between Threshold1 and Threshold2"),      []);
 	addOption(widgets["feedvalue"], "colour3",   "colour_picker",  _Tr("Colour3"),     _Tr("Colour for range above Threshold2"),      []);
+        addOption(widgets["feedvalue"], "scale", "value", _Tr("Scale"), _Tr("scale"),    []);
 	return widgets;
 }
 
-function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,append,colour,decimals,size,align,errorCode,errorMessage)
+function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,append,colour,decimals,size,align,errorCode,errorMessage,scale)
 {
     colour = colour || "4444CC";
     size = size || "8";
@@ -124,7 +125,10 @@ function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,a
     fstyle = fstyle || "2";
     fweight = fweight || "1";
     align = align || "center";
-    
+    scale = scale || 1.0;
+	
+    val *= (1*scale);
+	
     var fontsize;
 
     if (size === "0"){fontsize = 6;}
@@ -303,7 +307,8 @@ function feedvalue_draw()
             feedvalue.attr("size"),
             feedvalue.attr("align"),
             errorCode,
-            errorMessage
+            errorMessage,
+	    feedvalue.attr("scale")
         );
     });
 }
