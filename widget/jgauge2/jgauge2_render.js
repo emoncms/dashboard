@@ -6,9 +6,9 @@
  */
 
 // Global variables
-var img = null,
-  needle = null,
-  needle2 = null;
+var img_jgauge2 = null,
+  needle_jgauge2 = null,
+  needle2_jgauge2 = null;
 
 function jgauge2_widgetlist()
 {
@@ -32,15 +32,21 @@ function jgauge2_init()
   setup_widget_canvas('jgauge2');
 
   // Load the needle image
-  needle_jgauge2 = new Image();
-  needle_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/needle2.png';
+  if (needle_jgauge2==null) {
+    needle_jgauge2 = new Image();
+    needle_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/needle2.png';
+  }
   
-  needle2_jgauge2 = new Image();
-  needle2_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/needle.png';
+  if (needle2_jgauge2==null) {
+    needle2_jgauge2 = new Image();
+    needle2_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/needle.png';
+  }
 
   // Load the jgauge2 image
-  img_jgauge2 = new Image();
-  img_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/jgauge2.png';
+  if (img_jgauge2==null) {
+    img_jgauge2 = new Image();
+    img_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/jgauge2.png';
+  }
 }
 
 function jgauge2_draw()

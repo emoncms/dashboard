@@ -31,12 +31,16 @@ function jgauge_init()
   setup_widget_canvas('jgauge');
 
   // Load the needle image
-  needle = new Image();
-  needle.src = path+'Modules/dashboard/widget/jgauge/needle2.png';
+  if (needle==null) {
+    needle = new Image();
+    needle.src = path+'Modules/dashboard/widget/jgauge/needle2.png';
+  }
 
   // Load the jgauge image
-  img = new Image();
-  img.src = path+'Modules/dashboard/widget/jgauge/jgauge.png';
+  if (img==null) {
+    img = new Image();
+    img.src = path+'Modules/dashboard/widget/jgauge/jgauge.png';
+  }
 }
 
 function jgauge_draw()
