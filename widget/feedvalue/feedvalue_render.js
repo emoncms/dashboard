@@ -208,42 +208,37 @@ function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,a
 
 function feedvalue_draw()
 {
+    var now = (new Date()).getTime()*0.001;
+  
     $(".feedvalue").each(function(index)
     {
         var feedvalue = $(this);
-        var errorMessage = $(this).attr("errormessagedisplayed");
-        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
-          errorMessage = "TO Error";
-        }
-        var errorTimeout = feedvalue.attr("timeout");
-        if (errorTimeout === "" || errorTimeout === undefined){           //Timeout parameter is empty
-            errorTimeout = 0;
-        }
-
-        var font = feedvalue.attr("font");
+        
         var feedid = feedvalue.attr("feedid");
         if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
-        if (associd[feedid] === undefined) { console.log("Review config for feed id of " + feedvalue.attr("class")); return; }
-        var val = associd[feedid]["value"] * 1;
+        
+        var val = 0;
+        var feed_update_time = now;
+        
+        if (associd[feedid] != undefined) {
+            val = associd[feedid]["value"] * 1;
+            feed_update_time = 1*associd[feedid]["time"];
+        }
 
         if (val===undefined) {val = 0;}
         if (isNaN(val))  {val = 0;}
 
+        // Timeout error    
+        var errorMessage = feedvalue.attr("errormessagedisplayed");
+        if (errorMessage === "" || errorMessage === undefined) errorMessage = "TO Error";
+        
+        var errorTimeout = feedvalue.attr("timeout");
+        if (errorTimeout === "" || errorTimeout === undefined) errorTimeout = 0;
+        
         var errorCode = "0";
-        if (errorTimeout !== 0)
-        {
-            if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
-            {
-                errorCode = "1";
-            }
+        if (errorTimeout !== 0) {
+            if ((now-offsetofTime-feed_update_time) > errorTimeout) errorCode = "1";
         }
-
-        var size = feedvalue.attr("size");
-
-        var decimals = feedvalue.attr("decimals");
-
-        if (decimals===undefined) {decimals = -1};
-
 
         // backwards compatibility
         var unitend = feedvalue.attr("unitend");
@@ -299,7 +294,7 @@ function feedvalue_draw()
             feedvalue.attr("align"),
             errorCode,
             errorMessage,
-	    feedvalue.attr("scale")
+	          feedvalue.attr("scale")
         );
     });
 }
@@ -314,5 +309,5 @@ function feedvalue_slowupdate()
 }
 function feedvalue_fastupdate()
 {
-	  feedvalue_draw();
+	  if (redraw) feedvalue_draw();
 }
