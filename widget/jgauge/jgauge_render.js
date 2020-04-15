@@ -54,6 +54,7 @@ function jgauge_draw()
     
     var val = 0;
     var curve_val = 0;
+    var feed_update_time = 0;
     
     if (associd[feedid] != undefined) { 
         val = (associd[feedid]["value"] * 1).toFixed(3);
@@ -69,7 +70,6 @@ function jgauge_draw()
     if (errorTimeout !== 0) {
         if ((now-offsetofTime-feed_update_time) > errorTimeout) errorCode = "1";
     }
-    
     var id = "can-"+$(this).attr("id");
     if (last_errorCode[id]==undefined) last_errorCode[id] = errorCode;
     
