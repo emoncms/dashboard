@@ -45,38 +45,46 @@ function jgauge_init()
 
 function jgauge_draw()
 {
+  var now = (new Date()).getTime()*0.001;
+  
   $('.jgauge').each(function(index)
   {
-    var errorMessage = $(this).attr("errormessagedisplayed");
-        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
-          errorMessage = "TO Error";
-        }
-    var errorTimeout = $(this).attr("timeout");
-        if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
-          errorTimeout = 0;
-        }
-
-    var errorCode = "0";
-
     var feedid = $(this).attr("feedid");
     if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
-    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var val = curve_value(feedid,dialrate).toFixed(3);
-
-    if (errorTimeout !== 0)
-      {
-        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
-        {
-          errorCode = "1";
-        }
-      }
-    // ONLY UPDATE ON CHANGE
-    if (val != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1 || errorTimeout != 0)
-    {
-      var id = "can-"+$(this).attr("id");
-      var scale = 1*$(this).attr("scale") || 1;
-      draw_jgauge(widgetcanvas[id],0,0,$(this).width(),$(this).height(),val*scale,$(this).attr("max"),$(this).attr("min"),$(this).attr("units"),errorCode,errorMessage);
+    
+    var val = 0;
+    var curve_val = 0;
+    
+    if (associd[feedid] != undefined) { 
+        val = (associd[feedid]["value"] * 1).toFixed(3);
+        curve_val = curve_value(feedid,dialrate).toFixed(3);
+        feed_update_time = 1*associd[feedid]["time"];
     }
+    
+    // Timeout error    
+    var errorTimeout = $(this).attr("timeout");
+    if (errorTimeout === "" || errorTimeout === undefined) errorTimeout = 0;
+
+    var errorCode = "0";
+    if (errorTimeout !== 0) {
+        if ((now-offsetofTime-feed_update_time) > errorTimeout) errorCode = "1";
+    }
+    
+    var id = "can-"+$(this).attr("id");
+    if (last_errorCode[id]==undefined) last_errorCode[id] = errorCode;
+    
+    // ONLY UPDATE ON CHANGE
+    if (curve_val!=val || redraw == 1 || errorCode != last_errorCode[id])
+    {
+      // console.log("update jguage");
+      var errorMessage = $(this).attr("errormessagedisplayed");
+      if (errorMessage === "" || errorMessage === undefined) errorMessage = "TO Error";
+      
+      var scale = 1*$(this).attr("scale") || 1;
+      draw_jgauge(widgetcanvas[id],0,0,$(this).width(),$(this).height(),curve_val*scale,$(this).attr("max"),$(this).attr("min"),$(this).attr("units"),errorCode,errorMessage);
+    }
+    
+    last_errorCode[id] = errorCode;
   });
 }
 

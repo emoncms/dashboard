@@ -555,21 +555,19 @@ function dial_draw(){
         val = (associd[feedid]["value"] * 1).toFixed(3);        
         val_curve = curve_value(feedid,dialrate).toFixed(3);
         feed_update_time = 1*associd[feedid]["time"];
-    } else {
-        // return;
     }
     
-    // Timeout error    
+    // Timeout error
     var errorTimeout = $(this).attr("timeout");
     if (errorTimeout === "" || errorTimeout === undefined) errorTimeout = 0;
-
-    var errorMessage = $(this).attr("errormessagedisplayed");
-    if (errorMessage === "" || errorMessage === undefined) errorMessage = "TO Error";
 
     var errorCode = "0";
     if (errorTimeout !== 0) {
         if ((now-offsetofTime-feed_update_time) > errorTimeout) errorCode = "1";
     }
+    
+    var id = "can-"+$(this).attr("id");
+    if (last_errorCode[id]==undefined) last_errorCode[id] = errorCode;
     
     // The minval and maxval feed settings default to the first feed in the feedlist 
     // which may not be public for use in public dashboards, which will then result in
@@ -588,16 +586,20 @@ function dial_draw(){
         maxval = (associd[maxvaluefeed]["value"] * 1).toFixed(3);
         maxval_curve = curve_value(maxvaluefeed,dialrate).toFixed(3);
     }
-    // Here we disable the min/max values feature when one of the feed settings is not valid
-    var displayminmax = $(this).attr("displayminmax")||"0";
-    if (associd[minvaluefeed] == undefined || associd[maxvaluefeed] == undefined) {
-        displayminmax = "0";
-    }
     
     // ONLY UPDATE ON CHANGE
-    if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval || redraw == 1 || errorTimeout != 0)
+    if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval || redraw == 1 || errorCode != last_errorCode[id])
     {
-      var id = "can-"+$(this).attr("id");
+      // console.log("update dial");
+      var errorMessage = $(this).attr("errormessagedisplayed");
+      if (errorMessage === "" || errorMessage === undefined) errorMessage = "TO Error";
+      
+      // Here we disable the min/max values feature when one of the feed settings is not valid
+      var displayminmax = $(this).attr("displayminmax")||"0";
+      if (associd[minvaluefeed] == undefined || associd[maxvaluefeed] == undefined) {
+          displayminmax = "0";
+      }
+      
       var scale = 1*$(this).attr("scale") || 1;
       var unitend = $(this).attr("unitend") || "0";
       draw_gauge(widgetcanvas[id],
@@ -621,6 +623,7 @@ function dial_draw(){
                  errorMessage
                  );
     }
+    last_errorCode[id] = errorCode;
   });
 }
 
