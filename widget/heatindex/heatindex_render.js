@@ -35,15 +35,6 @@ function heatindex(RH,T,rule1,rule2) {
   return hi;
 }
 
-function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
-{
-    widget["options"    ].push(optionKey);
-    widget["optionstype"].push(optionType);
-    widget["optionsname"].push(optionName);
-    widget["optionshint"].push(optionHint);
-    widget["optionsdata"].push(optionData);
-}
-
 function heatindex_widgetlist()
 {
     var widgets =

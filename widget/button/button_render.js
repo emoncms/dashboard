@@ -60,7 +60,6 @@ function button_events()
 function button_init()
 {
   setup_widget_canvas('button');
-  button_draw();
 }
 
 function button_draw()
@@ -69,8 +68,10 @@ function button_draw()
   {
     var feedid = $(this).attr("feedid");
     if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
-    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var val = associd[feedid]['value']*1;
+    
+    var val = 0;
+    if (associd[feedid] != undefined) val = associd[feedid]['value']*1;
+    
     var id = "can-"+$(this).attr("id");
     draw_button(widgetcanvas[id], val);
   });
@@ -83,7 +84,7 @@ function button_slowupdate()
 
 function button_fastupdate()
 {
-  
+  if (redraw) button_draw();
 }
 
 

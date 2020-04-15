@@ -9,16 +9,6 @@
     http://openenergymonitor.org/emon/forum
  */
 
-// Convenience function for shoving things into the widget object
-// I'm not sure about calling optionKey "optionKey", but I don't want to just use "options" (because that's what this whole function returns), and it's confusing enough as it is.
-function addOption(widget, optionKey, optionType, optionName, optionHint, optionData){
-  widget["options"    ].push(optionKey);
-  widget["optionstype"].push(optionType);
-  widget["optionsname"].push(optionName);
-  widget["optionshint"].push(optionHint);
-  widget["optionsdata"].push(optionData);
-}
-
 function dial_widgetlist(){
   var widgets =
   {
@@ -528,32 +518,28 @@ function dial_define_tooltips(){
       var id2 = "can-"+$(this).attr("id");
       var canvas2 = document.getElementById(id2);
       var parent = canvas2.parentNode;           // parent node for canvas
-      if(document.getElementById(id2 + "-tooltip-1")){}
-      else{
-      var div1 = document.createElement("div");      // the tool-tip div 1
-      div1.id = id2 + "-tooltip-1";
-      parent.appendChild(div1);}
-      if(document.getElementById(id2 + "-tooltip-2")){}
-      else{
-      var div2 = document.createElement("div");      // the tool-tip div 2
-      div2.id = id2 + "-tooltip-2";
-      parent.appendChild(div2);}
+      
+      if(document.getElementById(id2 + "-tooltip-1")){
+      } else {
+          var div1 = document.createElement("div");      // the tool-tip div 1
+          div1.id = id2 + "-tooltip-1";
+          parent.appendChild(div1);
+      }
+     
+      if (document.getElementById(id2 + "-tooltip-2")){
+      } else {
+          var div2 = document.createElement("div");      // the tool-tip div 2
+          div2.id = id2 + "-tooltip-2";
+          parent.appendChild(div2);
+      }
   });
 }
 
 function dial_draw(){
+  var now = (new Date()).getTime()*0.001;
+
   $(".dial").each(function(index) {
-    var errorMessage = $(this).attr("errormessagedisplayed");
-        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
-          errorMessage = "TO Error";
-        }
-    var errorTimeout = $(this).attr("timeout");
-        if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
-          errorTimeout = 0;
-        }
-
-    var errorCode = "0";
-
+  
     var feedid = $(this).attr("feedid");
     if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     var minvaluefeed = $(this).attr("minvaluefeed")||"0";
@@ -561,18 +547,29 @@ function dial_draw(){
     var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
     if (assocfeed[maxvaluefeed]!=undefined) maxvaluefeed = assocfeed[maxvaluefeed];
     
-    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
+    var val = 0;
+    var val_curve = 0;
+    var feed_update_time = now;
+    
+    if (associd[feedid] != undefined) { 
+        val = (associd[feedid]["value"] * 1).toFixed(3);        
+        val_curve = curve_value(feedid,dialrate).toFixed(3);
+        feed_update_time = 1*associd[feedid]["time"];
+    } else {
+        // return;
+    }
+    
+    // Timeout error    
+    var errorTimeout = $(this).attr("timeout");
+    if (errorTimeout === "" || errorTimeout === undefined) errorTimeout = 0;
 
-    var val = (associd[feedid]["value"] * 1).toFixed(3);        
-    var val_curve = curve_value(feedid,dialrate).toFixed(3);
+    var errorMessage = $(this).attr("errormessagedisplayed");
+    if (errorMessage === "" || errorMessage === undefined) errorMessage = "TO Error";
 
-    if (errorTimeout !== 0)
-      {
-        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
-        {
-          errorCode = "1";
-        }
-      }
+    var errorCode = "0";
+    if (errorTimeout !== 0) {
+        if ((now-offsetofTime-feed_update_time) > errorTimeout) errorCode = "1";
+    }
     
     // The minval and maxval feed settings default to the first feed in the feedlist 
     // which may not be public for use in public dashboards, which will then result in
@@ -598,7 +595,7 @@ function dial_draw(){
     }
     
     // ONLY UPDATE ON CHANGE
-    if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval ||redraw == 1 || errorTimeout != 0)
+    if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval || redraw == 1 || errorTimeout != 0)
     {
       var id = "can-"+$(this).attr("id");
       var scale = 1*$(this).attr("scale") || 1;
