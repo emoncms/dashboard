@@ -6,8 +6,8 @@
  */
 
 // Global variables
-var img = null,
-  needle = null;
+var jgauge_needle2 = null,
+  jgauge_jgauge = null;
 
 function jgauge_widgetlist()
 {
@@ -31,15 +31,15 @@ function jgauge_init()
   setup_widget_canvas('jgauge');
 
   // Load the needle image
-  if (needle==null) {
-    needle = new Image();
-    needle.src = path+'Modules/dashboard/widget/jgauge/needle2.png';
+  if (jgauge_needle2==null) {
+    jgauge_needle2 = new Image();
+    jgauge_needle2.src = path+'Modules/dashboard/widget/jgauge/needle2.png';
   }
 
   // Load the jgauge image
-  if (img==null) {
-    img = new Image();
-    img.src = path+'Modules/dashboard/widget/jgauge/jgauge.png';
+  if (jgauge_jgauge==null) {
+    jgauge_jgauge = new Image();
+    jgauge_jgauge.src = path+'Modules/dashboard/widget/jgauge/jgauge.png';
   }
 }
 
@@ -135,7 +135,7 @@ function draw_jgauge(ctx,x,y,width,height,value,max,min,units,errorCode,errorMes
   ctx.clearRect(0,0,width,height);
 
   // Draw the jgauge onto the canvas
-  ctx.drawImage(img, 0, 0, size, size);
+  ctx.drawImage(jgauge_jgauge, 0, 0, size, size);
 
   //ticks labels
   var step = ((max - min)/6);
@@ -173,7 +173,7 @@ function draw_jgauge(ctx,x,y,width,height,value,max,min,units,errorCode,errorMes
   ctx.rotate((position + offset) * (Math.PI / 180));
   // Draw the image back and up
   if (errorCode!= "1"){
-  ctx.drawImage(needle, -(size/2), -(size/2), size, size);
+  ctx.drawImage(jgauge_needle2, -(size/2), -(size/2), size, size);
   }
 
   // Restore the previous drawing state

@@ -6,9 +6,9 @@
  */
 
 // Global variables
-var img_jgauge2 = null,
-  needle_jgauge2 = null,
-  needle2_jgauge2 = null;
+var jgauge2_needle2 = null,
+  jgauge2_needle = null,
+  jgauge2_jgauge2 = null;
 
 function jgauge2_widgetlist()
 {
@@ -32,20 +32,20 @@ function jgauge2_init()
   setup_widget_canvas('jgauge2');
 
   // Load the needle image
-  if (needle_jgauge2==null) {
-    needle_jgauge2 = new Image();
-    needle_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/needle2.png';
+  if (jgauge2_needle2==null) {
+    jgauge2_needle2 = new Image();
+    jgauge2_needle2.src = path+'Modules/dashboard/widget/jgauge2/needle2.png';
   }
   
-  if (needle2_jgauge2==null) {
-    needle2_jgauge2 = new Image();
-    needle2_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/needle.png';
+  if (jgauge2_needle==null) {
+    jgauge2_needle = new Image();
+    jgauge2_needle.src = path+'Modules/dashboard/widget/jgauge2/needle.png';
   }
 
   // Load the jgauge2 image
-  if (img_jgauge2==null) {
-    img_jgauge2 = new Image();
-    img_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/jgauge2.png';
+  if (jgauge2_jgauge2==null) {
+    jgauge2_jgauge2 = new Image();
+    jgauge2_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/jgauge2.png';
   }
 }
 
@@ -167,7 +167,7 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units,errorCode,
   ctx.clearRect(0,0,width,height);
 
   // Draw the jgauge2 onto the canvas
-  ctx.drawImage(img_jgauge2, 0, 0, size, size);
+  ctx.drawImage(jgauge2_jgauge2, 0, 0, size, size);
 
   //ticks labels
   var step = ((max - min)/6);
@@ -212,7 +212,7 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units,errorCode,
   ctx.rotate((position + offset) * (Math.PI / 180));
   // Draw the image back and up
   if (errorCode!= "1"){
-  ctx.drawImage(needle_jgauge2, -(size/2), -(size/2), size, size);
+  ctx.drawImage(jgauge2_needle, -(size/2), -(size/2), size, size);
   }
   // Restore the previous drawing state
   ctx.restore(); 
@@ -224,7 +224,7 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units,errorCode,
   // Rotate around this point
   ctx.rotate((position2 + offset) * (Math.PI / 180));
   // Draw the image back and up
-  ctx.drawImage(needle2_jgauge2, -(size/2), -(size/2), size, size);
+  ctx.drawImage(jgauge2_needle2, -(size/2), -(size/2), size, size);
   // Restore the previous drawing state
   ctx.restore();
 }

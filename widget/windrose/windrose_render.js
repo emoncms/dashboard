@@ -6,8 +6,8 @@
  */
 
 // Global variables
-var img = null,
-  needle = null;
+var windrose_needle = null,
+  windrose_windrose = null;
 
 
 function windrose_widgetlist()
@@ -32,34 +32,45 @@ function windrose_init()
   setup_widget_canvas('windrose');
 
   // Load the needle image
-  needle_windrose = new Image();
-  needle_windrose.src = path+'Modules/dashboard/widget/windrose/needle.png';
+  windrose_needle = new Image();
+  windrose_needle.src = path+'Modules/dashboard/widget/windrose/needle.png';
   
   // Load the windrose image
-  img_windrose = new Image();
-  img_windrose.src = path+'Modules/dashboard/widget/windrose/windrose.png';
+  windrose_windrose = new Image();
+  windrose_windrose.src = path+'Modules/dashboard/widget/windrose/windrose.png';
 }
 
 function windrose_draw()
 {
   $('.windrose').each(function(index)
   {
+    // Feed 1:
     var feedid = $(this).attr("feedid");
     if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
+
+    var val = 0;
+    var curve_val = 0;
+    if (associd[feedid] != undefined) { 
+        val = (associd[feedid]["value"] * 1).toFixed(3);
+        curve_val = curve_value(feedid,dialrate).toFixed(3);
+    }
+
+    // Feed 2:
     var feedid2 = $(this).attr("feedid2");
     if (assocfeed[feedid2]!=undefined) feedid2 = assocfeed[feedid2]; // convert tag:name to feedid
-    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    if (associd[feedid2] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var val = curve_value(feedid,dialrate).toFixed(3);
-    var val2 = curve_value(feedid2, dialrate).toFixed(3);
+        
+    var val2 = 0;
+    var curve_val2 = 0;
+    if (associd[feedid2] != undefined) { 
+        val2 = (associd[feedid2]["value"] * 1).toFixed(3);
+        curve_val2 = curve_value(feedid2,dialrate).toFixed(3);
+    }
+    
     // ONLY UPDATE ON CHANGE
-    if (val != (associd[feedid]['value'] * 1).toFixed(3) || 
-        val2 != (associd[feedid2]['value'] * 1).toFixed(3) ||
-        redraw == 1)
-    {
+    if (curve_val!=val || curve_val2!=val2 || redraw == 1) {
       var id = "can-"+$(this).attr("id");
       var scale = 1*$(this).attr("scale") || 1;
-      draw_windrose(widgetcanvas[id],0,0,$(this).width(),$(this).height(),val,val2*scale,$(this).attr("units"));
+      draw_windrose(widgetcanvas[id],0,0,$(this).width(),$(this).height(),curve_val,curve_val2*scale,$(this).attr("units"));
     }
   });
 }
@@ -101,7 +112,7 @@ function draw_windrose(ctx,x,y,width,height,value,value2,units)
   ctx.clearRect(0,0,width,height);
 
   // Draw the windrose onto the canvas
-  ctx.drawImage(img_windrose, 0, 0, size, size);
+  ctx.drawImage(windrose_windrose, 0, 0, size, size);
 
   // main label
   ctx.font = "14pt Calibri,Geneva,Arial";
@@ -118,7 +129,7 @@ function draw_windrose(ctx,x,y,width,height,value,value2,units)
   // Rotate around this point
   ctx.rotate((position + offset) * (Math.PI / 180));
   // Draw the image back and up
-  ctx.drawImage(needle_windrose, -(size/2), -(size/2), size, size);
+  ctx.drawImage(windrose_needle, -(size/2), -(size/2), size, size);
   // Restore the previous drawing state
   ctx.restore(); 
 
