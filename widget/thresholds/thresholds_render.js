@@ -6,14 +6,6 @@
     http://openenergymonitor.org
     Widget initially created by Aymeric Thibaut
  */
-function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
-{
-    widget["options"    ].push(optionKey);
-    widget["optionstype"].push(optionType);
-    widget["optionsname"].push(optionName);
-    widget["optionshint"].push(optionHint);
-    widget["optionsdata"].push(optionData);
-}
 	var shapeOptions = [
     [2, _Tr("Circle")],
     [1, _Tr("Triangle &#9650;")],

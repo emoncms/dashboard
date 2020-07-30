@@ -9,16 +9,6 @@
     http://openenergymonitor.org/emon/forum
  */
 
-// Convenience function for shoving things into the widget object
-// I'm not sure about calling optionKey "optionKey", but I don't want to just use "options" (because that's what this whole function returns), and it's confusing enough as it is.
-function addOption(widget, optionKey, optionType, optionName, optionHint, optionData){
-  widget["options"    ].push(optionKey);
-  widget["optionstype"].push(optionType);
-  widget["optionsname"].push(optionName);
-  widget["optionshint"].push(optionHint);
-  widget["optionsdata"].push(optionData);
-}
-
 function battery_widgetlist(){
   var widgets =
   {
@@ -86,6 +76,7 @@ function battery_widgetlist(){
   addOption(widgets["battery"], "scale",                 "value",         _Tr("Scale"),           _Tr("Value is multiplied by scale before display"),                           []);
   addOption(widgets["battery"], "units",                 "dropbox_other", _Tr("Units"),           _Tr("Units to show"),                                                         _SI);
   addOption(widgets["battery"], "unitend",               "dropbox",       _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                        unitEndOptions);
+  addOption(widgets["battery"], "number_of_blocks",      "value",         _Tr("Number of blocks"),_Tr("Number of blocks to display"),                                           []);
   addOption(widgets["battery"], "decimals",              "dropbox",       _Tr("Decimals"),        _Tr("Decimals to show"),                                                      decimalsDropBoxOptions);
   addOption(widgets["battery"], "offset",                "value",         _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing"),                 []);
   addOption(widgets["battery"], "colour",                "colour_picker", _Tr("Colour label"),    _Tr("Color of the label"),                                                    []);
@@ -153,7 +144,7 @@ function battery_draw(){
       var cap_width = battery_width/3;
       var line_width = 2;
       var margin = 1;
-      var number_of_blocks = 5;
+      var number_of_blocks = Math.round(1*$(this).attr("number_of_blocks")) || 5;
 
       var fontname;
       if (font === "0"){fontname = "Impact";}

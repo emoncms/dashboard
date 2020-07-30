@@ -8,13 +8,6 @@
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
  */
-function addOption(widget, optionKey, optionType, optionName, optionHint, optionData){
-  widget["options"    ].push(optionKey);
-  widget["optionstype"].push(optionType);
-  widget["optionsname"].push(optionName);
-  widget["optionshint"].push(optionHint);
-  widget["optionsdata"].push(optionData);
-}
 
 function cylinder_widgetlist()
 {
@@ -70,7 +63,6 @@ function cylinder_widgetlist()
 
   function drawCylinder(ctx,cylBot,cylTop,width,height,temptype,unitend,decimals)
   {
-
     // console.log("Draw cylinder");
     if (!ctx) console.log("No CTX");
     if (!ctx) return;
@@ -180,14 +172,18 @@ function cylinder_draw()
     var feedid2 = $(this).attr("botfeedid");
     if (assocfeed[feedid2]!=undefined) feedid2 = assocfeed[feedid2]; // convert tag:name to feedid
     
-    if ((associd[feedid1] === undefined) || (associd[feedid2] === undefined)) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var cylTop = associd[feedid1]["value"]*1;
-    var cylBot = associd[feedid2]["value"]*1;
+    var cylTop = 60;
+    var cylBot = 20;
+    
+    if (associd[feedid1] != undefined) cylTop = associd[feedid1]["value"]*1;
+    if (associd[feedid2] != undefined) cylBot = associd[feedid2]["value"]*1;
+    
     var unitend = $(this).attr("unitend") || "0";
     var temptype= $(this).attr("temptype") || "0";
     var decimals = $(this).attr("decimals") || "-1";
 
     var id = "can-"+$(this).attr("id");
+    
     drawCylinder(widgetcanvas[id],cylBot,cylTop,$(this).width(),$(this).height(),temptype,unitend,decimals);
   });
 }
@@ -204,5 +200,5 @@ function cylinder_slowupdate()
 
 function cylinder_fastupdate()
 {
-  cylinder_draw();
+  if (redraw) cylinder_draw();
 }

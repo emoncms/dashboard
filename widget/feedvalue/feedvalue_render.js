@@ -10,15 +10,6 @@
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
  */
- 
- function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
-{
-  widget["options"    ].push(optionKey);
-  widget["optionstype"].push(optionType);
-  widget["optionsname"].push(optionName);
-  widget["optionshint"].push(optionHint);
-  widget["optionsdata"].push(optionData);
-}
 
 function feedvalue_widgetlist()
 {
@@ -113,10 +104,11 @@ function feedvalue_widgetlist()
 	addOption(widgets["feedvalue"], "colour1",   "colour_picker",  _Tr("Colour1"),     _Tr("Colour for range below Threshold1"),      []);
 	addOption(widgets["feedvalue"], "colour2",   "colour_picker",  _Tr("Colour2"),     _Tr("Colour for range between Threshold1 and Threshold2"),      []);
 	addOption(widgets["feedvalue"], "colour3",   "colour_picker",  _Tr("Colour3"),     _Tr("Colour for range above Threshold2"),      []);
+        addOption(widgets["feedvalue"], "scale", "value", _Tr("Scale"), _Tr("scale"),    []);
 	return widgets;
 }
 
-function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,append,colour,decimals,size,align,errorCode,errorMessage)
+function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,append,colour,decimals,size,align,errorCode,errorMessage,scale)
 {
     colour = colour || "4444CC";
     size = size || "8";
@@ -124,7 +116,10 @@ function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,a
     fstyle = fstyle || "2";
     fweight = fweight || "1";
     align = align || "center";
-    
+    scale = scale || 1.0;
+	
+    val *= (1*scale);
+	
     var fontsize;
 
     if (size === "0"){fontsize = 6;}
@@ -213,42 +208,37 @@ function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,a
 
 function feedvalue_draw()
 {
+    var now = (new Date()).getTime()*0.001;
+  
     $(".feedvalue").each(function(index)
     {
         var feedvalue = $(this);
-        var errorMessage = $(this).attr("errormessagedisplayed");
-        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
-          errorMessage = "TO Error";
-        }
-        var errorTimeout = feedvalue.attr("timeout");
-        if (errorTimeout === "" || errorTimeout === undefined){           //Timeout parameter is empty
-            errorTimeout = 0;
-        }
-
-        var font = feedvalue.attr("font");
+        
         var feedid = feedvalue.attr("feedid");
         if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
-        if (associd[feedid] === undefined) { console.log("Review config for feed id of " + feedvalue.attr("class")); return; }
-        var val = associd[feedid]["value"] * 1;
+        
+        var val = 0;
+        var feed_update_time = now;
+        
+        if (associd[feedid] != undefined) {
+            val = associd[feedid]["value"] * 1;
+            feed_update_time = 1*associd[feedid]["time"];
+        }
 
         if (val===undefined) {val = 0;}
         if (isNaN(val))  {val = 0;}
 
+        // Timeout error    
+        var errorMessage = feedvalue.attr("errormessagedisplayed");
+        if (errorMessage === "" || errorMessage === undefined) errorMessage = "TO Error";
+        
+        var errorTimeout = feedvalue.attr("timeout");
+        if (errorTimeout === "" || errorTimeout === undefined) errorTimeout = 0;
+        
         var errorCode = "0";
-        if (errorTimeout !== 0)
-        {
-            if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
-            {
-                errorCode = "1";
-            }
+        if (errorTimeout !== 0) {
+            if ((now-offsetofTime-feed_update_time) > errorTimeout) errorCode = "1";
         }
-
-        var size = feedvalue.attr("size");
-
-        var decimals = feedvalue.attr("decimals");
-
-        if (decimals===undefined) {decimals = -1};
-
 
         // backwards compatibility
         var unitend = feedvalue.attr("unitend");
@@ -303,7 +293,8 @@ function feedvalue_draw()
             feedvalue.attr("size"),
             feedvalue.attr("align"),
             errorCode,
-            errorMessage
+            errorMessage,
+	          feedvalue.attr("scale")
         );
     });
 }
@@ -318,5 +309,5 @@ function feedvalue_slowupdate()
 }
 function feedvalue_fastupdate()
 {
-	  feedvalue_draw();
+	  if (redraw) feedvalue_draw();
 }

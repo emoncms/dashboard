@@ -10,19 +10,6 @@
         http://openenergymonitor.org/emon/forum
  */
 
-// Convenience function for shoving things into the widget object
-// I'm not sure about calling optionKey "optionKey", but I don't want to just use "options" (because that's what this whole function returns), and it's confusing enough as it is.
-function addOption(widget, optionKey, optionType, optionName, optionHint, optionData)
-{
-
-    widget["options"    ].push(optionKey);
-    widget["optionstype"].push(optionType);
-    widget["optionsname"].push(optionName);
-    widget["optionshint"].push(optionHint);
-    widget["optionsdata"].push(optionData);
-
-
-}
 function thermometer_widgetlist()
 {
     var widgets =
