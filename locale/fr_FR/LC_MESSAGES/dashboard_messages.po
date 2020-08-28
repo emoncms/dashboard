@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: emoncms3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-29 16:35+0200\n"
-"PO-Revision-Date: 2019-06-29 17:18+0200\n"
+"POT-Creation-Date: 2020-08-28 12:22+0200\n"
+"PO-Revision-Date: 2020-08-28 12:23+0200\n"
 "Last-Translator: Aymeric THIBAUT\n"
 "Language-Team: Baptiste Gaultier (Télécom Bretagne) <baptiste."
 "gaultier@telecom-bretagne.eu>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Poedit-KeywordsList: _;gettext;gettext_noop;dgettext:2\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.4.1\n"
 "X-Poedit-SearchPath-0: ../../..\n"
 
 #: ../../../Views/dashboard_config.php:17
@@ -93,95 +93,107 @@ msgstr "Public"
 msgid ""
 "Shows dashboard description on mouse over dashboard name in menu project"
 msgstr ""
-"Affiche la description du tableau de bord en passant la souris sur son nom "
+"Afficher la description du tableau de bord en passant la souris sur son nom "
 "dans le menu projet"
 
 #: ../../../Views/dashboard_config.php:56
 msgid "Show description"
 msgstr "Description"
 
-#: ../../../Views/dashboard_config.php:59
+#: ../../../Views/dashboard_config.php:61
+msgid "Hide menus on dashboard. Make full screen."
+msgstr "Masquer les menus sur le tableau de bord. Faire du plein écran."
+
+#: ../../../Views/dashboard_config.php:61
+msgid "Hide Menus"
+msgstr "Masquer les menus"
+
+#: ../../../Views/dashboard_config.php:64
 msgid "Content: "
 msgstr "Contenu :"
 
-#: ../../../Views/dashboard_config.php:60
+#: ../../../Views/dashboard_config.php:65
 msgid "To view content changes reload editor after saving"
 msgstr ""
 "Pour visualiser les modifications de contenu, rechargez l'éditeur après "
 "sauvegarde"
 
-#: ../../../Views/dashboard_config.php:65
+#: ../../../Views/dashboard_config.php:70
 msgid "Close"
 msgstr "Fermer"
 
-#: ../../../Views/dashboard_config.php:66
-#: ../../../Views/dashboard_edit_view.php:42
+#: ../../../Views/dashboard_config.php:71
+#: ../../../Views/dashboard_edit_view.php:51
 msgid "Save changes"
 msgstr "Enregistrer les modifications"
 
+#: ../../../Views/dashboard_edit_view.php:36
+msgid "Saved"
+msgstr "Sauvegardé"
+
 #: ../../../Views/dashboard_edit_view.php:37
+msgid "Could not save Dashboard"
+msgstr "Impossible de sauvegarder le tableau de bord"
+
+#: ../../../Views/dashboard_edit_view.php:38
+msgid "Items Saved"
+msgstr "Éléments sauvegardés"
+
+#: ../../../Views/dashboard_edit_view.php:46
 msgid "Configure element"
 msgstr "Configurer l'élément"
 
-#: ../../../Views/dashboard_edit_view.php:41
+#: ../../../Views/dashboard_edit_view.php:50
 #: ../../../Views/dashboard_list.old.php:42
 msgid "Cancel"
 msgstr "Annuler"
 
-#: ../../../Views/dashboard_edit_view.php:47
+#: ../../../Views/dashboard_edit_view.php:56
 msgid "Toolbox"
 msgstr "Boîte à outils"
 
-#: ../../../Views/dashboard_edit_view.php:51
+#: ../../../Views/dashboard_edit_view.php:60
 msgid "Configure dashboard basic data"
 msgstr "Configurer les données de base du tableau de bord"
 
-#: ../../../Views/dashboard_edit_view.php:52
+#: ../../../Views/dashboard_edit_view.php:61
 msgid "Undo last step"
 msgstr "Annuler la dernière étape"
 
-#: ../../../Views/dashboard_edit_view.php:53
+#: ../../../Views/dashboard_edit_view.php:62
 msgid "Redo last step"
 msgstr "Rétablir la dernière étape"
 
-#: ../../../Views/dashboard_edit_view.php:54
+#: ../../../Views/dashboard_edit_view.php:63
 msgid "Return to view mode"
 msgstr "Retourner au mode visualisation"
 
-#: ../../../Views/dashboard_edit_view.php:57
+#: ../../../Views/dashboard_edit_view.php:66
 msgid "Configure selected item"
 msgstr "Configurer l'élément sélectionné"
 
-#: ../../../Views/dashboard_edit_view.php:58
+#: ../../../Views/dashboard_edit_view.php:67
 msgid "Move selected item in front of other items"
 msgstr "Déplacer l'élément devant les autres éléments"
 
-#: ../../../Views/dashboard_edit_view.php:59
+#: ../../../Views/dashboard_edit_view.php:68
 msgid "Move selected item to back of other items"
 msgstr "Déplacer l'élément derrière les autres éléments"
 
-#: ../../../Views/dashboard_edit_view.php:60
+#: ../../../Views/dashboard_edit_view.php:69
 msgid "Delete selected items"
 msgstr "Supprimer les éléments sélectionnés"
 
-#: ../../../Views/dashboard_edit_view.php:63
+#: ../../../Views/dashboard_edit_view.php:72
 msgid "Nothing to save"
 msgstr "Aucun élément à sauvegarder"
 
-#: ../../../Views/dashboard_edit_view.php:63
+#: ../../../Views/dashboard_edit_view.php:72
 msgid "Not modified"
 msgstr "Non modifié"
 
-#: ../../../Views/dashboard_edit_view.php:163
-msgid "Saved"
-msgstr "Sauvegardé"
-
-#: ../../../Views/dashboard_edit_view.php:164
-msgid "Items Saved"
-msgstr "Éléments sauvegardés"
-
 #: ../../../Views/dashboard_list.old.php:16
-#: ../../../Views/dashboard_list.php:151 ../../../dashboard_menu.php:18
+#: ../../../Views/dashboard_list.php:151 ../../../dashboard_menu.php:23
 msgid "Dashboards"
 msgstr "Tableaux de bord"
 
@@ -1224,7 +1236,7 @@ msgstr "Valeur affichée (vitesse du vent)"
 msgid "Wind direction"
 msgstr "Direction du vent"
 
-#: ../../../dashboard_menu.php:49
+#: ../../../dashboard_menu.php:52
 msgid "All Dashboards"
 msgstr "Tous les tableaux de bord"
 
