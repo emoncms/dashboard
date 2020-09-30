@@ -113,8 +113,7 @@ function polar_to_cart(mag, ang, xOff, yOff){
     return Ergebnis;
   }
 // X, Y are the center coordinates of the canvas
-function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed,
-    errorCode,errorMessage){
+function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed,errorCode,errorMessage){
   if (!ctx) {return;}
 
   // if (1 * maxvalue) == false: 3000. Else 1 * maxvalue
@@ -307,14 +306,14 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   ctx.lineWidth = (size*0.052).toFixed(0);
   //---------------------------------------------------------------
   if (errorCode != "1"){
-  ctx.beginPath();
-  ctx.moveTo(x+Math.sin(Math.PI*needle-0.2)*inner,y+Math.cos(Math.PI*needle-0.2)*inner);
-  ctx.lineTo(x+Math.sin(Math.PI*needle)*size,y+Math.cos(Math.PI*needle)*size);
-  ctx.lineTo(x+Math.sin(Math.PI*needle+0.2)*inner,y+Math.cos(Math.PI*needle+0.2)*inner);
-  ctx.arc(x,y,inner,1-(Math.PI*needle-0.2),1-(Math.PI*needle+5.4),true);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x+Math.sin(Math.PI*needle-0.2)*inner,y+Math.cos(Math.PI*needle-0.2)*inner);
+    ctx.lineTo(x+Math.sin(Math.PI*needle)*size,y+Math.cos(Math.PI*needle)*size);
+    ctx.lineTo(x+Math.sin(Math.PI*needle+0.2)*inner,y+Math.cos(Math.PI*needle+0.2)*inner);
+    ctx.arc(x,y,inner,1-(Math.PI*needle-0.2),1-(Math.PI*needle+5.4),true);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
   }
 
   
@@ -376,18 +375,14 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   }
     
   var dialtext;
-  if (errorCode == "1")
-      {
-        dialtext = errorMessage;
-      }
-  else
-  {
+  if (errorCode == "1") {
+    dialtext = errorMessage;
+  } else {
       if (unitend ==="0"){
       dialtext=val+units;}
       if (unitend ==="1"){
       dialtext=units+val;}
   }
-  
   
   var textsize = (size / (dialtext.length+2)) * 6;
   
@@ -445,6 +440,10 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
       ctx.fill();
       ctx.stroke();
 
+      /*
+      
+      // Adding mousemove events here may be causing a memory leak, commenting feature out for now
+      
       var canvas = document.getElementById(canvasid);
       var cw=canvas.width;
       var ch=canvas.height;
@@ -508,11 +507,13 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
           tt2.style.visibility ="hidden";
        }
       }
-     $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
+      $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
+      */
     }
   }
 }
 
+/*
 function dial_define_tooltips(){
   $(".dial").each(function(index) {
       var id2 = "can-"+$(this).attr("id");
@@ -533,7 +534,7 @@ function dial_define_tooltips(){
           parent.appendChild(div2);
       }
   });
-}
+}*/
 
 function dial_draw(){
   var now = (new Date()).getTime()*0.001;
@@ -629,7 +630,7 @@ function dial_draw(){
 
 function dial_init(){
   setup_widget_canvas("dial");
-  dial_define_tooltips();
+  // dial_define_tooltips();
 }
 
 function dial_slowupdate(){
