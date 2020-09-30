@@ -9,16 +9,6 @@
     http://openenergymonitor.org/emon/forum
  */
 
-// Convenience function for shoving things into the widget object
-// I'm not sure about calling optionKey "optionKey", but I don't want to just use "options" (because that's what this whole function returns), and it's confusing enough as it is.
-function addOption(widget, optionKey, optionType, optionName, optionHint, optionData){
-  widget["options"    ].push(optionKey);
-  widget["optionstype"].push(optionType);
-  widget["optionsname"].push(optionName);
-  widget["optionshint"].push(optionHint);
-  widget["optionsdata"].push(optionData);
-}
-
 function dial_widgetlist(){
   var widgets =
   {
@@ -123,8 +113,7 @@ function polar_to_cart(mag, ang, xOff, yOff){
     return Ergebnis;
   }
 // X, Y are the center coordinates of the canvas
-function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed,
-    errorCode,errorMessage){
+function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decimals,type,offset,graduationBool,unitend,displayminmax,minvaluefeed,maxvaluefeed,errorCode,errorMessage){
   if (!ctx) {return;}
 
   // if (1 * maxvalue) == false: 3000. Else 1 * maxvalue
@@ -317,14 +306,14 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   ctx.lineWidth = (size*0.052).toFixed(0);
   //---------------------------------------------------------------
   if (errorCode != "1"){
-  ctx.beginPath();
-  ctx.moveTo(x+Math.sin(Math.PI*needle-0.2)*inner,y+Math.cos(Math.PI*needle-0.2)*inner);
-  ctx.lineTo(x+Math.sin(Math.PI*needle)*size,y+Math.cos(Math.PI*needle)*size);
-  ctx.lineTo(x+Math.sin(Math.PI*needle+0.2)*inner,y+Math.cos(Math.PI*needle+0.2)*inner);
-  ctx.arc(x,y,inner,1-(Math.PI*needle-0.2),1-(Math.PI*needle+5.4),true);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x+Math.sin(Math.PI*needle-0.2)*inner,y+Math.cos(Math.PI*needle-0.2)*inner);
+    ctx.lineTo(x+Math.sin(Math.PI*needle)*size,y+Math.cos(Math.PI*needle)*size);
+    ctx.lineTo(x+Math.sin(Math.PI*needle+0.2)*inner,y+Math.cos(Math.PI*needle+0.2)*inner);
+    ctx.arc(x,y,inner,1-(Math.PI*needle-0.2),1-(Math.PI*needle+5.4),true);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
   }
 
   
@@ -386,18 +375,14 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
   }
     
   var dialtext;
-  if (errorCode == "1")
-      {
-        dialtext = errorMessage;
-      }
-  else
-  {
+  if (errorCode == "1") {
+    dialtext = errorMessage;
+  } else {
       if (unitend ==="0"){
       dialtext=val+units;}
       if (unitend ==="1"){
       dialtext=units+val;}
   }
-  
   
   var textsize = (size / (dialtext.length+2)) * 6;
   
@@ -455,6 +440,10 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
       ctx.fill();
       ctx.stroke();
 
+      /*
+      
+      // Adding mousemove events here may be causing a memory leak, commenting feature out for now
+      
       var canvas = document.getElementById(canvasid);
       var cw=canvas.width;
       var ch=canvas.height;
@@ -518,42 +507,40 @@ function draw_gauge(ctx,canvasid,x,y,width,height,position,maxvalue,units,decima
           tt2.style.visibility ="hidden";
        }
       }
-     $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
+      $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
+      */
     }
   }
 }
 
+/*
 function dial_define_tooltips(){
   $(".dial").each(function(index) {
       var id2 = "can-"+$(this).attr("id");
       var canvas2 = document.getElementById(id2);
       var parent = canvas2.parentNode;           // parent node for canvas
-      if(document.getElementById(id2 + "-tooltip-1")){}
-      else{
-      var div1 = document.createElement("div");      // the tool-tip div 1
-      div1.id = id2 + "-tooltip-1";
-      parent.appendChild(div1);}
-      if(document.getElementById(id2 + "-tooltip-2")){}
-      else{
-      var div2 = document.createElement("div");      // the tool-tip div 2
-      div2.id = id2 + "-tooltip-2";
-      parent.appendChild(div2);}
+      
+      if(document.getElementById(id2 + "-tooltip-1")){
+      } else {
+          var div1 = document.createElement("div");      // the tool-tip div 1
+          div1.id = id2 + "-tooltip-1";
+          parent.appendChild(div1);
+      }
+     
+      if (document.getElementById(id2 + "-tooltip-2")){
+      } else {
+          var div2 = document.createElement("div");      // the tool-tip div 2
+          div2.id = id2 + "-tooltip-2";
+          parent.appendChild(div2);
+      }
   });
-}
+}*/
 
 function dial_draw(){
+  var now = (new Date()).getTime()*0.001;
+
   $(".dial").each(function(index) {
-    var errorMessage = $(this).attr("errormessagedisplayed");
-        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
-          errorMessage = "TO Error";
-        }
-    var errorTimeout = $(this).attr("timeout");
-        if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
-          errorTimeout = 0;
-        }
-
-    var errorCode = "0";
-
+  
     var feedid = $(this).attr("feedid");
     if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
     var minvaluefeed = $(this).attr("minvaluefeed")||"0";
@@ -561,18 +548,27 @@ function dial_draw(){
     var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
     if (assocfeed[maxvaluefeed]!=undefined) maxvaluefeed = assocfeed[maxvaluefeed];
     
-    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
+    var val = 0;
+    var val_curve = 0;
+    var feed_update_time = now;
+    
+    if (associd[feedid] != undefined) { 
+        val = (associd[feedid]["value"] * 1).toFixed(3);        
+        val_curve = curve_value(feedid,dialrate).toFixed(3);
+        feed_update_time = 1*associd[feedid]["time"];
+    }
+    
+    // Timeout error
+    var errorTimeout = $(this).attr("timeout");
+    if (errorTimeout === "" || errorTimeout === undefined) errorTimeout = 0;
 
-    var val = (associd[feedid]["value"] * 1).toFixed(3);        
-    var val_curve = curve_value(feedid,dialrate).toFixed(3);
-
-    if (errorTimeout !== 0)
-      {
-        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
-        {
-          errorCode = "1";
-        }
-      }
+    var errorCode = "0";
+    if (errorTimeout !== 0) {
+        if ((now-offsetofTime-feed_update_time) > errorTimeout) errorCode = "1";
+    }
+    
+    var id = "can-"+$(this).attr("id");
+    if (last_errorCode[id]==undefined) last_errorCode[id] = errorCode;
     
     // The minval and maxval feed settings default to the first feed in the feedlist 
     // which may not be public for use in public dashboards, which will then result in
@@ -591,16 +587,20 @@ function dial_draw(){
         maxval = (associd[maxvaluefeed]["value"] * 1).toFixed(3);
         maxval_curve = curve_value(maxvaluefeed,dialrate).toFixed(3);
     }
-    // Here we disable the min/max values feature when one of the feed settings is not valid
-    var displayminmax = $(this).attr("displayminmax")||"0";
-    if (associd[minvaluefeed] == undefined || associd[maxvaluefeed] == undefined) {
-        displayminmax = "0";
-    }
     
     // ONLY UPDATE ON CHANGE
-    if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval ||redraw == 1 || errorTimeout != 0)
+    if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval || redraw == 1 || errorCode != last_errorCode[id])
     {
-      var id = "can-"+$(this).attr("id");
+      // console.log("update dial");
+      var errorMessage = $(this).attr("errormessagedisplayed");
+      if (errorMessage === "" || errorMessage === undefined) errorMessage = "TO Error";
+      
+      // Here we disable the min/max values feature when one of the feed settings is not valid
+      var displayminmax = $(this).attr("displayminmax")||"0";
+      if (associd[minvaluefeed] == undefined || associd[maxvaluefeed] == undefined) {
+          displayminmax = "0";
+      }
+      
       var scale = 1*$(this).attr("scale") || 1;
       var unitend = $(this).attr("unitend") || "0";
       draw_gauge(widgetcanvas[id],
@@ -624,12 +624,13 @@ function dial_draw(){
                  errorMessage
                  );
     }
+    last_errorCode[id] = errorCode;
   });
 }
 
 function dial_init(){
   setup_widget_canvas("dial");
-  dial_define_tooltips();
+  // dial_define_tooltips();
 }
 
 function dial_slowupdate(){
