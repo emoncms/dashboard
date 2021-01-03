@@ -102,11 +102,11 @@ class Dashboard
             $content = htmlspecialchars_decode($antiXss->xss_clean($_content));
             $_content = htmlspecialchars_decode($_content);
             if ($content!=$_content) return array('success'=>false, 'message'=>'Error: Invalid dashboard content, content not saved');
+            // re-instate the &nbsp; character once all XSS tests are complete
+            $content = str_replace($nbsp_placeholder,'&nbsp;',$content);
         } else {
             $content = $_content;
         }
-        // re-instate the &nbsp; character once all XSS tests are complete
-        $content = str_replace($nbsp_placeholder,'&nbsp;',$content);
         $result = $this->mysqli->query("SELECT content FROM dashboard WHERE userid = '$userid' AND id='$id'");
         $row = $result->fetch_object();
         if ($row) {
