@@ -1,5 +1,8 @@
 <?php
-    global $mysqli,$route,$session;
+global $mysqli,$route,$session;
+
+if ($session["read"]) {
+
     require_once "Modules/dashboard/dashboard_model.php";
     $dashboard = new Dashboard($mysqli);
     load_language_files("Modules/dashboard/locale", "dashboard_messages");
@@ -12,46 +15,33 @@
         }
     }
 
-    // sidebar nav list
-    // Contains a list for the drop down with dashboards available for user session type
-    $listmenu = $dashboard->build_menu_array('view');
+        
+    // Level 1 top bar
+    $menu["dashboards"] = array("name"=>"Dashboards", "order"=>3, "icon"=>"dashboard", "l2"=>array());       
+      
+    if ($listmenu = $dashboard->build_menu_array('view')) {
 
-    //navbar link
-    if(!empty($listmenu) || $session["write"]) { //if the dashboard menu isn't empty, or if the session is write, show the menu
-    $menu['tabs'][] = array(
-        'icon'=>'dashboard',
-        'text'=> dgettext("dashboard_messages","Dashboards"),
-        'path'=> 'dashboard/view',
-        'order' => 3,
-        'data'=> array('sidebar' => '#sidebar_dashboard')
-    );
-    }
-
-    foreach ($listmenu as $dash) {
-        $id = $dash['id'];
-
-        $icon = !empty($default['id']) && $default['id'] === $id ? 'star': '';
-        $menu['sidebar']['dashboard'][] = array(
-            'title' => $dash['desc'],
-            'text' => $dash['name'],
-            'path' => str_replace('dashboard/view&id','dashboard/view?id',$dash['path']),
-            'active' => array(
-                sprintf('dashboard/edit?id=%s',$id),
-                sprintf('dashboard/view?id=%s',$id)
-            ),
-            'order' => $dash['order'],
-            'icon' => $icon,
-            'data' => array(
-                'id' => $id
-            )
-        );
+        // Level 2 List of dashboards
+        foreach ($listmenu as $dash) {
+            $id = $dash['id'];
+            $icon = !empty($default['id']) && $default['id'] === $id ? 'star': 'star_border';
+            
+            $menu["dashboards"]['l2'][] = array(
+                "name"=>$dash['name'],
+                "title"=>$dash['desc'],
+                "href"=>str_replace('dashboard/view&id','dashboard/view?id',$dash['path']),
+                "icon"=>$icon, 
+                "order"=>$dash['order']
+            );
+        }
     }
 
     if ($session["write"]) {
-    $menu['sidebar']['dashboard'][] = array(
-        'text'=> dgettext("dashboard_messages","All Dashboards"),
-        'path'=> 'dashboard/list',
-        'order' => 1,
-        'icon' => 'dashboard'
-    );
+        $menu["dashboards"]['l2'][] = array(
+            "name"=>dgettext("dashboard_messages","All Dashboards"),
+            "href"=>"dashboard/list",
+            "icon"=>"dashboard", 
+            "order"=>1
+        );
     }
+}
