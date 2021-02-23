@@ -25,7 +25,9 @@ if(isset($dashboard['fullscreen']) && $dashboard['fullscreen']): ?>
      */
     $(function(){
         // hide menus
-        $('#emoncms-navbar, #sidebar').hide();
+        // $('#emoncms-navbar, #sidebar').hide();
+        
+        
         // shift content
         $('.content-container').css({margin:0});
         // fit footer to botttom of screen
@@ -85,4 +87,6 @@ if(isset($dashboard['fullscreen']) && $dashboard['fullscreen']): ?>
   $(window).resize(function(){
     redraw = 1;
   });
+  
+menu.min_l2();
 </script>
