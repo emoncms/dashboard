@@ -114,11 +114,11 @@ msgstr "Füllwert"
 
 #: ../../../dashboard_langjs.php:50
 msgid "Currency"
-msgstr "Strom"
+msgstr "Währung"
 
 #: ../../../dashboard_langjs.php:51
 msgid "Currency to show"
-msgstr "Strom zum Anzeigen"
+msgstr "Währung zum Anzeigen"
 
 #: ../../../dashboard_langjs.php:52
 msgid "Kwh price"
@@ -195,7 +195,7 @@ msgstr "Mittelwert"
 #: ../../../Views/dashboard_list.php:19
 #, fuzzy
 msgid "No dashboards created"
-msgstr "Neues Dashboard angelegt"
+msgstr "keine Dashboard angelegt"
 
 #: ../../../Views/dashboard_list.php:20
 msgid "Maybe you would like to add your first dashboard using the button"
@@ -331,7 +331,7 @@ msgstr "Anzeigemethode"
 #: ../../../Views/dashboard_menu.php:59
 #, fuzzy
 msgid "Configure dashboard"
-msgstr "Neues  Dashboard"
+msgstr "konfiguriere Dashboard"
 
 #: ../../../Views/dashboard_menu.php:62
 msgid "New"
@@ -366,7 +366,7 @@ msgstr "Anzeigen als Liste"
 #~ msgstr "Aktionen"
 
 #~ msgid "Share"
-#~ msgstr "Geteilt"
+#~ msgstr "Teilen"
 
 #~ msgid "This is the main dashboard"
 #~ msgstr "Dies ist das Hauptdashboard"

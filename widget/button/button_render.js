@@ -32,17 +32,28 @@ function button_events()
 {
   $('.button').on("click", function(event) {
     var feedid = $(this).attr("feedid");
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
 
-    var invalue = $(this).attr("value");
-    if (invalue == 0) outval = 1;
-    if (invalue == 1) outval = 0;
-
-    feed.set(feedid,{'time':parseInt((new Date()).getTime()/1000),'value':outval});
-    $(this).attr("value",outval);
+    var value = $(this).attr("value");
+    if (value == 0) value = 1; else value = 0;
+    
+    $.ajax({ 
+        url: path+"feed/insert.json", 
+        data: "id="+feedid+"&time="+parseInt((new Date()).getTime()/1000)+"&value="+value, 
+        dataType: 'json', 
+        async: false, 
+        success: function(result){
+            if (result!=value) {
+                alert(JSON.stringify(result));
+            }
+        }
+    });
+    
+    $(this).attr("value",value);
 
     var id = "can-"+$(this).attr("id");
-    draw_button(widgetcanvas[id], outval);
-    associd[feedid]['value'] = outval;
+    draw_button(widgetcanvas[id], value);
+    associd[feedid]['value'] = value;
   });
 }
 
@@ -56,8 +67,11 @@ function button_draw()
   $('.button').each(function(index)
   {
     var feedid = $(this).attr("feedid");
-    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var val = associd[feedid]['value']*1;
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
+    
+    var val = 0;
+    if (associd[feedid] != undefined) val = associd[feedid]['value']*1;
+    
     var id = "can-"+$(this).attr("id");
     draw_button(widgetcanvas[id], val);
   });
@@ -70,6 +84,7 @@ function button_slowupdate()
 
 function button_fastupdate()
 {
+  if (redraw) button_draw();
 }
 
 

@@ -49,7 +49,7 @@ class Dashboard
         $row = $result->fetch_array();
 
         // Name for cloned dashboard
-        $name = $row['name']._(' clone');
+        $name = sprintf('%s %s', $row['name'], _('clone'));
 
         $this->mysqli->query("INSERT INTO dashboard (`userid`,`content`,`name`,`description`,`height`) VALUES ('$userid','{$row['content']}','$name','{$row['description']}','{$row['height']}')");
 
@@ -63,7 +63,7 @@ class Dashboard
         $qB = ""; $qC = "";
         if ($public==true) $qB = " and public=1";
         if ($published==true) $qC = " and published=1";
-        if (!$result = $this->mysqli->query("SELECT id, name, alias, description, main, published, public, showdescription FROM dashboard WHERE userid='$userid'".$qB.$qC)) {
+        if (!$result = $this->mysqli->query("SELECT id, name, alias, description, main, published, public, showdescription, fullscreen FROM dashboard WHERE userid='$userid'".$qB.$qC)) {
           return array();
         }
         
@@ -84,18 +84,43 @@ class Dashboard
         return $list;
     }
 
-    public function set_content($userid, $id, $content, $height)
+    public function set_content($userid, $id, $_content, $height)
     {
         $userid = (int) $userid;
         $id = (int) $id;
         $height = (int) $height;
-        $content = $this->mysqli->real_escape_string($content);
-
-        $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid = '$userid' AND id='$id'");
-        $row = $result->fetch_array();
+        
+        // sudo apt-get install php-mbstring
+        if (function_exists("mb_convert_encoding")) {
+            $axdir = "Modules/dashboard/AntiXSS/php5";
+            require_once "$axdir/Bootup.php";
+            require_once "$axdir/UTF8.php";
+            require_once "$axdir/AntiXSS.php";
+            $antiXss = new AntiXSS();
+            $nbsp_placeholder = "<!-- START-NON-BREAKING-SPACE --> <!-- END-NON-BREAKING-SPACE -->";
+            $_content = str_replace('&nbsp;',$nbsp_placeholder,$_content);
+            $content = htmlspecialchars_decode($antiXss->xss_clean($_content));
+            $_content = htmlspecialchars_decode($_content);
+            if ($content!=$_content) return array('success'=>false, 'message'=>'Error: Invalid dashboard content, content not saved');
+            // re-instate the &nbsp; character once all XSS tests are complete
+            $content = str_replace($nbsp_placeholder,'&nbsp;',$content);
+        } else {
+            $content = $_content;
+        }
+        $result = $this->mysqli->query("SELECT content FROM dashboard WHERE userid = '$userid' AND id='$id'");
+        $row = $result->fetch_object();
         if ($row) {
-            $this->mysqli->query("UPDATE dashboard SET content = '$content', height = '$height' WHERE userid='$userid' AND id='$id'");
-            if ($this->mysqli->affected_rows>0){
+            if ($row->content==$content) {
+                return array('success'=>false, 'message'=>'Dashboard content not updated, no changes made');
+            }
+            
+            $stmt = $this->mysqli->prepare("UPDATE dashboard SET content=?, height=? WHERE userid=? AND id=?");
+            $stmt->bind_param("siii", $content, $height, $userid, $id);
+            $stmt->execute();
+            $affected_rows = $stmt->affected_rows;
+            $stmt->close();
+            
+            if ($affected_rows>0){
                 return array('success'=>true, 'message'=>'Dashboard updated');
             }
         }
@@ -106,44 +131,51 @@ class Dashboard
     {
         $userid = (int) $userid;
         $id = (int) $id;
-        $fields = json_decode(stripslashes($fields));
-
-        $array = array();
-
-        // content, height, name, alias, description, main, public, published, showdescription
-        // Repeat this line changing the field name to add fields that can be updated:
-
-        if (isset($fields->height)) $array[] = "`height` = '".intval($fields->height)."'";
-        if (isset($fields->content)) $array[] = "`content` = '".preg_replace('/[^\p{L}_\p\{N}\s-.#<>?",;:=&\/%~]/u','',$fields->content)."'";
-
-        if (isset($fields->name)) $array[] = "`name` = '".preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->name)."'";
-        if (isset($fields->alias)) $array[] = "`alias` = '".preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->alias)."'";
-        if (isset($fields->description)) $array[] = "`description` = '".preg_replace('/[^\p{L}_\p{N}\s-]/u','',$fields->description)."'";
-
-        if (isset($fields->backgroundcolor)) $array[] = "`backgroundcolor` = '".preg_replace('/[^0-9a-f]/','', strtolower($fields->backgroundcolor))."'";
-
-        if (isset($fields->gridsize)) $array[] = "`gridsize` = '".preg_replace('/[^0-9]/','', $fields->gridsize)."'";
-
-        if (isset($fields->main))
+        $fields = json_decode($fields);
+        if(!empty($fields->alias)){
+            $fields->alias = $this->make_slug($fields->alias); // make url friendly
+            $fields->alias = substr($fields->alias,0,20); // limit to 20 chars to match the db
+        }
+        $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' and `id` = '$id'");
+        if ($row = $result->fetch_object()) 
         {
-            $main = (bool)$fields->main;
-            if ($main) $this->mysqli->query("UPDATE dashboard SET main = FALSE WHERE userid='$userid' and id<>'$id'");
-            $array[] = "`main` = '".$main ."'";
+            if (isset($fields->height)) $row->height = (int) $fields->height;
+            if (isset($fields->name)) $row->name = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->name);
+            if (isset($fields->alias)) $row->alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->alias);
+            if (isset($fields->description)) $row->description = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->description);
+            if (isset($fields->backgroundcolor)) $row->backgroundcolor = preg_replace('/[^0-9a-f]/','', strtolower($fields->backgroundcolor));
+            if (isset($fields->gridsize)) $row->gridsize = preg_replace('/[^0-9]/','', $fields->gridsize);
+            if (isset($fields->feedmode)) $row->feedmode = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$fields->feedmode);
+
+            if (isset($fields->main))
+            {
+                $main = (bool)$fields->main;
+                if ($main) $this->mysqli->query("UPDATE dashboard SET main = FALSE WHERE userid='$userid' and id<>'$id'");
+                $row->main = $main;
+            }
+
+            if (isset($fields->public)) $row->public = (bool) $fields->public;
+            if (isset($fields->fullscreen)) $row->fullscreen = (bool) $fields->fullscreen;
+            if (isset($fields->published)) $row->published = (bool) $fields->published;
+            if (isset($fields->showdescription)) $row->showdescription = (bool) $fields->showdescription;
+            
+            if (!$stmt = $this->mysqli->prepare("UPDATE dashboard SET height=?,name=?,alias=?,description=?,backgroundcolor=?,gridsize=?,feedmode=?,main=?,public=?,published=?,showdescription=?,fullscreen=? WHERE userid=? AND id=?")) {
+                return array('success'=>false, 'message'=>'Dashboard schema error, please run emoncms database update');
+            }
+            $stmt->bind_param("issssisiiiiiii",$row->height,$row->name,$row->alias,$row->description,$row->backgroundcolor,$row->gridsize,$row->feedmode,$row->main,$row->public,$row->published,$row->showdescription,$row->fullscreen,$userid,$id);
+
+            $stmt->execute();
+            $affected_rows = $stmt->affected_rows;
+            $error = $stmt->error;
+            $stmt->close();
+            
+            if ($affected_rows>0){
+                return array('success'=>true, 'message'=>'Field updated', 'id'=>$id, 'alias'=>$row->alias);
+            } else {
+                return array('success'=>false, 'message'=>'Nothing changed', 'id'=>$id, 'alias'=>$row->alias);
+            }
         }
-
-        if (isset($fields->public)) $array[] = "`public` = '".((bool)$fields->public)."'";
-        if (isset($fields->published)) $array[] = "`published` = '".((bool)$fields->published)."'";
-        if (isset($fields->showdescription)) $array[] = "`showdescription` = '".((bool)$fields->showdescription)."'";
-        // Convert to a comma seperated string for the mysql query
-        $fieldstr = implode(",",$array);
-
-        $this->mysqli->query("UPDATE dashboard SET ".$fieldstr." WHERE userid='$userid' and `id` = '$id'");
-
-        if ($this->mysqli->affected_rows>0){
-            return array('success'=>true, 'message'=>'Field updated');
-        } else {
-            return array('success'=>false, 'message'=>'Field could not be updated');
-        }
+        return array('success'=>false, 'message'=>'Field could not be updated'. " $error");
     }
 
     // Return the main dashboard from $userid
@@ -160,16 +192,42 @@ class Dashboard
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE id='$id'");
         return $result->fetch_array();
     }
+    
+    public function get_content($userid,$id)
+    {
+        $id = (int) $id;
+        $userid = (int) $userid;
+        $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' AND id='$id'");
+        return $result->fetch_object();
+    }
 
     // Returns the $id dashboard from $userid
     public function get_from_alias($userid, $alias)
     {
         $userid = (int) $userid;
-        $alias = preg_replace('/[^\p{L}_\p{N}\s-]/u','',$alias);
+        $alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$alias);
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' and alias='$alias'");
         return $result->fetch_array();
     }
-
+    /**
+     * Get the public dashboard from $alias
+     * return array of fields for found database
+     * @param string $alias
+     */
+    public function get_from_public_alias($alias)
+    {
+        $alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$alias);
+        // access to public dashboards
+        if(!empty($alias)) {
+            $stmt = $this->mysqli->prepare("SELECT * FROM dashboard WHERE alias=?");
+            $stmt->bind_param("s",$alias);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $stmt->free_result();
+            $stmt->close();
+            return $result->fetch_array();
+        }
+    }
     public function build_menu_array($location)
     {
         global $session;
@@ -203,10 +261,26 @@ class Dashboard
             }
 
             // Build the menu item
-            $menu[] = array('name' => $dashboard['name'], 'desc'=> $desc, 'published'=> $dashboard['published'], 'path' => $dashpath.$aliasurl, 'order' => "-1".$dashboard['name']);
+            $menu[] = array(
+                'id' => $dashboard['id'],
+                'name' => $dashboard['name'],
+                'desc'=> $desc,
+                'published'=> $dashboard['published'],
+                'path' => $dashpath.$aliasurl,
+                'order' => "-1".$dashboard['name']
+            );
         }
         return $menu;
     }
-
+    public function make_slug( $string, $separator = '-' ) {
+        $accents_regex = '~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i';
+        $special_cases = array( '&' => 'and', "'" => '');
+        $string = mb_strtolower( trim( $string ), 'UTF-8' );
+        $string = str_replace( array_keys($special_cases), array_values( $special_cases), $string );
+        $string = preg_replace( $accents_regex, '$1', htmlentities( $string, ENT_QUOTES, 'UTF-8' ) );
+        $string = preg_replace("/[^a-z0-9]/u", "$separator", $string);
+        $string = preg_replace("/[$separator]+/u", "$separator", $string);
+        return $string;
+    }
 }
 

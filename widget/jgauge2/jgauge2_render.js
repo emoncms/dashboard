@@ -1,13 +1,14 @@
 /*
-   All emon_widgets code is released under the GNU General Public License v3.
-   See COPYRIGHT.txt and LICENSE.txt.
+  All Emoncms code is released under the GNU Affero General Public License.
+  See COPYRIGHT.txt and LICENSE.txt.
+    ---------------------------------------------------------------------
    Part of the OpenEnergyMonitor project:  http://openenergymonitor.org
  */
 
 // Global variables
-var img = null,
-  needle = null,
-  needle2 = null;
+var jgauge2_needle2 = null,
+  jgauge2_needle = null,
+  jgauge2_jgauge2 = null;
 
 function jgauge2_widgetlist()
 {
@@ -16,10 +17,10 @@ function jgauge2_widgetlist()
     {
       "offsetx":-80,"offsety":-80,"width":160,"height":160,
       "menu":"Widgets",
-      "options":["feedid", "feedid2", "scale", "max", "min", "units"],
-      "optionstype":["feedid","feedid","value","value","value"],
-      "optionsname":[_Tr("Feed 1"),_Tr("Feed 2"),_Tr("Scale"),_Tr("Max value"),_Tr("Min value"),_Tr("Units")],
-      "optionshint":[_Tr("Feed 1"),_Tr("Feed 2 (Min/Max for example)"),_Tr("Scale applied to value"),_Tr("Max value to show"),_Tr("Min value to show"),_Tr("Units to show")]
+      "options":["feedid", "feedid2", "scale", "max", "min", "units","timeout","errormessagedisplayed"],
+      "optionstype":["feedid","feedid","value","value","value","value","value"],
+      "optionsname":[_Tr("Feed 1"),_Tr("Feed 2"),_Tr("Scale"),_Tr("Max value"),_Tr("Min value"),_Tr("Units"),_Tr("Timeout"),_Tr("Error Message")],
+      "optionshint":[_Tr("Feed 1"),_Tr("Feed 2 (Min/Max for example)"),_Tr("Scale applied to value"),_Tr("Max value to show"),_Tr("Min value to show"),_Tr("Units to show"),_Tr("Timeout without feed update in seconds (empty is never)"),_Tr("Error message displayed when timeout is reached")]
 
     }
   }
@@ -31,36 +32,81 @@ function jgauge2_init()
   setup_widget_canvas('jgauge2');
 
   // Load the needle image
-  needle_jgauge2 = new Image();
-  needle_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/needle2.png';
+  if (jgauge2_needle2==null) {
+    jgauge2_needle2 = new Image();
+    jgauge2_needle2.src = path+'Modules/dashboard/widget/jgauge2/needle2.png';
+  }
   
-  needle2_jgauge2 = new Image();
-  needle2_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/needle.png';
+  if (jgauge2_needle==null) {
+    jgauge2_needle = new Image();
+    jgauge2_needle.src = path+'Modules/dashboard/widget/jgauge2/needle.png';
+  }
 
   // Load the jgauge2 image
-  img_jgauge2 = new Image();
-  img_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/jgauge2.png';
+  if (jgauge2_jgauge2==null) {
+    jgauge2_jgauge2 = new Image();
+    jgauge2_jgauge2.src = path+'Modules/dashboard/widget/jgauge2/jgauge2.png';
+  }
 }
 
 function jgauge2_draw()
 {
+  var now = (new Date()).getTime()*0.001;
+  
   $('.jgauge2').each(function(index)
   {
+    // Feed 1:
     var feedid = $(this).attr("feedid");
-    var feedid2 = $(this).attr("feedid2");
-    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    if (associd[feedid2] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var val = curve_value(feedid,dialrate).toFixed(3);
-    var val2 = curve_value(feedid2, dialrate).toFixed(3);
-    // ONLY UPDATE ON CHANGE
-    if (val != (associd[feedid]['value'] * 1).toFixed(3) || 
-        val2 != (associd[feedid2]['value'] * 1).toFixed(3) ||
-        redraw == 1)
-    {
-      var id = "can-"+$(this).attr("id");
-      var scale = 1*$(this).attr("scale") || 1;
-      draw_jgauge2(widgetcanvas[id],0,0,$(this).width(),$(this).height(),val*scale,val2*scale,$(this).attr("max"),$(this).attr("min"),$(this).attr("units"));
+    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
+
+    var val = 0;
+    var curve_val = 0;
+    var feed_update_time = now;
+    
+    if (associd[feedid] != undefined) { 
+        val = (associd[feedid]["value"] * 1).toFixed(3);
+        curve_val = curve_value(feedid,dialrate).toFixed(3);
+        feed_update_time = 1*associd[feedid]["time"];
     }
+
+    // Feed 2:
+    var feedid2 = $(this).attr("feedid2");
+    if (assocfeed[feedid2]!=undefined) feedid2 = assocfeed[feedid2]; // convert tag:name to feedid
+        
+    var val2 = 0;
+    var curve_val2 = 0;
+    var feed_update_time2 = now;
+    
+    if (associd[feedid2] != undefined) { 
+        val2 = (associd[feedid2]["value"] * 1).toFixed(3);
+        curve_val2 = curve_value(feedid2,dialrate).toFixed(3);
+        feed_update_time2 = 1*associd[feedid2]["time"];
+    }
+
+    // Timeout error    
+    var errorTimeout = $(this).attr("timeout");
+    if (errorTimeout === "" || errorTimeout === undefined) errorTimeout = 0;
+
+    var errorCode = "0";
+    if (errorTimeout !== 0) {
+        if ((now-offsetofTime-feed_update_time) > errorTimeout) errorCode = "1";
+        // if ((now-offsetofTime-feed_update_time2) > errorTimeout) errorCode = "1";
+    }
+    var id = "can-"+$(this).attr("id");
+    if (last_errorCode[id]==undefined) last_errorCode[id] = errorCode;
+    
+    // ONLY UPDATE ON CHANGE
+    if (val!=curve_val || val2!=curve_val2 || redraw == 1 || errorCode != last_errorCode[id])
+    {
+      // console.log("update jguage2");
+      var errorMessage = $(this).attr("errormessagedisplayed");
+      if (errorMessage === "" || errorMessage === undefined) errorMessage = "TO Error"; 
+      
+      var scale = 1*$(this).attr("scale") || 1;
+      draw_jgauge2(widgetcanvas[id],0,0,$(this).width(),$(this).height(),curve_val*scale,curve_val2*scale,$(this).attr("max"),$(this).attr("min"),$(this).attr("units"),errorCode,errorMessage);
+    }
+
+    last_errorCode[id] = errorCode;
   });
 }
 
@@ -74,7 +120,7 @@ function jgauge2_fastupdate()
   jgauge2_draw();
 }
 
-function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units)
+function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units,errorCode,errorMessage)
 {
   if (!max) max = 1000;
   if (!min) min = 0;
@@ -121,7 +167,7 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units)
   ctx.clearRect(0,0,width,height);
 
   // Draw the jgauge2 onto the canvas
-  ctx.drawImage(img_jgauge2, 0, 0, size, size);
+  ctx.drawImage(jgauge2_jgauge2, 0, 0, size, size);
 
   //ticks labels
   var step = ((max - min)/6);
@@ -142,9 +188,14 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units)
   ctx.font = "14pt Calibri,Geneva,Arial";
   ctx.strokeStyle = "rgb(255,255,255)";
   ctx.fillStyle = "rgb(255,255,255)";
+  if (errorCode!= "1"){
   value = Number(value.toFixed(decimalPlaces));
   ctx.fillText(value+units, 50*(size/100), 88*(size/100));
-
+  }
+  else
+  {
+  ctx.fillText(errorMessage, 50*(size/100), 85*(size/100));
+  }
   // max label
   ctx.font = "10pt Calibri,Geneva,Arial";
   ctx.strokeStyle = "rgb(255,255,255)";
@@ -160,7 +211,9 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units)
   // Rotate around this point
   ctx.rotate((position + offset) * (Math.PI / 180));
   // Draw the image back and up
-  ctx.drawImage(needle_jgauge2, -(size/2), -(size/2), size, size);
+  if (errorCode!= "1"){
+  ctx.drawImage(jgauge2_needle, -(size/2), -(size/2), size, size);
+  }
   // Restore the previous drawing state
   ctx.restore(); 
 
@@ -171,7 +224,7 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units)
   // Rotate around this point
   ctx.rotate((position2 + offset) * (Math.PI / 180));
   // Draw the image back and up
-  ctx.drawImage(needle2_jgauge2, -(size/2), -(size/2), size, size);
+  ctx.drawImage(jgauge2_needle2, -(size/2), -(size/2), size, size);
   // Restore the previous drawing state
   ctx.restore();
 }

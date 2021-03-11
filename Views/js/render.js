@@ -16,9 +16,12 @@
 // Global page vars definition
 
 // Array for all feed details by feed id
-var associd = [];
+var associd = {};
+var assocfeed = {};
 // Array for smooth change values - creation of smooth dial widget
-var assoc_curve = [];
+var assoc_curve = {};
+// Stores timeout state of widgets used for updating a widget on a timeout event
+var last_errorCode = {};
 
 var widgetcanvas = {};
 
@@ -86,6 +89,7 @@ function update(first_time){
     success : function(data){ 
       for (z in data){
         associd[data[z]['id']] = data[z];
+        assocfeed[data[z]['tag']+":"+data[z]['name']] = data[z]['id'];
       }
       if (!first_time){
         for (z in widget){
@@ -94,6 +98,15 @@ function update(first_time){
           fn();
         }
       }
+    },
+    error : function(){
+          for (z in widget){ 
+          var fname = widget[z]+"_isnonetwork";
+          var fn = window[fname];
+             if(typeof(fn) == 'function') {
+             fn();
+             }
+         }
     }
   });
 }
@@ -122,6 +135,7 @@ function curve_value(feed,rate){
     if (associd[feed] !== undefined) assoc_curve[feed] = assoc_curve[feed] + ((parseFloat(associd[feed]['value']) - assoc_curve[feed]) * rate);
     val = assoc_curve[feed] * 1;
   }
+  if (isNaN(val)) val = 0;
   return val;
 }
 
@@ -151,4 +165,14 @@ function setup_widget_canvas(elementclass){
     // 3) Get and store the canvas context
     widgetcanvas[canvasid] = canvas.getContext("2d");
   });
+}
+
+// Convenience function for shoving things into the widget object
+// I'm not sure about calling optionKey "optionKey", but I don't want to just use "options" (because that's what this whole function returns), and it's confusing enough as it is.
+function addOption(widget, optionKey, optionType, optionName, optionHint, optionData){
+  widget["options"    ].push(optionKey);
+  widget["optionstype"].push(optionType);
+  widget["optionsname"].push(optionName);
+  widget["optionshint"].push(optionHint);
+  widget["optionsdata"].push(optionData);
 }
