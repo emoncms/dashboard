@@ -17,7 +17,7 @@ if ($session["read"]) {
 
         
     // Level 1 top bar
-    $menu["dashboards"] = array("name"=>"Dashboards", "order"=>3, "icon"=>"dashboard", "l2"=>array());       
+    $menu["dashboards"] = array("name"=>"Dashboards", "order"=>3, "icon"=>"dashboard", "default"=>"dashboard/list", "l2"=>array());       
       
     if ($listmenu = $dashboard->build_menu_array('view')) {
 
@@ -33,6 +33,8 @@ if ($session["read"]) {
                 "icon"=>$icon, 
                 "order"=>$dash['order']
             );
+            
+            $menu["dashboards"]["default"] = str_replace('dashboard/view&id','dashboard/view?id',$dash['path']);
         }
     }
 
