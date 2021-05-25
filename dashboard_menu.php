@@ -28,30 +28,33 @@
     }
 
     foreach ($listmenu as $dash) {
-        $id = $dash['id'];
+        if ($dash['published']){
+            $id = $dash['id'];
 
-        $icon = !empty($default['id']) && $default['id'] === $id ? 'star': '';
-        $menu['sidebar']['dashboard'][] = array(
-            'title' => $dash['desc'],
-            'text' => $dash['name'],
-            'path' => str_replace('dashboard/view&id','dashboard/view?id',$dash['path']),
-            'active' => array(
-                sprintf('dashboard/edit?id=%s',$id),
-                sprintf('dashboard/view?id=%s',$id)
-            ),
-            'order' => $dash['order'],
-            'icon' => $icon,
-            'data' => array(
-                'id' => $id
-            )
-        );
+            $icon = !empty($default['id']) && $default['id'] === $id ? 'star': '';
+            // $icon = 'dashboard';
+            $menu['sidebar']['dashboard'][] = array(
+                'title' => $dash['desc'],
+                'text' => $dash['name'],
+                'path' => str_replace('dashboard/view&id','dashboard/view?id',$dash['path']),
+                'active' => array(
+                    sprintf('dashboard/edit?id=%s',$id),
+                    sprintf('dashboard/view?id=%s',$id)
+                ),
+                'order' => $dash['order'],
+                'icon' => $icon,
+                'data' => array(
+                    'id' => $id
+                )
+            );
+    }
     }
 
     if ($session["write"]) {
     $menu['sidebar']['dashboard'][] = array(
-        'text'=> dgettext("dashboard_messages","All Dashboards"),
+        'text'=> dgettext("dashboard_messages","Configuration"),
         'path'=> 'dashboard/list',
         'order' => 1,
-        'icon' => 'dashboard'
+        'icon' => 'cog'
     );
     }
