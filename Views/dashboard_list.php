@@ -35,10 +35,6 @@
         padding-left: 0;
         padding-right: 0;
     }
-    .container-fluid {
-        padding-right: 4px;
-        padding-left:  4px;
-    }
     .table .control-group{
         margin:0
     }
@@ -124,12 +120,6 @@
         }
         .d-sm-table-cell {
             display: table-cell!important;
-        }
-    }
-    @media (min-width: 767px) {
-        .container-fluid {
-            padding-right: 20px;
-            padding-left: 20px;
         }
     }
 
