@@ -88,5 +88,5 @@ if(isset($dashboard['fullscreen']) && $dashboard['fullscreen']): ?>
     redraw = 1;
   });
   
-menu.min_l2();
+  if (typeof(menu) !== 'undefined') menu.min_l2();
 </script>
