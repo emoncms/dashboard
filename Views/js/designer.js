@@ -420,6 +420,9 @@ var designer = {
             }
 
             else if (options_type && options_type[z] == "colour_picker"){
+                 if (optionsdata[z]!=undefined && val=="") {
+                     val = optionsdata[z];
+                 }
                  options_html += "<input  type='color' class='options' id='"+box_options[z]+"'  value='#"+val+"'/ >"
             }
 
