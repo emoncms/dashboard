@@ -17,7 +17,7 @@ if ($session["read"]) {
 
         
     // Level 1 top bar
-    $menu["dashboards"] = array("name"=>"Dashboards", "order"=>3, "icon"=>"dashboard", "default"=>"dashboard/list", "l2"=>array());       
+    $menu["dashboards"] = array("name"=>_("Dashboards"), "order"=>3, "icon"=>"dashboard", "default"=>"dashboard/list", "l2"=>array());       
       
     if ($listmenu = $dashboard->build_menu_array('view')) {
 
