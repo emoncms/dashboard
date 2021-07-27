@@ -9,6 +9,7 @@ Part of the OpenEnergyMonitor project:
 http://openenergymonitor.org
 */
 
+defined('EMONCMS_EXEC') or die('Restricted access');
 global $session,$path;
 
 load_language_files("Modules/vis/locale", "vis_messages");

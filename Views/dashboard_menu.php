@@ -8,22 +8,3 @@
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
 */
-
-    global $path;
-
-    $result = "";
-
-/*
-    if ($type=="view" && isset($id)) {
-        $result .= "<a class='btn btn-mini' href='" . $path . "dashboard/edit?id=" . $id . "'><span class='icon-edit' title='" . _("Draw Editor") . "'></span></a>";
-    }
-*/
-
-    //CHAVEIRO: Removed, dashboard list is accessible via setup menu now
-    //if ($type!="list") {
-    //    $result .= "<a class='btn btn-mini' href='" . $path . "dashboard/list'><span class='icon-th-list' title='" . _('List view') ."'></span></a>";
-    //}
-
-    if ($result) {
-        echo "<div class='btn-toolbar' style='padding:2px; margin: 0;' align='right'><div class='btn-group'>".$result."</div></div>";   
-    }

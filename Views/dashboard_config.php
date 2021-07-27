@@ -9,6 +9,7 @@
     http://openenergymonitor.org
     */
     global $path;
+    defined('EMONCMS_EXEC') or die('Restricted access');
 ?>
 
 <div id="dashConfigModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="dashConfigModalLabel" aria-hidden="true" data-backdrop="static">

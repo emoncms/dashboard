@@ -10,6 +10,8 @@
     http://openenergymonitor.org
 
     */
+
+    defined('EMONCMS_EXEC') or die('Restricted access');
     
     define("MODULE_PATH","Modules");
     echo "<script type='application/javascript'>var requestTime = Date.now() /1000;var offsetofTime = 0;offsetofTime = Math.round(requestTime - ".time()."); // Offset in s from local to server time</script>";

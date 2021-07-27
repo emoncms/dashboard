@@ -1,3 +1,7 @@
+<?php
+defined('EMONCMS_EXEC') or die('Restricted access');
+?>
+
 <style>
     #app {
         max-width: 990px;
