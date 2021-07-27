@@ -43,7 +43,7 @@ if ($session["read"]) {
             "name"=>dgettext("dashboard_messages","All Dashboards"),
             "href"=>"dashboard/list",
             "icon"=>"dashboard", 
-            "order"=>1
+            "order"=>99
         );
     }
 }
