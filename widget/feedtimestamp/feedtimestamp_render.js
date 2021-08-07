@@ -75,7 +75,7 @@ function feedtimestamp_widgetlist()
 	];
 
 	var dateformatOptions = [
-		[0, _Tr("Not Displayed")],
+		[0, _Tr("Not displayed")],
 		[1, "DD/MM/YYYY"],
 		[2, "DD-MM-YYYY"],
 		[3, "DD.MM.YYYY"],
@@ -88,7 +88,7 @@ function feedtimestamp_widgetlist()
 	];
 	
 	var timeformatOptions = [
-		[0, _Tr("Not Displayed")],
+		[0, _Tr("Not displayed")],
 		[1, "HH:MM:SS"],
 		[2, "HH:MM"],
 		[3, "H:MM:SS"],
