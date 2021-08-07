@@ -5,7 +5,7 @@
     Part of the OpenEnergyMonitor project:
     http://openenergymonitor.org
 
-    Author: Trystan Lea: trystan.lea@googlemail.com
+    Author: Aymeric Thibaut
     If you have any questions please get in touch, try the forums here:
     http://openenergymonitor.org/emon/forum
  */
