@@ -166,7 +166,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
 
 
-<script src="<?php echo $path; ?>Modules/dashboard/dashboard.js"></script>
+<script src="<?php echo $path; ?>Modules/dashboard/dashboard.js?v=1"></script>
 <script src="<?php echo $path; ?>Lib/vue.min.js"></script>
 <!-- <script src="/emoncms/Modules/config/vue.js"></script> -->
 
