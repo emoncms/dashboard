@@ -3,9 +3,6 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 ?>
 
 <style>
-    #app {
-        max-width: 990px;
-    }
     .arrow {
         display: inline-block;
         vertical-align: middle;
