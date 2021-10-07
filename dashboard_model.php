@@ -266,10 +266,17 @@ class Dashboard
                 'name' => $dashboard['name'],
                 'desc'=> $desc,
                 'published'=> $dashboard['published'],
-                'path' => $dashpath.$aliasurl,
-                'order' => "-1".$dashboard['name']
+                'path' => $dashpath.$aliasurl
             );
         }
+        usort($menu, function($a, $b) {
+            return strcmp($a['name'], $b['name']);
+        });
+        
+        for ($i=0; $i<count($menu); $i++) {
+            $menu[$i]['order'] = $i;
+        }
+        
         return $menu;
     }
     public function make_slug( $string, $separator = '-' ) {

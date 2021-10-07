@@ -152,9 +152,10 @@ var dashboard_v2 = {
         } else {
             jqxhr = $.ajax(settings);
         }
+        
 
         // on ajax success check response for error message
-        jqxhr.success(function(data, status, xhr) {
+        jqxhr.done(function(data, status, xhr) {
             // reject if data has property success set to false
             if (!data || data.hasOwnProperty('success') && data.success === false) {
                 deferred.reject(jqxhr, data.message || 'error');
@@ -164,7 +165,7 @@ var dashboard_v2 = {
         });
 
         // on ajax error return rejected promise
-        jqxhr.error(function(jqXHR, status, error) {
+        jqxhr.fail(function(jqXHR, status, error) {
             deferred.reject(jqXHR, status, error);
         });
         

@@ -1,3 +1,7 @@
+<?php
+defined('EMONCMS_EXEC') or die('Restricted access');
+?>
+
 <style>
     #app {
         max-width: 990px;
@@ -34,10 +38,6 @@
     .table-condensed td {
         padding-left: 0;
         padding-right: 0;
-    }
-    .container-fluid {
-        padding-right: 4px;
-        padding-left:  4px;
     }
     .table .control-group{
         margin:0
@@ -126,12 +126,6 @@
             display: table-cell!important;
         }
     }
-    @media (min-width: 767px) {
-        .container-fluid {
-            padding-right: 20px;
-            padding-left: 20px;
-        }
-    }
 
 </style>
 
@@ -172,7 +166,7 @@
 
 
 
-<script src="<?php echo $path; ?>Modules/dashboard/dashboard.js"></script>
+<script src="<?php echo $path; ?>Modules/dashboard/dashboard.js?v=1"></script>
 <script src="<?php echo $path; ?>Lib/vue.min.js"></script>
 <!-- <script src="/emoncms/Modules/config/vue.js"></script> -->
 
