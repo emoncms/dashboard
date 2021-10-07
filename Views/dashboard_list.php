@@ -409,6 +409,25 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                         }
                     }
                 },
+                published: {
+                    sort: true,
+                    icon: '#icon-dashboard',
+                    title: _('Allow this Dashboard on the menu'),
+                    handler: function(event, item) {
+                        // toggle public status
+                        try {
+                            let id = item.id
+                            let field = 'published';
+                            let value = !item[field];
+                            // only modify view on success
+                            dashboard_v2.set(field, id, value).then(function() {
+                                item[field] = value;
+                            });
+                        } catch (error) {
+                            _debug.error (_('JS Error'), field, error, arguments);
+                        }
+                    }
+                },
                 clone: {
                     icon: '#icon-content_copy',
                     noHeader: true,

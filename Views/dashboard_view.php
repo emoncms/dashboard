@@ -71,6 +71,5 @@ if (isset($dashboard['fullscreen']) && $dashboard['fullscreen']) { $embed=1; ?>
   $(window).resize(function(){
     redraw = 1;
   });
-  
-  if (typeof(menu) !== 'undefined') menu.min_l2();
+
 </script>
