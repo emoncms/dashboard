@@ -356,22 +356,7 @@ var designer = {
             // all feeds
 
             if (options_type && options_type[z] == "feedid"){
-                options_html += designer.select_feed(box_options[z],feedlist,0,val);
-            }
-            
-            // realtime feeds only
-            else if (options_type && options_type[z] == "feedid_realtime"){
-                options_html += designer.select_feed(box_options[z],feedlist,1,val);
-            }
-            
-            // daily feeds only
-            else if (options_type && options_type[z] == "feedid_daily"){
-                options_html += designer.select_feed(box_options[z],feedlist,2,val);
-            }
-            
-            // histogram feeds only
-            else if (options_type && options_type[z] == "feedid_hist"){
-                options_html += designer.select_feed(box_options[z],feedlist,3,val);
+                options_html += designer.select_feed(box_options[z],feedlist,val);
             }
 
             else if (options_type && options_type[z] == "html"){
@@ -489,15 +474,13 @@ var designer = {
         })
     },
     
-    "select_feed": function (id, feedlist, type, currentval){
+    "select_feed": function (id, feedlist, currentval){
         var feedgroups = [];
         for (f in feedlist){
-            if (type == 0 || feedlist[f].datatype == type) {
-                var group = (feedlist[f].tag === null ? "NoGroup" : feedlist[f].tag);
-                if (group!="Deleted") {
-                    if (!feedgroups[group]) feedgroups[group] = []
-                    feedgroups[group].push(feedlist[f]);
-                }
+            var group = (feedlist[f].tag === null ? "NoGroup" : feedlist[f].tag);
+            if (group!="Deleted") {
+                if (!feedgroups[group]) feedgroups[group] = []
+                feedgroups[group].push(feedlist[f]);
             }
         }
         var out = "<select id='"+id+"' class='options'>";
