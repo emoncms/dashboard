@@ -711,12 +711,12 @@ function kwhperiod_draw () {
     previousRefresh = new Date(now)
     if (periodsAgo > 0 || useLastYear) {
       // pastPeriodEndValue
-      var result = feed.get_value(feedid, pastperiodEndTime.getTime())
+      var result = feed.getvalue(feedid, pastperiodEndTime.getTime()*0.001)
       //console.log(result, 'past period end')
       var pastPeriodEndValue = result[1]
 
       // pastPeriodStartValue
-      var result = feed.get_value(feedid, pastPeriodStartTime.getTime())
+      var result = feed.getvalue(feedid, pastPeriodStartTime.getTime()*0.001)
       //console.log(result, 'past period start')
       var pastPeriodStartValue = result[1]
 
@@ -736,12 +736,12 @@ function kwhperiod_draw () {
     } else {
       // thisperiodEndValue
       /*
-      var result = feed.get_value(feedid, now.getTime())
+      var result = feed.getvalue(feedid, now.getTime()*0.001)
       console.log(result, 'recent period end / now')
       var thisperiodEndValue = result[1]
       */
       // thisPeriodStartValue
-      var result = feed.get_value(feedid, thisPeriodStartTime.getTime())
+      var result = feed.getvalue(feedid, thisPeriodStartTime.getTime()*0.001)
       //console.log(result, 'recent period start value')
       var thisPeriodStartValue = result[1]
 
