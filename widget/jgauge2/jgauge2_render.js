@@ -189,12 +189,12 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units,errorCode,
   ctx.strokeStyle = "rgb(255,255,255)";
   ctx.fillStyle = "rgb(255,255,255)";
   if (errorCode!= "1"){
-  value = Number(value.toFixed(decimalPlaces));
-  ctx.fillText(value+units, 50*(size/100), 88*(size/100));
+    value = Number(value.toFixed(decimalPlaces));
+    ctx.fillText(value+units, 50*(size/100), 88*(size/100));
   }
   else
   {
-  ctx.fillText(errorMessage, 50*(size/100), 85*(size/100));
+    ctx.fillText(errorMessage, 50*(size/100), 85*(size/100));
   }
   // max label
   ctx.font = "10pt Calibri,Geneva,Arial";
@@ -212,7 +212,7 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units,errorCode,
   ctx.rotate((position + offset) * (Math.PI / 180));
   // Draw the image back and up
   if (errorCode!= "1"){
-  ctx.drawImage(jgauge2_needle, -(size/2), -(size/2), size, size);
+    ctx.drawImage(jgauge2_needle2, -(size/2), -(size/2), size, size);
   }
   // Restore the previous drawing state
   ctx.restore(); 
@@ -224,7 +224,7 @@ function draw_jgauge2(ctx,x,y,width,height,value,value2,max,min,units,errorCode,
   // Rotate around this point
   ctx.rotate((position2 + offset) * (Math.PI / 180));
   // Draw the image back and up
-  ctx.drawImage(jgauge2_needle2, -(size/2), -(size/2), size, size);
+  ctx.drawImage(jgauge2_needle, -(size/2), -(size/2), size, size);
   // Restore the previous drawing state
   ctx.restore();
 }
