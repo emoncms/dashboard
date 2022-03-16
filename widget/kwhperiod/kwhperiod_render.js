@@ -713,12 +713,12 @@ function kwhperiod_draw () {
       // pastPeriodEndValue
       var result = feed.getvalue(feedid, pastperiodEndTime.getTime()*0.001)
       //console.log(result, 'past period end')
-      var pastPeriodEndValue = result[1]
+      var pastPeriodEndValue = result
 
       // pastPeriodStartValue
       var result = feed.getvalue(feedid, pastPeriodStartTime.getTime()*0.001)
       //console.log(result, 'past period start')
-      var pastPeriodStartValue = result[1]
+      var pastPeriodStartValue = result
 
       // ... and calculate the result of our time window.
       
@@ -738,12 +738,12 @@ function kwhperiod_draw () {
       /*
       var result = feed.getvalue(feedid, now.getTime()*0.001)
       console.log(result, 'recent period end / now')
-      var thisperiodEndValue = result[1]
+      var thisperiodEndValue = result
       */
       // thisPeriodStartValue
       var result = feed.getvalue(feedid, thisPeriodStartTime.getTime()*0.001)
       //console.log(result, 'recent period start value')
-      var thisPeriodStartValue = result[1]
+      var thisPeriodStartValue = result
 
       // ... and calculate the result of our time window.
       //console.log(val, 'value now')
