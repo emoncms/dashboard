@@ -1,32 +1,25 @@
 <?php
 global $mysqli,$route,$session;
 
-if ($session["read"]) {
+if ($session["read"] || $session["public_userid"]) {
 
     require_once "Modules/dashboard/dashboard_model.php";
     $dashboard = new Dashboard($mysqli);
     load_language_files("Modules/dashboard/locale", "dashboard_messages");
-
-    // get the default dashboard 
-    $default = array();
-    foreach($dashboard->get_list($session['userid'],false,false) as $item){
-        if($item['main']===true){
-            $default = $item;
-        }
-    }
-
         
-    // Level 1 top bar
-    $menu["dashboards"] = array("name"=>_("Dashboards"), "order"=>3, "icon"=>"dashboard", "default"=>"dashboard/list", "l2"=>array());       
+    $l2 = array();
       
     if ($listmenu = $dashboard->build_menu_array('view')) {
-
         // Level 2 List of dashboards
         foreach ($listmenu as $dash) {
             $id = $dash['id'];
-            $icon = !empty($default['id']) && $default['id'] === $id ? 'star': 'star_border';
+            if ($dash['main']) {
+                $icon = 'star';
+            } else {
+                $icon = 'star_border';
+            }
             
-            $menu["dashboards"]['l2'][] = array(
+            $dashboard_item = array(
                 "name"=>$dash['name'],
                 "title"=>$dash['desc'],
                 "href"=>str_replace('dashboard/view&id','dashboard/view?id',$dash['path']),
@@ -34,16 +27,27 @@ if ($session["read"]) {
                 "order"=>$dash['order']
             );
             
+            if ($session['public_userid']) {
+                $dashboard_item["href"] = $session['public_username']."/".$dashboard_item["href"];
+            }   
+            
+            $l2[] = $dashboard_item;
+            
             $menu["dashboards"]["default"] = str_replace('dashboard/view&id','dashboard/view?id',$dash['path']);
         }
     }
 
     if ($session["write"]) {
-        $menu["dashboards"]['l2'][] = array(
+        $l2[] = array(
             "name"=>dgettext("dashboard_messages","All Dashboards"),
             "href"=>"dashboard/list",
             "icon"=>"dashboard", 
             "order"=>99
         );
     }
+    
+    // Level 1 top bar
+    if (count($l2)) {
+        $menu["dashboards"] = array("name"=>_("Dashboards"), "order"=>3, "icon"=>"dashboard", "default"=>"dashboard/list", "l2"=>$l2);
+    } 
 }

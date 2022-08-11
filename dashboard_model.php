@@ -231,16 +231,17 @@ class Dashboard
     public function build_menu_array($location)
     {
         global $session;
-        $userid = (int) $session['userid'];
 
-        $public = 0; $published = 0;
-
-        if (isset($session['profile']) && $session['profile']==1) {
-            $dashpath = $session['username'];
-            $public = !$session['write'];
+        $dashpath = 'dashboard/'.$location;
+            
+        if ($session['public_userid']) {
+            $userid = $session['public_userid'];
+            $public = 1;
             $published = 1;
         } else {
-            $dashpath = 'dashboard/'.$location;
+            $userid = (int) $session['userid'];        
+            $public = 0;
+            $published = 0; 
         }
 
         $dashboards = $this->get_list($userid, $public, $published);
@@ -266,7 +267,8 @@ class Dashboard
                 'name' => $dashboard['name'],
                 'desc'=> $desc,
                 'published'=> $dashboard['published'],
-                'path' => $dashpath.$aliasurl
+                'path' => $dashpath.$aliasurl,
+                'main' => $dashboard['main']
             );
         }
         usort($menu, function($a, $b) {
