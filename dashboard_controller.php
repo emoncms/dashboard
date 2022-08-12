@@ -43,7 +43,7 @@ function dashboard_controller()
             // - with a readkey, does not create a session
             // - via public dashboard username
             // - via dashboard id & public dashboard
-            
+            $result = EMPTY_ROUTE;
             $userid = false;
             $apikey = "";
              
