@@ -14,13 +14,13 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
 function dashboard_controller()
 {
-    global $mysqli, $session, $route, $path;
+    global $mysqli, $session, $user, $route, $path;
 
     require "Modules/dashboard/dashboard_model.php";
     $dashboard = new Dashboard($mysqli);
     // id, userid, content, height, name, alias, description, main, public, published, showdescription, fullscreen
     
-    $js_css_version = 9;
+    $js_css_version = 11;
 
     $result = false; $submenu = '';
 
@@ -38,21 +38,51 @@ function dashboard_controller()
 
         else if ($route->action == "view")
         {
-            $dashid =(int) get('id');
+            // 4 access modes:
+            // - as a session user either login or apikey
+            // - with a readkey, does not create a session
+            // - via public dashboard username
+            // - via dashboard id & public dashboard
+            
+            $userid = false;
+            $apikey = "";
+             
+            if (isset($session['read']) && $session['read']) {
+                $userid = $session['userid'];
+                if (isset($_GET['apikey'])) {
+                    $apikey = $user->get_apikey_read($session['userid']);
+                }
+            } else if (isset($_GET['readkey'])) {
+                if ($userid = $user->get_id_from_apikey($_GET['readkey'])) {
+                    $apikey = $user->get_apikey_read($userid);
+                }
+            } else if ($session['public_userid']) {
+                $userid = (int) $session['public_userid'];
+            }
+            
+            $dashid = (int) get('id');
             if ($dashid) {
                 $dash = $dashboard->get($dashid);
-            } else if ($session['read']) {
-                if ($route->subaction) $dash = $dashboard->get_from_alias($session['userid'],$route->subaction);
-                else $dash = $dashboard->get_main($session['userid']);
-            } else if (!$session['read']) {
-                if ($route->subaction) $dash = $dashboard->get_from_public_alias($route->subaction);
+            } else if ($route->subaction && $userid) {
+                $dash = $dashboard->get_from_alias($userid,$route->subaction);
+            } else if ($userid) {
+                $dash = $dashboard->get_main($userid);
             }
-            if (isset($dash)){
-                if ($dash['public'] || ($session['read'] && $session['userid']>0 && $dash['userid']==$session['userid'] && !isset($session['profile']) )) {
-                    if (!$session['userid']) { $session['userid'] =  $dash['userid']; } // Required for passing userid to feed api
-                    $result = view("Modules/dashboard/Views/dashboard_view.php",array('dashboard'=>$dash, 'js_css_version'=>$js_css_version));
-                } else if ($session['read'] && !isset($session['profile'])) {
-                    $result = view("Modules/dashboard/Views/dashboard_list.php", array('js_css_version'=>$js_css_version));
+            
+            if (isset($dash)) {
+                
+                $public_userid = 0;
+                if (!$session['read'] && $dash['public']) {
+                    $public_userid = $dash['userid'];
+                }
+                
+                if ($dash['public'] || $apikey || ($session['read'] && $session['userid']>0 && $dash['userid']==$session['userid'])) {
+                    $result = view("Modules/dashboard/Views/dashboard_view.php",array(
+                        'dashboard'=>$dash, 
+                        'js_css_version'=>$js_css_version, 
+                        'apikey'=>$apikey, 
+                        'public_userid'=>$public_userid
+                    ));
                 }
             }
         }

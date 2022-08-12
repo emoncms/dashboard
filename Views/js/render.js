@@ -78,7 +78,11 @@ function gpu_fast_update() {
 
 // update function
 function update(first_time){
-  var query = path + "feed/list.json?userid="+userid;
+
+  var public_userid_str = "";
+  if (public_userid>0) public_userid_str = "?userid="+public_userid;
+
+  var query = path + "feed/list.json" + public_userid_str;
   if (apikey) query += "&apikey="+apikey;
   $.ajax(
   {

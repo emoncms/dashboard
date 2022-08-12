@@ -57,11 +57,12 @@ if (isset($dashboard['fullscreen']) && $dashboard['fullscreen']) { $embed=1; ?>
 <script type="application/javascript">
   var dashid = <?php echo $dashboard['id']; ?>;
   var widget = <?php echo json_encode($widgets); ?>;
-  var apikey = "<?php echo get('apikey'); ?>";
-  var userid = <?php echo $session['userid']; ?>;
+  var apikey = "<?php echo $apikey; ?>";
   var redraw = 1;
   var reloadiframe = 0; // dont re-calculate vis iframe urls
   var _SI = []; // get a list of International System of Units (SI)
+
+  public_userid = "<?php echo $public_userid; ?>";
 
   $('body').css("background-color","#<?php echo $dashboard['backgroundcolor']; ?>");
 
