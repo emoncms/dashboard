@@ -74,4 +74,5 @@ if (isset($dashboard['fullscreen']) && $dashboard['fullscreen']) { $embed=1; ?>
   });
   
   if (typeof(menu) !== 'undefined' && menu.l2_visible) menu.min_l2();
+
 </script>

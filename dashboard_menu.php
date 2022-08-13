@@ -12,6 +12,7 @@ if ($session["read"] || $session["public_userid"]) {
     if ($listmenu = $dashboard->build_menu_array('view')) {
         // Level 2 List of dashboards
         foreach ($listmenu as $dash) {
+          if ($dash['published']){
             $id = $dash['id'];
             if ($dash['main']) {
                 $icon = 'star';
@@ -34,14 +35,15 @@ if ($session["read"] || $session["public_userid"]) {
             $l2[] = $dashboard_item;
             
             $menu["dashboards"]["default"] = str_replace('dashboard/view&id','dashboard/view?id',$dash['path']);
+          }
         }
     }
 
     if ($session["write"]) {
         $l2[] = array(
-            "name"=>dgettext("dashboard_messages","All Dashboards"),
+            "name"=>dgettext("dashboard_messages","Configuration"),
             "href"=>"dashboard/list",
-            "icon"=>"dashboard", 
+            "icon"=>"cog", 
             "order"=>99
         );
     }
