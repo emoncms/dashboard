@@ -268,7 +268,7 @@ function feedvalue_draw()
 
         if($(this).attr("threshold1")!=undefined && $(this).attr("threshold1")!="" && $(this).attr("threshold2")!=undefined && $(this).attr("threshold2")!=""){
             var limit1 = $(this).attr("threshold1")*1 || 60;
-            var limit2 = $(this).attr("threshold2")*2 || 120;
+            var limit2 = $(this).attr("threshold2")*1 || 120;
             if (val< limit1){
                textcolor = feedvalue.attr("colour1")|| "#019F62";
             } else if(val > limit2){
