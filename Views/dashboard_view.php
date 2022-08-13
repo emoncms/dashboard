@@ -58,6 +58,7 @@ if (isset($dashboard['fullscreen']) && $dashboard['fullscreen']) { $embed=1; ?>
   var dashid = <?php echo $dashboard['id']; ?>;
   var widget = <?php echo json_encode($widgets); ?>;
   var apikey = "<?php echo $apikey; ?>";
+  feed.apikey = apikey;
   var redraw = 1;
   var reloadiframe = 0; // dont re-calculate vis iframe urls
   var _SI = []; // get a list of International System of Units (SI)
