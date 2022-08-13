@@ -712,6 +712,7 @@ function kwhperiod_draw () {
     if (periodsAgo > 0 || useLastYear) {
       // pastPeriodEndValue
       var result = feed.getvalue(feedid, pastperiodEndTime.getTime()*0.001)
+      
       //console.log(result, 'past period end')
       var pastPeriodEndValue = result
 
