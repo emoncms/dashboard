@@ -42,7 +42,8 @@ function dashboard_controller()
             // - as a session user either login or apikey
             // - with a readkey, does not create a session
             // - via public dashboard username
-            // - via dashboard id & public dashboard
+            // - via dashboard id for public dashboard
+            // - via dashboard alias for public dashboard with public feeds
             $result = EMPTY_ROUTE;
             $userid = false;
             $apikey = "";
@@ -67,10 +68,12 @@ function dashboard_controller()
                 $dash = $dashboard->get_from_alias($userid,$route->subaction);
             } else if ($userid) {
                 $dash = $dashboard->get_main($userid);
+            } else if (!$userid and $route->subaction) {
+               $dash = $dashboard->get_from_public_alias($route->subaction);
             }
             
             if (isset($dash)) {
-                
+
                 $public_userid = 0;
                 if (!$session['read'] && $dash['public']) {
                     $public_userid = $dash['userid'];
