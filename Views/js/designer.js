@@ -1,5 +1,5 @@
 /*
- designer.js -  Licence: GNU GPL Affero, Author: Trystan Lea / Chaveiro
+ designer.js -  Licence: GNU GPL Affero, Author: Trystan Lea / Chaveiro 2024
 
  The dashboard designer works around the concept of html elements with fixed positions
  and specified widths and heights. Its a box model where each box can hold a widget.
@@ -37,6 +37,12 @@ var designer = {
 
     'boxi': 0,
 
+    'box_select_mode': false,
+    'boxStartX': null,
+    'boxStartY': null,
+    'boxWidth': null,
+    'boxHeight': null,
+
     'mousedown': false,
     'shiftdown': false,
 
@@ -72,7 +78,7 @@ var designer = {
 
     "start_save_undo_state": function(){
         if (designer.nextundostate !== null) {
-            console.log("Imbalanced undo state save start/end!");
+            //console.log("Imbalanced undo state save start/end!");
         }
         var newstate = $("#page").html();
         designer.nextundostate = newstate;
@@ -80,7 +86,7 @@ var designer = {
 
     "end_save_undo_state": function(identifier){
         if (designer.nextundostate === null) {
-            console.log("No undo state to save!");
+            //console.log("No undo state to save!");
             return;
         }
         var currentstate = $("#page").html();
@@ -179,21 +185,56 @@ var designer = {
         return box;
     },
 
-    "selectbox": function(box){
-        if (box === null) {
-            designer.selected_boxes = [];
-        } else {
-            if (designer.shiftdown) {
-                var index = $.inArray(box, designer.selected_boxes);
-                if (index > -1) {
-                    designer.selected_boxes.splice(index, 1);
-                } else {
-                    designer.selected_boxes.push(box);
+    "boxesInsideDrawBox": function(x, y, width, height) {
+        var boxesInside = [];
+        for (var z in designer.boxlist) {
+            if (z) {
+                var box = designer.boxlist[z];
+                if (
+                    box["left"] >= x &&
+                    box["top"] >= y &&
+                    box["left"] + box["width"] <= x + width &&
+                    box["top"] + box["height"] <= y + height
+                ) {
+                    boxesInside.push(z);
                 }
-            } else {
-                designer.selected_boxes = [box];
             }
         }
+        return boxesInside;
+    },
+
+    "selectbox": function(selected_box, multiple_add = false){
+        if (selected_box === null) {
+            designer.selected_boxes = [];
+        } else {
+            var index = $.inArray(selected_box, designer.selected_boxes);
+            if (index > -1) {
+                if (designer.shiftdown && !multiple_add) {
+                    designer.selected_boxes.splice(index, 1);
+                }
+            } else {
+                if (designer.shiftdown || multiple_add) {
+                    designer.selected_boxes.push(selected_box);
+                } else {
+                    designer.selected_boxes = [selected_box];
+                }
+            }
+        }
+
+        // save offset of all boxes related to selected_box for multiple move operations
+        designer.selected_boxes.forEach(function(box) {
+            if (box == selected_box) {
+                designer.boxlist[selected_box]["selected_offset_mid_x"] = 0;
+                designer.boxlist[selected_box]["selected_offset_mid_y"] = 0;
+            } else {
+                var midx = designer.boxlist[selected_box]["left"] + (designer.boxlist[selected_box]["width"]/2);
+                var midy = designer.boxlist[selected_box]["top"] + (designer.boxlist[selected_box]["height"]/2);
+                var midtargetx = designer.boxlist[box]["left"] + (designer.boxlist[box]["width"] /2);
+                var midtargety = designer.boxlist[box]["top"] + (designer.boxlist[box]["height"] /2);
+                designer.boxlist[box]["selected_offset_mid_x"] = midtargetx - midx;
+                designer.boxlist[box]["selected_offset_mid_y"] = midtargety - midy;
+            }
+        })
 
         // Show/hide the buttons as appropriate
         var selected_boxes_count = designer.selected_boxes.length;
@@ -489,7 +530,6 @@ var designer = {
             for (p in feedgroups[f]) {
                 var feedref = feedgroups[f][p]['id']
                 if (designer.feedmode=="tagname") feedref = feedgroups[f][p]['tag']+":"+feedgroups[f][p]['name']
-                // console.log("select_feed() - feedref:"+feedref);
                 var selected = "";
                 if (currentval == feedref)
                     selected = "selected";
@@ -645,7 +685,7 @@ var designer = {
             return false;
         }
     },
-    
+
     "handle_delete_key_event": function(e){
         var targetTagName = e.target.tagName.toLowerCase();
         if (targetTagName === "input" || targetTagName === "textarea") return false;
@@ -658,26 +698,6 @@ var designer = {
     },
 
     "add_events": function(){
-        // Click to select
-        $(this.canvas).click(function(event){
-            if (designer.edit_mode) {
-                var mx = 0, my = 0;
-                if(event.offsetX==undefined){
-                    mx = (event.pageX - $(event.target).offset().left);
-                    my = (event.pageY - $(event.target).offset().top);
-                } else {
-                    mx = event.offsetX;
-                    my = event.offsetY;
-                }
-                var selected_box = designer.onbox(mx,my);
-                if (selected_box == null) {
-                    // This handles when the click is outside any box to
-                    // deselect all boxes.
-                    designer.selectbox(null);
-                    designer.draw()
-                }
-            }
-        });
 
         // Double click to display widget options
         $(this.canvas).bind('dblclick', function(e){
@@ -704,9 +724,7 @@ var designer = {
                 var selected_box = designer.onbox(mx,my);
                 if (selected_box) {
                     designer.selectbox(selected_box);
-                }
 
-                if (selected_box) {
                     designer.start_save_undo_state();
 
                     resize = designer.boxlist[selected_box];
@@ -737,7 +755,21 @@ var designer = {
                         designer.selected_edge = selected_edges.none;
 
                     designer.draw();
+
+                } else {
+                    if (!designer.shiftdown) {
+                        // This handles when the click is outside any box to deselect all boxes.
+                        designer.selectbox(null);
+                        designer.draw()
+                    }
+                    // Box drawing mode
+                    designer.box_select_mode = true;
+                    designer.boxStartX = mx;
+                    designer.boxStartY = my;
+                    designer.boxWidth = 0;
+                    designer.boxHeight = 0;
                 }
+
             } else {
                 if (designer.create){
                     designer.add_widget(mx,my,designer.create);
@@ -747,61 +779,98 @@ var designer = {
             }
         });
 
-        $(this.canvas).bind('touchend touchcancel mouseup', function(event){
+        $(this.canvas).bind('touchend touchcancel mouseup', function(e){
             designer.end_save_undo_state();
             designer.mousedown = false;
             designer.selected_edge = selected_edges.none;
-            designer.draw();
+
+            if (designer.box_select_mode){
+                // Normalize width and height to always be positive
+                if (designer.boxWidth < 0) {
+                    designer.boxStartX += designer.boxWidth;
+                    designer.boxWidth = Math.abs(designer.boxWidth);
+                }
+                if (designer.boxHeight < 0) {
+                    designer.boxStartY += designer.boxHeight;
+                    designer.boxHeight = Math.abs(designer.boxHeight);
+                }
+
+                designer.ctx.strokeRect(designer.boxStartX, designer.boxStartY, designer.boxWidth, designer.boxHeight);
+
+                // Select boxes inside the drawn box
+                var selectedBoxes = designer.boxesInsideDrawBox(designer.boxStartX, designer.boxStartY, designer.boxWidth, designer.boxHeight);
+                selectedBoxes.forEach(function(box) {
+                    designer.selectbox(box, true);
+                });
+                designer.box_select_mode = false;
+                designer.draw();
+                return false;
+            }
         });
 
         $(this.canvas).bind('touchmove mousemove', function(e){
-            if (designer.mousedown && designer.selected_boxes.length == 1 && designer.selected_edge){
-                // We just allow moving/resizing with the mouse if one box is selected, so just grab the first
-                var selected_box = designer.selected_boxes[0];
+            var mx = 0, my = 0;
+            var event = designer.get_unified_event(e);
+            if(event.offsetX==undefined){ // this works for Firefox
+                mx = (event.pageX - $(event.target).offset().left);
+                my = (event.pageY - $(event.target).offset().top);
+            } else {
+                mx = event.offsetX;
+                my = event.offsetY;
+            }
+            // Force limits to designer area
+            if (mx < 0) mx = 0; else if (mx >  designer.page_width) mx = designer.page_width;
+            if (my < 0) my = 0;
 
-                var mx = 0, my = 0;
-                var event = designer.get_unified_event(e);
-                if(event.offsetX==undefined){ // this works for Firefox
-                    mx = (event.pageX - $(event.target).offset().left);
-                    my = (event.pageY - $(event.target).offset().top);
-                } else {
-                    mx = event.offsetX;
-                    my = event.offsetY;
-                }
-                // Force limits to designer area
-                if (mx < 0) mx = 0; else if (mx >  designer.page_width) mx = designer.page_width;
-                if (my < 0) my = 0;
+            if (designer.mousedown && designer.box_select_mode) {
+                // Draw the box being dragged
+                designer.boxWidth = mx - designer.boxStartX;
+                designer.boxHeight = my - designer.boxStartY;
 
-                var rightedge = resize["left"]+resize["width"];
-                var bottedge = resize["top"]+resize["height"];
+                designer.draw(); // Draw existing boxes
 
-                switch(designer.selected_edge){
-                    case selected_edges.right:
-                        designer.boxlist[selected_box]["width"] = (designer.snap(mx)-resize["left"]);
-                        break;
-                    case selected_edges.left:
-                        designer.boxlist[selected_box]["left"] = (designer.snap(mx));
-                        designer.boxlist[selected_box]["width"] = rightedge - designer.snap(mx);
-                        break;
-                    case selected_edges.bottom:
-                        designer.boxlist[selected_box]["height"] = (designer.snap(my)-resize["top"]);
-                        break;
-                    case selected_edges.top:
-                        designer.boxlist[selected_box]["top"] = (designer.snap(my));
-                        designer.boxlist[selected_box]["height"] = bottedge - designer.snap(my);
-                        break;
-                    case selected_edges.center:
-                        designer.boxlist[selected_box]["left"] = (designer.snap(mx-designer.boxlist[selected_box]["width"]/2));
-                        designer.boxlist[selected_box]["top"] = (designer.snap(my-designer.boxlist[selected_box]["height"]/2));
-                        break;
-                }
-                if (designer.boxlist[selected_box]["width"] < designer.grid_size) designer.boxlist[selected_box]["width"] = designer.grid_size;    // Zero cant be selected se we default to minimal grid size
-                if (designer.boxlist[selected_box]["height"] < designer.grid_size) designer.boxlist[selected_box]["height"] = designer.grid_size;
-                
-                if (bottedge>designer.page_height-designer.grid_size){
-                    designer.page_height = bottedge+designer.grid_size;
-                }
+                var selectedColor = "rgba(0, 0, 0, 0.9)";
+                designer.ctx.strokeStyle = selectedColor;
+                designer.ctx.setLineDash([6]);
+                designer.ctx.strokeRect(designer.boxStartX, designer.boxStartY, designer.boxWidth, designer.boxHeight);
+                return false;
 
+            } else if (designer.mousedown && designer.selected_boxes.length > 0 && designer.selected_edge){
+
+                designer.selected_boxes.forEach(function(selected_box) {
+                    resizelocal = designer.boxlist[selected_box];
+
+                    var rightedge = resizelocal["left"]+resizelocal["width"];
+                    var bottedge = resizelocal["top"]+resizelocal["height"];
+
+                    switch(designer.selected_edge){
+                        case selected_edges.right:
+                            resizelocal["width"] = (designer.snap(mx)-resizelocal["left"]);
+                            break;
+                        case selected_edges.left:
+                            resizelocal["left"] = (designer.snap(mx));
+                            resizelocal["width"] = rightedge - designer.snap(mx);
+                            break;
+                        case selected_edges.bottom:
+                            resizelocal["height"] = (designer.snap(my)-resizelocal["top"]);
+                            break;
+                        case selected_edges.top:
+                            resizelocal["top"] = (designer.snap(my));
+                            resizelocal["height"] = bottedge - designer.snap(my);
+                            break;
+                        case selected_edges.center:
+                            resizelocal["left"] = (designer.snap(mx + resizelocal["selected_offset_mid_x"] - resizelocal["width"]/2));
+                            resizelocal["top"] = (designer.snap(my + resizelocal["selected_offset_mid_y"] - resizelocal["height"]/2));
+                            break;
+                    }
+                    // Zero cant be selected se we default to minimal grid size
+                    if (resizelocal["width"] < designer.grid_size) resizelocal["width"] = designer.grid_size;
+                    if (resizelocal["height"] < designer.grid_size) resizelocal["height"] = designer.grid_size;
+                    
+                    if (bottedge>designer.page_height-designer.grid_size){
+                        designer.page_height = bottedge+designer.grid_size;
+                    }
+                })
                 designer.draw();
                 designer.modified();
 
@@ -822,6 +891,7 @@ var designer = {
                     }
                     break;
                 case 16: // Shift
+                case 17: // Ctrl
                     designer.shiftdown = true;
                     break;
                 case 8:
@@ -839,7 +909,7 @@ var designer = {
         $(window).keyup(function(e) {
             var keyCode = e.keyCode;
 
-            if (keyCode == 16) {
+            if (keyCode == 16 || keyCode == 17) {
                 designer.shiftdown = false;
             }
         });
