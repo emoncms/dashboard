@@ -218,6 +218,26 @@ class Dashboard
         }
         return false;
     }
+
+    /**
+     * Get the public dashboard from $alias
+     * return array of fields for found database
+     * @param string $alias
+     */
+    public function get_from_public_alias($alias)
+    {
+        $alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$alias);
+        // access to public dashboards
+        if(!empty($alias)) {
+            $stmt = $this->mysqli->prepare("SELECT * FROM dashboard WHERE alias=?");
+            $stmt->bind_param("s",$alias);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $stmt->free_result();
+            $stmt->close();
+            return $result->fetch_array();
+        }
+    }
     
     public function build_menu_array($location)
     {

@@ -74,6 +74,6 @@ if (isset($dashboard['fullscreen']) && $dashboard['fullscreen']) { $embed=1; ?>
     redraw = 1;
   });
   
-  if (typeof(menu) !== 'undefined' && menu.l2_visible) menu.min_l2();
+  if (typeof(menu) !== 'undefined' && menu.l2_visible && $(window).width() > 576 && $(window).width() < 1150) menu.min_l2();
 
 </script>
