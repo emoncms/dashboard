@@ -449,6 +449,9 @@ function draw_kwhperiod (
 
 function kwhperiod_draw () {
   $('.kwhperiod').each(function (index) {
+    var widgetid = $(this).attr('id');
+    
+    console.log("widgetid2: ", widgetid);
     var kwhperiod = $(this)
     var errorCode = '0'
     var errorMessage = $(this).attr('errormessagedisplayed')
@@ -462,16 +465,13 @@ function kwhperiod_draw () {
       errorTimeout = 0
     }
 
-    var font = kwhperiod.attr('font')
-    var feedid = kwhperiod.attr('feedid')
-    if (assocfeed[feedid] != undefined) feedid = assocfeed[feedid] // convert tag:name to feedid
-    if (kwhperiod_associd[feedid] === undefined) {
+    if (kwhperiod_associd[widgetid] === undefined) {
         // not loaded yet
         errorCode = '1'
         errorMessage = '...' // loading
     } else {
-        var val = kwhperiod_associd[feedid]['value'] * 1
-        var latest_feedtime = kwhperiod_associd[feedid]['time'] * 1
+        var val = kwhperiod_associd[widgetid]['value'] * 1
+        var latest_feedtime = kwhperiod_associd[widgetid]['time'] * 1
     }
     if (val === undefined || isNaN(val)) {
       val = 0
@@ -544,6 +544,7 @@ function kwhperiod_timer() {
         if (now - previousRefresh >= refreshPeriod && previousRefresh != -1) {
             previousRefresh = -1 // Disable until current cycle ends          
             $('.kwhperiod').each(async function (index) {
+                var widgetid = $(this).attr('id');
                 var kwhperiod = $(this)
 
                 var periodLength = kwhperiod.attr('periodLength') * 1
@@ -741,7 +742,7 @@ function kwhperiod_timer() {
                   }
 
                 }
-                kwhperiod_associd[feedid] = { value: val, time: now / 1000 }; // Write found value to the global widget variable
+                kwhperiod_associd[widgetid] = { value: val, time: now / 1000 }; // Write found value to the global widget variable
             })
             previousRefresh = now.getTime(); // Required for loop but set only after previous loop finish
         }
