@@ -134,17 +134,17 @@ defined('EMONCMS_EXEC') or die('Restricted access');
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="alert-heading" if="status.title"><?php echo _('No dashboards created') ?></h4>
-        <?php echo _('Maybe you would like to add your first dashboard using the button below&hellip;') ?>
+        <h4 class="alert-heading" if="status.title"><?php echo tr('No dashboards created') ?></h4>
+        <?php echo tr('Maybe you would like to add your first dashboard using the button below&hellip;') ?>
     </div>
     <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
-            <h3><?php echo _('Dashboards') ?></h3>
-            <button class="btn btn-light ml-3" @click.prevent="addNew"><?php echo _('New') ?>  <svg class="icon"><use xlink:href="#icon-plus"></use></svg> </button>
+            <h3><?php echo tr('Dashboards') ?></h3>
+            <button class="btn btn-light ml-3" @click.prevent="addNew"><?php echo tr('New') ?>  <svg class="icon"><use xlink:href="#icon-plus"></use></svg> </button>
         </div>
         <form v-if="gridData.length > 0" id="search" class="form-inline position-relative mb-0">
             <div class="form-group">
-                <input id="search-box" name="query" v-model="searchQuery" type="search" class="form-control input-medium mb-0" aria-describedby="searchHelp" placeholder="<?php echo _('Search') ?>" title="<?php echo _('Search the data by any column') ?>">
+                <input id="search-box" name="query" v-model="searchQuery" type="search" class="form-control input-medium mb-0" aria-describedby="searchHelp" placeholder="<?php echo tr('Search') ?>" title="<?php echo tr('Search the data by any column') ?>">
                 <button id="searchclear" @click.prevent="searchQuery = ''"style="right:0" class="btn btn-link position-absolute" :class="{'d-none':searchQuery.length===0}"><svg class="icon"><use xlink:href="#icon-close"></use></svg></button>
             </div>
         </form>
@@ -175,24 +175,24 @@ defined('EMONCMS_EXEC') or die('Restricted access');
      */
     function getTranslations(){
         return {
-            'Error': "<?php echo _('Error') ?>",
-            'Save': "<?php echo _('Save') ?>",
-            'Done': "<?php echo _('Done') ?>",
-            'Error loading': "<?php echo _('Error loading') ?>",
-            'Found %s entries': "<?php echo _('Found %s entries') ?>",
-            'JS Error': "<?php echo _('JS Error') ?>",
-            'Reload': "<?php echo _('Reload') ?>",
-            'Loading': "<?php echo _('Loading') ?>…",
-            'Saving': "<?php echo _('Saving') ?>…",
-            'Label this dashboard with a name': "<?php echo _('Label this dashboard with a name') ?>",
-            'Must be unique. Short title to use in URL.\neg \"roof-solar\"': "<?php echo _('Must be unique. Short title to use in URL.\neg \"roof-solar\"') ?>",
-            'Adds a \"Default Dashboard\" bookmark in the sidebar.\nAlso visible at \"dashboard/view\"': "<?php echo _('Adds a \"Default Dashboard\" bookmark in the sidebar.\nAlso visible at \"dashboard/view\"') ?>",
-            'Allow this Dashboard to be viewed by anyone': "<?php echo _('Allow this Dashboard to be viewed by anyone') ?>",
-            'Clone the layout of this dashboard to a new Dashboard': "<?php echo _('Clone the layout of this dashboard to a new Dashboard') ?>",
-            'Edit this dashboard layout': "<?php echo _('Edit this dashboard layout') ?>",
-            'Delete this dashboard': "<?php echo _('Delete this dashboard') ?>…",
-            'View this dashboard': "<?php echo _('View this dashboard') ?>…",
-            'Edit Layout': "<?php echo _('Edit Layout') ?>"
+            'Error': "<?php echo tr('Error') ?>",
+            'Save': "<?php echo tr('Save') ?>",
+            'Done': "<?php echo tr('Done') ?>",
+            'Error loading': "<?php echo tr('Error loading') ?>",
+            'Found %s entries': "<?php echo tr('Found %s entries') ?>",
+            'JS Error': "<?php echo tr('JS Error') ?>",
+            'Reload': "<?php echo tr('Reload') ?>",
+            'Loading': "<?php echo tr('Loading') ?>…",
+            'Saving': "<?php echo tr('Saving') ?>…",
+            'Label this dashboard with a name': "<?php echo tr('Label this dashboard with a name') ?>",
+            'Must be unique. Short title to use in URL.\neg \"roof-solar\"': "<?php echo tr('Must be unique. Short title to use in URL.\neg \"roof-solar\"') ?>",
+            'Adds a \"Default Dashboard\" bookmark in the sidebar.\nAlso visible at \"dashboard/view\"': "<?php echo tr('Adds a \"Default Dashboard\" bookmark in the sidebar.\nAlso visible at \"dashboard/view\"') ?>",
+            'Allow this Dashboard to be viewed by anyone': "<?php echo tr('Allow this Dashboard to be viewed by anyone') ?>",
+            'Clone the layout of this dashboard to a new Dashboard': "<?php echo tr('Clone the layout of this dashboard to a new Dashboard') ?>",
+            'Edit this dashboard layout': "<?php echo tr('Edit this dashboard layout') ?>",
+            'Delete this dashboard': "<?php echo tr('Delete this dashboard') ?>…",
+            'View this dashboard': "<?php echo tr('View this dashboard') ?>…",
+            'Edit Layout': "<?php echo tr('Edit Layout') ?>"
         }
     }
 </script>
@@ -279,7 +279,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 name: {
                     sort: true,
                     input: true,
-                    title: _('Label this dashboard with a name'),
+                    title: tr('Label this dashboard with a name'),
                     handler: function(event, item, property, value, success, error, always) {
                         try {
                             let vm = app;
@@ -299,19 +299,19 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                                 vm.Set_field_delayed(event, item, property, value, success, error, always)
                             }
                         } catch (error) {
-                            _debug.error (_('JS Error'), property, error, arguments);
+                            _debug.error (tr('JS Error'), property, error, arguments);
                         }
                     },
                     messages: {
-                        success: _('Saved'),
-                        error: _('Error'),
-                        always: _('Done')
+                        success: tr('Saved'),
+                        error: tr('Error'),
+                        always: tr('Done')
                     }
                 },
                 alias: {
                     sort: true,
                     input: true,
-                    title: _('Must be unique. Short title to use in URL.\neg \"roof-solar\"'),
+                    title: tr('Must be unique. Short title to use in URL.\neg \"roof-solar\"'),
                     handler: function(event, item, property, value, success, error, always) {
                         try {
                             let vm = app;
@@ -334,7 +334,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                                 window.clearTimeout(vm.timeouts[timeout_key]);
                             } else if(!unique) {
                                 container.classList.add('error')
-                                feedback.innerText = _('Not unique');
+                                feedback.innerText = tr('Not unique');
                                 window.clearTimeout(vm.timeouts[timeout_key]);
                             } else {
                                 success2 = function(event, data) {
@@ -351,20 +351,20 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                                 vm.Set_field_delayed(event, item, property, value, success2, error, always)
                             }
                         } catch (error) {
-                            _debug.error (_('JS Error'), property, error, arguments);
+                            _debug.error (tr('JS Error'), property, error, arguments);
                         }
                     },
                     messages: {
-                        success: _('Saved'),
-                        error: _('Error'),
-                        always: _('Done')
+                        success: tr('Saved'),
+                        error: tr('Error'),
+                        always: tr('Done')
                     }
                 },
                 main: {
                     sort: true,
                     icon: '#icon-star_border',
-                    label: _('default'),
-                    title: _('Adds a \"Default Dashboard\" bookmark in the sidebar.\nAlso visible at \"dashboard/view\"'),
+                    label: tr('default'),
+                    title: tr('Adds a \"Default Dashboard\" bookmark in the sidebar.\nAlso visible at \"dashboard/view\"'),
                     handler: function(event, item) {
                         // "..there can be only one..!" -Highlander '86
                         try {
@@ -383,14 +383,14 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                             });
                             
                         } catch (error) {
-                            _debug.error (_('JS Error'), field, error, arguments);
+                            _debug.error (tr('JS Error'), field, error, arguments);
                         }
                     }
                 },
                 public: {
                     sort: true,
                     icon: '#icon-earth',
-                    title: _('Allow this Dashboard to be viewed by anyone'),
+                    title: tr('Allow this Dashboard to be viewed by anyone'),
                     handler: function(event, item) {
                         // toggle public status
                         try {
@@ -402,14 +402,14 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                                 item[field] = value;
                             });
                         } catch (error) {
-                            _debug.error (_('JS Error'), field, error, arguments);
+                            _debug.error (tr('JS Error'), field, error, arguments);
                         }
                     }
                 },
                 published: {
                     sort: true,
                     icon: '#icon-dashboard',
-                    title: _('Allow this Dashboard on the menu'),
+                    title: tr('Allow this Dashboard on the menu'),
                     handler: function(event, item) {
                         // toggle public status
                         try {
@@ -421,14 +421,14 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                                 item[field] = value;
                             });
                         } catch (error) {
-                            _debug.error (_('JS Error'), field, error, arguments);
+                            _debug.error (tr('JS Error'), field, error, arguments);
                         }
                     }
                 },
                 clone: {
                     icon: '#icon-content_copy',
                     noHeader: true,
-                    title: _('Clone the layout of this dashboard to a new Dashboard'),
+                    title: tr('Clone the layout of this dashboard to a new Dashboard'),
                     handler: function(event, item) {
                         // clone item
                         try {
@@ -446,7 +446,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                                 // @todo: handle error
                             })
                         } catch (error) {
-                            _debug.error (_('JS Error'), field, error, arguments);
+                            _debug.error (tr('JS Error'), field, error, arguments);
                         }
                     }
                 },
@@ -454,23 +454,23 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                     icon: '#icon-cog',
                     noHeader: true,
                     link: true,
-                    label: _('Edit Layout'),
-                    title: _('Edit this dashboard layout'),
+                    label: tr('Edit Layout'),
+                    title: tr('Edit this dashboard layout'),
                     hideNarrow: true
                 },
                 delete: {
                     icon: '#icon-bin',
                     noHeader: true,
-                    title: _('Delete this dashboard'),
+                    title: tr('Delete this dashboard'),
                     handler: function(event, item){
                         // delete item
                         try {
-                            let title = _('Delete "%s"').replace('%s',item.name);
+                            let title = tr('Delete "%s"').replace('%s',item.name);
                             let question = [
                                 title,
-                                _("Deleting a dashboard is permanent"),
+                                tr("Deleting a dashboard is permanent"),
                                 "\n",
-                                _("Are you sure you want to delete ?")
+                                tr("Are you sure you want to delete ?")
                             ]
                             let max = 0;
                             question.forEach(function(item){
@@ -488,7 +488,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                                 })
                             }
                         } catch (error) {
-                            _debug.error (_('JS Error'), error, arguments);
+                            _debug.error (tr('JS Error'), error, arguments);
                         }
                     }
                 },
@@ -496,7 +496,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                     icon: '#icon-arrow_forward',
                     noHeader: true,
                     link: true,
-                    title: _('View this dashboard'),
+                    title: tr('View this dashboard'),
                     hideNarrow: true
                 }
             }
@@ -519,7 +519,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                             break;
                         case 'number':
                             this.statusData.total = value
-                            this.statusData.title =  _('Found %s entries').replace('%s', value)
+                            this.statusData.title =  tr('Found %s entries').replace('%s', value)
                             break;
                         case 'string':
                             this.statusData.title = value
@@ -563,7 +563,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                     // set the property and call the callbacks
                     success = function(data, success_message, xhr) {
                         // execute on successful save
-                        _debug.log (_('set_field_delayed() SUCCESS'), success_message, arguments);
+                        _debug.log (tr('set_field_delayed() SUCCESS'), success_message, arguments);
                         window.clearTimeout(vm.timeouts[timeout_key])
                         vm.Notify(data.message)
                         if (typeof success_callback == 'function') {
@@ -622,12 +622,12 @@ defined('EMONCMS_EXEC') or die('Restricted access');
             addNew: function() {
                 let vm = this;
                 dashboard_v2.add().then(function() {
-                    vm.update({title:_('Added')});
+                    vm.update({title:tr('Added')});
                 })
             },
             update: function(message) {
                 let vm = this;
-                message = message ? message: _('Loading');
+                message = message ? message: tr('Loading');
                 vm.Notify(message, true)
                 dashboard_v2.list().then(
                     function(data){
@@ -653,7 +653,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                         // handle error - notify user
                         vm.Notify = ({
                             success: false,
-                            title: _('Error loading.'),
+                            title: tr('Error loading.'),
                             message: message,
                             total: 0,
                             url: this.url

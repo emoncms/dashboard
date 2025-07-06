@@ -49,7 +49,7 @@ class Dashboard
         $row = $result->fetch_array();
 
         // Name for cloned dashboard
-        $name = sprintf('%s %s', $row['name'], _('clone'));
+        $name = sprintf('%s %s', $row['name'], tr('clone'));
 
         $this->mysqli->query("INSERT INTO dashboard (`userid`,`content`,`name`,`description`,`height`) VALUES ('$userid','{$row['content']}','$name','{$row['description']}','{$row['height']}')");
 

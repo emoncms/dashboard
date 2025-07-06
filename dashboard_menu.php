@@ -50,6 +50,6 @@ if ($session["read"] || $session["public_userid"]) {
     
     // Level 1 top bar
     if (count($l2)) {
-        $menu["dashboards"] = array("name"=>_("Dashboards"), "order"=>3, "icon"=>"dashboard", "default"=>"dashboard/list", "l2"=>$l2);
+        $menu["dashboards"] = array("name"=>tr("Dashboards"), "order"=>3, "icon"=>"dashboard", "default"=>"dashboard/list", "l2"=>$l2);
     } 
 }

@@ -34,9 +34,9 @@ if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
     // @see: Lib/misc/gettext.js
     function getTranslations() {
         return Object.assign({
-            "Saved": "<?php echo _("Saved") ?>",
-            "Could not save Dashboard": "<?php echo _("Could not save Dashboard") ?>",
-            "Items Saved": "<?php echo _("Items Saved") ?>"
+            "Saved": "<?php echo tr("Saved") ?>",
+            "Could not save Dashboard": "<?php echo tr("Could not save Dashboard") ?>",
+            "Items Saved": "<?php echo tr("Items Saved") ?>"
         }, LANG_JS);
     }
     </script>
@@ -168,11 +168,11 @@ function toolboxMove(e) {
         }
     });
     function showError(xhr,status) {
-        throw(new Error(_("Could not save Dashboard. ") + status));
+        throw(new Error(tr("Could not save Dashboard. ") + status));
     }
     function showSuccess() {
-        $("#save-dashboard").attr("class","btn btn-success").text(_("Saved"));
-        $("#save-dashboard").attr("title",_("Items Saved"));
+        $("#save-dashboard").attr("class","btn btn-success").text(tr("Saved"));
+        $("#save-dashboard").attr("title",tr("Items Saved"));
         lastsavecontent = $("#page").html();
     }
 
