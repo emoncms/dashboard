@@ -167,7 +167,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 <script src="<?php echo $path; ?>Lib/vue.min.js"></script>
 <!-- <script src="/emoncms/Modules/config/vue.js"></script> -->
 
-<script src="<?php echo $path; ?>Lib/misc/gettext.js"></script>
+<script src="<?php echo $path; ?>Lib/misc/gettext.js?v=2"></script>
 <script>
     /**
      * return plain js object with gettext translated strings
