@@ -41,7 +41,7 @@ if ($session["read"] || $session["public_userid"]) {
 
     if ($session["write"]) {
         $l2[] = array(
-            "name"=>dgettext("dashboard_messages","Configuration"),
+            "name"=>ctx_tr("dashboard_messages","Configuration"),
             "href"=>"dashboard/list",
             "icon"=>"cog", 
             "order"=>99
