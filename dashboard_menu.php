@@ -41,7 +41,7 @@ if ($session["read"] || $session["public_userid"]) {
 
     if ($session["write"]) {
         $l2[] = array(
-            "name"=>dgettext("dashboard_messages","Configuration"),
+            "name"=>ctx_tr("dashboard_messages","Configuration"),
             "href"=>"dashboard/list",
             "icon"=>"cog", 
             "order"=>99
@@ -50,6 +50,6 @@ if ($session["read"] || $session["public_userid"]) {
     
     // Level 1 top bar
     if (count($l2)) {
-        $menu["dashboards"] = array("name"=>_("Dashboards"), "order"=>3, "icon"=>"dashboard", "default"=>"dashboard/list", "l2"=>$l2);
+        $menu["dashboards"] = array("name"=>tr("Dashboards"), "order"=>3, "icon"=>"dashboard", "default"=>"dashboard/list", "l2"=>$l2);
     } 
 }
