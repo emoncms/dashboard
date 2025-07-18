@@ -451,7 +451,6 @@ function kwhperiod_draw () {
   $('.kwhperiod').each(function (index) {
     var widgetid = $(this).attr('id');
     
-    console.log("widgetid2: ", widgetid);
     var kwhperiod = $(this)
     var errorCode = '0'
     var errorMessage = $(this).attr('errormessagedisplayed')

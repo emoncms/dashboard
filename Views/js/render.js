@@ -90,17 +90,17 @@ function update(first_time){
     url : query,
     dataType : 'json',
     async: !first_time,
-    success : function(data){ 
+    success : function(data){
       for (z in data){
         associd[data[z]['id']] = data[z];
         assocfeed[data[z]['tag']+":"+data[z]['name']] = data[z]['id'];
       }
       if (!first_time){
-        for (z in widget){
-          var fname = widget[z]+"_slowupdate";
-          var fn = window[fname];
-          fn();
-        }
+        slow_update();
+      } else {
+        setTimeout(function() {
+          slow_update();
+        }, 100);
       }
     },
     error : function(){
@@ -113,6 +113,16 @@ function update(first_time){
          }
     }
   });
+}
+
+function slow_update() {
+  for (z in widget){
+    var fname = widget[z]+"_slowupdate";
+    var fn = window[fname];
+    if (typeof(fn) == 'function') {
+      fn();
+    }
+  }
 }
 
 function fast_update(){

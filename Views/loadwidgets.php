@@ -48,7 +48,7 @@
         }
         if (is_file($folder."/".$widgetname."_render.js"))
         {
-            echo "<script type='text/javascript' src='".$path.$folder."/".$widgetname."_render.js?v=5'></script>";
+            echo "<script type='text/javascript' src='".$path.$folder."/".$widgetname."_render.js?v=6'></script>";
             $gotWidget = true;
         }
         return $gotWidget;
