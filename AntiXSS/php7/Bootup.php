@@ -21,7 +21,7 @@ class Bootup
    */
   public static function filterRequestInputs($normalization_form = 4 /* n::NFC */, $leading_combining = '◌')
   {
-    $a = [
+        $a = [
         &$_FILES,
         &$_ENV,
         &$_GET,
@@ -29,33 +29,43 @@ class Bootup
         &$_COOKIE,
         &$_SERVER,
         &$_REQUEST,
-    ];
+        ];
 
-    /** @noinspection ReferenceMismatchInspection */
-    /** @noinspection ForeachSourceInspection */
-    foreach ($a[0] as &$r) {
-      $a[] = [
-          &$r['name'],
-          &$r['type'],
-      ];
-    }
-    unset($r, $a[0]);
+        /**
+   * @noinspection ReferenceMismatchInspection 
+*/
+        /**
+   * @noinspection ForeachSourceInspection 
+*/
+        foreach ($a[0] as &$r) {
+          $a[] = [
+            &$r['name'],
+            &$r['type'],
+          ];
+            }
+        unset($r, $a[0]);
 
-    $len = \count($a) + 1;
-    for ($i = 1; $i < $len; ++$i) {
-      /** @noinspection ReferenceMismatchInspection */
-      /** @noinspection ForeachSourceInspection */
-      foreach ($a[$i] as &$r) {
-        /** @noinspection ReferenceMismatchInspection */
-        $s = $r; // $r is a reference, $s a copy
-        if (\is_array($s)) {
-          $a[$len++] = &$r;
-        } else {
-          $r = self::filterString($s, $normalization_form, $leading_combining);
-        }
-      }
-      unset($r, $a[$i]);
-    }
+        $len = \count($a) + 1;
+        for ($i = 1; $i < $len; ++$i) {
+          /**
+   * @noinspection ReferenceMismatchInspection 
+*/
+          /**
+   * @noinspection ForeachSourceInspection 
+*/
+          foreach ($a[$i] as &$r) {
+                /**
+       * @noinspection ReferenceMismatchInspection 
+*/
+                $s = $r; // $r is a reference, $s a copy
+                if (\is_array($s)) {
+                    $a[$len++] = &$r;
+                    } else {
+                  $r = self::filterString($s, $normalization_form, $leading_combining);
+                    }
+          }
+          unset($r, $a[$i]);
+            }
   }
 
   /**
@@ -68,60 +78,60 @@ class Bootup
    */
   public static function filterRequestUri($uri = null, $exit = true)
   {
-    if (null === $uri) {
+        if (null === $uri) {
 
-      if (!isset($_SERVER['REQUEST_URI'])) {
-        return false;
-      }
+          if (!isset($_SERVER['REQUEST_URI'])) {
+                return false;
+          }
 
-      $uri = $_SERVER['REQUEST_URI'];
-    }
+          $uri = $_SERVER['REQUEST_URI'];
+            }
 
-    $uriOrig = $uri;
+        $uriOrig = $uri;
 
-    //
-    // Ensures the URL is well formed UTF-8
-    //
+        //
+        // Ensures the URL is well formed UTF-8
+        //
 
-    if (UTF8::is_utf8(\rawurldecode($uri)) === true) {
-      return $uri;
-    }
+        if (UTF8::is_utf8(\rawurldecode($uri)) === true) {
+          return $uri;
+            }
 
-    //
-    // When not, assumes Windows-1252 and redirects to the corresponding UTF-8 encoded URL
-    //
+        //
+        // When not, assumes Windows-1252 and redirects to the corresponding UTF-8 encoded URL
+        //
 
-    $uri = (string)\preg_replace_callback(
+        $uri = (string)\preg_replace_callback(
         '/[\x80-\xFF]+/',
         function ($m) {
           return \rawurlencode($m[0]);
-        },
+            },
         $uri
-    );
+        );
 
-    $uri = (string)\preg_replace_callback(
+        $uri = (string)\preg_replace_callback(
         '/(?:%[89A-F][0-9A-F])+/i',
         function ($m) {
           return \rawurlencode(UTF8::rawurldecode($m[0]));
-        },
+            },
         $uri
-    );
+        );
 
-    if (
+        if (
         $uri !== $uriOrig
         &&
         $exit === true
         &&
         \headers_sent() === false
-    ) {
-      // Use ob_start() to buffer content and avoid problem of headers already sent...
-      $severProtocol = ($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1');
-      \header($severProtocol . ' 301 Moved Permanently');
-      \header('Location: ' . $uri);
-      exit();
-    }
+        ) {
+          // Use ob_start() to buffer content and avoid problem of headers already sent...
+          $severProtocol = ($_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/1.1');
+          \header($severProtocol . ' 301 Moved Permanently');
+          \header('Location: ' . $uri);
+          exit();
+            }
 
-    return $uri;
+        return $uri;
   }
 
   /**
@@ -135,7 +145,7 @@ class Bootup
    */
   public static function filterString($input, int $normalization_form = 4 /* n::NFC */, string $leading_combining = '◌')
   {
-    return UTF8::filter($input, $normalization_form, $leading_combining);
+        return UTF8::filter($input, $normalization_form, $leading_combining);
   }
 
   /**
@@ -149,17 +159,17 @@ class Bootup
    */
   public static function get_random_bytes($length)
   {
-    if (!$length) {
-      return false;
-    }
+        if (!$length) {
+          return false;
+            }
 
-    $length = (int)$length;
+        $length = (int)$length;
 
-    if ($length <= 0) {
-      return false;
-    }
+        if ($length <= 0) {
+          return false;
+            }
 
-    return \random_bytes($length);
+        return \random_bytes($length);
   }
 
   /**
@@ -167,9 +177,9 @@ class Bootup
    */
   public static function initAll()
   {
-    \ini_set('default_charset', 'UTF-8');
+        \ini_set('default_charset', 'UTF-8');
 
-    // everything is init via composer, so we are done here ...
+        // everything is init via composer, so we are done here ...
   }
 
   /**
@@ -181,15 +191,15 @@ class Bootup
    */
   public static function is_php($version): bool
   {
-    static $_IS_PHP;
+        static $_IS_PHP;
 
-    $version = (string)$version;
+        $version = (string)$version;
 
-    if (!isset($_IS_PHP[$version])) {
-      $_IS_PHP[$version] = \version_compare(PHP_VERSION, $version, '>=');
-    }
+        if (!isset($_IS_PHP[$version])) {
+          $_IS_PHP[$version] = \version_compare(PHP_VERSION, $version, '>=');
+            }
 
-    return $_IS_PHP[$version];
+        return $_IS_PHP[$version];
   }
 }
 
