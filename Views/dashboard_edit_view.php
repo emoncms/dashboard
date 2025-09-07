@@ -168,11 +168,11 @@ function toolboxMove(e) {
         }
     });
     function showError(xhr,status) {
-        throw(new Error(tr("Could not save Dashboard. ") + status));
+        throw(new Error(_Tr("Could not save Dashboard. ") + status));
     }
     function showSuccess() {
-        $("#save-dashboard").attr("class","btn btn-success").text(tr("Saved"));
-        $("#save-dashboard").attr("title",tr("Items Saved"));
+        $("#save-dashboard").attr("class","btn btn-success").text(_Tr("Saved"));
+        $("#save-dashboard").attr("title",_Tr("Items Saved"));
         lastsavecontent = $("#page").html();
     }
 
