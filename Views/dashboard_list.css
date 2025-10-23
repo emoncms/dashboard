@@ -1,0 +1,121 @@
+
+.arrow {
+    display: inline-block;
+    vertical-align: middle;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    opacity: 0.66;
+}
+
+.arrow.asc {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid #000;
+}
+
+.arrow.dsc {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #000;
+}
+div:empty{
+    width: 5em;
+    height: 1em;
+}
+.table-condensed th {
+    font-size: 10px;
+    font-weight: normal;
+}
+.table-condensed th,
+.table-condensed td {
+    padding-left: 0;
+    padding-right: 0;
+}
+.table .control-group{
+    margin:0
+}
+.table .control-group {
+    position: relative;
+}
+.table .control-group .help-inline{
+    display: block;
+    top: 0;
+    position: absolute;
+    font-size: 11px;
+    opacity: .8;
+    width: 96%;
+    user-select: none;
+    -moz-user-select: none;
+}
+.table .form-control{
+    cursor: pointer;
+    border: 1px solid transparent;
+    box-shadow: none;
+    width: 80%;
+    min-width: 1rem;
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+table td{
+    vertical-align: middle!important;
+}
+table td .btn{
+    color: #212529
+}
+td:nth-child(n+4):nth-child(-n+9){
+    text-align: center;
+    width: 3rem;
+}
+th:nth-child(n+4):nth-child(-n+9) .d-flex{
+    justify-content: center !important;
+}
+.table caption{
+    caption-side: bottom
+}
+[v-cloak] { display: none; }
+
+.caret-dark{
+    border-top-color: #212429!important;
+}
+.table-condensed td .form-control[type="text"] {
+    padding-top: .4em;
+    padding-bottom: .4em;
+}
+.position-absolute{
+    position: absolute!important;
+}
+.position-relative {
+    position: relative!important;
+}
+.table .form-control .fade{
+    opacity: 0!important;
+    transition-delay: 2s
+}
+/* small devices */
+@media (min-width: 576px) {
+    .btn-sm-md {
+        padding: 4px 12px;
+        font-size: 14px;
+        border-radius: 4px;
+    }
+    .table-condensed th,
+    .table-condensed td {
+        padding: 4px 5px;
+    }
+    .arrow {
+        margin-left: 5px;
+    }
+    .table-condensed th {
+        font-size: 14px;
+        font-weight: bold;
+    }
+    .table .form-control {
+        width: 95%;
+        min-width: 5rem;
+    }
+    .d-sm-table-cell {
+        display: table-cell!important;
+    }
+}
