@@ -31,8 +31,7 @@ function dashboard_controller()
             load_language_files("Modules/dashboard/locale", "dashboard_messages");
             $result = view("Modules/dashboard/Views/dashboard_list.php", array(
                 'js_css_version' => $js_css_version,
-                'path' => $path,
-                'gridjs' => view('Lib/gridjs/grid.html')
+                'path' => $path
             ));
         }
 
