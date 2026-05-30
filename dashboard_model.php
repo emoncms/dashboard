@@ -50,10 +50,17 @@ class Dashboard
 
         // Name for cloned dashboard
         $name = sprintf('%s %s', $row['name'], tr('clone'));
+        $content = $row['content'];
+        $description = $row['description'];
+        $height = (int) $row['height'];
 
-        $this->mysqli->query("INSERT INTO dashboard (`userid`,`content`,`name`,`description`,`height`) VALUES ('$userid','{$row['content']}','$name','{$row['description']}','{$row['height']}')");
+        $stmt = $this->mysqli->prepare("INSERT INTO dashboard (`userid`,`content`,`name`,`description`,`height`) VALUES (?,?,?,?,?)");
+        $stmt->bind_param("isssi", $userid, $content, $name, $description, $height);
+        $stmt->execute();
+        $insert_id = $stmt->insert_id;
+        $stmt->close();
 
-        return $this->mysqli->insert_id;
+        return $insert_id;
     }
 
     public function get_list($userid, $public, $published)
