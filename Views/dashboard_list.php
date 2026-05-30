@@ -16,12 +16,12 @@ defined('EMONCMS_EXEC') or die('Restricted access');
     <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
             <h3><?php echo tr('Dashboards') ?></h3>
-            <button class="btn btn-light ml-3" @click.prevent="addNew"><?php echo tr('New') ?>  <svg class="icon"><use xlink:href="#icon-plus"></use></svg> </button>
+            <button class="btn btn-light ml-3" @click.prevent="addNew"><?php echo tr('New') ?>  <span class="svg-icon-plus"></span> </button>
         </div>
         <form v-if="gridData.length > 0" id="search" class="form-inline position-relative mb-0">
             <div class="form-group">
                 <input id="search-box" name="query" v-model="searchQuery" type="search" class="form-control input-medium mb-0" aria-describedby="searchHelp" placeholder="<?php echo tr('Search') ?>" title="<?php echo tr('Search the data by any column') ?>">
-                <button id="searchclear" @click.prevent="searchQuery = ''"style="right:0" class="btn btn-link position-absolute" :class="{'d-none':searchQuery.length===0}"><svg class="icon"><use xlink:href="#icon-close"></use></svg></button>
+                <button id="searchclear" @click.prevent="searchQuery = ''"style="right:0" class="btn btn-link position-absolute" :class="{'d-none':searchQuery.length===0}"><span class="svg-icon-close"></span></button>
             </div>
         </form>
     </div>
@@ -121,7 +121,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                             class="btn btn-sm-md btn-small"
                             :class="entry.main ? 'btn-primary active' : 'btn-light'"
                             :title="'#' + entry.id + ' MAIN\n' + translations['Adds a Default Dashboard bookmark in the sidebar.\nAlso visible at dashboard/view']">
-                        <svg class="icon"><use xlink:href="#icon-star_border"></use></svg>
+                        <span class="svg-icon-star_border"></span>
                     </button>
                 </td>
                 
@@ -131,7 +131,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                             class="btn btn-sm-md btn-small"
                             :class="entry.public ? 'btn-primary active' : 'btn-light'"
                             :title="'#' + entry.id + ' PUBLIC\n' + translations['Allow this Dashboard to be viewed by anyone']">
-                        <svg class="icon"><use xlink:href="#icon-earth"></use></svg>
+                        <span class="svg-icon-earth"></span>
                     </button>
                 </td>
                 
@@ -141,7 +141,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                             class="btn btn-sm-md btn-small"
                             :class="entry.published ? 'btn-primary active' : 'btn-light'"
                             :title="'#' + entry.id + ' PUBLISHED\n' + translations['Allow this Dashboard on the menu']">
-                        <svg class="icon"><use xlink:href="#icon-dashboard"></use></svg>
+                        <span class="svg-icon-dashboard"></span>
                     </button>
                 </td>
                 
@@ -150,7 +150,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                     <button @click="cloneDashboard(entry)"
                             class="btn btn-light btn-sm-md btn-small"
                             :title="'#' + entry.id + ' CLONE\n' + translations['Clone the layout of this dashboard to a new Dashboard']">
-                        <svg class="icon"><use xlink:href="#icon-content_copy"></use></svg>
+                        <span class="svg-icon-content_copy"></span>
                     </button>
                 </td>
                 
@@ -159,7 +159,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                     <a class="btn btn-light btn-sm-md btn-small"
                        :title="'#' + entry.id + ' EDIT\n' + translations['Edit this dashboard layout']"
                        :href="entry.edit">
-                        <svg class="icon"><use xlink:href="#icon-cog"></use></svg>
+                        <span class="svg-icon-cog"></span>
                     </a>
                 </td>
                 
@@ -168,7 +168,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                     <button @click="deleteDashboard(entry)"
                             class="btn btn-light btn-sm-md btn-small"
                             :title="'#' + entry.id + ' DELETE\n' + translations['Delete this dashboard']">
-                        <svg class="icon"><use xlink:href="#icon-bin"></use></svg>
+                        <span class="svg-icon-bin"></span>
                     </button>
                 </td>
                 
@@ -177,7 +177,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                     <a class="btn btn-light btn-sm-md btn-small"
                        :title="'#' + entry.id + ' VIEW\n' + translations['View this dashboard']"
                        :href="entry.view">
-                        <svg class="icon"><use xlink:href="#icon-arrow_forward"></use></svg>
+                        <span class="svg-icon-arrow_forward"></span>
                     </a>
                 </td>
             </tr>
