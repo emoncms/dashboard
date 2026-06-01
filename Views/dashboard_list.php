@@ -55,7 +55,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 <!-- Default Column -->
                 <th :class="{ active: sortKey == 'main' }" @click="sortBy('main')">
                     <a href="#" class="text-body d-flex align-items-center">
-                        <span>{{ translations['default'] | capitalize }}</span>
+                        <span>{{ capitalize(translations['default']) }}</span>
                         <span class="arrow" :class="sortOrders.main > 0 ? 'asc' : 'dsc'"></span>
                     </a>
                 </th>
@@ -190,7 +190,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
 
 <script src="<?php echo $path; ?>Modules/dashboard/dashboard.js?v=1"></script>
-<script src="<?php echo $path; ?>Lib/vue.min.js"></script>
+<?php load_js("Lib/js/vue.global.prod-3.5.22.min.js"); ?>
 <script src="<?php echo $path; ?>Lib/misc/gettext.js?v=2"></script>
 <script>
     /**
@@ -252,9 +252,8 @@ defined('EMONCMS_EXEC') or die('Restricted access');
     // Extract common translations
     const translations = getTranslations();
 
-    var app = new Vue({
-        el: "#app",
-        data: {
+    var app = Vue.createApp({
+        data() { return {
             wait: 800,
             timeouts: {},
             statusData: { title: '', message: '', fade: false, success: true, total: 0 },
@@ -270,12 +269,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 published: 1
             },
             translations: getTranslations()
-        },
-        filters: {
-            capitalize: function(str) {
-                return str.charAt(0).toUpperCase() + str.slice(1);
-            }
-        },
+        }; },
         computed: {
             status: {
                 get() { return this.statusData; },
@@ -330,6 +324,9 @@ defined('EMONCMS_EXEC') or die('Restricted access');
             this.update(); 
         },
         methods: {
+            capitalize: function(str) {
+                return str.charAt(0).toUpperCase() + str.slice(1);
+            },
             sortBy: function(key) {
                 this.sortKey = key;
                 this.sortOrders[key] = this.sortOrders[key] * -1;
@@ -550,5 +547,5 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 );
             }
         }
-    });
+    }).mount("#app");
 </script>
