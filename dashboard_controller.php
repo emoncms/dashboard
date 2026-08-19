@@ -78,7 +78,14 @@ function dashboard_controller()
                     $public_userid = $dash['userid'];
                 }
                 
-                if ($dash['public'] || $apikey || ($session['read'] && $session['userid']>0 && $dash['userid']==$session['userid'])) {
+                // Access control. $userid is resolved above from the session or,
+                // for a keyless share link, from the supplied readkey's owner. A
+                // dashboard is shown only if it is public or the resolved user owns
+                // it. Note: $apikey is NOT an authorisation signal here - it is the
+                // read key injected into the page so the feed widgets can load data,
+                // and in the logged-in branch it is the requester's own key. Testing
+                // it here previously let any key holder open any dashboard by id.
+                if ($dash['public'] || ($userid && $dash['userid']==$userid)) {
                     $result = view("Modules/dashboard/Views/dashboard_view.php",array(
                         'dashboard'=>$dash, 
                         'js_css_version'=>$js_css_version, 
