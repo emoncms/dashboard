@@ -32,11 +32,17 @@ class Dashboard
         return $this->mysqli->insert_id;
     }
 
-    public function delete($id)
+    public function delete($userid,$id)
     {
+        $userid = (int) $userid;
         $id = (int) $id;
-        $result = $this->mysqli->query("DELETE FROM dashboard WHERE id = '$id'");
-        return $result;
+        // Scoped to the session user so that a dashboard can only be deleted by its owner
+        $stmt = $this->mysqli->prepare("DELETE FROM dashboard WHERE userid = ? AND id = ?");
+        $stmt->bind_param("ii",$userid,$id);
+        $stmt->execute();
+        $affected_rows = $stmt->affected_rows;
+        $stmt->close();
+        return $affected_rows>0;
     }
 
     public function dashclone($userid, $id)
