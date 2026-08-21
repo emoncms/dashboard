@@ -46,15 +46,25 @@ function dashboard_controller()
             $result = EMPTY_ROUTE;
             $userid = false;
             $apikey = "";
-             
+
+            // $owner_context is true when $userid identifies the *requester* and so
+            // proves ownership: an interactive/apikey session, or a readkey (the
+            // owner's own read apikey). It is false on the public-profile path, where
+            // $userid is the *content owner* being browsed, not the requester - there
+            // ownership must never be inferred from $userid and only public
+            // dashboards may be shown.
+            $owner_context = false;
+
             if (isset($session['read']) && $session['read']) {
                 $userid = $session['userid'];
+                $owner_context = true;
                 if (isset($_GET['apikey'])) {
                     $apikey = $user->get_apikey_read($session['userid']);
                 }
             } else if (isset($_GET['readkey'])) {
                 if ($userid = $user->get_id_from_apikey($_GET['readkey'])) {
                     $apikey = $user->get_apikey_read($userid);
+                    $owner_context = true;
                 }
             } else if ($session['public_userid']) {
                 $userid = (int) $session['public_userid'];
@@ -78,14 +88,17 @@ function dashboard_controller()
                     $public_userid = $dash['userid'];
                 }
                 
-                // Access control. $userid is resolved above from the session or,
-                // for a keyless share link, from the supplied readkey's owner. A
-                // dashboard is shown only if it is public or the resolved user owns
-                // it. Note: $apikey is NOT an authorisation signal here - it is the
-                // read key injected into the page so the feed widgets can load data,
-                // and in the logged-in branch it is the requester's own key. Testing
-                // it here previously let any key holder open any dashboard by id.
-                if ($dash['public'] || ($userid && $dash['userid']==$userid)) {
+                // Access control. A dashboard is shown if it is public, or - only in
+                // an owner context (session or the owner's own readkey) - if the
+                // requester owns it. On the public-profile path $userid is the content
+                // owner, not the requester, so the ownership clause is gated behind
+                // $owner_context; otherwise browsing /<username>/dashboard/view?id=N
+                // would expose every one of that user's dashboards, private included.
+                // Note: $apikey is NOT an authorisation signal here - it is the read
+                // key injected into the page so the feed widgets can load data, and in
+                // the logged-in branch it is the requester's own key. Testing it here
+                // previously let any key holder open any dashboard by id.
+                if ($dash['public'] || ($owner_context && $userid && $dash['userid']==$userid)) {
                     $result = view("Modules/dashboard/Views/dashboard_view.php",array(
                         'dashboard'=>$dash, 
                         'js_css_version'=>$js_css_version, 
