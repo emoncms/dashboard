@@ -19,7 +19,7 @@ define('EMONCMS_EXEC', 1);
 
 if (php_sapi_name() !== 'cli') die("cli only\n");
 
-require_once dirname(__FILE__) . "/../dashboard_convert.php";
+require_once dirname(__FILE__) . "/../dashboard_render.php";
 
 $passed = 0;
 $failed = 0;
@@ -283,6 +283,152 @@ check('non ascii text kept', widgets($result)[0]['html'], 'Température 20°C �
 $result = convert('');
 check('empty content converts to nothing', count(widgets($result)), 0);
 check('empty content is clean', codes($result), array());
+
+// ---------------------------------------------------------------------------
+// The allowlist
+//
+// These replace the AntiXSS filter, which looked for markup known to be
+// dangerous and refused the save when it found any. Each case is checked twice,
+// once on what the converter stores and once on what the renderer puts back in
+// the page, because both sides run the allowlist.
+// ---------------------------------------------------------------------------
+
+function box($inner)
+{
+    return '<div id="1" class="paragraph" style="position:absolute; margin:0; top:0px; '
+        . 'left:0px; width:200px; height:60px;">' . $inner . '</div>';
+}
+
+function attack($name, $inner, $forbidden, $kept = null)
+{
+    $result = convert(box($inner));
+    $document = $result['document'];
+
+    // What set_content stores. The meta block records how a conversion went
+    // and is not written by the editor, see set_content in dashboard_model.php.
+    unset($document['meta']);
+    $stored = dashboard_convert_encode($document);
+
+    $rendered = dashboard_render($document);
+    $html = $rendered['html'];
+
+    foreach ($forbidden as $needle) {
+        check("$name: not stored, $needle", stripos($stored, $needle) !== false, false);
+        check("$name: not rendered, $needle", stripos($html, $needle) !== false, false);
+    }
+    if ($kept !== null) {
+        check("$name: text kept", strpos($html, $kept) !== false, true);
+    }
+}
+
+attack('script tag', 'ok<script>alert(1)</script>',
+    array('<script', 'alert(1)'), 'ok');
+
+attack('event handler', '<span onclick="alert(1)" onmouseover="alert(2)">hover</span>',
+    array('onclick', 'onmouseover', 'alert'), 'hover');
+
+attack('unquoted event handler', '<img src=x onerror=alert(1)>',
+    array('onerror', 'alert'));
+
+attack('javascript url', '<a href="javascript:alert(1)">go</a>',
+    array('javascript', 'alert'), 'go');
+
+attack('javascript url with whitespace', '<a href="  java&#9;script:alert(1)">go</a>',
+    array('javascript', 'java	script', 'alert'), 'go');
+
+attack('javascript url in mixed case', '<a href="JaVaScRiPt:alert(1)">go</a>',
+    array('alert'), 'go');
+
+attack('data url in an image', '<img src="data:text/html;base64,PHNjcmlwdD4=" alt="x">',
+    array('data:', 'base64'));
+
+attack('vbscript url', '<a href="vbscript:msgbox(1)">go</a>',
+    array('vbscript', 'msgbox'), 'go');
+
+attack('svg with an animation handler', '<svg><animate onbegin="alert(1)"></svg>text',
+    array('<svg', 'onbegin', 'alert'), 'text');
+
+attack('iframe', '<iframe src="https://evil.example/x"></iframe>text',
+    array('<iframe', 'evil.example'), 'text');
+
+attack('object and embed', '<object data="x.swf"></object><embed src="y.swf">',
+    array('<object', '<embed', 'x.swf', 'y.swf'));
+
+attack('form controls', '<form action="/x"><input name="a"><button>go</button></form>',
+    array('<form', '<input', '<button'));
+
+attack('style tag', '<style>body{background:url(//evil.example/x)}</style>text',
+    array('<style>', 'evil.example'), 'text');
+
+attack('url in an inline style', '<span style="background-image:url(//evil.example/x)">text</span>',
+    array('url(', 'evil.example'), 'text');
+
+attack('expression in an inline style', '<span style="width:expression(alert(1))">text</span>',
+    array('expression', 'alert'), 'text');
+
+attack('meta refresh', '<meta http-equiv="refresh" content="0;url=//evil.example">text',
+    array('<meta', 'evil.example'), 'text');
+
+attack('base tag', '<base href="//evil.example/">text',
+    array('<base', 'evil.example'), 'text');
+
+attack('link stylesheet', '<link rel="stylesheet" href="//evil.example/x.css">text',
+    array('<link', 'evil.example'), 'text');
+
+attack('noscript wrapper', '<noscript><p title="</noscript><img src=x onerror=alert(1)>">',
+    array('onerror', 'alert'));
+
+attack('broken nesting', '<b><i>text</b></i><script>alert(1)</script>',
+    array('<script', 'alert'), 'text');
+
+attack('comment hiding markup', 'a<!-- <script>alert(1)</script> -->b',
+    array('<script', 'alert', '<!--'));
+
+attack('null byte in a url', "<a href=\"java\0script:alert(1)\">go</a>",
+    array('alert'), 'go');
+
+attack('colon dressed up as a path', '<a href="java&#xfffd;script:alert(1)">go</a>',
+    array('alert'), 'go');
+
+// A relative path is still allowed, including one with a colon after the first
+// separator, and so are the three schemes the allowlist names.
+$result = convert(box('<a href="dashboard/view?id=2">a</a><a href="x/y:z">b</a>'
+    . '<a href="https://example.com/x">c</a><a href="mailto:someone@example.com">d</a>'));
+$kept = $result['document']['widgets'][0]['html'];
+check('relative url kept', strpos($kept, 'dashboard/view?id=2') !== false, true);
+check('colon after a separator kept', strpos($kept, 'x/y:z') !== false, true);
+check('https url kept', strpos($kept, 'https://example.com/x') !== false, true);
+check('mailto url kept', strpos($kept, 'mailto:someone@example.com') !== false, true);
+
+// An option value cannot break out of the attribute it is written into
+$result = convert('<div id="1" class="feedvalue" style="position:absolute; top:0px; left:0px; '
+    . 'width:10px; height:10px;" feedid="1&quot; onload=&quot;alert(1)"></div>');
+$html = dashboard_render($result['document'])['html'];
+check('option value cannot break out', stripos($html, 'onload') !== false, false);
+
+// Neither can a widget type
+$result = convert('<div id="1" class="x&quot; onload=&quot;alert(1)" style="position:absolute; '
+    . 'top:0px; left:0px; width:10px; height:10px;"></div>');
+$html = dashboard_render($result['document'])['html'];
+check('widget type cannot break out', stripos($html, 'onload=') !== false, false);
+
+// A document that reached the column some other way is still filtered on output
+$planted = array('version' => 1, 'widgets' => array(array(
+    'type' => 'paragraph', 'x' => 0, 'y' => 0, 'w' => 10, 'h' => 10,
+    'options' => array(),
+    'html' => '<script>alert(1)</script><a href="javascript:alert(2)">go</a>'
+)));
+$html = dashboard_render($planted)['html'];
+check('planted document is filtered on output',
+    stripos($html, 'script') !== false || stripos($html, 'javascript') !== false, false);
+
+// A widget that may not hold html does not get to
+$planted['widgets'][0]['type'] = 'feedvalue';
+$planted['widgets'][0]['html'] = '<b>text</b>';
+$rendered = dashboard_render($planted);
+check('html on a data widget is refused', strpos($rendered['html'], '<b>') !== false, false);
+check('html on a data widget is reported', $rendered['errors'][0]['code'],
+    'html_not_allowed_on_type');
 
 // ---------------------------------------------------------------------------
 

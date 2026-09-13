@@ -101,6 +101,7 @@ function dashboard_controller()
                 if ($dash['public'] || ($owner_context && $userid && $dash['userid']==$userid)) {
                     $result = view("Modules/dashboard/Views/dashboard_view.php",array(
                         'dashboard'=>$dash, 
+                        'page_html'=>$dashboard->content_html($dash),
                         'js_css_version'=>$js_css_version, 
                         'apikey'=>$apikey, 
                         'public_userid'=>$public_userid
@@ -113,8 +114,19 @@ function dashboard_controller()
         {
             if ($route->subaction) $dash = $dashboard->get_from_alias($session['userid'],$route->subaction);
             elseif (isset($_GET['id'])) $dash = $dashboard->get(get('id'));
-            $result = view("Modules/dashboard/Views/dashboard_edit_view.php",array('dashboard'=>$dash, 'js_css_version'=>$js_css_version));
-            $result .= view("Modules/dashboard/Views/dashboard_config.php", array('dashboard'=>$dash, 'js_css_version'=>$js_css_version));
+            // Rendered once and given to both views, so the config modal shows
+            // the same content the page does.
+            $page_html = $dashboard->content_html($dash);
+            $result = view("Modules/dashboard/Views/dashboard_edit_view.php",array(
+                'dashboard'=>$dash,
+                'page_html'=>$page_html,
+                'js_css_version'=>$js_css_version
+            ));
+            $result .= view("Modules/dashboard/Views/dashboard_config.php", array(
+                'dashboard'=>$dash,
+                'page_html'=>$page_html,
+                'js_css_version'=>$js_css_version
+            ));
 
             $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'],'type'=>"edit", 'js_css_version'=>$js_css_version));
         }

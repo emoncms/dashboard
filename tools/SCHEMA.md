@@ -400,18 +400,44 @@ are safe to migrate. Faults are not.
 1. Add the `content_json` column. Done, see `dashboard_schema.php`.
 2. Measure. `tools/convert.php` for what is dropped, `tools/roundtrip.php` for
    whether it still draws the same. Not a parse success count.
-3. Convert and write `content_json`, leaving `content` alone.
-4. Read `content_json` when it is there, falling back to `content`.
-5. Save through the converter, so what is stored is what the allowlist passed.
+3. Convert and write `content_json`, leaving `content` alone. Done, in
+   `Dashboard::convert_content`.
+4. Read `content_json`. Done, in `Dashboard::content_html`.
+5. Save through the converter. Done, in `Dashboard::set_content`.
 6. Drop `content` in a later release, not the same one.
 
-Steps 4 and 5 go together. Reading the new column while the editor still writes
-html to the old one leaves the two disagreeing the first time anyone saves,
-with the reader showing one thing and the editor another.
+Steps 4 and 5 had to go together. Reading the new column while the editor still
+wrote html to the old one would leave the two disagreeing the first time anyone
+saved, with the reader showing one thing and the editor another.
 
-The smallest way to do both at once is to convert on save rather than rewriting
-the designer. `set_content` already receives the page html the designer built.
-Putting it through `dashboard_convert` and storing the document means the
-server decides what is kept, which is the allowlist the whole exercise is for,
-and the designer needs no changes. The round trip figures are the evidence that
-this loses nothing.
+### How it works now
+
+A dashboard still holding html is converted the first time it is loaded, and
+the document is stored. Nothing else has to be run, and an install migrates
+itself as its dashboards are opened.
+
+The `content` column is not written again. It holds what was there before the
+conversion, so a dashboard that converted badly can be looked at and converted
+again. That is what it is for until it is dropped.
+
+`set_content` receives the page html the designer built and converts it, which
+is what makes the server rather than the browser decide what a dashboard may
+hold. The designer needed no changes. Anything the allowlist does not keep is
+reported back in the save response and shown in the editor, rather than
+disappearing without comment.
+
+The document the editor writes carries no `meta` block. It records how a
+conversion went, which belongs to the migration, and its warnings would
+otherwise store fragments of whatever was posted.
+
+This replaced the AntiXSS filter, which has been removed. It looked for markup
+known to be dangerous and refused the save when it found any. Listing what is
+allowed does not depend on having thought of every way of writing an attack.
+
+### One thing to know when changing the converter
+
+`dashboard_convert.php` is required from inside a class method. A variable
+assigned at the top level of an included file takes the scope of whatever
+included it, so the allowlists are functions rather than variables. As globals
+they were silently empty when the converter ran from the model, and everything
+still parsed. Keep them as functions.

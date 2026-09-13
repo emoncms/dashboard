@@ -34,51 +34,76 @@ require_once dirname(__FILE__) . "/widget_registry.php";
 
 define('DASHBOARD_CONVERTER_VERSION', 1);
 
+/*
+ The allowlists.
+
+ These are functions rather than variables because this file is required from
+ inside a class method in dashboard_model.php. A variable assigned at the top
+ level of an included file takes the scope of whatever included it, so as
+ globals they were silently empty when the converter ran from the model.
+*/
+
 // Elements allowed in the html of a text or container widget.
-$dashboard_convert_elements = array(
-    'a', 'b', 'strong', 'i', 'em', 'u', 'sub', 'sup', 'br', 'p', 'div', 'span',
-    'center', 'font', 'small', 'h1', 'h2', 'h3', 'h4', 'h5',
-    'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img'
-);
+function dashboard_convert_allowed_elements()
+{
+    return array(
+        'a', 'b', 'strong', 'i', 'em', 'u', 'sub', 'sup', 'br', 'p', 'div', 'span',
+        'center', 'font', 'small', 'h1', 'h2', 'h3', 'h4', 'h5',
+        'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img'
+    );
+}
 
 // Elements removed with everything inside them. Anything else that is not
 // allowed is unwrapped instead, so the text inside it survives.
-$dashboard_convert_strip = array(
-    'script', 'style', 'meta', 'title', 'link', 'object', 'embed', 'iframe',
-    'svg', 'form', 'input', 'button', 'select', 'textarea', 'canvas', 'applet',
-    'base', 'frame', 'frameset', 'noscript', 'template'
-);
+function dashboard_convert_stripped_elements()
+{
+    return array(
+        'script', 'style', 'meta', 'title', 'link', 'object', 'embed', 'iframe',
+        'svg', 'form', 'input', 'button', 'select', 'textarea', 'canvas', 'applet',
+        'base', 'frame', 'frameset', 'noscript', 'template'
+    );
+}
 
 // Attributes allowed per element, on top of style which any of them may carry.
-$dashboard_convert_attributes = array(
-    'a' => array('href', 'target', 'title'),
-    'img' => array('src', 'alt', 'width', 'height'),
-    'font' => array('color', 'face', 'size'),
-    'table' => array('border', 'cellpadding', 'cellspacing'),
-    'td' => array('colspan', 'rowspan', 'align'),
-    'th' => array('colspan', 'rowspan', 'align')
-);
+function dashboard_convert_allowed_attributes()
+{
+    return array(
+        'a' => array('href', 'target', 'title'),
+        'img' => array('src', 'alt', 'width', 'height'),
+        'font' => array('color', 'face', 'size'),
+        'table' => array('border', 'cellpadding', 'cellspacing'),
+        'td' => array('colspan', 'rowspan', 'align'),
+        'th' => array('colspan', 'rowspan', 'align')
+    );
+}
 
 // Style properties allowed, both on a widget box and inside its html.
-$dashboard_convert_styles = array(
-    'color', 'background-color', 'font-size', 'font-family', 'font-weight',
-    'font-style', 'text-align', 'text-decoration', 'line-height',
-    'vertical-align', 'padding', 'margin', 'border', 'width', 'height'
-);
+function dashboard_convert_allowed_styles()
+{
+    return array(
+        'color', 'background-color', 'font-size', 'font-family', 'font-weight',
+        'font-style', 'text-align', 'text-decoration', 'line-height',
+        'vertical-align', 'padding', 'margin', 'border', 'width', 'height'
+    );
+}
 
 // Style properties of a widget box that the designer writes and the renderer
 // puts back, so they are dropped without a warning.
-$dashboard_convert_box_styles = array(
-    'position', 'top', 'left', 'width', 'height', 'margin'
-);
+function dashboard_convert_box_styles()
+{
+    return array('position', 'top', 'left', 'width', 'height', 'margin');
+}
 
 // Attributes added by browser extensions to the page the editor saved.
-$dashboard_convert_extension_attrs = array(
-    'bis_skin_checked', '_msttexthash', '_msthash', 'wfd-id',
-    'data-darkreader-inline-color', 'data-dashlane-frameid',
-    'data-ruffle-polyfilled', 'data-ol-has-click-handler',
-    '__gchrome_childframeremotetoken'
-);
+function dashboard_convert_extension_attributes()
+{
+    return array(
+        'bis_skin_checked', '_msttexthash', '_msthash', 'wfd-id',
+        'data-darkreader-inline-color', 'data-dashlane-frameid',
+        'data-ruffle-polyfilled', 'data-ol-has-click-handler',
+        '__gchrome_childframeremotetoken'
+    );
+}
 
 /**
  * Converts one dashboard's stored content.
@@ -424,9 +449,7 @@ function dashboard_convert_style_broke_out($node)
 // to name them one by one, so they are recognised by where they are instead.
 function dashboard_convert_artefact($name, $type, $known, $broken, $value)
 {
-    global $dashboard_convert_extension_attrs;
-
-    if (in_array($name, $dashboard_convert_extension_attrs)) {
+    if (in_array($name, dashboard_convert_extension_attributes())) {
         return 'browser_extension_attribute';
     }
 
@@ -494,7 +517,8 @@ function dashboard_convert_sanitise_html($html, &$warnings, $index = null)
 
 function dashboard_convert_clean($node, $index, $registry, &$warnings)
 {
-    global $dashboard_convert_elements, $dashboard_convert_strip;
+    $allowed = dashboard_convert_allowed_elements();
+    $strip = dashboard_convert_stripped_elements();
 
     // Collected first because the list is modified while walking it.
     $children = array();
@@ -518,7 +542,7 @@ function dashboard_convert_clean($node, $index, $registry, &$warnings)
             continue;
         }
 
-        if (in_array($tag, $dashboard_convert_strip)) {
+        if (in_array($tag, $strip)) {
             $detail = $tag;
             if ($tag === 'iframe') $detail = dashboard_convert_snippet($child->getAttribute('src'));
             dashboard_convert_warn($warnings, $index,
@@ -527,7 +551,7 @@ function dashboard_convert_clean($node, $index, $registry, &$warnings)
             continue;
         }
 
-        if (!in_array($tag, $dashboard_convert_elements)) {
+        if (!in_array($tag, $allowed)) {
             // Not dangerous, just not part of the vocabulary, so the text
             // inside it is kept and the element itself is unwrapped.
             dashboard_convert_warn($warnings, $index, 'tag_unwrapped', $tag);
@@ -546,10 +570,10 @@ function dashboard_convert_clean($node, $index, $registry, &$warnings)
 
 function dashboard_convert_attributes($element, $tag, $index, &$warnings)
 {
-    global $dashboard_convert_attributes, $dashboard_convert_extension_attrs;
+    $per_element = dashboard_convert_allowed_attributes();
+    $extensions = dashboard_convert_extension_attributes();
 
-    $allowed = isset($dashboard_convert_attributes[$tag])
-        ? $dashboard_convert_attributes[$tag] : array();
+    $allowed = isset($per_element[$tag]) ? $per_element[$tag] : array();
 
     $attributes = array();
     foreach ($element->attributes as $attribute) $attributes[] = $attribute->nodeName;
@@ -581,22 +605,30 @@ function dashboard_convert_attributes($element, $tag, $index, &$warnings)
 
         // on* handlers are covered here along with everything else that is not
         // on the list, and there is no rule above that could have kept one.
-        if (!in_array($lower, $dashboard_convert_extension_attrs)) {
+        if (!in_array($lower, $extensions)) {
             dashboard_convert_warn($warnings, $index, 'attribute_dropped', "$tag/$name");
         }
         $element->removeAttribute($name);
     }
 }
 
-// Control characters are stripped before the scheme is tested, never after, so
-// a scheme cannot be hidden inside one.
+// Control characters and whitespace are stripped before the scheme is tested,
+// never after, so a scheme cannot be hidden inside one.
+//
+// What is left has to be http, https, mailto or a relative reference. A
+// relative reference cannot carry a colon before its first path separator, so
+// testing for that rejects every other scheme without having to name them, and
+// rejects the ones dressed up to look like something else. A null byte in
+// java\0script: comes back out of the parser as a replacement character, which
+// is not a control character and would pass a scheme shaped pattern.
 function dashboard_convert_url_allowed($url)
 {
     $url = preg_replace('/[\x00-\x20\x7f]/', '', $url);
     if ($url === '') return false;
     if (preg_match('#^(https?://|mailto:)#i', $url)) return true;
-    // A relative path, which must not start a scheme of its own.
-    return !preg_match('#^[a-z0-9.+-]*:#i', $url);
+
+    $head = preg_split('#[/?\#]#', $url, 2);
+    return strpos($head[0], ':') === false;
 }
 
 // ---------------------------------------------------------------------------
@@ -626,13 +658,14 @@ function dashboard_convert_parse_style($style)
  */
 function dashboard_convert_styles($declarations, $index, &$warnings, $box)
 {
-    global $dashboard_convert_styles, $dashboard_convert_box_styles;
+    $allowed = dashboard_convert_allowed_styles();
+    $box_styles = dashboard_convert_box_styles();
 
     $kept = array();
     foreach ($declarations as $property => $value) {
-        if ($box && in_array($property, $dashboard_convert_box_styles)) continue;
+        if ($box && in_array($property, $box_styles)) continue;
 
-        if (!in_array($property, $dashboard_convert_styles)) {
+        if (!in_array($property, $allowed)) {
             // Extension styling and vendor variables are not author written.
             if (substr($property, 0, 2) !== '--' && $property !== 'user-select') {
                 dashboard_convert_warn($warnings, $index, 'style_property_dropped', $property);

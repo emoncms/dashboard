@@ -64,7 +64,7 @@
 
         <label><?php echo ctx_tr('dashboard_messages','Content: '); ?></label>
         <i style="font-size:12px"><?php echo ctx_tr('dashboard_messages','To view content changes reload editor after saving');?></i>
-        <textarea name="content" style="width:100%; height:200px;"><?php echo $dashboard['content']; ?></textarea>
+        <textarea name="content" style="width:100%; height:200px;"><?php echo htmlspecialchars($page_html, ENT_QUOTES, 'UTF-8'); ?></textarea>
 
     </div>
     <div class="modal-footer">

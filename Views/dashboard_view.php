@@ -52,7 +52,7 @@ if (isset($dashboard['fullscreen']) && $dashboard['fullscreen']) { $embed=1; ?>
 </div>
 
   <div id="page-container" style="height:<?php echo $dashboard['height']; ?>px; position:relative;">
-    <div id="page"><?php echo $dashboard['content']; ?></div>
+    <div id="page"><?php echo $page_html; ?></div>
 
 <script type="application/javascript">
   var dashid = <?php echo $dashboard['id']; ?>;

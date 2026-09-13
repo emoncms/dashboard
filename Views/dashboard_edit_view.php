@@ -77,7 +77,7 @@ if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
 
 
 <div id="page-container" style="height:<?php echo $dashboard['height']; ?>px; background-color:#<?php echo $dashboard['backgroundcolor']; ?>; position:relative;">
-    <div id="page"><?php echo $dashboard['content']; ?></div>
+    <div id="page"><?php echo $page_html; ?></div>
     <canvas id="can" width="940px" height="<?php echo $dashboard['height']; ?>px" style="position:absolute; top:0px; left:0px; margin:0; padding:0;"></canvas>
 </div>
 
@@ -170,10 +170,19 @@ function toolboxMove(e) {
     function showError(xhr,status) {
         throw(new Error(_Tr("Could not save Dashboard. ") + status));
     }
-    function showSuccess() {
+    function showSuccess(data) {
         $("#save-dashboard").attr("class","btn btn-success").text(_Tr("Saved"));
         $("#save-dashboard").attr("title",_Tr("Items Saved"));
         lastsavecontent = $("#page").html();
+
+        // The server keeps what the widget list and the html allowlist allow,
+        // so a save can drop something. Say what, rather than letting it go
+        // without comment.
+        if (data && data.dropped && data.dropped.length) {
+            $("#save-dashboard").attr("class","btn btn-warning")
+                .text(_Tr("Saved, some content removed"))
+                .attr("title", _Tr("Not saved: ") + data.dropped.join(", "));
+        }
     }
 
     $(window).resize(function(){

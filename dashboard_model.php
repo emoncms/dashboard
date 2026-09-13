@@ -19,10 +19,91 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 class Dashboard
 {
     private $mysqli;
+    private $log;
 
     public function __construct($mysqli)
     {
         $this->mysqli = $mysqli;
+        $this->log = new EmonLogger(__FILE__);
+    }
+
+    /**
+     * The html for the page div of a dashboard.
+     *
+     * Content is stored as JSON and rendered from it, see
+     * Modules/dashboard/tools/SCHEMA.md. A dashboard still holding html is
+     * converted the first time it is loaded, and the html is left in place
+     * untouched so the conversion can be looked at again later.
+     *
+     * @param array $dash a row from get
+     * @return string
+     */
+    public function content_html($dash)
+    {
+        require_once "Modules/dashboard/dashboard_render.php";
+
+        $json = isset($dash['content_json']) ? (string) $dash['content_json'] : '';
+
+        if (trim($json) === '') {
+            $content = isset($dash['content']) ? (string) $dash['content'] : '';
+            if (trim($content) === '') return '';
+            $json = $this->convert_content((int) $dash['id'], $content);
+        }
+
+        if (trim($json) === '') return '';
+
+        $rendered = dashboard_render($json);
+        foreach ($rendered['errors'] as $error) {
+            $this->log->warn("dashboard " . (int) $dash['id'] . " render "
+                . $error['code'] . " " . $error['detail']);
+        }
+        return $rendered['html'];
+    }
+
+    /**
+     * Converts a dashboard still holding html and stores the result.
+     *
+     * The html column is not touched. Until it is dropped in a later release
+     * it holds what was there before the conversion, so a dashboard that
+     * converted badly can be looked at and converted again.
+     *
+     * @param int $id
+     * @param string $content the html column
+     * @return string the document, or an empty string if there was nothing to keep
+     */
+    public function convert_content($id, $content)
+    {
+        require_once "Modules/dashboard/dashboard_convert.php";
+
+        $converted = dashboard_convert($content);
+        if ($converted['document'] === null || !count($converted['document']['widgets'])) {
+            $this->log->warn("dashboard $id holds content that converts to no widgets");
+            return '';
+        }
+
+        $json = dashboard_convert_encode($converted['document']);
+        if ($json === false) {
+            $this->log->error("dashboard $id could not be encoded: " . json_last_error_msg());
+            return '';
+        }
+
+        $stmt = $this->mysqli->prepare("UPDATE dashboard SET content_json=? WHERE id=?");
+        if ($stmt) {
+            $stmt->bind_param("si", $json, $id);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            // The column is missing, so the install has not run its database
+            // update yet. The dashboard still draws, it is just converted
+            // again on the next load.
+            $this->log->warn("dashboard $id converted but not stored: " . $this->mysqli->error);
+        }
+
+        $warnings = count($converted['warnings']);
+        $this->log->info("dashboard $id converted to json, "
+            . count($converted['document']['widgets']) . " widgets, $warnings warnings");
+
+        return $json;
     }
 
     public function create($userid)
@@ -51,17 +132,20 @@ class Dashboard
         $id = (int) $id;
 
         // Get content, name and description from origin dashboard
-        $result = $this->mysqli->query("SELECT content,name,description,height FROM dashboard WHERE userid = '$userid' AND id='$id'");
+        $result = $this->mysqli->query("SELECT content,content_json,name,description,height FROM dashboard WHERE userid = '$userid' AND id='$id'");
         $row = $result->fetch_array();
 
         // Name for cloned dashboard
         $name = sprintf('%s %s', $row['name'], tr('clone'));
         $content = $row['content'];
+        // Both columns are copied. A dashboard that has not been converted yet
+        // is converted the first time the copy is loaded.
+        $content_json = $row['content_json'];
         $description = $row['description'];
         $height = (int) $row['height'];
 
-        $stmt = $this->mysqli->prepare("INSERT INTO dashboard (`userid`,`content`,`name`,`description`,`height`) VALUES (?,?,?,?,?)");
-        $stmt->bind_param("isssi", $userid, $content, $name, $description, $height);
+        $stmt = $this->mysqli->prepare("INSERT INTO dashboard (`userid`,`content`,`content_json`,`name`,`description`,`height`) VALUES (?,?,?,?,?,?)");
+        $stmt->bind_param("issssi", $userid, $content, $content_json, $name, $description, $height);
         $stmt->execute();
         $insert_id = $stmt->insert_id;
         $stmt->close();
@@ -97,47 +181,116 @@ class Dashboard
         return $list;
     }
 
+    /**
+     * Saves the page the designer built.
+     *
+     * The designer posts the page html. It is converted to the stored document
+     * here, which is what makes the server rather than the browser decide what
+     * a dashboard may contain. Anything outside the widget registry and the
+     * html allowlist does not survive the conversion, so it cannot be stored
+     * and cannot come back out, see Modules/dashboard/tools/SCHEMA.md.
+     *
+     * This replaces a filter that looked for markup known to be dangerous and
+     * refused the save when it found any. Listing what is allowed does not
+     * depend on having thought of every way of writing an attack.
+     */
     public function set_content($userid, $id, $_content, $height)
     {
+        require_once "Modules/dashboard/dashboard_convert.php";
+
         $userid = (int) $userid;
         $id = (int) $id;
         $height = (int) $height;
-        
-        // sudo apt-get install php-mbstring
-        if (function_exists("mb_convert_encoding")) {
-            $axdir = "Modules/dashboard/AntiXSS/php5";
-            require_once "$axdir/Bootup.php";
-            require_once "$axdir/UTF8.php";
-            require_once "$axdir/AntiXSS.php";
-            $antiXss = new AntiXSS();
-            $nbsp_placeholder = "<!-- START-NON-BREAKING-SPACE --> <!-- END-NON-BREAKING-SPACE -->";
-            $_content = str_replace('&nbsp;',$nbsp_placeholder,$_content);
-            $content = htmlspecialchars_decode($antiXss->xss_clean($_content));
-            $_content = htmlspecialchars_decode($_content);
-            if ($content!=$_content) return array('success'=>false, 'message'=>'Error: Invalid dashboard content, content not saved');
-            // re-instate the &nbsp; character once all XSS tests are complete
-            $content = str_replace($nbsp_placeholder,'&nbsp;',$content);
-        } else {
-            $content = $_content;
+
+        $result = $this->mysqli->query(
+            "SELECT content_json FROM dashboard WHERE userid = '$userid' AND id='$id'");
+        $row = $result ? $result->fetch_object() : false;
+        if (!$row) return array('success'=>false, 'message'=>'Dashboard not updated');
+
+        $converted = dashboard_convert($_content);
+        $document = $converted['document'];
+
+        if ($document === null) {
+            return array('success'=>false,
+                'message'=>'Error: Dashboard content could not be read, content not saved');
         }
-        $result = $this->mysqli->query("SELECT content FROM dashboard WHERE userid = '$userid' AND id='$id'");
-        $row = $result->fetch_object();
-        if ($row) {
-            if ($row->content==$content) {
-                return array('success'=>false, 'message'=>'Dashboard content not updated, no changes made');
+
+        // An empty page is a dashboard someone has cleared, which is allowed.
+        // A page that arrived with something in it and produced no widgets is
+        // damaged, and saving it would wipe the dashboard.
+        if (trim($_content) !== '' && !count($document['widgets'])) {
+            return array('success'=>false,
+                'message'=>'Error: No dashboard widgets found in content, content not saved');
+        }
+
+        // The document the editor writes carries no meta block. It records how
+        // a conversion went, which belongs to the migration, and its warnings
+        // would otherwise store fragments of whatever was posted.
+        unset($document['meta']);
+
+        $content_json = dashboard_convert_encode($document);
+        if ($content_json === false) {
+            return array('success'=>false,
+                'message'=>'Error: Dashboard content could not be encoded, content not saved');
+        }
+
+        // The widgets are compared rather than the whole document, because the
+        // document carries the time it was converted and would never match.
+        $previous = json_decode((string) $row->content_json, true);
+        if (is_array($previous) && isset($previous['widgets'])
+            && $previous['widgets'] == $document['widgets']) {
+            return array('success'=>false, 'message'=>'Dashboard content not updated, no changes made');
+        }
+
+        $stmt = $this->mysqli->prepare(
+            "UPDATE dashboard SET content_json=?, height=? WHERE userid=? AND id=?");
+        $stmt->bind_param("siii", $content_json, $height, $userid, $id);
+        $stmt->execute();
+        $affected_rows = $stmt->affected_rows;
+        $stmt->close();
+
+        if ($affected_rows>0){
+            // Anything the allowlist would not keep has gone. Saying so beats
+            // letting it disappear without comment, which is what the author
+            // would otherwise see.
+            $dropped = $this->authored_drops($converted['warnings']);
+            if (count($dropped)) {
+                $this->log->info("dashboard $id saved, dropped " . implode(', ', $dropped));
+                return array('success'=>true, 'message'=>'Dashboard updated',
+                    'dropped'=>array_values($dropped));
             }
-            
-            $stmt = $this->mysqli->prepare("UPDATE dashboard SET content=?, height=? WHERE userid=? AND id=?");
-            $stmt->bind_param("siii", $content, $height, $userid, $id);
-            $stmt->execute();
-            $affected_rows = $stmt->affected_rows;
-            $stmt->close();
-            
-            if ($affected_rows>0){
-                return array('success'=>true, 'message'=>'Dashboard updated');
-            }
+            return array('success'=>true, 'message'=>'Dashboard updated');
         }
         return array('success'=>false, 'message'=>'Dashboard not updated');
+    }
+
+    /**
+     * Summarises the warnings that mean something an author wrote did not
+     * survive. The rest are generated markup, designer artefacts and browser
+     * extension debris, which nobody needs telling about.
+     *
+     * @param array $warnings from dashboard_convert
+     * @return array code => "code (count)"
+     */
+    private function authored_drops($warnings)
+    {
+        $authored = array(
+            'nested_widget_dropped', 'iframe_dropped', 'tag_dropped', 'tag_unwrapped',
+            'url_dropped', 'attribute_dropped', 'style_property_dropped',
+            'style_value_dropped', 'option_value_dropped', 'text_outside_widget',
+            'position_fixed_dropped', 'widget_without_type'
+        );
+
+        $counts = array();
+        foreach ($warnings as $warning) {
+            if (!in_array($warning['code'], $authored)) continue;
+            if (!isset($counts[$warning['code']])) $counts[$warning['code']] = 0;
+            $counts[$warning['code']]++;
+        }
+
+        $summary = array();
+        foreach ($counts as $code => $count) $summary[$code] = "$code ($count)";
+        return $summary;
     }
 
     public function set($userid,$id,$fields)

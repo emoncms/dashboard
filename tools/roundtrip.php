@@ -418,14 +418,14 @@ function compare_widget($before, $after, $i, $registry, &$differences)
 
 function compare_tags($before, $after, $where, &$differences)
 {
-    global $dashboard_convert_elements, $dashboard_convert_strip;
+    $allowed = dashboard_convert_allowed_elements();
+    $strip = dashboard_convert_stripped_elements();
 
     foreach ($before['tags'] as $tag => $count) {
         $now = isset($after['tags'][$tag]) ? $after['tags'][$tag] : 0;
         if ($now >= $count) continue;
 
-        $expected = in_array($tag, $dashboard_convert_strip)
-            || !in_array($tag, $dashboard_convert_elements);
+        $expected = in_array($tag, $strip) || !in_array($tag, $allowed);
         $differences[] = difference($expected ? 'tag_dropped' : 'tag_lost', $expected,
             "$where <$tag> " . $count . ' became ' . $now);
     }
@@ -437,9 +437,7 @@ function compare_tags($before, $after, $where, &$differences)
 // agreeing means something.
 function why_dropped($name, $value, $type, $known, $attributes)
 {
-    global $dashboard_convert_extension_attrs;
-
-    if (in_array($name, $dashboard_convert_extension_attrs)) {
+    if (in_array($name, dashboard_convert_extension_attributes())) {
         return array('kind' => 'browser_extension_attribute', 'expected' => true);
     }
     if (preg_match('/[:;()\/]|^[0-9]/', $name)) {
