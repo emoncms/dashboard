@@ -364,7 +364,15 @@ class Dashboard
         $id = (int) $id;
         $userid = (int) $userid;
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' AND id='$id'");
-        return $result->fetch_object();
+        $row = $result->fetch_object();
+        if (!$row) return $row;
+
+        // The content column is frozen at what was there before the dashboard
+        // was converted, so returning it would hand back something the
+        // dashboard no longer holds. The html the page is built from is
+        // returned instead, alongside the document it came from.
+        $row->content = $this->content_html((array) $row);
+        return $row;
     }
 
     // Returns the $id dashboard from $userid

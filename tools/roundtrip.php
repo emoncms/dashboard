@@ -55,6 +55,8 @@ if (isset($opts['help'])) {
     echo "  --show=KIND   print examples of one kind of difference\n";
     echo "  --samples=N   how many examples to print, default 5\n";
     echo "  --limit=N     stop after N dashboards\n";
+    echo "  --faulty-ids  print the ids of the dashboards with faults, nothing else,\n";
+    echo "                for feeding to migrate.php --skip-ids\n";
     exit(0);
 }
 
@@ -70,6 +72,7 @@ $limit = isset($opts['limit']) ? (int) $opts['limit'] : 0;
 $samples = isset($opts['samples']) ? (int) $opts['samples'] : 5;
 $show = isset($opts['show']) ? $opts['show'] : null;
 $only = isset($opts['id']) ? (int) $opts['id'] : 0;
+$ids_only = isset($opts['faulty-ids']);
 
 $rows = isset($opts['in']) ? rows_from_export($opts['in']) : rows_from_database($root);
 
@@ -151,6 +154,11 @@ foreach ($rows as $row) {
 if ($only) {
     fwrite(STDERR, "No dashboard with id $only\n");
     exit(1);
+}
+
+if ($ids_only) {
+    foreach (array_keys($faulty_ids) as $id) echo $id . "\n";
+    exit($faulty ? 1 : 0);
 }
 
 if ($show !== null) {
