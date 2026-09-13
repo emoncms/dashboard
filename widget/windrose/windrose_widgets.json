@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/windrose/windrose_render.js",
+  "widgets": {
+    "windrose": {
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "feedid2": {
+          "type": "feedid"
+        },
+        "scale": {
+          "type": "value"
+        },
+        "units": {
+          "type": "value"
+        }
+      }
+    }
+  }
+}

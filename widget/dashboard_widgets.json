@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/Views/js/widgetlist.js",
+  "widgets": {
+    "Container-Black": {
+      "options": {}
+    },
+    "Container-BlueLine": {
+      "options": {}
+    },
+    "Container-Grey": {
+      "options": {}
+    },
+    "Container-White": {
+      "options": {}
+    },
+    "heading": {
+      "options": {
+        "html": {
+          "type": "html"
+        }
+      }
+    },
+    "heading-center": {
+      "options": {
+        "html": {
+          "type": "html"
+        }
+      }
+    },
+    "paragraph": {
+      "options": {
+        "html": {
+          "type": "html"
+        }
+      }
+    }
+  }
+}

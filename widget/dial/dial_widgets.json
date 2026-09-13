@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/dial/dial_render.js",
+  "widgets": {
+    "dial": {
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "max": {
+          "type": "value"
+        },
+        "scale": {
+          "type": "value"
+        },
+        "units": {
+          "type": "dropbox_other",
+          "suggested": [
+            "W",
+            "kW",
+            "kWh",
+            "MWh",
+            "Wh",
+            "V",
+            "VA",
+            "A",
+            "°C",
+            "K",
+            "°F",
+            "%",
+            "Hz",
+            "rpm",
+            "pulses",
+            "dB",
+            "hPa",
+            "bar",
+            "psi",
+            "ppm",
+            "µg/m³",
+            "m³",
+            "L",
+            "km",
+            "mi",
+            "m³/h",
+            "l/m",
+            "l/h"
+          ]
+        },
+        "decimals": {
+          "type": "dropbox",
+          "values": [
+            "-1",
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ]
+        },
+        "offset": {
+          "type": "value"
+        },
+        "type": {
+          "type": "dropbox",
+          "values": [
+            "10",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "9",
+            "11",
+            "8",
+            "12",
+            "13",
+            "14",
+            "0",
+            "18",
+            "19",
+            "15",
+            "7",
+            "20",
+            "16",
+            "17",
+            "21",
+            "22",
+            "23"
+          ]
+        },
+        "graduations": {
+          "type": "dropbox",
+          "values": [
+            "1",
+            "0"
+          ]
+        },
+        "unitend": {
+          "type": "dropbox",
+          "values": [
+            "0",
+            "1"
+          ]
+        },
+        "displayminmax": {
+          "type": "dropbox",
+          "values": [
+            "0",
+            "1"
+          ]
+        },
+        "minvaluefeed": {
+          "type": "feedid"
+        },
+        "maxvaluefeed": {
+          "type": "feedid"
+        },
+        "timeout": {
+          "type": "value"
+        },
+        "errormessagedisplayed": {
+          "type": "value"
+        }
+      }
+    }
+  }
+}

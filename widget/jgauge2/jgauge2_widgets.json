@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/jgauge2/jgauge2_render.js",
+  "widgets": {
+    "jgauge2": {
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "feedid2": {
+          "type": "feedid"
+        },
+        "scale": {
+          "type": "value"
+        },
+        "max": {
+          "type": "value"
+        },
+        "min": {
+          "type": "value"
+        },
+        "units": {
+          "type": "value"
+        },
+        "timeout": {
+          "type": "value"
+        },
+        "errormessagedisplayed": {
+          "type": "value"
+        }
+      }
+    }
+  }
+}

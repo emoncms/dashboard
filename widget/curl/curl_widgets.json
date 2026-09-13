@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/curl/curl_render.js",
+  "widgets": {
+    "curl": {
+      "options": {
+        "ip": {
+          "type": "value"
+        },
+        "port": {
+          "type": "value"
+        },
+        "url": {
+          "type": "value"
+        },
+        "payload": {
+          "type": "value"
+        },
+        "method": {
+          "type": "value"
+        },
+        "https": {
+          "type": "value"
+        },
+        "timeout": {
+          "type": "value"
+        },
+        "colour": {
+          "type": "value"
+        },
+        "caption": {
+          "type": "value"
+        },
+        "confirm": {
+          "type": "value"
+        }
+      }
+    }
+  }
+}

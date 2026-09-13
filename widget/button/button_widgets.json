@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/button/button_render.js",
+  "widgets": {
+    "button": {
+      "options": {
+        "feedid": {
+          "type": "feedid_realtime"
+        },
+        "value": {
+          "type": "value"
+        }
+      }
+    }
+  }
+}

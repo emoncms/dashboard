@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/led/led_render.js",
+  "widgets": {
+    "led": {
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "ledstyle": {
+          "type": "dropbox",
+          "values": [
+            "1",
+            "0"
+          ]
+        }
+      }
+    }
+  }
+}

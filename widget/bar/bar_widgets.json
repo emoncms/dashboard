@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/bar/bar_render.js",
+  "widgets": {
+    "bar": {
+      "options": {
+        "title_bar": {
+          "type": "value"
+        },
+        "colour_label": {
+          "type": "colour_picker"
+        },
+        "font": {
+          "type": "dropbox",
+          "values": [
+            "9",
+            "8",
+            "7",
+            "6",
+            "5",
+            "4",
+            "3",
+            "2",
+            "1",
+            "0"
+          ]
+        },
+        "fstyle": {
+          "type": "dropbox",
+          "values": [
+            "2",
+            "1",
+            "0"
+          ]
+        },
+        "fweight": {
+          "type": "dropbox",
+          "values": [
+            "0",
+            "1"
+          ]
+        },
+        "feedid": {
+          "type": "feedid"
+        },
+        "max": {
+          "type": "value"
+        },
+        "scale": {
+          "type": "value"
+        },
+        "units": {
+          "type": "dropbox_other",
+          "suggested": [
+            "W",
+            "kW",
+            "kWh",
+            "MWh",
+            "Wh",
+            "V",
+            "VA",
+            "A",
+            "°C",
+            "K",
+            "°F",
+            "%",
+            "Hz",
+            "rpm",
+            "pulses",
+            "dB",
+            "hPa",
+            "bar",
+            "psi",
+            "ppm",
+            "µg/m³",
+            "m³",
+            "L",
+            "km",
+            "mi",
+            "m³/h",
+            "l/m",
+            "l/h"
+          ]
+        },
+        "unitend": {
+          "type": "dropbox",
+          "values": [
+            "0",
+            "1"
+          ]
+        },
+        "decimals": {
+          "type": "dropbox",
+          "values": [
+            "-1",
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ]
+        },
+        "offset": {
+          "type": "value"
+        },
+        "colour": {
+          "type": "colour_picker"
+        },
+        "graduations": {
+          "type": "dropbox",
+          "values": [
+            "0",
+            "1"
+          ]
+        },
+        "gradNumber": {
+          "type": "value"
+        },
+        "displayminmax": {
+          "type": "dropbox",
+          "values": [
+            "0",
+            "1"
+          ]
+        },
+        "minvaluefeed": {
+          "type": "feedid"
+        },
+        "maxvaluefeed": {
+          "type": "feedid"
+        },
+        "colour_minmax": {
+          "type": "colour_picker"
+        },
+        "timeout": {
+          "type": "value"
+        },
+        "errormessagedisplayed": {
+          "type": "value"
+        }
+      },
+      "legacy": {
+        "title": {
+          "type": "value"
+        }
+      }
+    }
+  }
+}

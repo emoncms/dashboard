@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/cylinder/cylinder_render.js",
+  "widgets": {
+    "cylinder": {
+      "options": {
+        "topfeedid": {
+          "type": "feedid"
+        },
+        "botfeedid": {
+          "type": "feedid"
+        },
+        "temptype": {
+          "type": "dropbox",
+          "values": [
+            "0",
+            "1"
+          ]
+        },
+        "decimals": {
+          "type": "dropbox",
+          "values": [
+            "-1",
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ]
+        },
+        "unitend": {
+          "type": "dropbox",
+          "values": [
+            "0",
+            "1",
+            "2"
+          ]
+        }
+      }
+    }
+  }
+}

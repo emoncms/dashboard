@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/signal/signal_render.js",
+  "widgets": {
+    "signal": {
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "max": {
+          "type": "value"
+        },
+        "scale": {
+          "type": "value"
+        },
+        "offset": {
+          "type": "value"
+        },
+        "signal_title": {
+          "type": "value"
+        },
+        "colour1": {
+          "type": "colour_picker"
+        },
+        "colour": {
+          "type": "colour_picker"
+        },
+        "font": {
+          "type": "dropbox",
+          "values": [
+            "8",
+            "7",
+            "6",
+            "5",
+            "4",
+            "3",
+            "2",
+            "1",
+            "0"
+          ]
+        },
+        "fstyle": {
+          "type": "dropbox",
+          "values": [
+            "2",
+            "1",
+            "0"
+          ]
+        },
+        "fweight": {
+          "type": "dropbox",
+          "values": [
+            "0",
+            "1"
+          ]
+        },
+        "timeout": {
+          "type": "value"
+        },
+        "errormessagedisplayed": {
+          "type": "value"
+        }
+      }
+    }
+  }
+}
