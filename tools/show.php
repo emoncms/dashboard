@@ -9,12 +9,21 @@ Part of the OpenEnergyMonitor project:
 http://openenergymonitor.org
 */
 
-// Stage 1 of the move to JSON dashboard content.
-// Prints the stored content of one or more dashboards from the export, so a
-// finding in the census can be checked against the html it came from.
+// Prints the stored content of one or more dashboards, so a finding in the
+// census can be checked against the html it came from. Read only.
 //
-//   php Modules/dashboard/tools/show.php dashboards.jsonl 42694 44855
-//   php Modules/dashboard/tools/show.php dashboards.jsonl --grep=text-align:
+// Reads the dashboard table:
+//
+//   php Modules/dashboard/tools/show.php 42694 44855
+//   php Modules/dashboard/tools/show.php --grep=text-align:
+//
+// Or an export written by export_content.php:
+//
+//   php Modules/dashboard/tools/show.php dashboards.jsonl 42694
+//
+// This prints the content column, which after the switch over holds what was
+// there before the dashboard was converted. Use convert.php --id=N to see the
+// document a dashboard holds now.
 //
 // Add --raw for the content on one line, unwrapped.
 
@@ -29,28 +38,28 @@ for ($i = 1; $i < $argc; $i++) {
     if (substr($argv[$i], 0, 2) === '--') {
         $parts = explode('=', substr($argv[$i], 2), 2);
         $opts[$parts[0]] = isset($parts[1]) ? $parts[1] : true;
-    } else if ($infile === null) {
+    } else if ($infile === null && !ctype_digit($argv[$i])) {
         $infile = $argv[$i];
     } else {
         $ids[] = (int) $argv[$i];
     }
 }
 
-if ($infile === null || isset($opts['help'])) {
-    echo "usage: php show.php EXPORT.jsonl [ID ...] [--grep=STRING] [--raw] [--max=N]\n";
+if (isset($opts['help']) || (!count($ids) && !isset($opts['grep']) && $infile === null)) {
+    echo "usage: php show.php [ID ...] [--grep=STRING] [--raw] [--max=N]\n";
+    echo "       php show.php EXPORT.jsonl [ID ...] [--grep=STRING]\n\n";
+    echo "Reads the dashboard table unless an export file is named.\n";
     exit(0);
 }
-if (!is_readable($infile)) die("Cannot read $infile\n");
+if ($infile !== null && !is_readable($infile)) die("Cannot read $infile\n");
 
 $grep = isset($opts['grep']) ? $opts['grep'] : null;
 $max = isset($opts['max']) ? (int) $opts['max'] : 5;
 $raw = isset($opts['raw']);
 
-$fh = fopen($infile, 'r');
 $shown = 0;
 
-while (($line = fgets($fh)) !== false) {
-    $row = json_decode(trim($line), true);
+foreach (rows($infile, $ids) as $row) {
     if (!is_array($row) || !isset($row['content'])) continue;
 
     $wanted = count($ids) && in_array((int) $row['id'], $ids);
@@ -71,5 +80,43 @@ while (($line = fgets($fh)) !== false) {
     }
 }
 
-fclose($fh);
 if (!$shown) echo "No matching dashboards found\n";
+
+// Either the export, or the dashboard table when no export was named.
+function rows($infile, $ids)
+{
+    if ($infile !== null) {
+        $fh = fopen($infile, 'r');
+        while (($line = fgets($fh)) !== false) {
+            yield json_decode(trim($line), true);
+        }
+        fclose($fh);
+        return;
+    }
+
+    $cwd = getcwd();
+    chdir(dirname(__FILE__) . "/../../..");
+    require "process_settings.php";
+    chdir($cwd);
+
+    $mysqli = @new mysqli(
+        $settings["sql"]["server"],
+        $settings["sql"]["username"],
+        $settings["sql"]["password"],
+        $settings["sql"]["database"],
+        $settings["sql"]["port"]
+    );
+    if ($mysqli->connect_error) die("Cannot connect to database: " . $mysqli->connect_error . "\n");
+    $mysqli->set_charset("utf8mb4");
+
+    $where = count($ids) ? " WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")" : "";
+    $result = $mysqli->query("SELECT id, content FROM dashboard" . $where . " ORDER BY id",
+        MYSQLI_USE_RESULT);
+    if (!$result) die("Query failed: " . $mysqli->error . "\n");
+
+    while ($row = $result->fetch_assoc()) {
+        yield array('id' => $row['id'], 'content' => $row['content'] === null ? '' : $row['content']);
+    }
+    $result->free();
+    $mysqli->close();
+}
