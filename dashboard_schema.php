@@ -4,6 +4,11 @@ $schema['dashboard'] = array(
     'id' => array('type' => 'int(11)', 'Null'=>'NO', 'Key'=>'PRI', 'Extra'=>'auto_increment'),
     'userid' => array('type' => 'int(11)'),
     'content' => array('type' => 'text'),
+    // The widgets as JSON, see tools/SCHEMA.md. Written by the converter and
+    // by the editor. While both columns are in use, content stays the html it
+    // has always been and this is read in preference to it. mediumtext rather
+    // than text because text caps at 64KB.
+    'content_json' => array('type' => 'mediumtext'),
     'height' => array('type' => 'int(11)', 'default'=>'600'),
     'name' => array('type' => "varchar(30)", 'default'=>'no name'),
     'alias' => array('type' => "varchar(20)", 'default'=>''),
