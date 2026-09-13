@@ -87,16 +87,16 @@ class Dashboard
             return '';
         }
 
-        $stmt = $this->mysqli->prepare("UPDATE dashboard SET content_json=? WHERE id=?");
-        if ($stmt) {
+        try {
+            $stmt = $this->mysqli->prepare("UPDATE dashboard SET content_json=? WHERE id=?");
             $stmt->bind_param("si", $json, $id);
             $stmt->execute();
             $stmt->close();
-        } else {
-            // The column is missing, so the install has not run its database
-            // update yet. The dashboard still draws, it is just converted
-            // again on the next load.
-            $this->log->warn("dashboard $id converted but not stored: " . $this->mysqli->error);
+        } catch (Exception $e) {
+            // Most likely the column is missing because the install has not run
+            // its database update yet. The dashboard still draws, it is just
+            // converted again on the next load.
+            $this->log->warn("dashboard $id converted but not stored: " . $e->getMessage());
         }
 
         $warnings = count($converted['warnings']);
@@ -134,6 +134,7 @@ class Dashboard
         // Get content, name and description from origin dashboard
         $result = $this->mysqli->query("SELECT content,content_json,name,description,height FROM dashboard WHERE userid = '$userid' AND id='$id'");
         $row = $result->fetch_array();
+        if (!$row) return false;
 
         // Name for cloned dashboard
         $name = sprintf('%s %s', $row['name'], tr('clone'));
@@ -202,8 +203,15 @@ class Dashboard
         $id = (int) $id;
         $height = (int) $height;
 
-        $result = $this->mysqli->query(
-            "SELECT content_json FROM dashboard WHERE userid = '$userid' AND id='$id'");
+        try {
+            $result = $this->mysqli->query(
+                "SELECT content_json FROM dashboard WHERE userid = '$userid' AND id='$id'");
+        } catch (Exception $e) {
+            $this->log->error("dashboard $id cannot be saved: " . $e->getMessage());
+            return array('success'=>false,
+                'message'=>'Error: The dashboard table has no content_json column. '
+                    . 'Run the database update.');
+        }
         $row = $result ? $result->fetch_object() : false;
         if (!$row) return array('success'=>false, 'message'=>'Dashboard not updated');
 
@@ -242,12 +250,18 @@ class Dashboard
             return array('success'=>false, 'message'=>'Dashboard content not updated, no changes made');
         }
 
-        $stmt = $this->mysqli->prepare(
-            "UPDATE dashboard SET content_json=?, height=? WHERE userid=? AND id=?");
-        $stmt->bind_param("siii", $content_json, $height, $userid, $id);
-        $stmt->execute();
-        $affected_rows = $stmt->affected_rows;
-        $stmt->close();
+        try {
+            $stmt = $this->mysqli->prepare(
+                "UPDATE dashboard SET content_json=?, height=? WHERE userid=? AND id=?");
+            $stmt->bind_param("siii", $content_json, $height, $userid, $id);
+            $stmt->execute();
+            $affected_rows = $stmt->affected_rows;
+            $stmt->close();
+        } catch (Exception $e) {
+            $this->log->error("dashboard $id cannot be saved: " . $e->getMessage());
+            return array('success'=>false,
+                'message'=>'Error: Dashboard content could not be saved, see the log');
+        }
 
         if ($affected_rows>0){
             // Anything the allowlist would not keep has gone. Saying so beats
