@@ -93,22 +93,39 @@ intended are both safe. Faults are not.
 
 Expect the warning counts to be dominated by things that are meant to go:
 generated canvas and iframe markup, `units_dropdown` designer artefacts,
-browser extension attributes and the broken style fragments. The census of
-5996 dashboards found about 18000 attributes in that category.
+browser extension attributes and the broken style fragments. On a long lived
+install these outnumber everything else by a wide margin, which is why they are
+counted separately from what an author wrote.
 
 Three difference kinds are worth reading off `roundtrip.php` by name, because
 they are the content rules rather than the markup and no census count predicts
 them: `url_dropped`, `option_value_rejected` and `negative_top_clamped`. Step 4
 lists the dashboards behind each.
 
+`widget_wrapped` is the one to stop for. It means a widget box is not a child of
+the page, so it is inside something that is removed whole, and that dashboard
+draws with less on it than it has now.
+
+Do not treat a clean run here as the whole answer. `roundtrip.php` compares what
+it can read on both sides, so it is blind to anything missing from both: a
+widget it does not recognise as a widget is absent before and after, and reads
+as agreement. Two things close that gap, and both found real faults that this
+tool called clean:
+
+- open half a dozen converted dashboards in a browser and look at them, picking
+  ones that use text widgets, free text options and hand written html. A render
+  script can tell an absent option from an empty one, which no comparison of
+  stored content will show you.
+- read the ids `migrate.php` reports under "no widgets" in step 5, before
+  running it with `--write`. A dashboard with content and no widgets either
+  holds no widget at all or holds one the converter could not reach.
+
 ### 4. Look at what will change
 
     php Modules/dashboard/tools/find.php nested wrapped iframe script --full
 
 Lists the dashboards holding the dropped cases, with their ids and userids, so
-their owners can be told or the dashboards looked at first. The census found 53
-hand added iframes, a few hundred nested widgets and 21 dashboards with an
-author `<style>` block.
+their owners can be told or the dashboards looked at first.
 
 The stylesheets are the ones to tell first. A dashboard loses every rule in the
 block, and what it styled stays on the page unstyled, which on the dashboards
@@ -164,6 +181,22 @@ the same as any other. Leaving them out of this step only means they are not
 converted in bulk while their faults are still being looked at.
 
 Run it again after the last step to confirm it has nothing left to do.
+
+Read the ids it lists under "no widgets" rather than passing over them. A
+dashboard with content and no widgets is either a stray line of text, which is
+the common case, or a dashboard whose widgets the converter could not reach.
+`show.php NNN` tells you which within a few seconds, and it is the cheapest
+check in the whole runbook for the amount it has found.
+
+If the converter changes after this step, the documents it already wrote are
+the old converter's work and `migrate.php` will skip them, because they are
+documents. Clear them before running it again:
+
+    UPDATE dashboard SET content_json = NULL;
+
+Safe at any point before step 6, since nothing reads the column yet. After step
+6 it means every dashboard converts again on its next load, which is the same
+thing more slowly.
 
 ### 6. Deploy the switch over
 
