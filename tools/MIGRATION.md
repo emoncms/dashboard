@@ -15,6 +15,38 @@ conversion. The new `content_json` column holds the document.
 Saving goes through the same converter, so the server rather than the browser
 decides what a dashboard may hold. AntiXSS is removed.
 
+## Updating your own install
+
+Most of this document is about doing the migration for other people's
+dashboards. If you are updating your own emoncms, there is one thing to do.
+
+    php scripts/emoncms-cli admin:dbupdate
+
+Or the admin database page. That adds the `content_json` column, and it is the
+same database update any emoncms update asks for. Everything else happens by
+itself: each dashboard is converted the first time it is opened, and the
+`content` column keeps the HTML it had.
+
+Without the column your dashboards still draw, converting on every load rather
+than once, but saving a dashboard fails with a message telling you to run the
+update, and so does cloning one.
+
+Two things are worth knowing before you update rather than after. Both of these
+read the database and change nothing, and take seconds on a handful of
+dashboards:
+
+    php Modules/dashboard/tools/convert.php
+    php Modules/dashboard/tools/roundtrip.php
+
+If they report a fault, or a warning marked as something an author wrote,
+`find.php` in step 4 says which dashboard and what is in it. The cases that
+change a dashboard visibly are listed in `SCHEMA.md` under "Cases decided
+against keeping", and `FORUM-POST-STYLESHEETS.md` covers the most common one,
+a `<style>` block in a text widget.
+
+Steps 3 to 5 and step 8 below are about doing this at scale and are not worth
+your time for your own dashboards.
+
 ## The three branches
 
 The work is split so that the inert part can be deployed and measured before
