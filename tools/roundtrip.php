@@ -104,9 +104,13 @@ foreach ($rows as $row) {
     );
 
     foreach ($rendered['errors'] as $error) {
-        // The renderer rejecting what the converter produced is always a fault.
+        // The renderer rejecting what the converter produced is a fault, with
+        // one exception. A widget whose type the registry does not hold is
+        // drawn as a placeholder on purpose, and the type is one the site
+        // removed years ago, so the box is already empty on the page today.
+        $expected = $error['code'] === 'widget_type_unknown';
         $differences[] = array('kind' => 'renderer_' . $error['code'],
-            'expected' => false, 'detail' => $error['detail']);
+            'expected' => $expected, 'detail' => $error['detail']);
     }
 
     if ($only) {
@@ -304,6 +308,14 @@ function nested_of($node)
 
 // The visible text of a box, with whitespace collapsed. Generated content is
 // left out, so the last reading a render script drew is not compared.
+// True for an element that is removed with everything inside it. What it held
+// is not compared, because it did not go missing on its own: it went with the
+// element, and compare_tags counts that as tag_dropped.
+function is_stripped_element($node)
+{
+    return in_array(strtolower($node->nodeName), dashboard_convert_stripped_elements());
+}
+
 function text_of($node)
 {
     $text = '';
@@ -312,7 +324,8 @@ function text_of($node)
             $text .= $child->textContent;
         } else if ($child->nodeType === XML_ELEMENT_NODE) {
             $tag = strtolower($child->nodeName);
-            if ($tag === 'canvas' || $tag === 'iframe' || $tag === 'script') continue;
+            if ($tag === 'canvas') continue;
+            if (is_stripped_element($child)) continue;
             if ($child->hasAttribute('id')
                 && preg_match('/^can-.*-tooltip-\d+$/', $child->getAttribute('id'))) continue;
             if (is_nested_widget($child)) continue;
@@ -331,6 +344,7 @@ function urls_of($node)
     foreach ($node->childNodes as $child) {
         if ($child->nodeType !== XML_ELEMENT_NODE) continue;
         if (is_nested_widget($child)) continue;
+        if (is_stripped_element($child)) continue;
 
         foreach (array('src', 'href') as $attribute) {
             if (!$child->hasAttribute($attribute)) continue;
@@ -442,8 +456,12 @@ function compare_widget($before, $after, $i, $registry, &$differences)
         compare_tags($before, $after, $where, $differences);
         compare_urls($before, $after, $where, $differences);
     } else if ($after['text'] !== '') {
-        $differences[] = difference('text_added', false,
-            "$where " . dashboard_convert_snippet($after['text']));
+        // An undeclared widget is drawn as a placeholder naming its type, see
+        // dashboard_render_placeholder. Anything else is text on a data widget
+        // that the author did not write.
+        $placeholder = !$known;
+        $differences[] = difference($placeholder ? 'placeholder_text_added' : 'text_added',
+            $placeholder, "$where " . dashboard_convert_snippet($after['text']));
     }
 }
 
@@ -503,8 +521,10 @@ function why_dropped($name, $value, $type, $known, $attributes)
         return array('kind' => 'empty_option_omitted', 'expected' => true);
     }
     if (!$known) {
-        // Nothing on an unknown widget should have been dropped.
-        return array('kind' => 'option_lost', 'expected' => false);
+        // Nothing says which attributes of an undeclared widget were options,
+        // so none are kept, see dashboard_convert_options. The type is not
+        // drawn either, so the option had nothing left to configure.
+        return array('kind' => 'option_dropped_unknown_type', 'expected' => true);
     }
     if (substr($name, -9) === '_dropdown'
         && widget_registry_option($type, substr($name, 0, -9))) {
