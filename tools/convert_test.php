@@ -200,7 +200,35 @@ check('no angle bracket in the rendered options',
 $result = convert('<div id="5" class="dial" style="position:absolute; top:0px; '
     . 'left:0px; width:100px; height:50px;" feedid="7" '
     . 'units="&lt;b&gt;kW&lt;/b&gt;"></div>');
-check('dropbox_other tag dropped', widgets($result)[0]['options'], array('feedid' => '7'));
+check('dropbox_other keeps its words', widgets($result)[0]['options'],
+    array('feedid' => '7', 'units' => 'kW'));
+
+// Free text that only fails because it holds a tag keeps its words. Dropping
+// the option takes the author's label with it, and feedvalue prints the word
+// undefined in its place when append is set and prepend is not.
+$label = function ($value) {
+    $result = convert('<div id="5" class="feedvalue" style="position:absolute; '
+        . 'top:0px; left:0px; width:100px; height:50px;" feedid="7" append=" W" '
+        . 'prepend="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"></div>');
+    $options = widgets($result)[0]['options'];
+    return array(isset($options['prepend']) ? $options['prepend'] : null,
+        implode(',', codes($result)));
+};
+
+check('subscript keeps its text', $label('P<sub>L1</sub>: '),
+    array('PL1: ', 'option_value_tags_stripped'));
+check('a br leaves a space', $label('Estimated<br>Solar:'),
+    array('Estimated Solar:', 'option_value_tags_stripped'));
+check('a trailing br keeps the spacing', $label('UFH Flow <br>'),
+    array('UFH Flow ', 'option_value_tags_stripped'));
+check('nothing but a tag is dropped', $label('<b></b>'),
+    array(null, 'option_value_dropped'));
+
+// Stripping a tag cannot leave an angle bracket behind, whatever it was
+check('a stray bracket is still dropped', $label('a<b>c>d'),
+    array(null, 'option_value_dropped'));
+check('a broken out attribute is still dropped', $label('"><script>alert(1)</script>'),
+    array(null, 'option_value_dropped'));
 
 // What authors actually write in these is kept, quotes included. The curl
 // widget sends a json payload through one, and a url through another.

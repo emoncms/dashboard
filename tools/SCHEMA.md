@@ -157,6 +157,17 @@ entity written in the attribute arrives already decoded, so it cannot spell one
 another way, and an entity that survives as text is written back out as text by
 `.html()`.
 
+A value that fails only because it holds a tag keeps its words rather than
+being dropped. `<br>` leaves a space behind, the remaining tags are removed and
+runs of whitespace are collapsed, so `P<sub>L1</sub>: ` becomes `PL1: ` and
+`Estimated<br>Solar:` becomes `Estimated Solar:`. The result is validated
+again, so anything still holding an angle bracket is dropped as before, and so
+is a value that was nothing but a tag. Six dashboards write subscripts and line
+breaks into a `prepend` this way. Dropping the option takes the author's label
+with it, and `feedvalue` prints the word undefined in its place when `append` is
+set and `prepend` is not, which is the same fault as omitting an empty option.
+The spacing either side of a label is what positions it, so it is kept.
+
 Quotes are kept. The renderer escapes them, and the `curl` widget sends a json
 payload through one of these options. Nothing may build markup by concatenating
 an option value into an html string. `graph_render.js` and `vis_render.js` used

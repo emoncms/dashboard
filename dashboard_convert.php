@@ -418,9 +418,15 @@ function dashboard_convert_options($node, $type, $known, $index, &$warnings)
         // left the other empty gets the word undefined printed beside the
         // reading once the empty one stops being written.
         if ($value !== '' && !dashboard_convert_option_valid($option, $value)) {
-            dashboard_convert_warn($warnings, $index, 'option_value_dropped',
+            $text = dashboard_convert_option_without_tags($option, $value);
+            if ($text === false) {
+                dashboard_convert_warn($warnings, $index, 'option_value_dropped',
+                    $name . '=' . dashboard_convert_snippet($value));
+                continue;
+            }
+            dashboard_convert_warn($warnings, $index, 'option_value_tags_stripped',
                 $name . '=' . dashboard_convert_snippet($value));
-            continue;
+            $value = $text;
         }
 
         // Stored under the name the registry declares, so the renderer and the
@@ -429,6 +435,27 @@ function dashboard_convert_options($node, $type, $known, $index, &$warnings)
     }
 
     return $options;
+}
+
+// Free text that fails only because it holds a tag keeps its words. The tag
+// cannot go back on the page, see the option values section of SCHEMA.md, but
+// dropping the option takes the author's label with it, and feedvalue prints
+// the word undefined in its place when append is set and prepend is not.
+//
+// Returns the text to store, or false when there is nothing worth keeping.
+function dashboard_convert_option_without_tags($option, $value)
+{
+    if ($option['type'] !== 'value' && $option['type'] !== 'dropbox_other') return false;
+    if (strpos($value, '<') === false && strpos($value, '>') === false) return false;
+
+    // A br is a line break the author wrote, so it leaves a space behind. The
+    // spacing either side of a label is kept, only runs of it are collapsed.
+    $text = preg_replace('/<br\s*\/?>/i', ' ', $value);
+    $text = strip_tags($text);
+    $text = preg_replace('/\s+/u', ' ', $text);
+    if ($text === null || trim($text) === '') return false;
+
+    return dashboard_convert_option_valid($option, $text) ? $text : false;
 }
 
 function dashboard_convert_option_valid($option, $value)

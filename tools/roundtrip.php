@@ -449,7 +449,9 @@ function compare_widget($before, $after, $i, $registry, &$differences)
     foreach ($before['attributes'] as $name => $value) {
         if (isset($after['attributes'][$name])) {
             if ($after['attributes'][$name] !== $value) {
-                $differences[] = difference('option_changed', false,
+                $reason = why_changed($name, $value, $after['attributes'][$name],
+                    $before['type'], $known);
+                $differences[] = difference($reason['kind'], $reason['expected'],
                     "$where $name " . describe($value) . ' became '
                     . describe($after['attributes'][$name]));
             }
@@ -568,6 +570,24 @@ function why_dropped($name, $value, $type, $known, $attributes)
         return array('kind' => 'option_value_rejected', 'expected' => true);
     }
     return array('kind' => 'option_lost', 'expected' => false);
+}
+
+// An option that does not hold the same value afterwards. Expected when free
+// text lost a tag it could not keep but kept its words, see
+// dashboard_convert_option_without_tags.
+function why_changed($name, $before, $after, $type, $known)
+{
+    if ($known) {
+        $option = widget_registry_option($type, $name);
+        if ($option !== false) {
+            $text = dashboard_convert_option_without_tags($option, $before);
+            if ($text !== false && $text === $after) {
+                return array('kind' => 'option_tags_stripped', 'expected' => true);
+            }
+        }
+    }
+
+    return array('kind' => 'option_changed', 'expected' => false);
 }
 
 // A url inside the html that is not there any more. Expected when the allowlist
