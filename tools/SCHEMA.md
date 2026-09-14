@@ -455,6 +455,31 @@ configurations are wanted for anything.
 Restoring a widget is still a matter of adding it back to the registry. Its
 boxes come back in place, to be configured again.
 
+## Widgets that are not children of the page
+
+A widget box belongs at the top level of the stored html, which is where the
+designer writes it and where the converter reads it. Two shapes in the corpus
+put one somewhere else.
+
+Four dashboards begin with a `<b>` that is opened and never closed, so every box
+after it parses as its content, 43 of them. One is a hand written flexbox
+layout with the boxes in wrapper divs. These are looked through: an element that
+is not a box is walked into when a box sits somewhere inside it, so ordinary
+stray markup is still passed over. The boxes of the `<b>` dashboards carry their
+geometry and options and convert exactly as they would have at the top level.
+The flexbox one has no geometry to read, so its boxes are placed by the
+renderer.
+
+Two dashboards hold the dashboard editor's own `<textarea name="content">` with
+the page pasted inside it. A browser draws that as a text box full of markup,
+which is what those two show today, so the migration does not draw it either.
+Stripped elements are never looked into. Note that libxml differs by version on
+whether it reads elements inside a textarea at all, so the warning counts for
+those rows are not the same on every machine.
+
+A widget inside another widget is separate from all of this and is dropped, see
+below. A widget is never looked through.
+
 ## Cases decided against keeping
 
 All four are discarded with a warning, so the dashboards holding them can be

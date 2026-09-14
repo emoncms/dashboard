@@ -577,6 +577,46 @@ check('multi token class warned',
 check('multi token class dropped', count(widgets($result)), 0);
 
 // ---------------------------------------------------------------------------
+// A page wrapped in something that is not a widget
+// ---------------------------------------------------------------------------
+
+// A tag opened and never closed takes every box after it as its content. The
+// boxes are ordinary ones, so they are read rather than lost with the wrapper.
+$box = 'style="position:absolute; top:5px; left:5px; width:10px; height:10px;"';
+$result = convert('<b>'
+    . '<div id="1" class="dial" ' . $box . ' feedid="7"></div>'
+    . '<div id="2" class="heading" ' . $box . '>Title</div>');
+check('wrapped boxes are read', count(widgets($result)), 2);
+check('wrapped box keeps its type', widgets($result)[0]['type'], 'dial');
+check('wrapped box keeps its geometry',
+    array(widgets($result)[0]['x'], widgets($result)[0]['y']), array(5, 5));
+check('wrapped box keeps its options', widgets($result)[0]['options'],
+    array('feedid' => '7'));
+
+// However deep the wrapper goes
+$result = convert('<div id="page"><div id="row">'
+    . '<div id="1" class="dial" ' . $box . '></div></div></div>');
+check('a box is found at any depth', count(widgets($result)), 1);
+
+// The editor's own textarea, pasted into the content column. A browser draws
+// what is inside it as text, so the migration does not draw it either.
+$result = convert('<textarea name="content">'
+    . '<div id="1" class="dial" ' . $box . '></div></textarea>');
+check('a box inside a textarea is not read', count(widgets($result)), 0);
+
+// Stray markup holding no box is passed over rather than walked into
+$result = convert('<div><p>notes to self</p></div>');
+check('markup with no box is left alone', count(widgets($result)), 0);
+check('and says only that it has no type', codes($result),
+    array('widget_without_type'));
+
+// A widget inside a widget is still dropped. A widget is never looked through.
+$result = convert('<div id="1" class="paragraph" ' . $box . '>'
+    . '<div id="2" class="dial" ' . $box . '></div>text</div>');
+check('a nested widget is still dropped', count(widgets($result)), 1);
+check('and the text box is what is kept', widgets($result)[0]['type'], 'paragraph');
+
+// ---------------------------------------------------------------------------
 // Encoding
 // ---------------------------------------------------------------------------
 
