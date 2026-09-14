@@ -538,14 +538,16 @@ function why_dropped($name, $value, $type, $known, $attributes)
         return array('kind' => 'broken_style_attribute', 'expected' => true);
     }
     if ($value === '') {
-        // Either a fragment of a broken style or an option left empty. Both
-        // are meant to go.
+        // An empty option the widget declares is kept, see
+        // dashboard_convert_options, so what is left here is an empty
+        // attribute that is not an option: a fragment of a broken style, or a
+        // name no widget declares. Both are meant to go.
         foreach ($attributes as $other => $ignored) {
             if (preg_match('/[:;()\/]|^[0-9]/', $other)) {
                 return array('kind' => 'broken_style_attribute', 'expected' => true);
             }
         }
-        return array('kind' => 'empty_option_omitted', 'expected' => true);
+        return array('kind' => 'empty_attribute_omitted', 'expected' => true);
     }
     if (!$known) {
         // Nothing says which attributes of an undeclared widget were options,
