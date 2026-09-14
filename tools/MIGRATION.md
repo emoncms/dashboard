@@ -116,6 +116,10 @@ using them for rotated labels is the change an owner sees straight away. The
 effect has to be written again as inline style, and `transform` is on the style
 list for a single `rotate()` so that it can be.
 
+`FORUM-POST-STYLESHEETS.md` is written for those owners. It says what changed,
+how to tell whether their dashboard is one of them, and how to write the rules
+again so they are kept.
+
 Then the content rules, which the census cannot predict. It recorded attribute
 names and counts, never values, so nothing in it says how many authors have a
 tag in an option, a cache busting query on an image, or an opacity of zero:
