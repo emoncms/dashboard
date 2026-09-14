@@ -56,3 +56,20 @@
   text-align: center;
   overflow: hidden;
 }
+
+/* Action widget left in a dashboard while enable_action_widgets is off */
+.widget-disabled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 1px dashed #aaa;
+  border-radius: 4px;
+  color: #888;
+  background-color: rgba(150, 150, 150, 0.08);
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  padding: 2px;
+  overflow: hidden;
+}
