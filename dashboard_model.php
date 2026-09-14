@@ -292,7 +292,8 @@ class Dashboard
             'nested_widget_dropped', 'iframe_dropped', 'tag_dropped', 'tag_unwrapped',
             'url_dropped', 'attribute_dropped', 'style_property_dropped',
             'style_value_dropped', 'option_value_dropped', 'text_outside_widget',
-            'position_fixed_dropped', 'widget_without_type'
+            'position_fixed_dropped', 'widget_without_type',
+            'unknown_widget_option_dropped', 'opacity_raised'
         );
 
         $counts = array();

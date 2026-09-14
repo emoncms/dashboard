@@ -441,9 +441,11 @@ function draw_kwhperiod (
   })
 
   if (errorCode === '1') {
-    kwhperiod.html(errorMessage)
+    kwhperiod.text(errorMessage)
   } else {
-    kwhperiod.html(prepend + val + append)
+    // Text, not html. prepend, append and units are free text an author
+    // types, see the option values section of tools/SCHEMA.md.
+    kwhperiod.text(prepend + val + append)
   }
 }
 

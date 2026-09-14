@@ -121,13 +121,29 @@ Validation is per option, driven by the widget registry:
 
 | option type | rule |
 | --- | --- |
-| `feedid` | digits only |
-| `dropbox` | must be one of the declared values |
-| `dropbox_other` | a declared value, or free text matching the option's pattern |
-| `colour_picker` | 3 or 6 hex digits, no `#` |
+| `feedid` | digits, or a tag:name association, no control characters and no `<>"'` |
+| `dropbox` | must be one of the declared values, or the same as `feedid` when the list is filled per user |
+| `dropbox_other` | free text, see below |
+| `colour_picker` | 3 or 6 hex digits, `#` optional |
 | `boolean` | `"0"` or `"1"` |
-| `value` | free text, length capped, no control characters |
+| `value` | free text, see below |
 | `html` | see below |
+
+**Free text options**, `value` and `dropbox_other`, are 1 to 512 characters with
+no control characters and no `<` or `>`. These hold what an author types: units,
+a title, a prepend and append, a curl url and payload. Several render scripts
+put them into the page with `.html()`, `feedvalue` and `kwhperiod` write
+`prepend + val + append` and `feedtime` writes `val + units`, so a value holding
+a tag would be parsed as one. Angle brackets are the only way to open a tag. An
+entity written in the attribute arrives already decoded, so it cannot spell one
+another way, and an entity that survives as text is written back out as text by
+`.html()`.
+
+Quotes are kept. The renderer escapes them, and the `curl` widget sends a json
+payload through one of these options. Nothing may build markup by concatenating
+an option value into an html string. `graph_render.js` and `vis_render.js` used
+to build their embed iframe that way, and now set the url on an element they
+create, with both halves of every query parameter encoded.
 
 ## The widget registry
 
@@ -269,13 +285,47 @@ characters before testing the scheme, never after.
 **Style properties**
 
 ```
-color background-color font-size font-family font-weight font-style
-text-align text-decoration line-height vertical-align
-padding margin border width height
+text        color font font-size font-family font-weight font-style
+            letter-spacing line-height text-align text-decoration
+            text-transform vertical-align white-space
+
+paint       background background-color border border-top border-right
+            border-bottom border-left border-color border-style border-width
+            border-radius border-collapse border-spacing box-shadow opacity
+
+box         padding padding-top padding-right padding-bottom padding-left
+            margin margin-top margin-right margin-bottom margin-left
+            width height max-width min-width max-height min-height
+            display visibility overflow float table-layout
+            align-items justify-content flex-wrap
 ```
 
-Values are matched against a pattern per property. Anything containing `url(`,
-`expression(`, or a `position` declaration is dropped.
+The list is drawn from the style properties stored dashboards actually use. A
+value is dropped whatever the property is if it calls anything but `rgb`,
+`rgba`, `hsl`, `hsla` or `calc`, or if it is a `position` declaration, so
+nothing on the list can fetch or run anything. The functions are named the
+allowed way round because the ways of writing a fetch are not a list to keep up
+with: `url()`, `image-set()` and its vendor spellings, `element()`, `paint()`.
+
+`opacity` is floored at 0.2, on a widget box and inside its html. A widget at
+zero opacity is invisible and still takes clicks, which on a public dashboard
+puts an unseen `curl` or `button` widget over something the visitor means to
+press. A value below the floor is raised and the author is told. An opacity
+written some other way, `calc(0.1)` for example, cannot be read here, so it is
+dropped rather than left through. `display: none` and `visibility: hidden` are
+left alone, they take the box out of hit testing.
+
+`box-shadow` can paint outside its own box, so a widget can put colour over the
+rest of the page. It cannot take a click, so it is kept.
+
+`position`, `top`, `left`, `width`, `height` and the margins are dropped from a
+widget box without a warning. The designer writes them and the renderer puts
+them back from the document, so what is stored is generated. Inside the html of
+a text or container widget they are kept.
+
+Off the list on purpose: `position` and `z-index`, which lift a box out of the
+page and restack it, and `transform`, which moves one without changing its
+geometry.
 
 ## What the converter discards
 
@@ -289,7 +339,12 @@ Values are matched against a pattern per property. Anything containing `url(`,
 - Browser extension debris: `bis_skin_checked`, `_msttexthash`, `_msthash`,
   `wfd-id`, `data-darkreader-inline-color`, `data-dashlane-frameid`,
   `data-ruffle-polyfilled`, `__gchrome_childframeremotetoken` and the rest,
-  along with `user-select` and `--darkreader-inline-color` in inline styles.
+  along with `user-select`, `word-break`, `pointer-events`, `font-stretch`,
+  `font-width`, `font-size-adjust`, `font-kerning`, `font-feature-settings`,
+  `font-optical-sizing`, `font-variation-settings`, the `font-variant` family
+  and the `--darkreader-*` custom properties in inline styles. The style
+  properties are dropped without a warning, see
+  `dashboard_convert_style_property_silent`.
   These are in the data because the editor saves `$("#page").html()` from a live
   DOM that the reader's extensions have already modified.
 
@@ -303,10 +358,31 @@ Nine classes in use are not in the deployed registry: `jgauge3`,
 `smoothie`, `stack`, `orderthreshold` and one pasted Tailwind class. 63
 dashboards between them.
 
-The converter keeps them, marked `"unknown": true`, with their options intact.
-Nothing is lost and the renderer can draw a labelled placeholder, the same
-treatment `loadwidgets.php` already gives disabled action widgets. Restoring a
-widget later is then a matter of adding it back to the registry.
+The converter keeps them, marked `"unknown": true`, with their geometry and
+their box styling. Their attributes are dropped, each with an
+`unknown_widget_option_dropped` warning.
+
+The attributes go because nothing declares the widget, so nothing says which of
+them are options and which would act on the page. The name alone does not
+settle it: `onmouseover` is shaped exactly like an option name, and a widget
+type is whatever an author typed into a class attribute. Rendering an
+undeclared attribute put an author written event handler on the page, on public
+dashboards included.
+
+The renderer draws a labelled placeholder in the author's box, the same
+treatment `loadwidgets.php` already gives disabled action widgets. A container
+draws itself from its own html and keeps it.
+
+What this costs, across the corpus: `jgauge3` loses `feedid scale max min units
+decimals` on 20 dashboards, `histgraph` and `timestoredaily` lose `feedid` and
+`units` on 13 and 12, `orderthreshold` and `smoothie` lose theirs on one and
+three. None of those widgets have a render script deployed, so none of them
+draw today and none of the values are in use. The `content` column still holds
+the html they came from. Export it before that column is dropped if the
+configurations are wanted for anything.
+
+Restoring a widget is still a matter of adding it back to the registry. Its
+boxes come back in place, to be configured again.
 
 ## Cases decided against keeping
 

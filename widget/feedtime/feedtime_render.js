@@ -183,12 +183,12 @@ function draw_feedtime(feedvalue,
 
 			if (unitend ==="0")
 			{
-			feedvalue.html(val+units);
+			feedvalue.text(val+units);
 			}
 
 			if (unitend ==="1")
 			{
-			feedvalue.html(units+val);
+			feedvalue.text(units+val);
 			}
 
 

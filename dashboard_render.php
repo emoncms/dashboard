@@ -95,24 +95,34 @@ function dashboard_render_widget($widget, $index, $registry, &$errors)
     }
 
     $known = isset($registry[$type]);
-    if (!$known && empty($widget['unknown'])) {
+    if (!$known) {
         // Either the declaration is not deployed or the document was written
         // against a different set of widgets. Drawn as a placeholder rather
         // than silently left out, so the author can see it is still there.
         dashboard_convert_warn($errors, $index, 'widget_type_unknown', $type);
     }
 
+    $holds_html = dashboard_convert_holds_html($type, $known, $registry);
     $style = dashboard_render_box_style($widget, $index, $errors);
 
     $attributes = ' id="' . ($index + 1) . '"'
         . ' class="' . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . '"'
         . ' style="' . htmlspecialchars($style, ENT_QUOTES, 'UTF-8') . '"';
 
-    $attributes .= dashboard_render_options($widget, $type, $known, $index, $registry, $errors);
+    if ($known) {
+        $attributes .= dashboard_render_options($widget, $type, $index, $errors);
+    } else if (!empty($widget['options'])) {
+        // Written by a converter that carried the attributes of an undeclared
+        // widget through. Nothing says which of them are options, so none are
+        // written, see dashboard_convert_options. A document holding any is
+        // due to be converted again.
+        dashboard_convert_warn($errors, $index, 'unknown_widget_option_dropped',
+            implode(' ', array_keys((array) $widget['options'])));
+    }
 
     $inner = '';
     if (isset($widget['html']) && is_string($widget['html'])) {
-        if (dashboard_convert_holds_html($type, $known, $registry)) {
+        if ($holds_html) {
             // Run through the allowlist again on the way out.
             $inner = dashboard_convert_sanitise_html($widget['html'], $errors, $index);
         } else {
@@ -120,7 +130,23 @@ function dashboard_render_widget($widget, $index, $registry, &$errors)
         }
     }
 
+    // A container draws itself from its own html and box style, so it is left
+    // alone. The rest of the undeclared types are drawn by a render script
+    // that is not here, which would leave an empty box.
+    if (!$known && !$holds_html) $inner = dashboard_render_placeholder($type);
+
     return '<div' . $attributes . '>' . $inner . '</div>';
+}
+
+// Stands in for a widget no module declares. Named so the author can see which
+// widget it is and put the module back, or delete the box.
+function dashboard_render_placeholder($type)
+{
+    $label = function_exists('tr') ? tr('widget not installed') : 'widget not installed';
+
+    return '<div class="dashboard-placeholder">'
+        . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . '<br><small>'
+        . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</small></div>';
 }
 
 // The box style the designer writes, plus any allowlisted styling the widget
@@ -159,7 +185,11 @@ function dashboard_render_number($widget, $key, $index, &$errors)
     return (int) round((float) $widget[$key]);
 }
 
-function dashboard_render_options($widget, $type, $known, $index, $registry, &$errors)
+// Only ever called for a widget the registry declares. An option is written
+// when the declaration names it and the value passes the check for its type,
+// so the attributes on the page are the ones a widget said it accepts. See
+// dashboard_render_widget for what happens to the rest.
+function dashboard_render_options($widget, $type, $index, &$errors)
 {
     if (!isset($widget['options'])) return '';
 
@@ -187,23 +217,17 @@ function dashboard_render_options($widget, $type, $known, $index, $registry, &$e
         // their default when the attribute is absent.
         if ($value === '') continue;
 
-        if ($known) {
-            $option = widget_registry_option($type, $name);
-            if ($option === false) {
-                dashboard_convert_warn($errors, $index, 'option_unknown_dropped', $name);
-                continue;
-            }
-            if (!dashboard_convert_option_valid($option, $value)) {
-                dashboard_convert_warn($errors, $index, 'option_value_dropped',
-                    $name . '=' . dashboard_convert_snippet($value));
-                continue;
-            }
-            $name = $option['name'];
-        } else if (strlen($value) > 4096
-            || preg_match('/[\x00-\x08\x0b\x0c\x0e-\x1f]/', $value)) {
-            dashboard_convert_warn($errors, $index, 'option_value_dropped', $name);
+        $option = widget_registry_option($type, $name);
+        if ($option === false) {
+            dashboard_convert_warn($errors, $index, 'option_unknown_dropped', $name);
             continue;
         }
+        if (!dashboard_convert_option_valid($option, $value)) {
+            dashboard_convert_warn($errors, $index, 'option_value_dropped',
+                $name . '=' . dashboard_convert_snippet($value));
+            continue;
+        }
+        $name = $option['name'];
 
         $html .= ' ' . $name . '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
     }

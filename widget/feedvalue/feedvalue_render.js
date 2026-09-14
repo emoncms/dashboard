@@ -198,11 +198,13 @@ function draw_feedvalue(feedvalue,font,fstyle,fweight,width,height,prepend,val,a
 
     if (errorCode === "1")
     {
-        feedvalue.html(errorMessage);
+        feedvalue.text(errorMessage);
     }
     else
     {
-        feedvalue.html(prepend+val+append);
+        // Text, not html. prepend, append and units are free text an author
+        // types, see the option values section of tools/SCHEMA.md.
+        feedvalue.text(prepend+val+append);
     }
 }
 

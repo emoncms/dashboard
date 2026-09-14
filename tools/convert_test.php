@@ -42,6 +42,12 @@ function convert($html)
     return dashboard_convert($html);
 }
 
+function render($result)
+{
+    $rendered = dashboard_render($result['document']);
+    return $rendered['html'];
+}
+
 function codes($result)
 {
     $codes = array();
@@ -53,6 +59,25 @@ function codes($result)
 function widgets($result)
 {
     return $result['document']['widgets'];
+}
+
+// Every attribute name in a piece of rendered markup, read by parsing it.
+function dashboard_test_attributes($html)
+{
+    $names = array();
+    $root = dashboard_convert_parse($html);
+    if ($root === null) return $names;
+
+    $stack = array($root);
+    while (count($stack)) {
+        $node = array_pop($stack);
+        foreach ($node->childNodes as $child) {
+            if ($child->nodeType !== XML_ELEMENT_NODE) continue;
+            foreach ($child->attributes as $attribute) $names[] = $attribute->nodeName;
+            $stack[] = $child;
+        }
+    }
+    return $names;
 }
 
 // ---------------------------------------------------------------------------
@@ -151,6 +176,57 @@ check('bad dropbox value dropped', widgets($result)[0]['options'],
 check('bad dropbox value warned', codes($result), array('option_value_dropped'));
 
 // ---------------------------------------------------------------------------
+// A free text option cannot carry a tag
+// ---------------------------------------------------------------------------
+
+// feedvalue puts prepend, append, units and errormessagedisplayed into the
+// page with .html(), so an angle bracket in one of them would open a tag
+$html = '<div id="5" class="feedvalue" style="position:absolute; top:0px; left:0px; '
+    . 'width:100px; height:50px;" feedid="7" '
+    . 'units="&lt;img src=x onerror=alert(1)&gt;" '
+    . 'prepend="&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;" '
+    . 'append="&lt;svg onload=alert(1)&gt;" '
+    . 'errormessagedisplayed="&lt;iframe src=javascript:alert(1)&gt;"></div>';
+
+$result = convert($html);
+check('free text tag dropped', widgets($result)[0]['options'], array('feedid' => '7'));
+check('free text tag warned', codes($result), array('option_value_dropped',
+    'option_value_dropped', 'option_value_dropped', 'option_value_dropped'));
+check('no angle bracket in the rendered options',
+    strpos(render($result), 'img src=x'), false);
+
+// dropbox_other holds free text as well, see the units option of bar and dial
+$result = convert('<div id="5" class="dial" style="position:absolute; top:0px; '
+    . 'left:0px; width:100px; height:50px;" feedid="7" '
+    . 'units="&lt;b&gt;kW&lt;/b&gt;"></div>');
+check('dropbox_other tag dropped', widgets($result)[0]['options'], array('feedid' => '7'));
+
+// What authors actually write in these is kept, quotes included. The curl
+// widget sends a json payload through one, and a url through another.
+$html = '<div id="5" class="curl" style="position:absolute; top:0px; left:0px; '
+    . 'width:100px; height:50px;" ip="10.0.0.5" port="80" url="api?a=1&amp;b=2" '
+    . 'payload="{&quot;state&quot;:1}" caption="Turn on" method="POST"></div>';
+
+$result = convert($html);
+check('free text kept', widgets($result)[0]['options'], array(
+    'ip' => '10.0.0.5', 'port' => '80', 'url' => 'api?a=1&b=2',
+    'payload' => '{"state":1}', 'caption' => 'Turn on', 'method' => 'POST'));
+check('free text quiet', codes($result), array());
+check('free text quoting is escaped on the way out',
+    strpos(render($result), 'payload="{&quot;state&quot;:1}"') !== false, true);
+
+$html = '<div id="5" class="feedvalue" style="position:absolute; top:0px; left:0px; '
+    . 'width:100px; height:50px;" feedid="7" units=" kWh" prepend="&#163;" '
+    . 'append="&#176;C" scale="0.001" errormessagedisplayed="Feed timeout!"></div>';
+
+$result = convert($html);
+check('unicode free text kept', widgets($result)[0]['options'], array(
+    'feedid' => '7', 'units' => ' kWh', 'prepend' => "\xc2\xa3",
+    'append' => "\xc2\xb0C", 'scale' => '0.001',
+    'errormessagedisplayed' => 'Feed timeout!'));
+check('unicode free text quiet', codes($result), array());
+
+// ---------------------------------------------------------------------------
 // Empty options are left out
 // ---------------------------------------------------------------------------
 
@@ -205,6 +281,84 @@ check('paragraph warnings', codes($result), array(
     'url_dropped', 'url_dropped'
 ));
 
+// Styling authors write, from the style property counts in the census
+$styling = 'font: bold 22px / 60px Helvetica; border-bottom: 2px solid #333; '
+    . 'border-color: #9b9b9b; border-radius: 25px; background: black; opacity: 0.8; '
+    . 'display: flex; justify-content: center; align-items: center; overflow: hidden; '
+    . 'max-width: 100%; table-layout: fixed; white-space: nowrap; padding-bottom: 0';
+
+$result = convert('<div id="1" class="paragraph" style="position:absolute; top:0px; '
+    . "left:0px; width:10px; height:10px; $styling;\">x</div>");
+check('box styling kept', codes($result), array());
+check('box styling complete', count(widgets($result)[0]['style']), 14);
+
+// A value cannot fetch or run whatever the property is
+$result = convert(box('<span style="background:url(//example.com/x.png); '
+    . 'border-color:expression(alert(1)); box-shadow:0 0 0 red">x</span>'));
+check('style values still filtered', widgets($result)[0]['html'],
+    '<span style="box-shadow: 0 0 0 red">x</span>');
+
+// A fetch does not need url(). Every function in a value has to be one of the
+// few that only compute one, see dashboard_convert_allowed_style_functions.
+foreach (array('url(//example.com/x.png)', 'image-set("//example.com/x.png" 1x)',
+    '-webkit-image-set("//example.com/x.png" 1x)', 'element(#page)',
+    'expression(alert(1))', 'cross-fade(red, blue)') as $value) {
+    check("style value $value refused",
+        dashboard_convert_style_value_allowed($value), false);
+}
+foreach (array('rgb(255, 221, 221)', 'rgba(0, 0, 0, .5)', 'calc(100% - 10px)',
+    'bold 22px / 60px Helvetica', '1px solid rgb(0, 0, 0)') as $value) {
+    check("style value $value kept",
+        dashboard_convert_style_value_allowed($value), true);
+}
+
+// position, z-index and transform stay off the list: they lift a box out of
+// the page, restack it, or move it without changing its geometry
+$result = convert('<div id="1" class="paragraph" style="position:absolute; top:0px; '
+    . 'left:0px; width:10px; height:10px; z-index:100; transform:rotate(-90deg);">x</div>');
+check('box cannot restack or move itself', isset(widgets($result)[0]['style']), false);
+
+// The margin longhands go the way of the shorthand on a box, because the
+// renderer writes margin: 0 and a later margin-top would win
+$result = convert('<div id="1" class="paragraph" style="position:absolute; top:0px; '
+    . 'left:0px; width:10px; height:10px; margin-top:-500px; color:red;">x</div>');
+check('box margin longhand dropped', widgets($result)[0]['style'], array('color' => 'red'));
+$result = convert(box('<p style="margin-top:8px">x</p>'));
+check('margin longhand kept in html', widgets($result)[0]['html'],
+    '<p style="margin-top: 8px">x</p>');
+
+// Opacity is floored, so a widget cannot be left invisible and still clickable
+$result = convert(box('<span style="opacity:0">x</span>'));
+check('opacity floored', widgets($result)[0]['html'],
+    '<span style="opacity: 0.2">x</span>');
+check('opacity floor reported', codes($result), array('opacity_raised'));
+$result = convert(box('<span style="opacity:0.05%">x</span>'));
+check('opacity per cent floored', widgets($result)[0]['html'],
+    '<span style="opacity: 20%">x</span>');
+$result = convert(box('<span style="opacity:0.8">x</span>'));
+check('opacity above the floor kept', widgets($result)[0]['html'],
+    '<span style="opacity: 0.8">x</span>');
+check('opacity above the floor quiet', codes($result), array());
+$result = convert(box('<span style="opacity:calc(0.1)">x</span>'));
+check('opacity that cannot be read is dropped', widgets($result)[0]['html'],
+    '<span>x</span>');
+$result = convert('<div id="1" class="paragraph" style="position:absolute; top:0px; '
+    . 'left:0px; width:10px; height:10px; opacity:0;">x</div>');
+check('box opacity floored', widgets($result)[0]['style'], array('opacity' => '0.2'));
+
+// Extension styling is dropped without telling the author, there is nothing
+// for them to act on
+$result = convert(box('<span style="font-variant-caps:normal; font-stretch:100%; '
+    . 'word-break:normal; pointer-events:auto; font-kerning:auto; '
+    . '--darkreader-inline-color:red; user-select:none; font-width:100%; '
+    . 'font-size-adjust:none; font-feature-settings:normal; '
+    . 'font-optical-sizing:auto; font-variation-settings:normal">x</span>'));
+check('extension styling dropped', widgets($result)[0]['html'], '<span>x</span>');
+check('extension styling quiet', codes($result), array());
+$result = convert(box('<span style="mix-blend-mode:multiply">x</span>'));
+check('unknown property still reported', codes($result),
+    array('style_property_dropped'));
+
 // A container holding a hand built table
 $html = '<div id="11" class="Container-White" style="position:absolute; top:0px; '
     . 'left:0px; width:200px; height:200px;"><table border="1" cellpadding="2">'
@@ -241,14 +395,27 @@ check('hand added iframe src reported', $result['warnings'][0]['detail'],
 // ---------------------------------------------------------------------------
 
 $html = '<div id="15" class="jgauge3" style="position:absolute; top:5px; left:5px; '
-    . 'width:120px; height:120px;" feedid="4" max="10" someoption="x"></div>';
+    . 'width:120px; height:120px; color:red;" feedid="4" max="10" someoption="x"></div>';
 
 $result = convert($html);
 $widget = widgets($result)[0];
 check('unknown widget marked', $widget['unknown'], true);
-check('unknown widget options untouched', $widget['options'],
-    array('feedid' => '4', 'max' => '10', 'someoption' => 'x'));
-check('unknown widget warned', codes($result), array('widget_type_unknown'));
+// Nothing declares the widget, so nothing says which of its attributes are
+// options and which would act on the page, see the unknown widget types
+// section of SCHEMA.md.
+check('unknown widget options dropped', $widget['options'], array());
+check('unknown widget keeps its box style', $widget['style'], array('color' => 'red'));
+check('unknown widget warned', codes($result), array(
+    'unknown_widget_option_dropped', 'unknown_widget_option_dropped',
+    'unknown_widget_option_dropped', 'widget_type_unknown'));
+
+// An event handler is shaped like an option name, which is why none of them
+// are kept.
+$html = '<div id="1" class="notawidget" style="position:absolute; top:0px; left:0px; '
+    . 'width:10px; height:10px;" onmouseover="alert(1)"></div>';
+
+$result = convert($html);
+check('unknown widget handler dropped', widgets($result)[0]['options'], array());
 
 // ---------------------------------------------------------------------------
 // Nothing outside a widget, and nothing without a type
@@ -422,7 +589,42 @@ $html = dashboard_render($planted)['html'];
 check('planted document is filtered on output',
     stripos($html, 'script') !== false || stripos($html, 'javascript') !== false, false);
 
+// So is a document holding the options an earlier converter carried through
+// for an undeclared widget
+$planted = array('version' => 1, 'widgets' => array(array(
+    'type' => 'jgauge3', 'x' => 0, 'y' => 0, 'w' => 10, 'h' => 10, 'unknown' => true,
+    'options' => array('onmouseover' => 'alert(1)', 'feedid' => '4')
+)));
+$rendered = dashboard_render($planted);
+check('planted unknown widget writes no attributes',
+    preg_match('/\son\w+\s*=|feedid/i', $rendered['html']) > 0, false);
+check('planted unknown widget is reported',
+    in_array('unknown_widget_option_dropped', array_column($rendered['errors'], 'code')), true);
+check('planted unknown widget is drawn',
+    strpos($rendered['html'], 'dashboard-placeholder') !== false, true);
+
+// No widget of any kind puts an event handler on the page
+$every = array('version' => 1, 'widgets' => array());
+foreach (array('feedvalue', 'paragraph', 'Container-White', 'jgauge3', 'notawidget') as $type) {
+    $every['widgets'][] = array(
+        'type' => $type, 'x' => 0, 'y' => 0, 'w' => 10, 'h' => 10,
+        'options' => array('onclick' => 'alert(1)', 'units' => '" onload="alert(2)'),
+        'html' => '<b onmouseover="alert(3)">t</b>',
+        'style' => array('color' => 'red')
+    );
+}
+// Read back as markup rather than as a string: an option value may legitimately
+// contain the text of a handler, escaped, and that is not a handler.
+$handlers = array();
+foreach (dashboard_test_attributes(dashboard_render($every)['html']) as $name) {
+    if (preg_match('/^on/i', $name)) $handlers[] = $name;
+}
+check('no event handler reaches the page', $handlers, array());
+
 // A widget that may not hold html does not get to
+$planted = array('version' => 1, 'widgets' => array(array(
+    'type' => 'paragraph', 'x' => 0, 'y' => 0, 'w' => 10, 'h' => 10, 'options' => array()
+)));
 $planted['widgets'][0]['type'] = 'feedvalue';
 $planted['widgets'][0]['html'] = '<b>text</b>';
 $rendered = dashboard_render($planted);

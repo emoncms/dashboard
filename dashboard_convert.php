@@ -77,21 +77,41 @@ function dashboard_convert_allowed_attributes()
     );
 }
 
-// Style properties allowed, both on a widget box and inside its html.
+// Style properties allowed, both on a widget box and inside its html. Taken
+// from what stored dashboards use, see the style property counts in the census.
+// None of them can fetch or run anything: a value carrying url(), expression()
+// or a position declaration is dropped whatever the property is, see
+// dashboard_convert_style_value_allowed.
 function dashboard_convert_allowed_styles()
 {
     return array(
-        'color', 'background-color', 'font-size', 'font-family', 'font-weight',
-        'font-style', 'text-align', 'text-decoration', 'line-height',
-        'vertical-align', 'padding', 'margin', 'border', 'width', 'height'
+        // Text
+        'color', 'font', 'font-size', 'font-family', 'font-weight', 'font-style',
+        'letter-spacing', 'line-height', 'text-align', 'text-decoration',
+        'text-transform', 'vertical-align', 'white-space',
+        // Background, border and the rest of the paint
+        'background', 'background-color', 'border', 'border-top', 'border-right',
+        'border-bottom', 'border-left', 'border-color', 'border-style',
+        'border-width', 'border-radius', 'border-collapse', 'border-spacing',
+        'box-shadow', 'opacity',
+        // Box
+        'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+        'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+        'width', 'height', 'max-width', 'min-width', 'max-height', 'min-height',
+        'display', 'visibility', 'overflow', 'float', 'table-layout',
+        'align-items', 'justify-content', 'flex-wrap'
     );
 }
 
 // Style properties of a widget box that the designer writes and the renderer
-// puts back, so they are dropped without a warning.
+// puts back, so they are dropped without a warning. The margin longhands are
+// here with the shorthand: the renderer writes margin: 0 on every box, and a
+// margin-top written after it would win and move the box off the geometry the
+// document gives it. Inside the html of a widget they are kept.
 function dashboard_convert_box_styles()
 {
-    return array('position', 'top', 'left', 'width', 'height', 'margin');
+    return array('position', 'top', 'left', 'width', 'height',
+        'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left');
 }
 
 // Attributes added by browser extensions to the page the editor saved.
@@ -225,23 +245,29 @@ function dashboard_convert_widget($node, $index, $registry, &$warnings)
     $widget['options'] = dashboard_convert_options($node, $type, $known, $index, $warnings);
 
     if (!$known) {
-        // Kept with its options so nothing is lost, see the unknown widget
-        // types section of SCHEMA.md.
+        // Kept as a placeholder, with its geometry and its box styling but
+        // without its attributes, see the unknown widget types section of
+        // SCHEMA.md.
         $widget['unknown'] = true;
         dashboard_convert_warn($warnings, $index, 'widget_type_unknown', $type);
     }
 
-    if (dashboard_convert_holds_html($type, $known, $registry)) {
+    $holds_html = dashboard_convert_holds_html($type, $known, $registry);
+
+    if ($holds_html) {
         $html = dashboard_convert_html($node, $index, $registry, $warnings);
         if ($html !== '') $widget['html'] = $html;
-
-        // Only these widgets can carry author written box styling. On the
-        // rest the render script writes the box style at draw time, so what
-        // is stored is generated and is dropped without a warning.
-        $box = dashboard_convert_styles($declarations, $index, $warnings, true);
-        if (count($box)) $widget['style'] = $box;
     } else {
         dashboard_convert_check_discarded($node, $type, $index, $registry, $warnings);
+    }
+
+    // Author written box styling. A deployed data widget has its box style
+    // written by the render script at draw time, so what is stored is
+    // generated and is dropped without a warning. Text boxes, containers and
+    // placeholders keep theirs.
+    if ($holds_html || !$known) {
+        $box = dashboard_convert_styles($declarations, $index, $warnings, true);
+        if (count($box)) $widget['style'] = $box;
     }
 
     return $widget;
@@ -361,10 +387,14 @@ function dashboard_convert_options($node, $type, $known, $index, &$warnings)
             continue;
         }
 
-        // An unknown widget cannot be checked against anything, so its options
-        // are carried through as they are.
+        // Nothing declares this widget, so there is nothing to say which of its
+        // attributes are options and which would act on the page. The name on
+        // its own does not settle it: onmouseover is shaped like an option
+        // name. They are dropped rather than guessed at. The content column
+        // still holds the html they came from.
         if (!$known) {
-            $options[$name] = (string) $value;
+            dashboard_convert_warn($warnings, $index, 'unknown_widget_option_dropped',
+                $name . '=' . dashboard_convert_snippet($value));
             continue;
         }
 
@@ -422,6 +452,15 @@ function dashboard_convert_option_valid($option, $value)
 
         case 'dropbox_other':
         case 'value':
+            // Free text an author types. A render script puts several of these
+            // into the page with .html(), so a value holding a tag would be
+            // parsed as one, see the option values section of SCHEMA.md.
+            // Angle brackets are the only way to open a tag: an entity in an
+            // attribute arrives at .html() already decoded and is written back
+            // as text. Quotes are kept because the renderer escapes them and
+            // the curl widget sends a json payload through one of these.
+            return preg_match('/^[^<>]{1,512}$/u', $value) === 1;
+
         case 'html':
         default:
             return true;
@@ -666,8 +705,7 @@ function dashboard_convert_styles($declarations, $index, &$warnings, $box)
         if ($box && in_array($property, $box_styles)) continue;
 
         if (!in_array($property, $allowed)) {
-            // Extension styling and vendor variables are not author written.
-            if (substr($property, 0, 2) !== '--' && $property !== 'user-select') {
+            if (!dashboard_convert_style_property_silent($property)) {
                 dashboard_convert_warn($warnings, $index, 'style_property_dropped', $property);
             }
             continue;
@@ -679,19 +717,88 @@ function dashboard_convert_styles($declarations, $index, &$warnings, $box)
             continue;
         }
 
+        if ($property === 'opacity') {
+            $opacity = dashboard_convert_style_opacity($value);
+            if ($opacity === false) {
+                dashboard_convert_warn($warnings, $index, 'style_value_dropped',
+                    $property . ': ' . dashboard_convert_snippet($value));
+                continue;
+            }
+            if ($opacity !== $value) {
+                dashboard_convert_warn($warnings, $index, 'opacity_raised', $value);
+            }
+            $value = $opacity;
+        }
+
         $kept[$property] = $value;
     }
     return $kept;
+}
+
+// Style properties written by a browser extension or by the browser itself,
+// not by the author. Dropped like any other property off the list, but without
+// a warning, as there is nothing for the author to act on. The counts are in
+// the census: darkreader writes the custom properties, and the font-variant
+// family comes from readability and translation extensions.
+function dashboard_convert_style_property_silent($property)
+{
+    if (substr($property, 0, 2) === '--') return true;
+    if (substr($property, 0, 12) === 'font-variant') return true;
+
+    return in_array($property, array('user-select', 'font-stretch', 'font-width',
+        'font-size-adjust', 'font-kerning', 'font-feature-settings',
+        'font-optical-sizing', 'font-variation-settings', 'word-break',
+        'pointer-events'));
+}
+
+// Opacity is floored at 0.2. A widget at zero opacity is invisible and still
+// takes clicks, which on a public dashboard puts an unseen curl or button
+// widget over something the visitor means to press. Below the floor the value
+// is raised and the author is told. display: none and visibility: hidden do
+// not have this problem, they take the box out of hit testing, so they are
+// left alone.
+function dashboard_convert_style_opacity($value)
+{
+    $value = trim($value);
+
+    if (preg_match('/^(\d*\.?\d+)$/', $value, $match)) {
+        return ((float) $match[1] < 0.2) ? '0.2' : $value;
+    }
+    if (preg_match('/^(\d*\.?\d+)\s*%$/', $value, $match)) {
+        return ((float) $match[1] < 20) ? '20%' : $value;
+    }
+
+    // Anything else cannot be read here, so the floor cannot be applied to it.
+    return false;
+}
+
+// The functions a style value may call. Named the other way round because the
+// ways of writing a fetch are not a list to keep up with: url() and image-set()
+// and its vendor spellings fetch, expression() runs, element() and paint() draw
+// from elsewhere in the page, and the next one is not written yet. These few
+// only compute a value.
+function dashboard_convert_allowed_style_functions()
+{
+    return array('rgb', 'rgba', 'hsl', 'hsla', 'calc');
 }
 
 function dashboard_convert_style_value_allowed($value)
 {
     if ($value === '' || strlen($value) > 256) return false;
     if (preg_match('/[\x00-\x08\x0b\x0c\x0e-\x1f]/', $value)) return false;
-    // url() can fetch, expression() can run, and position can lift a box out
-    // of the page.
-    if (preg_match('/url\s*\(|expression\s*\(|[\\\\<>{}]/i', $value)) return false;
+    // A backslash writes a css escape, which could spell a function name
+    // another way, and the rest cannot appear in a value at all.
+    if (preg_match('/[\\\\<>{}]/', $value)) return false;
+    // position on its own lifts a box out of the page.
     if (preg_match('/^\s*position\s*$/i', $value)) return false;
+
+    if (preg_match_all('/([A-Za-z_-][A-Za-z0-9_-]*)\s*\(/', $value, $matches)) {
+        $allowed = dashboard_convert_allowed_style_functions();
+        foreach ($matches[1] as $function) {
+            if (!in_array(strtolower($function), $allowed)) return false;
+        }
+    }
+
     return true;
 }
 
