@@ -100,7 +100,9 @@ function dashboard_convert_allowed_styles()
         'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
         'width', 'height', 'max-width', 'min-width', 'max-height', 'min-height',
         'display', 'visibility', 'overflow', 'float', 'table-layout',
-        'align-items', 'justify-content', 'flex-wrap'
+        'align-items', 'justify-content', 'flex-wrap',
+        // Rotation only, see dashboard_convert_style_rotate_only
+        'transform'
     );
 }
 
@@ -224,11 +226,15 @@ function dashboard_convert_widget($node, $index, $registry, &$warnings)
     }
 
     // A widget type is one token because it is the class attribute of the box.
-    $type = $class;
+    // More than one is hand written markup rather than a widget the designer
+    // wrote, and the renderer will not draw a type carrying a space, so it is
+    // dropped here rather than written into a document that cannot be drawn.
     if (preg_match('/\s/', $class)) {
-        $type = preg_replace('/\s+/', ' ', $class);
-        dashboard_convert_warn($warnings, $index, 'widget_type_not_one_token', $type);
+        dashboard_convert_warn($warnings, $index, 'widget_type_not_one_token',
+            preg_replace('/\s+/', ' ', $class));
+        return null;
     }
+    $type = $class;
 
     $known = isset($registry[$type]);
     $widget = array('type' => $type);
@@ -406,11 +412,12 @@ function dashboard_convert_options($node, $type, $known, $index, &$warnings)
             continue;
         }
 
-        // An empty option is left out. The render scripts already fall back to
-        // their default when an attribute is absent.
-        if ($value === '') continue;
-
-        if (!dashboard_convert_option_valid($option, $value)) {
+        // An empty option is kept. Absent and empty are not the same to the
+        // render scripts. feedvalue only falls back to its units when both
+        // prepend and append are absent, so an author who set one of them and
+        // left the other empty gets the word undefined printed beside the
+        // reading once the empty one stops being written.
+        if ($value !== '' && !dashboard_convert_option_valid($option, $value)) {
             dashboard_convert_warn($warnings, $index, 'option_value_dropped',
                 $name . '=' . dashboard_convert_snippet($value));
             continue;
@@ -862,6 +869,17 @@ function dashboard_convert_styles($declarations, $index, &$warnings, $box)
             $value = $opacity;
         }
 
+        // transform is allowed to rotate and nothing else. Rotation turns a box
+        // where it stands, so it can cover no more of the page than the
+        // geometry already lets it. translate, scale and matrix move or grow
+        // it, which is how a widget ends up over one the visitor means to
+        // press, the overlay gate_action_widgets closes.
+        if ($property === 'transform' && !dashboard_convert_style_rotate_only($value)) {
+            dashboard_convert_warn($warnings, $index, 'style_value_dropped',
+                $property . ': ' . dashboard_convert_snippet($value));
+            continue;
+        }
+
         // A negative margin pulls content out of the widget box and up over the
         // emoncms menu bar, the same overlay the top clamp in the renderer
         // closes. Only ever reached for the html of a widget, the box path
@@ -887,6 +905,9 @@ function dashboard_convert_style_property_silent($property)
 {
     if (substr($property, 0, 2) === '--') return true;
     if (substr($property, 0, 12) === 'font-variant') return true;
+    // A prefixed transform is written beside the plain one, which is kept, so
+    // there is nothing for the author to act on. No browser still needs them.
+    if (preg_match('/^-(webkit|moz|ms|o)-transform$/', $property)) return true;
 
     return in_array($property, array('user-select', 'font-stretch', 'font-width',
         'font-size-adjust', 'font-kerning', 'font-feature-settings',
@@ -920,9 +941,19 @@ function dashboard_convert_style_opacity($value)
 // and its vendor spellings fetch, expression() runs, element() and paint() draw
 // from elsewhere in the page, and the next one is not written yet. These few
 // only compute a value.
+// One rotate() and nothing else. The angle takes any css unit, or none, which
+// css reads as degrees. A second function in the value, or anything either
+// side of it, is not a rotation and is not kept.
+function dashboard_convert_style_rotate_only($value)
+{
+    return preg_match(
+        '/^\s*rotate\(\s*[-+]?(\d+(\.\d+)?|\.\d+)(deg|grad|rad|turn)?\s*\)\s*$/i',
+        $value) === 1;
+}
+
 function dashboard_convert_allowed_style_functions()
 {
-    return array('rgb', 'rgba', 'hsl', 'hsla', 'calc');
+    return array('rgb', 'rgba', 'hsl', 'hsla', 'calc', 'rotate');
 }
 
 function dashboard_convert_style_value_allowed($value)

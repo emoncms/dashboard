@@ -220,16 +220,13 @@ function dashboard_render_options($widget, $type, $index, &$errors)
         }
         $value = (string) $value;
 
-        // An empty option is left out, as the render scripts fall back to
-        // their default when the attribute is absent.
-        if ($value === '') continue;
-
         $option = widget_registry_option($type, $name);
         if ($option === false) {
             dashboard_convert_warn($errors, $index, 'option_unknown_dropped', $name);
             continue;
         }
-        if (!dashboard_convert_option_valid($option, $value)) {
+        // An empty option is written back, see dashboard_convert_options.
+        if ($value !== '' && !dashboard_convert_option_valid($option, $value)) {
             dashboard_convert_warn($errors, $index, 'option_value_dropped',
                 $name . '=' . dashboard_convert_snippet($value));
             continue;

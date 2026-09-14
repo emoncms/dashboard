@@ -97,7 +97,8 @@ check('feedvalue geometry', array($widget['x'], $widget['y'], $widget['w'], $wid
     array(20, 40, 120, 60));
 check('feedvalue units', array($widget['wunit'], $widget['hunit']), array('px', 'px'));
 check('feedvalue options', $widget['options'],
-    array('feedid' => '821', 'decimals' => '2', 'align' => 'center'));
+    array('feedid' => '821', 'decimals' => '2', 'align' => 'center',
+        'scale' => '', 'timeout' => ''));
 check('feedvalue keeps no html', isset($widget['html']), false);
 check('feedvalue keeps no box style', isset($widget['style']), false);
 check('feedvalue is clean', codes($result), array());
@@ -227,14 +228,21 @@ check('unicode free text kept', widgets($result)[0]['options'], array(
 check('unicode free text quiet', codes($result), array());
 
 // ---------------------------------------------------------------------------
-// Empty options are left out
+// Empty options are kept
+//
+// A render script can read an empty option and an absent one differently, so
+// an empty one is written as the author left it, see dashboard_convert_options.
 // ---------------------------------------------------------------------------
 
 $html = '<div id="6" class="feedvalue" style="position:absolute; top:0px; left:0px; '
     . 'width:100px; height:50px;" feedid="7" scale="" timeout="" errormessagedisplayed=""></div>';
 
 $result = convert($html);
-check('empty options omitted', widgets($result)[0]['options'], array('feedid' => '7'));
+check('empty options kept', widgets($result)[0]['options'],
+    array('feedid' => '7', 'scale' => '', 'timeout' => '',
+        'errormessagedisplayed' => ''));
+check('empty options written back',
+    strpos(render($result), 'scale=""') !== false, true);
 check('empty options are not a warning', codes($result), array());
 
 // ---------------------------------------------------------------------------
@@ -360,11 +368,48 @@ foreach (array('rgb(255, 221, 221)', 'rgba(0, 0, 0, .5)', 'calc(100% - 10px)',
         dashboard_convert_style_value_allowed($value), true);
 }
 
-// position, z-index and transform stay off the list: they lift a box out of
-// the page, restack it, or move it without changing its geometry
+// position and z-index stay off the list: they lift a box out of the page or
+// restack it
 $result = convert('<div id="1" class="paragraph" style="position:absolute; top:0px; '
-    . 'left:0px; width:10px; height:10px; z-index:100; transform:rotate(-90deg);">x</div>');
-check('box cannot restack or move itself', isset(widgets($result)[0]['style']), false);
+    . 'left:0px; width:10px; height:10px; z-index:100;">x</div>');
+check('box cannot restack or lift itself', isset(widgets($result)[0]['style']), false);
+
+// transform is allowed to rotate, which turns a box where it stands, and
+// nothing else, see dashboard_convert_style_rotate_only
+$box = 'position:absolute; top:0px; left:0px; width:10px; height:10px; ';
+$result = convert('<div id="1" class="paragraph" style="' . $box
+    . 'transform:rotate(-90deg);">x</div>');
+check('box may rotate', widgets($result)[0]['style'],
+    array('transform' => 'rotate(-90deg)'));
+check('rotation is not a warning', codes($result), array());
+
+foreach (array('rotate(90deg)', 'rotate(-90deg)', 'rotate(.25turn)',
+    'rotate(+1.5rad)', 'ROTATE( 90DEG )') as $value) {
+    check("angle $value kept", dashboard_convert_style_rotate_only($value), true);
+}
+foreach (array('rotate(90deg) rotate(90deg)', 'rotate3d(0,0,1,90deg)',
+    'rotate(90deg) translate(1px)', 'rotate()', 'rotate(90deg', 'none') as $value) {
+    check("angle $value refused", dashboard_convert_style_rotate_only($value), false);
+}
+
+foreach (array('translate(100px, 0)', 'scale(40)', 'matrix(1,0,0,1,80,80)',
+    'rotate(90deg) translate(100px)', 'translate(10px) rotate(90deg)',
+    'rotate(90deg) scale(4)') as $value) {
+    $result = convert('<div id="1" class="paragraph" style="' . $box
+        . 'transform:' . $value . ';">x</div>');
+    check("transform $value dropped", isset(widgets($result)[0]['style']), false);
+    check("transform $value warned",
+        in_array('style_value_dropped', codes($result)), true);
+}
+
+// The prefixed copies say the same thing as the property now kept, so they go
+// without a warning
+$result = convert('<div id="1" class="paragraph" style="' . $box
+    . '-webkit-transform:rotate(90deg); -moz-transform:rotate(90deg); '
+    . 'transform:rotate(90deg);">x</div>');
+check('prefixed transform quiet', codes($result), array());
+check('prefixed transform not kept', widgets($result)[0]['style'],
+    array('transform' => 'rotate(90deg)'));
 
 // The margin longhands go the way of the shorthand on a box, because the
 // renderer writes margin: 0 and a later margin-top would win
@@ -493,6 +538,15 @@ $result = convert('loose text<div id="16" style="top:0px; left:0px; width:1px; h
 check('loose text warned', in_array('text_outside_widget', codes($result)), true);
 check('widget without a class dropped', in_array('widget_without_type', codes($result)), true);
 check('nothing kept', count(widgets($result)), 0);
+
+// A class of more than one token is hand written markup, not a widget. The
+// renderer will not draw a type carrying a space, so the converter does not
+// write one into the document.
+$result = convert('<div id="1" class="flex bg-gray-50" style="position:absolute; '
+    . 'top:0px; left:0px; width:10px; height:10px;">panel</div>');
+check('multi token class warned',
+    in_array('widget_type_not_one_token', codes($result)), true);
+check('multi token class dropped', count(widgets($result)), 0);
 
 // ---------------------------------------------------------------------------
 // Encoding

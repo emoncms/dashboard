@@ -52,10 +52,11 @@ Take a database backup, and keep it until step 8 is done.
 Note the current commit of each of the three repositories, so a rollback is a
 checkout rather than a decision.
 
-Read `SCHEMA.md` under "Cases decided against keeping". Three things are
-dropped on purpose: widgets nested inside text boxes, hand added iframes, and
-the styles broken by the old `htmlspecialchars_decode`. That is a visible
-change for the dashboards holding them, and step 4 lists which ones those are.
+Read `SCHEMA.md` under "Cases decided against keeping". Four things are dropped
+on purpose: widgets nested inside text boxes, hand added iframes, author
+`<style>` blocks, and the styles broken by the old `htmlspecialchars_decode`.
+That is a visible change for the dashboards holding them, and step 4 lists which
+ones those are.
 
 ## Step by step
 
@@ -102,11 +103,18 @@ lists the dashboards behind each.
 
 ### 4. Look at what will change
 
-    php Modules/dashboard/tools/find.php nested iframe --full
+    php Modules/dashboard/tools/find.php nested iframe script --full
 
-Lists the dashboards holding the three dropped cases, with their ids and
-userids, so their owners can be told or the dashboards looked at first. The
-census found 53 hand added iframes and a few hundred nested widgets.
+Lists the dashboards holding the dropped cases, with their ids and userids, so
+their owners can be told or the dashboards looked at first. The census found 53
+hand added iframes, a few hundred nested widgets and 21 dashboards with an
+author `<style>` block.
+
+The stylesheets are the ones to tell first. A dashboard loses every rule in the
+block, and what it styled stays on the page unstyled, which on the dashboards
+using them for rotated labels is the change an owner sees straight away. The
+effect has to be written again as inline style, and `transform` is on the style
+list for a single `rotate()` so that it can be.
 
 Then the content rules, which the census cannot predict. It recorded attribute
 names and counts, never values, so nothing in it says how many authors have a

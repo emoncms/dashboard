@@ -113,15 +113,21 @@ example `if (font === "5")` in `feedvalue_render.js`, so a value stored as a
 number would silently stop matching. This also preserves `scale: ".001"`,
 `decimals: "-1"` and `units_dropdown: "__other"` exactly as written.
 
-**An empty option is omitted.** The corpus is full of `scale=""`, `timeout=""`
-and `errormessagedisplayed=""`, which the render scripts already treat as absent
-through `x = x || default`. The renderer must emit no attribute at all for an
-absent option.
+**An empty option is kept.** The corpus is full of `scale=""`, `timeout=""` and
+`errormessagedisplayed=""`. These were omitted at first, on the grounds that the
+render scripts read them through `x = x || default` and so treat absent and
+empty the same. Enough of them do not.
 
-One exception to check before relying on that: `vis_render.js` builds its iframe
-URL from every attribute that is not `id`, `class` or `style`, so dropping an
-empty option changes the query string from `&colour=` to nothing. Confirm the
-vis endpoints treat the two the same.
+`feedvalue_render.js` falls back to its units only when `prepend` and `append`
+are both absent, so an author who set one and left the other empty got the word
+undefined printed beside the reading. `vis_render.js` builds its iframe URL from
+every attribute that is not `id`, `class` or `style`, so an omitted empty option
+changes the query string from `&colour=` to nothing.
+
+Absent and empty are not the same thing to a render script, and which of the two
+an author meant is not knowable from the html. An empty option is written back
+as the author left it, and validation is skipped for it: an empty string carries
+nothing, and several of the option rules require at least one character.
 
 Validation is per option, driven by the widget registry:
 
@@ -336,11 +342,13 @@ box         padding padding-top padding-right padding-bottom padding-left
             width height max-width min-width max-height min-height
             display visibility overflow float table-layout
             align-items justify-content flex-wrap
+
+other       transform, rotation only
 ```
 
 The list is drawn from the style properties stored dashboards actually use. A
 value is dropped whatever the property is if it calls anything but `rgb`,
-`rgba`, `hsl`, `hsla` or `calc`, or if it is a `position` declaration, so
+`rgba`, `hsl`, `hsla`, `calc` or `rotate`, or if it is a `position` declaration, so
 nothing on the list can fetch or run anything. The functions are named the
 allowed way round because the ways of writing a fetch are not a list to keep up
 with: `url()`, `image-set()` and its vendor spellings, `element()`, `paint()`.
@@ -368,8 +376,16 @@ them back from the document, so what is stored is generated. Inside the html of
 a text or container widget they are kept.
 
 Off the list on purpose: `position` and `z-index`, which lift a box out of the
-page and restack it, and `transform`, which moves one without changing its
-geometry.
+page and restack it.
+
+`transform` is on the list for a single `rotate()` and nothing else. Rotation
+turns a box where it stands, so it covers no more of the page than its geometry
+already allows, while `translate`, `scale` and `matrix` move or grow it, which
+is the overlay `gate_action_widgets` closes. Authors use it to stand a label on
+its side, and 21 dashboards in the corpus write their rotation in a `<style>`
+block, which is stripped whole, so an inline `transform` is the only way they
+can put those labels back. The prefixed spellings are dropped without a warning:
+they say the same thing as the property that is kept.
 
 ## What the converter discards
 
@@ -430,7 +446,7 @@ boxes come back in place, to be configured again.
 
 ## Cases decided against keeping
 
-All three are discarded with a warning, so the dashboards holding them can be
+All four are discarded with a warning, so the dashboards holding them can be
 listed and looked at by hand. `tools/find.php` lists them with their dashboard
 ids and userids.
 
@@ -449,6 +465,16 @@ where `"Arial Black"` broke out of the attribute, caused by the
 attributes it produced are dropped. The widget's real options are unaffected,
 so the render scripts draw from those. No attempt is made to reconstruct the
 intended font from the fragments.
+
+**Author stylesheets.** 21 dashboards hold a `<style>` block, pasted in with the
+rest of an html document. A stylesheet is not scoped to the widget holding it,
+so a rule in one reaches every widget on the page, and `id` and `class` are not
+kept on the elements inside a widget, so a selector would have nothing left to
+match anyway. The block is stripped whole. What it styled stays on the page
+unstyled, and the effect has to be written again as inline style on the elements
+themselves. The rotations these blocks mostly carry are what put `transform` on
+the style list. `find.php script` lists them, along with the other tags that are
+stripped whole.
 
 ## The converter
 
