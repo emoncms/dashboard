@@ -241,15 +241,11 @@ function extract_shape($html)
     libxml_use_internal_errors(false);
     if (!$ok || !$doc->documentElement) return $shape;
 
-    foreach ($doc->documentElement->childNodes as $node) {
-        if ($node->nodeType !== XML_ELEMENT_NODE) continue;
+    $boxes = array();
+    collect_boxes($doc->documentElement, $boxes);
 
-        $class = $node->hasAttribute('class') ? trim($node->getAttribute('class')) : '';
-        if ($class === '') continue;
-        // A widget type is one token, because it is the class of the box. More
-        // than one is hand written markup that never drew as a widget, so it
-        // is not a widget going missing when it is not there afterwards.
-        if (preg_match('/\s/', $class)) continue;
+    foreach ($boxes as $node) {
+        $class = trim($node->getAttribute('class'));
 
         $style = dashboard_convert_parse_style(
             $node->hasAttribute('style') ? $node->getAttribute('style') : '');
@@ -281,9 +277,10 @@ function extract_shape($html)
     return $shape;
 }
 
-// Widgets that are not children of the page. The converter reads the top level,
-// finds an element with no class of its own, warns widget_without_type and does
-// not descend, so everything inside is lost without either shape showing it.
+// Widgets inside an element that is removed whole, a textarea in the corpus.
+// The converter looks through a wrapper for boxes but not into one of these,
+// so the widgets go and neither shape shows it: they are not at the top level
+// before, and they are not on the page after.
 // A widget inside another widget is not this, it is counted as nested.
 function wrapped_widgets($html)
 {
@@ -299,25 +296,68 @@ function wrapped_widgets($html)
     libxml_use_internal_errors(false);
     if (!$ok || !$doc->documentElement) return $found;
 
+    $strip = dashboard_convert_stripped_elements();
     foreach ($doc->documentElement->childNodes as $node) {
         if ($node->nodeType !== XML_ELEMENT_NODE) continue;
         if (is_nested_widget($node)) continue;
-        collect_wrapped($node, $found);
+        collect_wrapped($node, in_array(strtolower($node->nodeName), $strip), $found);
     }
     return $found;
 }
 
-function collect_wrapped($node, &$found)
+function collect_wrapped($node, $stripped, &$found)
 {
+    $strip = dashboard_convert_stripped_elements();
+
     foreach ($node->childNodes as $child) {
         if ($child->nodeType !== XML_ELEMENT_NODE) continue;
         if (is_nested_widget($child)) {
-            $found[] = trim($child->getAttribute('class'))
-                . ' inside <' . strtolower($node->nodeName) . '>';
+            if ($stripped) {
+                $found[] = trim($child->getAttribute('class'))
+                    . ' inside <' . strtolower($node->nodeName) . '>';
+            }
             continue;
         }
-        collect_wrapped($child, $found);
+        collect_wrapped($child,
+            $stripped || in_array(strtolower($child->nodeName), $strip), $found);
     }
+}
+
+// The boxes of a page, in document order. A box is an element with a class of
+// one token, because that is what a widget type is. An element that is not one
+// is looked through when a box sits somewhere inside it, which is what the
+// converter does with a page wrapped in a tag that was never closed. A stripped
+// element is not looked into, since what is inside it is text on the page today.
+function collect_boxes($parent, &$boxes)
+{
+    $registry = widget_registry();
+
+    foreach ($parent->childNodes as $node) {
+        if ($node->nodeType !== XML_ELEMENT_NODE) continue;
+
+        $class = $node->hasAttribute('class') ? trim($node->getAttribute('class')) : '';
+        if ($class !== '' && !preg_match('/\s/', $class)) {
+            $boxes[] = $node;
+            continue;
+        }
+        if (in_array(strtolower($node->nodeName), dashboard_convert_stripped_elements())) {
+            continue;
+        }
+        if (holds_box($node, $registry)) collect_boxes($node, $boxes);
+    }
+}
+
+function holds_box($node, $registry)
+{
+    foreach ($node->childNodes as $child) {
+        if ($child->nodeType !== XML_ELEMENT_NODE) continue;
+
+        $class = $child->hasAttribute('class') ? trim($child->getAttribute('class')) : '';
+        if ($class !== '' && isset($registry[$class])) return true;
+        if (holds_box($child, $registry)) return true;
+    }
+
+    return false;
 }
 
 function number($style, $property)

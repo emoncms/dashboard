@@ -151,9 +151,20 @@ function dashboard_convert($html)
     $registry = widget_registry();
     $widgets = array();
 
-    foreach ($root->childNodes as $node) {
+    dashboard_convert_boxes($root, $widgets, $registry, $warnings, true);
+
+    return dashboard_convert_result($widgets, $warnings);
+}
+
+// Reads the widget boxes of a page. $page is true for the page itself, false
+// for an element being looked through, see dashboard_convert_holds_box.
+function dashboard_convert_boxes($parent, &$widgets, $registry, &$warnings, $page)
+{
+    foreach ($parent->childNodes as $node) {
         if ($node->nodeType === XML_TEXT_NODE) {
-            if (trim($node->textContent) !== '') {
+            // Only reported for the page. Text beside a box inside a wrapper is
+            // the wrapper's own, and is not a stray line someone left behind.
+            if ($page && trim($node->textContent) !== '') {
                 dashboard_convert_warn($warnings, null, 'text_outside_widget',
                     dashboard_convert_snippet($node->textContent));
             }
@@ -162,10 +173,42 @@ function dashboard_convert($html)
         if ($node->nodeType !== XML_ELEMENT_NODE) continue;
 
         $widget = dashboard_convert_widget($node, count($widgets), $registry, $warnings);
-        if ($widget !== null) $widgets[] = $widget;
+        if ($widget !== null) {
+            $widgets[] = $widget;
+            continue;
+        }
+
+        // Not a box. A stored page is sometimes wrapped in a tag that was
+        // opened and never closed, a stray <b> in the corpus, and everything
+        // after it parses as its content. The boxes are ordinary ones with
+        // their geometry and options intact, so they are read rather than lost
+        // with the wrapper. A box is never looked for inside a widget, which is
+        // where a nested widget lives and is dropped on purpose.
+        if (dashboard_convert_holds_box($node, $registry)) {
+            dashboard_convert_boxes($node, $widgets, $registry, $warnings, false);
+        }
+    }
+}
+
+// True when a box sits somewhere inside this element, so there is a reason to
+// look through it. Stripped elements are not looked into: what is inside a
+// textarea is text on the page today, not a widget, and the migration does not
+// draw what a browser does not.
+function dashboard_convert_holds_box($node, $registry)
+{
+    if (in_array(strtolower($node->nodeName), dashboard_convert_stripped_elements())) {
+        return false;
     }
 
-    return dashboard_convert_result($widgets, $warnings);
+    foreach ($node->childNodes as $child) {
+        if ($child->nodeType !== XML_ELEMENT_NODE) continue;
+
+        $class = $child->hasAttribute('class') ? trim($child->getAttribute('class')) : '';
+        if ($class !== '' && isset($registry[$class])) return true;
+        if (dashboard_convert_holds_box($child, $registry)) return true;
+    }
+
+    return false;
 }
 
 function dashboard_convert_result($widgets, $warnings)

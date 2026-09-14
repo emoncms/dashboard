@@ -50,7 +50,7 @@ foreach (array_slice($argv, 1) as $a) {
 
 $categories = array(
     'nested' => 'a widget sitting inside another widget',
-    'wrapped' => 'a widget inside an element that is not a widget, which the converter never reaches',
+    'wrapped' => 'a widget inside an element that is not a widget, lost only when that element is stripped',
     'iframe' => 'an iframe the author added, not one a vis or graph widget drew',
     'unknown' => 'a widget type no module declares',
     'broken-style' => 'a style attribute broken up into stray attributes',
@@ -272,9 +272,10 @@ function walk($node, $widget, $registry, $iframe_widgets, $wanted, &$hits, $top 
             record($hits, $wanted, 'nested', "$class inside $widget");
         }
 
-        // A widget box that is not a child of the page. The converter reads the
-        // top level, finds an element with no class, warns widget_without_type
-        // and moves on, so the widget inside is never seen.
+        // A widget box that is not a child of the page. Two shapes turn up: a
+        // page wrapped in a tag that was opened and never closed, which the
+        // converter looks through, and a page pasted inside the editor's own
+        // textarea, which it does not, see dashboard_convert_holds_box.
         if ($widget === null && $declared && !$top) {
             record($hits, $wanted, 'wrapped',
                 "$class inside <" . strtolower($node->nodeName) . ">");
