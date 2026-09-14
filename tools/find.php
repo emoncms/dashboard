@@ -56,7 +56,7 @@ $categories = array(
     'script' => 'a script, style, meta, link, object, embed or svg tag',
     'position-fixed' => 'a widget positioned fixed rather than absolute',
     'url' => 'a src or href the allowlist drops, a url pointing back at emoncms included',
-    'option-value' => 'an option value the widget will not accept, a tag or over 512 characters',
+    'option-value' => 'an option value the widget will not accept as written, a tag or over 512 characters',
     'style-value' => 'a negative margin, or an opacity that is raised or dropped'
 );
 

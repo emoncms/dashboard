@@ -129,7 +129,7 @@ tag in an option, a cache busting query on an image, or an opacity of zero:
 | category | what it finds |
 | --- | --- |
 | `url` | a `src` or `href` the allowlist drops, which since the same site rule went in includes an image or a link pointing back at emoncms. A same site `src` has to name a static image file with no query string. |
-| `option-value` | an option value the widget will not accept: a tag in free text, or over 512 characters. Long `curl` payloads are the ones to look at. |
+| `option-value` | an option value the widget will not accept as written: a tag in free text, or over 512 characters. A tag keeps its words and loses its formatting, so `P<sub>L1</sub>:` draws as `PL1:`. Anything else here is dropped, and long `curl` payloads are the ones to look at. |
 | `style-value` | a negative margin, or an opacity below the 0.2 floor. |
 
 These are changes to how a dashboard draws, not faults. `roundtrip.php` counts
