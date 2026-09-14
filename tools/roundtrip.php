@@ -238,6 +238,10 @@ function extract_shape($html)
 
         $class = $node->hasAttribute('class') ? trim($node->getAttribute('class')) : '';
         if ($class === '') continue;
+        // A widget type is one token, because it is the class of the box. More
+        // than one is hand written markup that never drew as a widget, so it
+        // is not a widget going missing when it is not there afterwards.
+        if (preg_match('/\s/', $class)) continue;
 
         $style = dashboard_convert_parse_style(
             $node->hasAttribute('style') ? $node->getAttribute('style') : '');
