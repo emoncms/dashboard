@@ -352,6 +352,7 @@ function urls_of($node)
 
         foreach (array('src', 'href') as $attribute) {
             if (!$child->hasAttribute($attribute)) continue;
+            if (!url_can_survive($child, $attribute)) continue;
             $key = $attribute . ' ' . normalise_url($child->getAttribute($attribute));
             if (!isset($urls[$key])) $urls[$key] = 0;
             $urls[$key]++;
@@ -362,6 +363,19 @@ function urls_of($node)
         }
     }
     return $urls;
+}
+
+// A url is only kept where the element and the attribute holding it are both
+// allowed. A src on a custom element goes when the element is unwrapped, and a
+// src on a div goes with the attribute, neither of which is the url being lost
+// on its own. tag_dropped and attribute_dropped count those.
+function url_can_survive($node, $attribute)
+{
+    $tag = strtolower($node->nodeName);
+    if (!in_array($tag, dashboard_convert_allowed_elements())) return false;
+
+    $per_element = dashboard_convert_allowed_attributes();
+    return isset($per_element[$tag]) && in_array($attribute, $per_element[$tag]);
 }
 
 // libxml escapes a space and anything non ASCII when it writes an href or a
