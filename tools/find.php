@@ -50,6 +50,7 @@ foreach (array_slice($argv, 1) as $a) {
 
 $categories = array(
     'nested' => 'a widget sitting inside another widget',
+    'wrapped' => 'a widget inside an element that is not a widget, which the converter never reaches',
     'iframe' => 'an iframe the author added, not one a vis or graph widget drew',
     'unknown' => 'a widget type no module declares',
     'broken-style' => 'a style attribute broken up into stray attributes',
@@ -251,7 +252,10 @@ function to_entities($html)
 }
 
 // $widget is the widget class this node sits inside, or null at the top level.
-function walk($node, $widget, $registry, $iframe_widgets, $wanted, &$hits)
+// $top is true for the children of the page itself, which is where a widget
+// box belongs. The converter reads those and does not descend into anything
+// else, see the top level loop in dashboard_convert.
+function walk($node, $widget, $registry, $iframe_widgets, $wanted, &$hits, $top = true)
 {
     foreach ($node->childNodes as $child) {
         if ($child->nodeType !== XML_ELEMENT_NODE) continue;
@@ -266,6 +270,14 @@ function walk($node, $widget, $registry, $iframe_widgets, $wanted, &$hits)
 
         if ($widget !== null && $declared) {
             record($hits, $wanted, 'nested', "$class inside $widget");
+        }
+
+        // A widget box that is not a child of the page. The converter reads the
+        // top level, finds an element with no class, warns widget_without_type
+        // and moves on, so the widget inside is never seen.
+        if ($widget === null && $declared && !$top) {
+            record($hits, $wanted, 'wrapped',
+                "$class inside <" . strtolower($node->nodeName) . ">");
         }
 
         if ($tag === 'iframe' && !($widget !== null && isset($iframe_widgets[$widget]))) {
@@ -332,7 +344,7 @@ function walk($node, $widget, $registry, $iframe_widgets, $wanted, &$hits)
         $inside = $widget;
         if ($inside === null && $declared) $inside = $class;
 
-        walk($child, $inside, $registry, $iframe_widgets, $wanted, $hits);
+        walk($child, $inside, $registry, $iframe_widgets, $wanted, $hits, false);
     }
 }
 

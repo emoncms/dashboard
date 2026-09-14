@@ -103,6 +103,14 @@ foreach ($rows as $row) {
         extract_shape($rendered['html'])
     );
 
+    // Read off the stored html rather than the shapes. A widget inside an
+    // element that is not a widget never reaches the converter at all, so it
+    // is missing from both sides of the comparison and the two agree.
+    foreach (wrapped_widgets($row['content']) as $detail) {
+        $differences[] = array('kind' => 'widget_wrapped', 'expected' => false,
+            'detail' => $detail);
+    }
+
     foreach ($rendered['errors'] as $error) {
         // The renderer rejecting what the converter produced is a fault, with
         // one exception. A widget whose type the registry does not hold is
@@ -271,6 +279,45 @@ function extract_shape($html)
         );
     }
     return $shape;
+}
+
+// Widgets that are not children of the page. The converter reads the top level,
+// finds an element with no class of its own, warns widget_without_type and does
+// not descend, so everything inside is lost without either shape showing it.
+// A widget inside another widget is not this, it is counted as nested.
+function wrapped_widgets($html)
+{
+    $found = array();
+    if (trim($html) === '') return $found;
+
+    $doc = new DOMDocument();
+    libxml_use_internal_errors(true);
+    libxml_clear_errors();
+    $ok = $doc->loadHTML('<div>' . dashboard_convert_to_entities($html) . '</div>',
+                         LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+    libxml_use_internal_errors(false);
+    if (!$ok || !$doc->documentElement) return $found;
+
+    foreach ($doc->documentElement->childNodes as $node) {
+        if ($node->nodeType !== XML_ELEMENT_NODE) continue;
+        if (is_nested_widget($node)) continue;
+        collect_wrapped($node, $found);
+    }
+    return $found;
+}
+
+function collect_wrapped($node, &$found)
+{
+    foreach ($node->childNodes as $child) {
+        if ($child->nodeType !== XML_ELEMENT_NODE) continue;
+        if (is_nested_widget($child)) {
+            $found[] = trim($child->getAttribute('class'))
+                . ' inside <' . strtolower($node->nodeName) . '>';
+            continue;
+        }
+        collect_wrapped($child, $found);
+    }
 }
 
 function number($style, $property)

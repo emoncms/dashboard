@@ -103,7 +103,7 @@ lists the dashboards behind each.
 
 ### 4. Look at what will change
 
-    php Modules/dashboard/tools/find.php nested iframe script --full
+    php Modules/dashboard/tools/find.php nested wrapped iframe script --full
 
 Lists the dashboards holding the dropped cases, with their ids and userids, so
 their owners can be told or the dashboards looked at first. The census found 53
