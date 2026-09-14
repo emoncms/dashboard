@@ -17,6 +17,11 @@ load_language_files("Modules/dashboard/locale", "dashboard_messages");
 
 if (!$dashboard['height']) $dashboard['height'] = 400;
 if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
+
+// Escaped for the place each one is printed into, as in dashboard_view.php.
+$dashid = (int) $dashboard['id'];
+$dashheight = (int) $dashboard['height'];
+$backgroundcolor = preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backgroundcolor']);
 ?>
     <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
     <script type="text/javascript"><?php require "Modules/vis/vis_langjs.php"; ?></script>
@@ -61,7 +66,7 @@ if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
 	<button id="dashboard-config-button" style="padding:4px; float:left; width:31px" class="btn" href="#dashConfigModal" role="button" data-toggle="modal" title="<?php echo ctx_tr('dashboard_messages','Configure dashboard basic data'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>"></span></button>
 	<button id="undo-button" class="btn" style="padding:4px; float:left; width:31px" title="<?php echo ctx_tr('dashboard_messages','Undo last step'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>"></span></button>
 	<button id="redo-button" class="btn" style="padding:4px; float:left; width:31px" title="<?php echo ctx_tr('dashboard_messages','Redo last step'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>"></span></button>
-	<button id="view-mode" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages','Return to view mode'); ?>" onclick="window.location.href='view?id=<?php echo $dashboard['id']; ?>'"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>" ></span></button>
+	<button id="view-mode" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages','Return to view mode'); ?>" onclick="window.location.href='view?id=<?php echo $dashid; ?>'"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>" ></span></button>
 	</span>
 	<span id="when-selected">
 		<button id="options-button" class="btn" style="float:left; padding:4px; width:31px" data-toggle="modal" data-target="#widget_options" title="<?php echo ctx_tr('dashboard_messages','Configure selected item'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>"></span></button>
@@ -76,9 +81,9 @@ if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
 </div>
 
 
-<div id="page-container" style="height:<?php echo $dashboard['height']; ?>px; background-color:#<?php echo $dashboard['backgroundcolor']; ?>; position:relative;">
+<div id="page-container" style="height:<?php echo $dashheight; ?>px; background-color:#<?php echo $backgroundcolor; ?>; position:relative;">
     <div id="page"><?php echo $page_html; ?></div>
-    <canvas id="can" width="940px" height="<?php echo $dashboard['height']; ?>px" style="position:absolute; top:0px; left:0px; margin:0; padding:0;"></canvas>
+    <canvas id="can" width="940px" height="<?php echo $dashheight; ?>px" style="position:absolute; top:0px; left:0px; margin:0; padding:0;"></canvas>
 </div>
 
 <script type="application/javascript">
@@ -127,10 +132,13 @@ function toolboxMove(e) {
 
 <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/designer.js"></script>
 <script type="application/javascript">
-    var dashid = <?php echo $dashboard['id']; ?>;
+    var dashid = <?php echo $dashid; ?>;
     var apikey = "";
     var feedlist = feed.list();
-    var userid = <?php echo $session['userid']; ?>;
+    var userid = <?php echo (int) $session['userid']; ?>;
+    // The editor only opens a dashboard its own owner asked for, see the edit
+    // action in dashboard_controller.php.
+    var dashboard_owner = true;
     var widget = <?php echo json_encode($widgets); ?>;
     var redraw = 0;
     var reloadiframe = -1; // force iframes url to recalculate for all vis widgets
@@ -140,8 +148,8 @@ function toolboxMove(e) {
     render_widgets_init(widget); // populate widgets variable
 
     designer.canvas = "#can";
-    designer.grid_size = <?php echo $dashboard['gridsize']; ?>;
-    designer.feedmode = "<?php echo $dashboard['feedmode']; ?>";
+    designer.grid_size = <?php echo (int) $dashboard['gridsize']; ?>;
+    designer.feedmode = <?php echo json_encode((string) $dashboard['feedmode']); ?>;
     console.log("designer.feedmode: "+designer.feedmode);
     designer.widgets = widgets;
     designer.init();

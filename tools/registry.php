@@ -22,6 +22,9 @@
 */
 
 define('EMONCMS_EXEC', 1);
+
+if (php_sapi_name() !== 'cli') die("cli only\n");
+
 require_once dirname(__DIR__) . '/widget_registry.php';
 
 $options = getopt('', array('type::', 'census::', 'audit', 'root::'));

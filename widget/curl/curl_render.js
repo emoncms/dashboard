@@ -32,27 +32,39 @@ function curl_events()
 {
   $('.curl').on("click", function(event) {
 
-    var jqxhr; //jQuery XMLHttpRequest
+    var el = $(this);
+    var method = (el.attr("method") === "" || el.attr("method") === undefined) ? "GET" : el.attr("method");
+    var payload = el.attr("payload") === undefined ? "" : el.attr("payload");
+    var timeout = (el.attr("timeout") > 0) ? el.attr("timeout") : 1000;
+    var url = "http" + ((el.attr("https") == "yes") ? "s" : "") + "://"
+        + el.attr("ip") + ":" + el.attr("port") + "/" + el.attr("url");
 
-    if($(this).attr("confirm")=="yes"){
-        
-            var r = confirm(_Tr("Do you want to continue?"));
-            if (r == true) {
-                jqxhr =  $.ajax({type:$(this).attr("method")==="" || $(this).attr("method")===undefined ? "GET" : $(this).attr("method"),
-                    url:"http"+(($(this).attr("https")=="yes")?"s":"")+"://"+$(this).attr("ip")+":"+$(this).attr("port")+"/"+$(this).attr("url"),
-                    data: ($(this).attr("payload").trim().charAt(0) === "{") ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload").indexOf("=")===-1 ? {"data": $(this).attr("payload")} : $(this).attr("payload"),
-                    timeout: ($(this).attr("timeout") > 0) ? $(this).attr("timeout") : 1000 });                
-            } else {
-                // Nothing to do
-            }
-        
-    }else{
-        jqxhr =  $.ajax({type:$(this).attr("method")==="" || $(this).attr("method")===undefined ? "GET" : $(this).attr("method"),
-            url:"http"+(($(this).attr("https")=="yes")?"s":"")+"://"+$(this).attr("ip")+":"+$(this).attr("port")+"/"+$(this).attr("url"),
-            data: ($(this).attr("payload").trim().charAt(0) === "{") ? {"data": $(this).attr("payload").trim()} : $(this).attr("payload").indexOf("=")===-1 ? {"data": $(this).attr("payload")} : $(this).attr("payload"),
-            timeout: ($(this).attr("timeout") > 0) ? $(this).attr("timeout") : 1000 });
+    // The request is sent by the browser of whoever is looking at the
+    // dashboard, to whatever address the author typed. On a dashboard the
+    // visitor does not own that is a request to the visitor's own network,
+    // from a button whose caption the author also wrote, so the destination
+    // is shown and the visitor has to agree to it. The author gets the
+    // confirmation they asked for on their own dashboard and nothing more.
+    var owner = (typeof dashboard_owner !== "undefined" && dashboard_owner === true);
+
+    if (owner) {
+      if (el.attr("confirm") == "yes" && !confirm(_Tr("Do you want to continue?"))) return;
+    } else {
+      if (!confirm(_Tr("This dashboard is asking your browser to send a request to") + ":\n\n"
+          + method + " " + url + "\n\n" + _Tr("Do you want to continue?"))) return;
     }
-    
+
+    var data;
+    if (payload.trim().charAt(0) === "{") {
+      data = {"data": payload.trim()};
+    } else if (payload.indexOf("=") === -1) {
+      data = {"data": payload};
+    } else {
+      data = payload;
+    }
+
+    var jqxhr = $.ajax({type: method, url: url, data: data, timeout: timeout});
+
     console.log(jqxhr);
 
   });

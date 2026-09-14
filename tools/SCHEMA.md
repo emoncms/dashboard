@@ -75,7 +75,7 @@ Array order is DOM order, which is paint order. Preserve it.
 | field | rule |
 | --- | --- |
 | `type` | required, one token, must be a known widget or carry `"unknown": true` |
-| `x` `y` | required, integer, may be negative |
+| `x` `y` | required, integer, may be negative, `y` is clamped to `0` when drawn |
 | `w` `h` | required, integer, `>= 0` |
 | `wunit` `hunit` | `"px"` or `"pc"`, default `"px"` |
 | `options` | object, string keys and string values |
@@ -86,6 +86,12 @@ Array order is DOM order, which is paint order. Preserve it.
 No `id`. The current markup carries `id="17"` from the designer's counter, and
 those ids collide within a dashboard in at least 37 cases. The renderer assigns
 ids from the array index instead, which fixes the collisions for free.
+
+A negative `y` is drawn at the top of the page. Widgets are positioned inside
+`#page-container`, which starts below the emoncms menu bar, so a negative top
+lifts author content over the site's own chrome. A negative `x` is left as
+written, it only moves the box off the side of the page where there is nothing
+to sit on top of.
 
 No `position` or `margin`. Every widget in the corpus is `position: absolute`
 with `margin: 0` apart from a handful of anomalies, so the renderer supplies
@@ -317,6 +323,12 @@ left alone, they take the box out of hit testing.
 
 `box-shadow` can paint outside its own box, so a widget can put colour over the
 rest of the page. It cannot take a click, so it is kept.
+
+A negative margin is dropped, with a warning. Inside the html of a widget it
+pulls content out of the widget box and up over the emoncms menu bar, which is
+the same overlay a negative `top` gives. A subtraction inside `calc()` goes
+with it, the result of that can be negative too. On a widget box margin is
+dropped before this, see below.
 
 `position`, `top`, `left`, `width`, `height` and the margins are dropped from a
 widget box without a warning. The designer writes them and the renderer puts

@@ -12,10 +12,18 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
 global $session,$path,$dashboard_editor_icon,$embed;
 
+// Everything printed below is escaped for the place it is printed into. The
+// columns are filtered on the way into the database as well, see Dashboard::set,
+// so this is the second of the two.
+$dashid = (int) $dashboard['id'];
+$dashheight = (int) $dashboard['height'];
+$backgroundcolor = preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backgroundcolor']);
+$owner = !empty($owner);
+
 load_language_files("Modules/vis/locale", "vis_messages");
 load_language_files("Modules/dashboard/locale", "dashboard_messages");
 
-if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit?id='. $dashboard['id'].'"> <img src="'.$path.'Modules/dashboard/Views/icons/gear-icon-outlined.png" style="width:80%" ></a>';
+if ($session['write']) $dashboard_editor_icon ='<a href="'.$path.'dashboard/edit?id='. $dashid.'"> <img src="'.$path.'Modules/dashboard/Views/icons/gear-icon-outlined.png" style="width:80%" ></a>';
 
 if (isset($dashboard['fullscreen']) && $dashboard['fullscreen']) { $embed=1; ?>
 <script>
@@ -44,28 +52,31 @@ if (isset($dashboard['fullscreen']) && $dashboard['fullscreen']) { $embed=1; ?>
   <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/render.js?ver=<?php echo $js_css_version; ?>"></script>
   <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js?ver=<?php echo $js_css_version; ?>"></script>
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
-<h2 class="d-none"><?php echo $dashboard['name'] ?></h2>
+<h2 class="d-none"><?php echo htmlspecialchars($dashboard['name'], ENT_QUOTES, 'UTF-8'); ?></h2>
  <div id="editicon" class="hidden-phone">
 	<div id="innerbutton" style="cursor: default">
 		<?php echo $dashboard_editor_icon; ?>
 	</div>
 </div>
 
-  <div id="page-container" style="height:<?php echo $dashboard['height']; ?>px; position:relative;">
+  <div id="page-container" style="height:<?php echo $dashheight; ?>px; position:relative;">
     <div id="page"><?php echo $page_html; ?></div>
 
 <script type="application/javascript">
-  var dashid = <?php echo $dashboard['id']; ?>;
+  var dashid = <?php echo $dashid; ?>;
   var widget = <?php echo json_encode($widgets); ?>;
-  var apikey = "<?php echo $apikey; ?>";
+  var apikey = <?php echo json_encode((string) $apikey); ?>;
+  // Whether the person looking at this page owns it. The curl widget asks
+  // before it sends a request from somebody else's browser, see curl_render.js.
+  var dashboard_owner = <?php echo $owner ? 'true' : 'false'; ?>;
   feed.apikey = apikey;
   var redraw = 1;
   var reloadiframe = 0; // dont re-calculate vis iframe urls
   var _SI = []; // get a list of International System of Units (SI)
 
-  public_userid = "<?php echo $public_userid; ?>";
+  public_userid = <?php echo json_encode((string) $public_userid); ?>;
 
-  $('body').css("background-color","#<?php echo $dashboard['backgroundcolor']; ?>");
+  $('body').css("background-color", <?php echo json_encode('#' . $backgroundcolor); ?>);
 
   render_widgets_init(widget); // populate widgets variable
   render_widgets_start(); // start widgets refresh

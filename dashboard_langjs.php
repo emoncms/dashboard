@@ -152,6 +152,7 @@ LANG_JS["Confirmation"] = '<?php echo addslashes(tr("Confirmation")); ?>';
 LANG_JS["Confirmation Box: yes/no"] = '<?php echo addslashes(tr("Confirmation Box: yes/no")); ?>';
 LANG_JS["Data to send"] = '<?php echo addslashes(tr("Data to send")); ?>';
 LANG_JS["Do you want to continue?"] = '<?php echo addslashes(tr("Do you want to continue?")); ?>';
+LANG_JS["This dashboard is asking your browser to send a request to"] = '<?php echo addslashes(tr("This dashboard is asking your browser to send a request to")); ?>';
 LANG_JS["GET/POST"] = '<?php echo addslashes(tr("GET/POST")); ?>';
 LANG_JS["HTTPS"] = '<?php echo addslashes(tr("HTTPS")); ?>';
 LANG_JS["in milliseconds"] = '<?php echo addslashes(tr("in milliseconds")); ?>';

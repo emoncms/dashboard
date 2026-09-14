@@ -15,6 +15,20 @@
 
 var selected_edges = {none : 0, left : 1, right : 2, top : 3, bottom : 4, center : 5};
 
+// Escapes a value on its way into the html the options modal is built from.
+// Option values hold what the author typed and feed names hold whatever posted
+// the data, so neither is markup here.
+function designer_escape(value)
+{
+    if (value === undefined || value === null) return "";
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 var designer = {
 
     'feedmode':"feedid",
@@ -402,7 +416,7 @@ var designer = {
 
             else if (options_type && options_type[z] == "html"){
                 val = $("#"+selected_box).html();
-                options_html += "<textarea class='options' id='"+box_options[z]+"' >"+val+"</textarea>"
+                options_html += "<textarea class='options' id='"+box_options[z]+"' >"+designer_escape(val)+"</textarea>"
             }
 
             // Combobox for selecting options
@@ -442,14 +456,14 @@ var designer = {
                 options_html += "</select>";
                 options_html += '</div>';
                 options_html += '<div class="input-prepend ' + other_hidden + ' other"><span class="add-on" style="width:100px; text-align: right; font-size:12px;background: none;border: none;margin-right: 1px;">' + _Tr('Other') + '</span>'
-                options_html += '<input id="' + box_options[z] + '" type="text" value="' + val + '" data-last-value="' + val + '" class="options input-is-other" style="border-radius:0 0 4px 4px;border-top:none">';
+                options_html += '<input id="' + box_options[z] + '" type="text" value="' + designer_escape(val) + '" data-last-value="' + designer_escape(val) + '" class="options input-is-other" style="border-radius:0 0 4px 4px;border-top:none">';
             }
 
             else if (options_type && options_type[z] == "colour_picker"){
                  if (optionsdata[z]!=undefined && val=="") {
                      val = optionsdata[z];
                  }
-                 options_html += "<input  type='color' class='options' id='"+box_options[z]+"'  value='#"+val+"'/ >"
+                 options_html += "<input  type='color' class='options' id='"+box_options[z]+"'  value='#"+designer_escape(val)+"'/ >"
             }
 
             else if (options_type && options_type[z] == "boolean"){
@@ -475,7 +489,7 @@ var designer = {
 */
 
             else{
-                options_html += "<input class='options' id='"+box_options[z]+"' type='text' value='"+val+"'/ >"
+                options_html += "<input class='options' id='"+box_options[z]+"' type='text' value='"+designer_escape(val)+"'/ >"
             }
 
             options_html += '</div>';
@@ -526,14 +540,14 @@ var designer = {
         }
         var out = "<select id='"+id+"' class='options'>";
         for (f in feedgroups){
-            out += "<optgroup label='"+f+"'>";
+            out += "<optgroup label='"+designer_escape(f)+"'>";
             for (p in feedgroups[f]) {
                 var feedref = feedgroups[f][p]['id']
                 if (designer.feedmode=="tagname") feedref = feedgroups[f][p]['tag']+":"+feedgroups[f][p]['name']
                 var selected = "";
                 if (currentval == feedref)
                     selected = "selected";
-                out += "<option value='"+feedref+"' "+selected+">"+feedgroups[f][p].name+"</option>";
+                out += "<option value='"+designer_escape(feedref)+"' "+selected+">"+designer_escape(feedgroups[f][p].name)+"</option>";
             }
             out += "</optgroup>";
         }

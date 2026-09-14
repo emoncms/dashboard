@@ -367,10 +367,24 @@ class Dashboard
         return $result->fetch_array();
     }
 
+    // Any dashboard by id, public or not. The caller has to decide whether the
+    // requester may see it, see the access control in dashboard_controller.
+    // Use get_owned where the answer is only ever the requester's own.
     public function get($id)
     {
         $id = (int) $id;
         $result = $this->mysqli->query("SELECT * FROM dashboard WHERE id='$id'");
+        return $result->fetch_array();
+    }
+
+    // The requester's own dashboard, or false. The editor loads through this,
+    // so an id belonging to somebody else opens nothing rather than showing
+    // its content.
+    public function get_owned($userid, $id)
+    {
+        $userid = (int) $userid;
+        $id = (int) $id;
+        $result = $this->mysqli->query("SELECT * FROM dashboard WHERE userid='$userid' AND id='$id'");
         return $result->fetch_array();
     }
     
@@ -417,8 +431,11 @@ class Dashboard
     {
         $alias = preg_replace('/[^\p{L}_\p{N}\s\-]/u','',$alias);
         // access to public dashboards
+        // Only public rows are matched, and the oldest wins. Matching any row
+        // let a private dashboard take an alias already in use and stop the
+        // public one it collided with from being reachable.
         if(!empty($alias)) {
-            $stmt = $this->mysqli->prepare("SELECT * FROM dashboard WHERE alias=?");
+            $stmt = $this->mysqli->prepare("SELECT * FROM dashboard WHERE alias=? AND public=1 ORDER BY id ASC LIMIT 1");
             $stmt->bind_param("s",$alias);
             $stmt->execute();
             $result = $stmt->get_result();

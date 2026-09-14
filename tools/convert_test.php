@@ -346,6 +346,26 @@ $result = convert('<div id="1" class="paragraph" style="position:absolute; top:0
     . 'left:0px; width:10px; height:10px; opacity:0;">x</div>');
 check('box opacity floored', widgets($result)[0]['style'], array('opacity' => '0.2'));
 
+// A negative margin inside the html lifts content out of the widget box and
+// over the emoncms menu bar, so it goes the way of a negative top
+$result = convert(box('<p style="margin-top:-500px">x</p>'));
+check('negative margin dropped', widgets($result)[0]['html'], '<p>x</p>');
+check('negative margin reported', codes($result), array('style_value_dropped'));
+$result = convert(box('<p style="margin:0 -20px">x</p>'));
+check('negative margin shorthand dropped', widgets($result)[0]['html'], '<p>x</p>');
+$result = convert(box('<p style="margin-left:-2px">x</p>'));
+check('negative margin dropped on the way out', render($result),
+    '<div id="1" class="paragraph" style="position:absolute; margin: 0; '
+    . 'top:0px; left:0px; width:200px; height:60px;"><p>x</p></div>');
+
+// A negative top is clamped to the top of the page, a negative left is left
+// alone, there is nothing to sit on top of off the side of the page
+$result = convert('<div id="1" class="paragraph" style="position:absolute; '
+    . 'top:-500px; left:-20px; width:10px; height:10px;">x</div>');
+check('negative top stored as written', widgets($result)[0]['y'], -500);
+check('negative top clamped on the way out',
+    strpos(render($result), 'top:0px; left:-20px;') !== false, true);
+
 // Extension styling is dropped without telling the author, there is nothing
 // for them to act on
 $result = convert(box('<span style="font-variant-caps:normal; font-stretch:100%; '

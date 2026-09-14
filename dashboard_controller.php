@@ -98,13 +98,16 @@ function dashboard_controller()
                 // key injected into the page so the feed widgets can load data, and in
                 // the logged-in branch it is the requester's own key. Testing it here
                 // previously let any key holder open any dashboard by id.
-                if ($dash['public'] || ($owner_context && $userid && $dash['userid']==$userid)) {
+                $owner = ($owner_context && $userid && $dash['userid']==$userid);
+
+                if ($dash['public'] || $owner) {
                     $result = view("Modules/dashboard/Views/dashboard_view.php",array(
                         'dashboard'=>$dash, 
                         'page_html'=>$dashboard->content_html($dash),
                         'js_css_version'=>$js_css_version, 
                         'apikey'=>$apikey, 
-                        'public_userid'=>$public_userid
+                        'public_userid'=>$public_userid,
+                        'owner'=>$owner
                     ));
                 }
             }
@@ -112,23 +115,32 @@ function dashboard_controller()
 
         else if ($route->action == "edit" && $session['write'])
         {
+            // The editor only ever opens the requester's own dashboard. It was
+            // loaded by id alone, so any writer could read the content of a
+            // private dashboard by asking for its id.
+            $dash = false;
             if ($route->subaction) $dash = $dashboard->get_from_alias($session['userid'],$route->subaction);
-            elseif (isset($_GET['id'])) $dash = $dashboard->get(get('id'));
-            // Rendered once and given to both views, so the config modal shows
-            // the same content the page does.
-            $page_html = $dashboard->content_html($dash);
-            $result = view("Modules/dashboard/Views/dashboard_edit_view.php",array(
-                'dashboard'=>$dash,
-                'page_html'=>$page_html,
-                'js_css_version'=>$js_css_version
-            ));
-            $result .= view("Modules/dashboard/Views/dashboard_config.php", array(
-                'dashboard'=>$dash,
-                'page_html'=>$page_html,
-                'js_css_version'=>$js_css_version
-            ));
+            elseif (isset($_GET['id'])) $dash = $dashboard->get_owned($session['userid'], get('id'));
 
-            $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'],'type'=>"edit", 'js_css_version'=>$js_css_version));
+            if (!$dash) {
+                $result = EMPTY_ROUTE;
+            } else {
+                // Rendered once and given to both views, so the config modal shows
+                // the same content the page does.
+                $page_html = $dashboard->content_html($dash);
+                $result = view("Modules/dashboard/Views/dashboard_edit_view.php",array(
+                    'dashboard'=>$dash,
+                    'page_html'=>$page_html,
+                    'js_css_version'=>$js_css_version
+                ));
+                $result .= view("Modules/dashboard/Views/dashboard_config.php", array(
+                    'dashboard'=>$dash,
+                    'page_html'=>$page_html,
+                    'js_css_version'=>$js_css_version
+                ));
+
+                $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'],'type'=>"edit", 'js_css_version'=>$js_css_version));
+            }
         }
     }
     else if ($route->format == 'json')

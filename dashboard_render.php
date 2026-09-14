@@ -162,6 +162,13 @@ function dashboard_render_box_style($widget, $index, &$errors)
     if ($w < 0) $w = 0;
     if ($h < 0) $h = 0;
 
+    // A negative top lifts the box out of the page and over the emoncms menu
+    // bar, which on a public dashboard puts author content on top of the site
+    // chrome. Clamped to the top of the page. A negative left is left alone,
+    // it only moves the box off the side of the page where there is nothing
+    // to sit on top of.
+    if ($y < 0) $y = 0;
+
     $wunit = (isset($widget['wunit']) && $widget['wunit'] === 'pc') ? '%' : 'px';
     $hunit = (isset($widget['hunit']) && $widget['hunit'] === 'pc') ? '%' : 'px';
 

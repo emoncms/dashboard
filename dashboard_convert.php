@@ -730,6 +730,17 @@ function dashboard_convert_styles($declarations, $index, &$warnings, $box)
             $value = $opacity;
         }
 
+        // A negative margin pulls content out of the widget box and up over the
+        // emoncms menu bar, the same overlay the top clamp in the renderer
+        // closes. Only ever reached for the html of a widget, the box path
+        // drops margin before this, see dashboard_convert_box_styles. A
+        // subtraction in calc() goes with it, the result can be negative too.
+        if (substr($property, 0, 6) === 'margin' && preg_match('/-\s*[\d.]/', $value)) {
+            dashboard_convert_warn($warnings, $index, 'style_value_dropped',
+                $property . ': ' . dashboard_convert_snippet($value));
+            continue;
+        }
+
         $kept[$property] = $value;
     }
     return $kept;

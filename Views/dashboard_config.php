@@ -10,6 +10,11 @@
     */
     global $path;
     defined('EMONCMS_EXEC') or die('Restricted access');
+
+    // Escaped for the place each one is printed into, as in dashboard_view.php.
+    function dashboard_config_attr($value) {
+        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    }
 ?>
 
 <div id="dashConfigModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="dashConfigModalLabel" aria-hidden="true" data-backdrop="static">
@@ -19,15 +24,15 @@
     </div>
     <div class="modal-body">
         <label><?php echo ctx_tr('dashboard_messages','Dashboard name: '); ?></label>
-        <input type="text" name="name" value="<?php echo $dashboard['name']; ?>" />
+        <input type="text" name="name" value="<?php echo dashboard_config_attr($dashboard['name']); ?>" />
         <label><?php echo ctx_tr('dashboard_messages','Alias name: '); ?></label>
-        <input type="text" name="alias" value="<?php echo $dashboard['alias']; ?>" />
+        <input type="text" name="alias" value="<?php echo dashboard_config_attr($dashboard['alias']); ?>" />
         <label><?php echo ctx_tr('dashboard_messages','Background color: '); ?></label>
-        <input type="color" name="backgroundcolor" value="#<?php echo $dashboard['backgroundcolor']; ?>" />
+        <input type="color" name="backgroundcolor" value="#<?php echo preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backgroundcolor']); ?>" />
         <label><?php echo ctx_tr('dashboard_messages','Description: '); ?></label>
-        <textarea name="description"><?php echo $dashboard['description']; ?></textarea>
+        <textarea name="description"><?php echo dashboard_config_attr($dashboard['description']); ?></textarea>
         <label><?php echo ctx_tr('dashboard_messages','Grid size: '); ?></label>
-        <input type="text" name="gridsize" value="<?php echo $dashboard['gridsize']; ?>" />
+        <input type="text" name="gridsize" value="<?php echo (int) $dashboard['gridsize']; ?>" />
 
 
         <label><?php echo ctx_tr('dashboard_messages','Feed selection mode: '); ?></label>
@@ -74,8 +79,8 @@
 </div>
 
 <script type="application/javascript">
-    var dashid = <?php echo $dashboard['id']; ?>;
-    var height = <?php echo $dashboard['height']; ?>;
+    var dashid = <?php echo (int) $dashboard['id']; ?>;
+    var height = <?php echo (int) $dashboard['height']; ?>;
 
     $("#dashboard-config-button").click(function (){
 
