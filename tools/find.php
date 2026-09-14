@@ -28,6 +28,7 @@ if (php_sapi_name() !== 'cli') die("cli only\n");
 
 $root = dirname(__FILE__) . "/../../..";
 require_once dirname(__FILE__) . "/../widget_registry.php";
+require_once dirname(__FILE__) . "/../dashboard_convert.php";
 
 // Parsed by hand rather than with getopt, which stops at the first argument
 // that is not an option, so the categories would hide the options after them.
@@ -53,7 +54,10 @@ $categories = array(
     'unknown' => 'a widget type no module declares',
     'broken-style' => 'a style attribute broken up into stray attributes',
     'script' => 'a script, style, meta, link, object, embed or svg tag',
-    'position-fixed' => 'a widget positioned fixed rather than absolute'
+    'position-fixed' => 'a widget positioned fixed rather than absolute',
+    'url' => 'a src or href the allowlist drops, a url pointing back at emoncms included',
+    'option-value' => 'an option value the widget will not accept, a tag or over 512 characters',
+    'style-value' => 'a negative margin, or an opacity that is raised or dropped'
 );
 
 if (isset($opts['list']) || isset($opts['help']) || !count($args)) {
@@ -269,6 +273,40 @@ function walk($node, $widget, $registry, $iframe_widgets, $wanted, &$hits)
             record($hits, $wanted, 'iframe', substr($src, 0, 120));
         }
 
+        // A url the allowlist will not keep. The iframe a vis or graph widget
+        // draws is generated and goes whatever its src says, so it is left out
+        // rather than reported as a url the author loses.
+        if (!($tag === 'iframe' && $widget !== null && isset($iframe_widgets[$widget]))) {
+            foreach (array('src', 'href') as $attribute) {
+                if (!$child->hasAttribute($attribute)) continue;
+                $url = $child->getAttribute($attribute);
+                if (dashboard_convert_url_allowed($url, $attribute)) continue;
+                record($hits, $wanted, 'url', $attribute . '=' . substr($url, 0, 120));
+            }
+        }
+
+        // An option value the widget will not accept. Only read on a widget box,
+        // which is the only place an option lives. An empty value and an option
+        // no widget declares are dropped for their own reasons and are not this.
+        if ($widget === null && $declared) {
+            foreach ($child->attributes as $attr) {
+                $name = strtolower($attr->nodeName);
+                if ($name === 'id' || $name === 'class' || $name === 'style') continue;
+                if ((string) $attr->nodeValue === '') continue;
+
+                $option = widget_registry_option($class, $name);
+                if ($option === false) continue;
+                if (dashboard_convert_option_valid($option, (string) $attr->nodeValue)) continue;
+
+                record($hits, $wanted, 'option-value',
+                    "$class $name=" . substr((string) $attr->nodeValue, 0, 120));
+            }
+        }
+
+        if ($child->hasAttribute('style')) {
+            find_style_values($child, $class, $tag, $widget, $wanted, $hits);
+        }
+
         if (in_array($tag, array('script', 'style', 'meta', 'link', 'object', 'embed', 'svg'))) {
             record($hits, $wanted, 'script', "<$tag>" . ($widget === null ? '' : " inside $widget"));
         }
@@ -295,6 +333,30 @@ function walk($node, $widget, $registry, $iframe_widgets, $wanted, &$hits)
         if ($inside === null && $declared) $inside = $class;
 
         walk($child, $inside, $registry, $iframe_widgets, $wanted, $hits);
+    }
+}
+
+// A style declaration the converter changes rather than keeps. Margin is only
+// read inside the html of a widget: on the box it is dropped whatever it says,
+// because the renderer writes the geometry from the document.
+function find_style_values($child, $class, $tag, $widget, $wanted, &$hits)
+{
+    $where = ($class === '' ? $tag : $class) . ': ';
+
+    foreach (dashboard_convert_parse_style($child->getAttribute('style')) as $property => $value) {
+        if ($widget !== null && substr($property, 0, 6) === 'margin'
+            && preg_match('/-\s*[\d.]/', $value)) {
+            record($hits, $wanted, 'style-value', $where . "$property: $value");
+        }
+
+        if ($property === 'opacity') {
+            $floored = dashboard_convert_style_opacity($value);
+            if ($floored === false) {
+                record($hits, $wanted, 'style-value', $where . "opacity: $value dropped");
+            } else if ($floored !== $value) {
+                record($hits, $wanted, 'style-value', $where . "opacity: $value raised to $floored");
+            }
+        }
     }
 }
 

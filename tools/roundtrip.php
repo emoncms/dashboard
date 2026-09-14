@@ -258,6 +258,7 @@ function extract_shape($html)
             'attributes' => $attributes,
             'text' => text_of($node),
             'tags' => tags_of($node),
+            'urls' => urls_of($node),
             'nested' => nested_of($node)
         );
     }
@@ -321,6 +322,30 @@ function text_of($node)
     return trim(preg_replace('/\s+/u', ' ', $text));
 }
 
+// The src and href values inside a box, counted. Tags and text on their own do
+// not show a url going missing: an img whose src was dropped is still an img
+// with no text, so a dashboard that loses an image reads as identical.
+function urls_of($node)
+{
+    $urls = array();
+    foreach ($node->childNodes as $child) {
+        if ($child->nodeType !== XML_ELEMENT_NODE) continue;
+        if (is_nested_widget($child)) continue;
+
+        foreach (array('src', 'href') as $attribute) {
+            if (!$child->hasAttribute($attribute)) continue;
+            $key = $attribute . ' ' . $child->getAttribute($attribute);
+            if (!isset($urls[$key])) $urls[$key] = 0;
+            $urls[$key]++;
+        }
+        foreach (urls_of($child) as $key => $count) {
+            if (!isset($urls[$key])) $urls[$key] = 0;
+            $urls[$key] += $count;
+        }
+    }
+    return $urls;
+}
+
 function tags_of($node)
 {
     $tags = array();
@@ -372,11 +397,8 @@ function compare_widget($before, $after, $i, $registry, &$differences)
 
     foreach ($before['geometry'] as $property => $value) {
         if ($value === $after['geometry'][$property]) continue;
-        // A widget whose style was destroyed has no geometry to preserve, and
-        // the renderer has to put it somewhere.
-        $expected = $value === null;
-        $differences[] = difference(
-            $expected ? 'geometry_supplied' : 'geometry_changed', $expected,
+        $reason = why_geometry_changed($property, $value, $after['geometry'][$property]);
+        $differences[] = difference($reason['kind'], $reason['expected'],
             "$where $property " . describe($value) . ' became '
             . describe($after['geometry'][$property]));
     }
@@ -418,6 +440,7 @@ function compare_widget($before, $after, $i, $registry, &$differences)
                 . dashboard_convert_snippet($after['text']));
         }
         compare_tags($before, $after, $where, $differences);
+        compare_urls($before, $after, $where, $differences);
     } else if ($after['text'] !== '') {
         $differences[] = difference('text_added', false,
             "$where " . dashboard_convert_snippet($after['text']));
@@ -437,6 +460,24 @@ function compare_tags($before, $after, $where, &$differences)
         $differences[] = difference($expected ? 'tag_dropped' : 'tag_lost', $expected,
             "$where <$tag> " . $count . ' became ' . $now);
     }
+}
+
+// Says why a widget is not where it was, and whether that was the intention.
+// A widget whose style was destroyed has no geometry to preserve and the
+// renderer has to put it somewhere. A negative top is clamped to the top of the
+// page, and a negative width or height to zero, see dashboard_render_box_style.
+function why_geometry_changed($property, $before, $after)
+{
+    if ($before === null) {
+        return array('kind' => 'geometry_supplied', 'expected' => true);
+    }
+    if ($property === 'top' && $before < 0 && $after === 0) {
+        return array('kind' => 'negative_top_clamped', 'expected' => true);
+    }
+    if (($property === 'width' || $property === 'height') && $before < 0 && $after === 0) {
+        return array('kind' => 'negative_size_clamped', 'expected' => true);
+    }
+    return array('kind' => 'geometry_changed', 'expected' => false);
 }
 
 // Says why an attribute that was there is not there any more, and whether that
@@ -478,6 +519,22 @@ function why_dropped($name, $value, $type, $known, $attributes)
         return array('kind' => 'option_value_rejected', 'expected' => true);
     }
     return array('kind' => 'option_lost', 'expected' => false);
+}
+
+// A url inside the html that is not there any more. Expected when the allowlist
+// is why, which since the same site rule went in covers an image or a link
+// pointing back at emoncms itself, see the URLs section of SCHEMA.md.
+function compare_urls($before, $after, $where, &$differences)
+{
+    foreach ($before['urls'] as $key => $count) {
+        $now = isset($after['urls'][$key]) ? $after['urls'][$key] : 0;
+        if ($now >= $count) continue;
+
+        list($attribute, $url) = explode(' ', $key, 2);
+        $expected = !dashboard_convert_url_allowed($url, $attribute);
+        $differences[] = difference($expected ? 'url_dropped' : 'url_lost', $expected,
+            "$where $attribute=" . dashboard_convert_snippet($url));
+    }
 }
 
 function difference($kind, $expected, $detail)

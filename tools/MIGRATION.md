@@ -95,6 +95,11 @@ generated canvas and iframe markup, `units_dropdown` designer artefacts,
 browser extension attributes and the broken style fragments. The census of
 5996 dashboards found about 18000 attributes in that category.
 
+Three difference kinds are worth reading off `roundtrip.php` by name, because
+they are the content rules rather than the markup and no census count predicts
+them: `url_dropped`, `option_value_rejected` and `negative_top_clamped`. Step 4
+lists the dashboards behind each.
+
 ### 4. Look at what will change
 
     php Modules/dashboard/tools/find.php nested iframe --full
@@ -102,6 +107,22 @@ browser extension attributes and the broken style fragments. The census of
 Lists the dashboards holding the three dropped cases, with their ids and
 userids, so their owners can be told or the dashboards looked at first. The
 census found 53 hand added iframes and a few hundred nested widgets.
+
+Then the content rules, which the census cannot predict. It recorded attribute
+names and counts, never values, so nothing in it says how many authors have a
+tag in an option, a cache busting query on an image, or an opacity of zero:
+
+    php Modules/dashboard/tools/find.php url option-value style-value --full
+
+| category | what it finds |
+| --- | --- |
+| `url` | a `src` or `href` the allowlist drops, which since the same site rule went in includes an image or a link pointing back at emoncms. A same site `src` has to name a static image file with no query string. |
+| `option-value` | an option value the widget will not accept: a tag in free text, or over 512 characters. Long `curl` payloads are the ones to look at. |
+| `style-value` | a negative margin, or an opacity below the 0.2 floor. |
+
+These are changes to how a dashboard draws, not faults. `roundtrip.php` counts
+them as intended, so they do not stop the migration, but the authors are worth
+telling. A dropped image is the visible one.
 
 For anything `roundtrip.php` called a fault:
 

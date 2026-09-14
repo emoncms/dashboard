@@ -515,6 +515,17 @@ Dashboards come out in three groups. Identical means nothing changed at all. As
 intended means the only changes were ones the migration set out to make. Both
 are safe to migrate. Faults are not.
 
+Tags and text on their own do not show a url going missing: an image whose src
+was dropped is still an image with no text, so the src and href values inside a
+widget are compared as well. A url that the allowlist rejects counts as
+intended, one it would have kept is a fault. This is what shows the same site
+rule working on a real dashboard, `--show=url_dropped` lists them.
+
+A widget the renderer moves is intended when it moved for a reason the renderer
+gives: `geometry_supplied` for a widget whose style was destroyed and has no
+geometry to preserve, `negative_top_clamped` and `negative_size_clamped` for the
+clamps. Anything else moving is `geometry_changed` and is a fault.
+
 ## Migration
 
 1. Add the `content_json` column. Done, see `dashboard_schema.php`.
