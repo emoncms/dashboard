@@ -60,7 +60,8 @@ function dashboard_convert_stripped_elements()
     return array(
         'script', 'style', 'meta', 'title', 'link', 'object', 'embed', 'iframe',
         'svg', 'form', 'input', 'button', 'select', 'textarea', 'canvas', 'applet',
-        'base', 'frame', 'frameset', 'noscript', 'template'
+        'base', 'frame', 'frameset', 'noscript', 'template',
+        'xmp', 'noembed', 'noframes', 'plaintext'
     );
 }
 
@@ -573,6 +574,16 @@ function dashboard_convert_clean($node, $index, $registry, &$warnings)
     foreach ($children as $child) {
         if ($child->nodeType === XML_COMMENT_NODE) {
             $node->removeChild($child);
+            continue;
+        }
+        // libxml parses the content of a raw text element (xmp, noembed,
+        // noframes, plaintext) into a CDATA section, and saveHTML writes a
+        // CDATA section out verbatim, markup and all, wherever it ends up.
+        // Unwrapping the element moved that live markup into the page. Turned
+        // into an ordinary text node here, which serialises escaped.
+        if ($child->nodeType === XML_CDATA_SECTION_NODE) {
+            $node->replaceChild(
+                $child->ownerDocument->createTextNode($child->textContent), $child);
             continue;
         }
         if ($child->nodeType !== XML_ELEMENT_NODE) continue;

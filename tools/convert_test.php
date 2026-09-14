@@ -701,6 +701,50 @@ check('html on a data widget is reported', $rendered['errors'][0]['code'],
     'html_not_allowed_on_type');
 
 // ---------------------------------------------------------------------------
+// Raw text elements.
+//
+// libxml parses the content of xmp, noembed, noframes and plaintext into a
+// CDATA section, and saveHTML writes a CDATA section out verbatim wherever it
+// ends up. Unwrapping the element carried that live markup into the page, and
+// one more level of nesting carried it past the second pass the renderer runs.
+// ---------------------------------------------------------------------------
+
+attack('raw text element', '<xmp><img src=x onerror=alert(1)></xmp>',
+    array('onerror', 'alert'));
+
+attack('nested raw text element', '<xmp><xmp><img src=x onerror=alert(1)></xmp></xmp>',
+    array('onerror', 'alert', '<xmp'));
+
+attack('raw text element holding a script', '<xmp><script>alert(1)</script></xmp>',
+    array('<script', 'alert'));
+
+attack('noembed', '<noembed><noembed><img src=x onerror=alert(1)></noembed></noembed>',
+    array('onerror', 'alert'));
+
+attack('noframes', '<noframes><noframes><svg onload=alert(1)></svg></noframes></noframes>',
+    array('onload', 'alert', '<svg'));
+
+attack('plaintext', '<plaintext><plaintext><img src=x onerror=alert(1)>',
+    array('onerror', 'alert'));
+
+// The sanitiser is run again by the renderer, so its output has to be its own
+// fixed point. Anything that survives one pass and not the next is markup it
+// emitted live, which is what the raw text elements above did.
+$idempotent = array(
+    '<xmp><img src=x onerror=alert(1)></xmp>',
+    '<noembed><b>t</b></noembed>',
+    '<p style="color:red">t</p><a href="https://example.com/x" target="_blank">l</a>',
+    '<img src="https://example.com/pv.png" alt="pv">',
+    '<table><tr><td align="left">c</td></tr></table>',
+);
+foreach ($idempotent as $i => $html) {
+    $w = array();
+    $once = dashboard_convert_sanitise_html($html, $w, 0);
+    $twice = dashboard_convert_sanitise_html($once, $w, 0);
+    check("sanitiser is its own fixed point $i", $twice, $once);
+}
+
+// ---------------------------------------------------------------------------
 
 echo "\n$passed passed, $failed failed\n";
 exit($failed ? 1 : 0);
