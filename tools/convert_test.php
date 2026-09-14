@@ -745,6 +745,47 @@ foreach ($idempotent as $i => $html) {
 }
 
 // ---------------------------------------------------------------------------
+// Documents that reached the column some other way.
+//
+// The renderer runs the allowlist on the way out, so a style value may not end
+// its own declaration and start another. A value carrying a semicolon wrote
+// position and z-index onto the box past the property allowlist.
+// ---------------------------------------------------------------------------
+
+$planted = array('version' => 1, 'widgets' => array(array(
+    'type' => 'paragraph', 'x' => 0, 'y' => 0, 'w' => 10, 'h' => 10, 'options' => array(),
+    'style' => array('background' => 'red;position:fixed;top:0;z-index:9999')
+)));
+$html = dashboard_render($planted)['html'];
+check('style value may not start a declaration', stripos($html, 'z-index') !== false, false);
+check('style value may not carry position', stripos($html, 'position:fixed') !== false, false);
+
+// A value that is not a string used to reach strlen and stop the page with a
+// TypeError rather than being dropped.
+$planted['widgets'][0]['style'] = array('color' => array('red'));
+$rendered = dashboard_render($planted);
+check('a style value that is not a string is dropped',
+    strpos($rendered['html'], 'color') !== false, false);
+check('a style value that is not a string is reported',
+    $rendered['errors'][0]['code'], 'style_declaration_unreadable');
+
+// An image keeps the referer of its fetch off the site it is fetched from. The
+// dashboard url carries an apikey or a readkey when the page was opened with
+// one, see set_referrer_policy in core.php.
+$w = array();
+$marked = dashboard_convert_sanitise_html(
+    '<img src="https://example.com/pv.png" alt="pv">', $w, 0);
+check('a remote image sends no referer',
+    strpos($marked, 'referrerpolicy="no-referrer"') !== false, true);
+
+// An author cannot ask for a weaker policy than that.
+$w = array();
+$marked = dashboard_convert_sanitise_html(
+    '<img src="https://example.com/pv.png" referrerpolicy="unsafe-url">', $w, 0);
+check('a weaker referer policy is overwritten',
+    strpos($marked, 'unsafe-url') !== false, false);
+
+// ---------------------------------------------------------------------------
 
 echo "\n$passed passed, $failed failed\n";
 exit($failed ? 1 : 0);

@@ -101,6 +101,13 @@ function dashboard_controller()
                 $owner = ($owner_context && $userid && $dash['userid']==$userid);
 
                 if ($dash['public'] || $owner) {
+                    // A public dashboard is meant to sit in an iframe on
+                    // another site, so it takes the embed frame policy. A
+                    // private one does not, and neither does a public one
+                    // being served to a logged in visitor, see
+                    // set_frame_policy in core.php.
+                    if ($dash['public']) allow_public_embed();
+
                     $result = view("Modules/dashboard/Views/dashboard_view.php",array(
                         'dashboard'=>$dash, 
                         'page_html'=>$dashboard->content_html($dash),

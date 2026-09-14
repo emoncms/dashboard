@@ -70,7 +70,7 @@ function dashboard_convert_allowed_attributes()
 {
     return array(
         'a' => array('href', 'target', 'title', 'rel'),
-        'img' => array('src', 'alt', 'width', 'height'),
+        'img' => array('src', 'alt', 'width', 'height', 'referrerpolicy'),
         'font' => array('color', 'face', 'size'),
         'table' => array('border', 'cellpadding', 'cellspacing'),
         'td' => array('colspan', 'rowspan', 'align'),
@@ -675,6 +675,17 @@ function dashboard_convert_attributes($element, $tag, $index, &$warnings)
     if ($tag === 'a' && $element->hasAttribute('target')) {
         $element->setAttribute('rel', 'noopener noreferrer');
     }
+
+    // An image is fetched from wherever the author pointed it, and the referer
+    // of that fetch is the dashboard url, which carries an apikey or a readkey
+    // when the page was opened with one. Set here rather than left to the
+    // author, and overwritten rather than trusted, so the author cannot ask
+    // for a weaker policy than this. Emoncms sends a Referrer-Policy header as
+    // well, see set_referrer_policy in core.php.
+    // An image with no src left is inert and is not marked.
+    if ($tag === 'img' && $element->hasAttribute('src')) {
+        $element->setAttribute('referrerpolicy', 'no-referrer');
+    }
 }
 
 // Control characters and whitespace are stripped before the scheme is tested,
@@ -813,6 +824,16 @@ function dashboard_convert_styles($declarations, $index, &$warnings, $box)
 
     $kept = array();
     foreach ($declarations as $property => $value) {
+        // The html path hands this parsed declarations, which are always
+        // strings. A decoded document hands it whatever the column held, so
+        // the shape is checked before anything is read from it.
+        if (!is_string($property) || !is_string($value)) {
+            dashboard_convert_warn($warnings, $index, 'style_declaration_unreadable',
+                is_string($property) ? $property : '');
+            continue;
+        }
+        $property = strtolower(trim($property));
+
         if ($box && in_array($property, $box_styles)) continue;
 
         if (!in_array($property, $allowed)) {
@@ -911,6 +932,11 @@ function dashboard_convert_style_value_allowed($value)
     // A backslash writes a css escape, which could spell a function name
     // another way, and the rest cannot appear in a value at all.
     if (preg_match('/[\\\\<>{}]/', $value)) return false;
+    // A semicolon ends the declaration and starts another, which is how a
+    // value carries position or z-index past the property allowlist. The html
+    // path splits on it before this is reached, a decoded document does not,
+    // and no value in the census holds either character.
+    if (preg_match('/[;:]/', $value)) return false;
     // position on its own lifts a box out of the page.
     if (preg_match('/^\s*position\s*$/i', $value)) return false;
 
