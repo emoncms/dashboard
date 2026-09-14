@@ -352,7 +352,7 @@ function urls_of($node)
 
         foreach (array('src', 'href') as $attribute) {
             if (!$child->hasAttribute($attribute)) continue;
-            $key = $attribute . ' ' . $child->getAttribute($attribute);
+            $key = $attribute . ' ' . normalise_url($child->getAttribute($attribute));
             if (!isset($urls[$key])) $urls[$key] = 0;
             $urls[$key]++;
         }
@@ -362,6 +362,15 @@ function urls_of($node)
         }
     }
     return $urls;
+}
+
+// libxml escapes a space and anything non ASCII when it writes an href or a
+// src back out, because it knows they name a url. A browser sends those bytes
+// for the unescaped url as well, so the two forms are the same link and are
+// compared as one.
+function normalise_url($url)
+{
+    return rawurldecode($url);
 }
 
 function tags_of($node)
