@@ -274,12 +274,60 @@ $widget = widgets($result)[0];
 check('paragraph width unit', array($widget['w'], $widget['wunit']), array(50, 'pc'));
 check('paragraph box style kept', $widget['style'], array('color' => '#333333'));
 check('paragraph html', $widget['html'],
-    '<b>Power</b> now <a href="https://example.com/x" target="_blank">link</a><a>bad</a>'
+    '<b>Power</b> now <a href="https://example.com/x" target="_blank" rel="noopener noreferrer">link</a><a>bad</a>'
     . '<img alt="x"><span style="color: red">styled</span>heading six');
 check('paragraph warnings', codes($result), array(
     'attribute_dropped', 'style_property_dropped', 'tag_dropped', 'tag_unwrapped',
     'url_dropped', 'url_dropped'
 ));
+
+// The html of a widget is the content of its box, so an html attribute was not
+// written by the designer and is not put back on the page
+$result = convert('<div id="1" class="paragraph" style="position:absolute; top:0px; '
+    . 'left:0px; width:10px; height:10px;" html="&lt;b&gt;x&lt;/b&gt;">y</div>');
+check('html attribute dropped', widgets($result)[0]['options'], array());
+check('html attribute reported', codes($result), array('option_value_dropped'));
+check('html attribute not rendered',
+    strpos(render($result), 'html=') === false, true);
+
+// A url pointing back at this emoncms is a request the browser of whoever is
+// looking at the dashboard makes, carrying their session. An image needs no
+// click, so a src has to name a static file.
+$_SERVER['HTTP_HOST'] = 'emoncms.example';
+
+$result = convert(box('<img src="/feed/delete.json?id=1" alt="a">'
+    . '<img src="feed/delete.json?id=2" alt="b">'
+    . '<img src="https://emoncms.example/feed/delete.json?id=3" alt="c">'
+    . '<img src="//emoncms.example/feed/delete.json?id=4" alt="d">'));
+check('own site api image dropped', widgets($result)[0]['html'],
+    '<img alt="a"><img alt="b"><img alt="c"><img alt="d">');
+check('own site api image reported', codes($result),
+    array('url_dropped', 'url_dropped', 'url_dropped', 'url_dropped'));
+
+$result = convert(box('<img src="/images/solar.png" alt="a">'
+    . '<img src="../pics/pv.jpg" alt="b">'
+    . '<img src="https://example.org/diagram.png" alt="c">'
+    . '<img src="https://example.org/render?id=1" alt="d">'));
+check('image file kept', codes($result), array());
+
+$result = convert(box('<a href="dashboard/view?id=2">two</a>'
+    . '<a href="https://openenergymonitor.org">out</a>'
+    . '<a href="mailto:a@b.c">mail</a>'));
+check('own site page link kept', codes($result), array());
+
+$result = convert(box('<a href="/feed/delete.json?id=1">one</a>'
+    . '<a href="/feed/data.csv?id=1">two</a>'));
+check('own site api link dropped', codes($result),
+    array('url_dropped', 'url_dropped'));
+
+// A link opening in another tab is told not to hand that tab a handle to this
+// one, on the way in and on the way out
+$result = convert(box('<a href="https://example.org/" target="_blank">x</a>'));
+check('target carries noopener', widgets($result)[0]['html'],
+    '<a href="https://example.org/" target="_blank" rel="noopener noreferrer">x</a>');
+check('target is quiet', codes($result), array());
+check('noopener survives the round trip',
+    widgets(convert(render($result)))[0]['html'], widgets($result)[0]['html']);
 
 // Styling authors write, from the style property counts in the census
 $styling = 'font: bold 22px / 60px Helvetica; border-bottom: 2px solid #333; '

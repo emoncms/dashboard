@@ -68,7 +68,7 @@ function dashboard_convert_stripped_elements()
 function dashboard_convert_allowed_attributes()
 {
     return array(
-        'a' => array('href', 'target', 'title'),
+        'a' => array('href', 'target', 'title', 'rel'),
         'img' => array('src', 'alt', 'width', 'height'),
         'font' => array('color', 'face', 'size'),
         'table' => array('border', 'cellpadding', 'cellspacing'),
@@ -462,6 +462,13 @@ function dashboard_convert_option_valid($option, $value)
             return preg_match('/^[^<>]{1,512}$/u', $value) === 1;
 
         case 'html':
+            // The html of a widget is the content of its box, never an
+            // attribute. The designer writes it with .html(), the document
+            // keeps it in its own field, and no dashboard in the census
+            // carries an html attribute. One that turns up was not authored
+            // and is not put back on the page.
+            return false;
+
         default:
             return true;
     }
@@ -634,7 +641,7 @@ function dashboard_convert_attributes($element, $tag, $index, &$warnings)
 
         if (in_array($lower, $allowed)) {
             if (($lower === 'href' || $lower === 'src')
-                && !dashboard_convert_url_allowed($value)) {
+                && !dashboard_convert_url_allowed($value, $lower)) {
                 dashboard_convert_warn($warnings, $index, 'url_dropped',
                     dashboard_convert_snippet($value));
                 $element->removeAttribute($name);
@@ -649,25 +656,118 @@ function dashboard_convert_attributes($element, $tag, $index, &$warnings)
         }
         $element->removeAttribute($name);
     }
+
+    // A link opening in another tab hands that tab a handle to this one unless
+    // it is told not to. Written here rather than left to the author, and
+    // written on the way out as well, so a link that arrived some other way
+    // carries it too. rel is on the allowlist so it survives the round trip.
+    if ($tag === 'a' && $element->hasAttribute('target')) {
+        $element->setAttribute('rel', 'noopener noreferrer');
+    }
 }
 
 // Control characters and whitespace are stripped before the scheme is tested,
 // never after, so a scheme cannot be hidden inside one.
 //
-// What is left has to be http, https, mailto or a relative reference. A
-// relative reference cannot carry a colon before its first path separator, so
-// testing for that rejects every other scheme without having to name them, and
-// rejects the ones dressed up to look like something else. A null byte in
-// java\0script: comes back out of the parser as a replacement character, which
-// is not a control character and would pass a scheme shaped pattern.
-function dashboard_convert_url_allowed($url)
+// What is left has to be http, https, mailto or a relative reference, and a url
+// pointing back at this emoncms is held to more than that, see
+// dashboard_convert_url_own_site.
+function dashboard_convert_url_allowed($url, $attribute = 'href')
 {
     $url = preg_replace('/[\x00-\x20\x7f]/', '', $url);
     if ($url === '') return false;
-    if (preg_match('#^(https?://|mailto:)#i', $url)) return true;
+    if (preg_match('#^mailto:#i', $url)) return true;
+
+    $host = dashboard_convert_url_host($url);
+    if ($host === false) return false;
+    if ($host !== '' && $host !== dashboard_convert_request_host()) return true;
+
+    // What is left points back at this emoncms, so the browser sends the
+    // session of whoever is looking at the dashboard with it. See
+    // dashboard_convert_url_own_site.
+    return dashboard_convert_url_own_site($url, $attribute);
+}
+
+// The host a url names, '' when it names none and so points at this site, or
+// false when the url is not one that may be written at all.
+//
+// A relative reference cannot carry a colon before its first path separator,
+// so testing for that rejects every scheme without having to name them, and
+// rejects the ones dressed up to look like something else. A null byte in
+// java\0script: comes back out of the parser as a replacement character, which
+// is not a control character and would pass a scheme shaped pattern.
+function dashboard_convert_url_host($url)
+{
+    if (preg_match('#^https?://([^/?\#]*)#i', $url, $match)) {
+        return strtolower(dashboard_convert_url_strip_port($match[1]));
+    }
+    // Scheme relative, //host/path, which is absolute to another site.
+    if (substr($url, 0, 2) === '//') {
+        $head = preg_split('#[/?\#]#', substr($url, 2), 2);
+        return strtolower(dashboard_convert_url_strip_port($head[0]));
+    }
 
     $head = preg_split('#[/?\#]#', $url, 2);
-    return strpos($head[0], ':') === false;
+    if (strpos($head[0], ':') !== false) return false;
+
+    return '';
+}
+
+function dashboard_convert_url_strip_port($host)
+{
+    // Userinfo is dropped with the port, neither says which site is named.
+    $at = strrpos($host, '@');
+    if ($at !== false) $host = substr($host, $at + 1);
+
+    $colon = strrpos($host, ':');
+    if ($colon !== false && strpos($host, ']') === false) $host = substr($host, 0, $colon);
+
+    return $host;
+}
+
+// The host this request came in on, or '' from the command line. A migration
+// run has no request to read, so it cannot tell an absolute url pointing at
+// this site from one pointing anywhere else. The renderer runs the same check
+// on the way out, inside a request, and drops it then.
+function dashboard_convert_request_host()
+{
+    if (!isset($_SERVER['HTTP_HOST'])) return '';
+    return strtolower(dashboard_convert_url_strip_port($_SERVER['HTTP_HOST']));
+}
+
+/**
+ * Whether a url pointing at this emoncms may be written.
+ *
+ * An image is fetched as the page draws, with no click and nothing shown, so a
+ * src here has to be a static image file: an emoncms api call reached this way
+ * runs as the person looking at the dashboard, and feed/delete.json is a GET.
+ * A link needs a click and navigates the page, so an href may point at a page
+ * but not at the api, which is what a format extension such as .json selects,
+ * see the Route class. A url pointing anywhere else is not this module's to
+ * police and is left alone.
+ */
+function dashboard_convert_url_own_site($url, $attribute)
+{
+    $path = preg_split('#[?\#]#', $url, 2);
+    $path = $path[0];
+
+    $segment = strrchr($path, '/');
+    if ($segment !== false) $path = substr($segment, 1);
+
+    $dot = strrpos($path, '.');
+    $extension = ($dot === false) ? '' : strtolower(substr($path, $dot + 1));
+
+    $images = array('png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico', 'avif');
+
+    if ($attribute === 'src') {
+        // A query string on a src is never needed to name a file and is the
+        // shape every api call takes, so it goes with the rest.
+        if (strpos($url, '?') !== false) return false;
+        return in_array($extension, $images);
+    }
+
+    return $extension === '' || in_array($extension, $images)
+        || in_array($extension, array('htm', 'html', 'pdf', 'txt'));
 }
 
 // ---------------------------------------------------------------------------

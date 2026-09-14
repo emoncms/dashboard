@@ -133,7 +133,13 @@ Validation is per option, driven by the widget registry:
 | `colour_picker` | 3 or 6 hex digits, `#` optional |
 | `boolean` | `"0"` or `"1"` |
 | `value` | free text, see below |
-| `html` | see below |
+| `html` | never an attribute, always dropped, see below |
+
+**An `html` option is not an attribute.** It names the content of the widget's
+box, which the designer writes with `.html()` and the document keeps in its own
+`html` field. No dashboard in the census carries an `html` attribute, so one
+that turns up was not authored, and it is dropped rather than put back on the
+page.
 
 **Free text options**, `value` and `dropbox_other`, are 1 to 512 characters with
 no control characters and no `<` or `>`. These hold what an author types: units,
@@ -275,7 +281,7 @@ including `script`, `style`, `meta`, `title`, `link`, `object`, `embed`,
 | element | allowed |
 | --- | --- |
 | any | `style`, restricted below |
-| `a` | `href`, `target`, `title` |
+| `a` | `href`, `target`, `title`, `rel` |
 | `img` | `src`, `alt`, `width`, `height` |
 | `font` | `color`, `face`, `size` |
 | `table` | `border`, `cellpadding`, `cellspacing` |
@@ -284,9 +290,35 @@ including `script`, `style`, `meta`, `title`, `link`, `object`, `embed`,
 Every other attribute is dropped. `on*` is dropped unconditionally and is never
 reachable by any other rule.
 
+`rel` is written rather than read. An `a` with a `target` is given
+`rel="noopener noreferrer"`, on the way in and on the way out, so a link opening
+in another tab does not hand that tab a handle to the dashboard. It is on the
+allowlist so it survives the round trip.
+
 **URLs** in `href` and `src` must be a relative path, or `http://`, `https://`
 or `mailto:`. Everything else is dropped, `data:` included. Strip control
 characters before testing the scheme, never after.
+
+A url pointing back at this emoncms is held to more than that. The browser of
+whoever is looking at the dashboard sends it, with their session, and an
+emoncms api call is a GET: `feed/delete.json?id=1` in the `src` of an image is
+a feed deleted with no click and nothing shown. So on this site:
+
+- a `src` must name a static image file, one of `png jpg jpeg gif webp svg bmp
+  ico avif`, and carry no query string. A cache busting `?v=2` goes with the
+  rest, it is not needed to name a file.
+- an `href` may point at a page but not at the api. A format extension is what
+  selects the api, see the `Route` class, so `.json`, `.csv` and the rest are
+  dropped while `dashboard/view?id=2` is kept.
+
+A url pointing anywhere else is not this module's to police and is left alone.
+Same site is decided by comparing the host against the host the request came in
+on. A migration run from the command line has no request to read, so it cannot
+tell an absolute url pointing at this site from any other. The renderer runs
+the same check on the way out, inside a request, and drops it then.
+
+The endpoints are the other half of this. An emoncms api call that changes or
+deletes something should not answer a GET, and several still do.
 
 **Style properties**
 
