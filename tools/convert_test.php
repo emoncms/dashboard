@@ -340,11 +340,31 @@ check('own site api image dropped', widgets($result)[0]['html'],
 check('own site api image reported', codes($result),
     array('url_dropped', 'url_dropped', 'url_dropped', 'url_dropped'));
 
-$result = convert(box('<img src="/images/solar.png" alt="a">'
-    . '<img src="../pics/pv.jpg" alt="b">'
+// A same-site src is held to the dashboard images directory, the one place
+// server-hosted diagrams live. The file extension cannot say whether a path is
+// a static file or a routed api call, so a src elsewhere on this site is
+// dropped whatever it ends in. A remote image is left alone.
+$result = convert(box('<img src="Modules/dashboard/Views/images/SolarDiagram.png" alt="a">'
+    . '<img src="/Modules/dashboard/Views/images/SolarDiagram2.png" alt="b">'
     . '<img src="https://example.org/diagram.png" alt="c">'
     . '<img src="https://example.org/render?id=1" alt="d">'));
-check('image file kept', codes($result), array());
+check('stored image kept', codes($result), array());
+
+// Same server, but not the images directory, so the extension proves nothing
+// and the src is dropped: a routed call with an image extension, a path
+// outside the directory, a subfolder, and a traversal that is decoded before
+// it is checked.
+$result = convert(box('<img src="feed/delete.png" alt="a">'
+    . '<img src="user/logout.json.png" alt="b">'
+    . '<img src="/images/solar.png" alt="c">'
+    . '<img src="../pics/pv.jpg" alt="d">'
+    . '<img src="Modules/dashboard/Views/images/sub/pv.png" alt="e">'
+    . '<img src="Modules/dashboard/Views/images/..%2f..%2f..%2ffeed/delete.png" alt="f">'));
+check('non stored same site image dropped', widgets($result)[0]['html'],
+    '<img alt="a"><img alt="b"><img alt="c"><img alt="d"><img alt="e"><img alt="f">');
+check('non stored same site image reported', codes($result),
+    array('url_dropped', 'url_dropped', 'url_dropped', 'url_dropped',
+        'url_dropped', 'url_dropped'));
 
 $result = convert(box('<a href="dashboard/view?id=2">two</a>'
     . '<a href="https://openenergymonitor.org">out</a>'

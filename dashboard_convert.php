@@ -838,8 +838,14 @@ function dashboard_convert_request_host()
  * Whether a url pointing at this emoncms may be written.
  *
  * An image is fetched as the page draws, with no click and nothing shown, so a
- * src here has to be a static image file: an emoncms api call reached this way
+ * src here has to be a static image file. An emoncms api call reached this way
  * runs as the person looking at the dashboard, and feed/delete.json is a GET.
+ * The file extension cannot tell the two apart: emoncms serves real files off
+ * disk and routes everything else through index.php on the controller and
+ * action, whatever the extension, so feed/delete.png routes just as
+ * feed/delete.json does. A src is held instead to the one directory
+ * server-hosted diagrams live in, see dashboard_convert_url_is_stored_image.
+ *
  * A link needs a click and navigates the page, so an href may point at a page
  * but not at the api, which is what a format extension such as .json selects,
  * see the Route class. A url pointing anywhere else is not this module's to
@@ -847,6 +853,13 @@ function dashboard_convert_request_host()
  */
 function dashboard_convert_url_own_site($url, $attribute)
 {
+    if ($attribute === 'src') {
+        // A query string on a src is never needed to name a file and is the
+        // shape every api call takes, so it goes with the rest.
+        if (strpos($url, '?') !== false) return false;
+        return dashboard_convert_url_is_stored_image($url);
+    }
+
     $path = preg_split('#[?\#]#', $url, 2);
     $path = $path[0];
 
@@ -858,15 +871,38 @@ function dashboard_convert_url_own_site($url, $attribute)
 
     $images = array('png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico', 'avif');
 
-    if ($attribute === 'src') {
-        // A query string on a src is never needed to name a file and is the
-        // shape every api call takes, so it goes with the rest.
-        if (strpos($url, '?') !== false) return false;
-        return in_array($extension, $images);
-    }
-
     return $extension === '' || in_array($extension, $images)
         || in_array($extension, array('htm', 'html', 'pdf', 'txt'));
+}
+
+// A file directly inside the dashboard's own images directory, the one place
+// server-hosted diagrams live. The path is app-root-relative, so it matches
+// whatever base a subdirectory install carries in front of it. A single
+// filename only, no subdirectory and no traversal, so nothing outside the
+// directory can be reached.
+function dashboard_convert_url_is_stored_image($url)
+{
+    $path = preg_split('#[?\#]#', $url, 2);
+    // Decode first, so ..%2f cannot smuggle a traversal past the segment check.
+    $path = urldecode($path[0]);
+
+    foreach (explode('/', $path) as $segment) {
+        if ($segment === '..') return false;
+    }
+
+    if (!preg_match('#(?:^|/)Modules/dashboard/Views/images/([^/]+)$#', $path, $match)) {
+        return false;
+    }
+    return dashboard_convert_url_is_image($match[1]);
+}
+
+function dashboard_convert_url_is_image($file)
+{
+    $dot = strrpos($file, '.');
+    if ($dot === false) return false;
+    $extension = strtolower(substr($file, $dot + 1));
+    return in_array($extension,
+        array('png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico', 'avif'), true);
 }
 
 // ---------------------------------------------------------------------------
