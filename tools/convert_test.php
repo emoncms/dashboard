@@ -954,6 +954,34 @@ check('a weaker referer policy is overwritten',
     strpos($marked, 'unsafe-url') !== false, false);
 
 // ---------------------------------------------------------------------------
+// Attributes in the reserved xml and xmlns namespaces.
+//
+// removeAttribute cannot remove one. libxml holds them apart from the rest and
+// the call returns having done nothing, so each was reported as dropped and
+// stayed on the element. Inert in an html page, and off the allowlist all the
+// same, see dashboard_convert_attributes.
+// ---------------------------------------------------------------------------
+
+$reserved = array(
+    '<a xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="javascript:alert(1)">x</a>',
+    '<p xmlns="urn:x">t</p>',
+    '<p xmlns:onclick="alert(1)">t</p>',
+    '<p xml:lang="en">t</p>',
+    '<p xml:base="//example.com/">t</p>',
+);
+foreach ($reserved as $i => $html) {
+    $w = array();
+    $out = dashboard_convert_sanitise_html($html, $w, 0);
+    check("reserved namespace attribute is gone $i", strpos($out, 'xml') === false, true);
+}
+
+// What the element carries otherwise is untouched
+$w = array();
+check('an allowed attribute survives a reserved one',
+    dashboard_convert_sanitise_html('<a xml:lang="en" href="https://example.com/x">x</a>', $w, 0),
+    '<a href="https://example.com/x">x</a>');
+
+// ---------------------------------------------------------------------------
 
 echo "\n$passed passed, $failed failed\n";
 exit($failed ? 1 : 0);

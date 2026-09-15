@@ -709,12 +709,19 @@ function dashboard_convert_attributes($element, $tag, $index, &$warnings)
 
     $allowed = isset($per_element[$tag]) ? $per_element[$tag] : array();
 
+    // The attribute nodes are collected rather than their names, because
+    // removeAttribute cannot remove an attribute in the reserved xml and xmlns
+    // namespaces. libxml holds those apart from the rest and the call returns
+    // having done nothing, so xmlns, xmlns:x, xml:lang and xml:base were
+    // reported as dropped and stayed on the element. removeAttributeNode
+    // removes them along with everything else.
     $attributes = array();
-    foreach ($element->attributes as $attribute) $attributes[] = $attribute->nodeName;
+    foreach ($element->attributes as $attribute) $attributes[] = $attribute;
 
-    foreach ($attributes as $name) {
+    foreach ($attributes as $attribute) {
+        $name = $attribute->nodeName;
         $lower = strtolower($name);
-        $value = $element->getAttribute($name);
+        $value = $attribute->nodeValue;
 
         if ($lower === 'style') {
             $declarations = dashboard_convert_parse_style($value);
@@ -722,7 +729,7 @@ function dashboard_convert_attributes($element, $tag, $index, &$warnings)
             if (count($kept)) {
                 $element->setAttribute('style', dashboard_convert_write_style($kept));
             } else {
-                $element->removeAttribute($name);
+                $element->removeAttributeNode($attribute);
             }
             continue;
         }
@@ -732,7 +739,7 @@ function dashboard_convert_attributes($element, $tag, $index, &$warnings)
                 && !dashboard_convert_url_allowed($value, $lower)) {
                 dashboard_convert_warn($warnings, $index, 'url_dropped',
                     dashboard_convert_snippet($value));
-                $element->removeAttribute($name);
+                $element->removeAttributeNode($attribute);
             }
             continue;
         }
@@ -742,7 +749,7 @@ function dashboard_convert_attributes($element, $tag, $index, &$warnings)
         if (!in_array($lower, $extensions)) {
             dashboard_convert_warn($warnings, $index, 'attribute_dropped', "$tag/$name");
         }
-        $element->removeAttribute($name);
+        $element->removeAttributeNode($attribute);
     }
 
     // A link opening in another tab hands that tab a handle to this one unless
