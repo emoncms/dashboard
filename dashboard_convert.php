@@ -822,7 +822,11 @@ function dashboard_convert_url_strip_port($host)
     $colon = strrpos($host, ':');
     if ($colon !== false && strpos($host, ']') === false) $host = substr($host, 0, $colon);
 
-    return $host;
+    // A trailing dot names the same host to dns, so emoncms.org. is emoncms.org.
+    // Without this it compares unequal and dodges the same-site rules, leaving
+    // https://emoncms.org./feed/delete.json reachable. An IPv6 literal in
+    // brackets carries no trailing dot, so it is untouched.
+    return rtrim($host, '.');
 }
 
 // The host this request came in on, or '' from the command line. A migration

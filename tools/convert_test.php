@@ -366,6 +366,17 @@ check('non stored same site image reported', codes($result),
     array('url_dropped', 'url_dropped', 'url_dropped', 'url_dropped',
         'url_dropped', 'url_dropped'));
 
+// A trailing dot names the same host, so an absolute url to emoncms.example.
+// is the same site and held to the same rules, not left alone as another host.
+// A trailing dot on a genuinely different host stays external.
+$result = convert(box('<img src="https://emoncms.example./feed/delete.json?id=1" alt="a">'
+    . '<a href="https://emoncms.example./feed/delete?id=1">b</a>'
+    . '<img src="https://example.org./diagram.png" alt="c">'));
+check('trailing dot same host dropped', widgets($result)[0]['html'],
+    '<img alt="a"><a>b</a><img src="https://example.org./diagram.png" alt="c" referrerpolicy="no-referrer">');
+check('trailing dot same host reported', codes($result),
+    array('url_dropped', 'url_dropped'));
+
 // An internal link navigates the page in the viewer's session, and emoncms
 // routes on controller and action whatever the path ends in, so a link back at
 // this site can reach a GET api: feed/delete with or without an extension,
