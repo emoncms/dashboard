@@ -846,10 +846,12 @@ function dashboard_convert_request_host()
  * feed/delete.json does. A src is held instead to the one directory
  * server-hosted diagrams live in, see dashboard_convert_url_is_stored_image.
  *
- * A link needs a click and navigates the page, so an href may point at a page
- * but not at the api, which is what a format extension such as .json selects,
- * see the Route class. A url pointing anywhere else is not this module's to
- * police and is left alone.
+ * A link navigates the page in the viewer's session, and emoncms routes on the
+ * controller and action whatever the path ends in, so a link back at this site
+ * can reach an api that acts on a GET, such as feed/delete or app/remove. The
+ * file extension does not say which, and several such actions run whatever the
+ * format. So an internal link is dropped. A link to another site is not this
+ * module's to police and is left alone, see dashboard_convert_url_allowed.
  */
 function dashboard_convert_url_own_site($url, $attribute)
 {
@@ -860,19 +862,8 @@ function dashboard_convert_url_own_site($url, $attribute)
         return dashboard_convert_url_is_stored_image($url);
     }
 
-    $path = preg_split('#[?\#]#', $url, 2);
-    $path = $path[0];
-
-    $segment = strrchr($path, '/');
-    if ($segment !== false) $path = substr($segment, 1);
-
-    $dot = strrpos($path, '.');
-    $extension = ($dot === false) ? '' : strtolower(substr($path, $dot + 1));
-
-    $images = array('png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico', 'avif');
-
-    return $extension === '' || in_array($extension, $images)
-        || in_array($extension, array('htm', 'html', 'pdf', 'txt'));
+    // href back at this site: dropped.
+    return false;
 }
 
 // A file directly inside the dashboard's own images directory, the one place

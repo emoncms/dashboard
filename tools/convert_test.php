@@ -366,15 +366,25 @@ check('non stored same site image reported', codes($result),
     array('url_dropped', 'url_dropped', 'url_dropped', 'url_dropped',
         'url_dropped', 'url_dropped'));
 
-$result = convert(box('<a href="dashboard/view?id=2">two</a>'
-    . '<a href="https://openenergymonitor.org">out</a>'
-    . '<a href="mailto:a@b.c">mail</a>'));
-check('own site page link kept', codes($result), array());
+// An internal link navigates the page in the viewer's session, and emoncms
+// routes on controller and action whatever the path ends in, so a link back at
+// this site can reach a GET api: feed/delete with or without an extension,
+// app/remove which acts whatever the format, and the index.php?q= front
+// controller. The extension cannot say which, so an internal link is dropped.
+$result = convert(box('<a href="dashboard/view?id=2">a</a>'
+    . '<a href="/feed/delete.json?id=1">b</a>'
+    . '<a href="feed/delete?id=1">c</a>'
+    . '<a href="/app/remove?id=1">d</a>'
+    . '<a href="index.php?q=feed/delete&id=1">e</a>'));
+check('internal link dropped', widgets($result)[0]['html'],
+    '<a>a</a><a>b</a><a>c</a><a>d</a><a>e</a>');
+check('internal link reported', codes($result),
+    array('url_dropped', 'url_dropped', 'url_dropped', 'url_dropped', 'url_dropped'));
 
-$result = convert(box('<a href="/feed/delete.json?id=1">one</a>'
-    . '<a href="/feed/data.csv?id=1">two</a>'));
-check('own site api link dropped', codes($result),
-    array('url_dropped', 'url_dropped'));
+// A link to another site, and mailto, are left alone.
+$result = convert(box('<a href="https://openenergymonitor.org">out</a>'
+    . '<a href="mailto:a@b.c">mail</a>'));
+check('external and mailto link kept', codes($result), array());
 
 // A link opening in another tab is told not to hand that tab a handle to this
 // one, on the way in and on the way out
@@ -767,13 +777,14 @@ attack('null byte in a url', "<a href=\"java\0script:alert(1)\">go</a>",
 attack('colon dressed up as a path', '<a href="java&#xfffd;script:alert(1)">go</a>',
     array('alert'), 'go');
 
-// A relative path is still allowed, including one with a colon after the first
-// separator, and so are the three schemes the allowlist names.
+// A relative path points back at this site and is dropped, including one with a
+// colon after the first separator, which the host parser reads as relative
+// rather than a scheme. The external schemes the allowlist names are kept.
 $result = convert(box('<a href="dashboard/view?id=2">a</a><a href="x/y:z">b</a>'
     . '<a href="https://example.com/x">c</a><a href="mailto:someone@example.com">d</a>'));
 $kept = $result['document']['widgets'][0]['html'];
-check('relative url kept', strpos($kept, 'dashboard/view?id=2') !== false, true);
-check('colon after a separator kept', strpos($kept, 'x/y:z') !== false, true);
+check('relative url dropped', strpos($kept, 'dashboard/view') === false, true);
+check('colon after a separator dropped', strpos($kept, 'x/y:z') === false, true);
 check('https url kept', strpos($kept, 'https://example.com/x') !== false, true);
 check('mailto url kept', strpos($kept, 'mailto:someone@example.com') !== false, true);
 
