@@ -312,27 +312,33 @@ reachable by any other rule.
 in another tab does not hand that tab a handle to the dashboard. It is on the
 allowlist so it survives the round trip.
 
-**URLs** in `href` and `src` must be a relative path, or `http://`, `https://`
-or `mailto:`. Everything else is dropped, `data:` included. Strip control
-characters before testing the scheme, never after.
+**URLs** in `href` and `src` must be an `http://` or `https://` link to
+another site. Everything else is dropped, `data:` and `mailto:` included, and
+so is a url pointing back at this emoncms. Strip control characters before
+testing the scheme, never after.
 
-A url pointing back at this emoncms is held to more than that. The browser of
+A url pointing back at this emoncms is the dangerous case. The browser of
 whoever is looking at the dashboard sends it, with their session, and an
 emoncms api call is a GET: `feed/delete.json?id=1` in the `src` of an image is
-a feed deleted with no click and nothing shown. So on this site:
+a feed deleted with no click and nothing shown. The file extension cannot say
+whether a same site url is a static file or an api call, because emoncms serves
+real files off disk and routes everything else through `index.php` on the
+controller and action whatever the path ends in, and several actions
+(`app/remove`) run whatever the format. So on this site:
 
-- a `src` must name a static image file, one of `png jpg jpeg gif webp svg bmp
-  ico avif`, and carry no query string. A cache busting `?v=2` goes with the
-  rest, it is not needed to name a file.
-- an `href` may point at a page but not at the api. A format extension is what
-  selects the api, see the `Route` class, so `.json`, `.csv` and the rest are
-  dropped while `dashboard/view?id=2` is kept.
+- a `src` must name a file directly inside `Modules/dashboard/Views/images`,
+  the one place server-hosted diagrams live, and carry no query string. The
+  path is read app-root-relative and a `..%2f` traversal is decoded before it
+  is checked.
+- an `href` is dropped. A link navigates the page in the viewer's session and
+  can reach a GET api, and no extension rule tells a page from an api. Links
+  between dashboards go until the api stops acting on a GET.
 
-A url pointing anywhere else is not this module's to police and is left alone.
-Same site is decided by comparing the host against the host the request came in
-on. A migration run from the command line has no request to read, so it cannot
-tell an absolute url pointing at this site from any other. The renderer runs
-the same check on the way out, inside a request, and drops it then.
+A url pointing at another site is not this module's to police and is left
+alone. Same site is decided by comparing the host against the host the request
+came in on. A migration run from the command line has no request to read, so it
+cannot tell an absolute url pointing at this site from any other. The renderer
+runs the same check on the way out, inside a request, and drops it then.
 
 The endpoints are the other half of this. An emoncms api call that changes or
 deletes something should not answer a GET, and several still do.

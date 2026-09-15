@@ -381,10 +381,13 @@ check('internal link dropped', widgets($result)[0]['html'],
 check('internal link reported', codes($result),
     array('url_dropped', 'url_dropped', 'url_dropped', 'url_dropped', 'url_dropped'));
 
-// A link to another site, and mailto, are left alone.
-$result = convert(box('<a href="https://openenergymonitor.org">out</a>'
-    . '<a href="mailto:a@b.c">mail</a>'));
-check('external and mailto link kept', codes($result), array());
+// A link to another site is left alone. mailto is dropped like every scheme
+// that is not http or https: harmless, but no dashboard needs it.
+$result = convert(box('<a href="https://openenergymonitor.org">out</a>'));
+check('external link kept', codes($result), array());
+$result = convert(box('<a href="mailto:a@b.c">mail</a>'));
+check('mailto link dropped', widgets($result)[0]['html'], '<a>mail</a>');
+check('mailto link reported', codes($result), array('url_dropped'));
 
 // A link opening in another tab is told not to hand that tab a handle to this
 // one, on the way in and on the way out
@@ -779,14 +782,15 @@ attack('colon dressed up as a path', '<a href="java&#xfffd;script:alert(1)">go</
 
 // A relative path points back at this site and is dropped, including one with a
 // colon after the first separator, which the host parser reads as relative
-// rather than a scheme. The external schemes the allowlist names are kept.
+// rather than a scheme. Only an external http or https link is kept; mailto
+// goes with the other schemes.
 $result = convert(box('<a href="dashboard/view?id=2">a</a><a href="x/y:z">b</a>'
     . '<a href="https://example.com/x">c</a><a href="mailto:someone@example.com">d</a>'));
 $kept = $result['document']['widgets'][0]['html'];
 check('relative url dropped', strpos($kept, 'dashboard/view') === false, true);
 check('colon after a separator dropped', strpos($kept, 'x/y:z') === false, true);
 check('https url kept', strpos($kept, 'https://example.com/x') !== false, true);
-check('mailto url kept', strpos($kept, 'mailto:someone@example.com') !== false, true);
+check('mailto url dropped', strpos($kept, 'mailto:someone@example.com') === false, true);
 
 // An option value cannot break out of the attribute it is written into
 $result = convert('<div id="1" class="feedvalue" style="position:absolute; top:0px; left:0px; '

@@ -768,14 +768,15 @@ function dashboard_convert_attributes($element, $tag, $index, &$warnings)
 // Control characters and whitespace are stripped before the scheme is tested,
 // never after, so a scheme cannot be hidden inside one.
 //
-// What is left has to be http, https, mailto or a relative reference, and a url
+// What is left has to be http or https pointing at another site. A url
 // pointing back at this emoncms is held to more than that, see
-// dashboard_convert_url_own_site.
+// dashboard_convert_url_own_site. mailto and every other scheme is dropped:
+// mailto is harmless but no dashboard needs it, and a link is plain text once
+// its href is gone.
 function dashboard_convert_url_allowed($url, $attribute = 'href')
 {
     $url = preg_replace('/[\x00-\x20\x7f]/', '', $url);
     if ($url === '') return false;
-    if (preg_match('#^mailto:#i', $url)) return true;
 
     $host = dashboard_convert_url_host($url);
     if ($host === false) return false;
