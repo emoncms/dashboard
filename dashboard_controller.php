@@ -101,12 +101,19 @@ function dashboard_controller()
                 $owner = ($owner_context && $userid && $dash['userid']==$userid);
 
                 if ($dash['public'] || $owner) {
-                    // A public dashboard is meant to sit in an iframe on
-                    // another site, so it takes the embed frame policy. A
-                    // private one does not, and neither does a public one
-                    // being served to a logged in visitor, see
-                    // set_frame_policy in core.php.
-                    if ($dash['public']) allow_public_embed();
+                    // A dashboard is meant to sit in an iframe on another
+                    // site, so it takes the embed frame policy. That includes
+                    // a private one: the way an owner embeds it is to put a
+                    // key in the iframe url, and a key in the url is not the
+                    // ambient authority a session cookie is. The site doing
+                    // the framing had to know the key to write the url, and
+                    // knowing it already grants everything framing the page
+                    // could reach. set_frame_policy in core.php holds the
+                    // relaxation back for a page the session cookie
+                    // authenticated, which is the clickjacking case, so a
+                    // logged in visitor is never relaxed whichever dashboard
+                    // this is.
+                    allow_public_embed();
 
                     $result = view("Modules/dashboard/Views/dashboard_view.php",array(
                         'dashboard'=>$dash, 
