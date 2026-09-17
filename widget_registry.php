@@ -34,7 +34,11 @@
    dropbox_other   a list of suggestions, any text may be stored
    colour_picker   a hex colour
    boolean         0 or 1
+   number          an integer, within min and max where the declaration gives them
+   url             an address a person follows
+   image_url       an address the browser fetches
    html            the widget body rather than an attribute
+   text            the widget body, held to a narrower vocabulary than html
 
  A dropbox marked dynamic is filled from the database for the logged in user,
  for example the saved graph list, so there is no fixed set to check against.
@@ -127,6 +131,8 @@ function widget_registry_read_options(&$options, $widget, $block, $legacy)
             'type' => isset($option['type']) ? $option['type'] : 'value',
             'values' => isset($option['values']) ? $option['values'] : null,
             'suggested' => isset($option['suggested']) ? $option['suggested'] : null,
+            'min' => isset($option['min']) ? (int) $option['min'] : null,
+            'max' => isset($option['max']) ? (int) $option['max'] : null,
             'dynamic' => !empty($option['dynamic']),
             'legacy' => $legacy
         );

@@ -66,11 +66,6 @@
             <input type="checkbox" name="fullscreen" id="chk_fullscreen" value="1" <?php if ($dashboard['fullscreen'] == true) echo 'checked'; ?> />
             <abbr title="<?php echo ctx_tr('dashboard_messages','Hide menus on dashboard. Make full screen.'); ?>"><?php echo ctx_tr('dashboard_messages','Hide Menus'); ?></abbr>
         </label>
-
-        <label><?php echo ctx_tr('dashboard_messages','Content: '); ?></label>
-        <i style="font-size:12px"><?php echo ctx_tr('dashboard_messages','To view content changes reload editor after saving');?></i>
-        <textarea name="content" style="width:100%; height:200px;"><?php echo htmlspecialchars($page_html, ENT_QUOTES, 'UTF-8'); ?></textarea>
-
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo ctx_tr('dashboard_messages','Close'); ?></button>

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/image/image_render.js",
+  "widgets": {
+    "image": {
+      "options": {
+        "src": {
+          "type": "image_url"
+        },
+        "alt": {
+          "type": "value"
+        },
+        "fit": {
+          "type": "dropbox",
+          "values": [
+            "contain",
+            "cover",
+            "fill"
+          ]
+        },
+        "link": {
+          "type": "url"
+        }
+      }
+    }
+  }
+}

@@ -32,6 +32,19 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
 require_once dirname(__FILE__) . "/widget_registry.php";
 
+// Stage 4. Converts a paragraph, heading or heading-center widget to a text
+// or image widget. Not called by the converter or the renderer, see
+// notes/TEXT-AND-IMAGE-WIDGETS.md.
+require_once dirname(__FILE__) . "/dashboard_convert_text.php";
+
+// Stage 5. Converts a Container-* widget to a panel widget. Not called by
+// the converter or the renderer either, see notes/PANEL-WIDGET.md.
+require_once dirname(__FILE__) . "/dashboard_convert_panel.php";
+
+// Replaces the old widgets of a document with the new ones. Called on save
+// and by tools/migrate_widgets.php.
+require_once dirname(__FILE__) . "/dashboard_migrate.php";
+
 define('DASHBOARD_CONVERTER_VERSION', 1);
 
 /*
@@ -51,6 +64,15 @@ function dashboard_convert_allowed_elements()
         'center', 'font', 'small', 'h1', 'h2', 'h3', 'h4', 'h5',
         'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img'
     );
+}
+
+// Elements allowed in a text widget. Styling is set with options, so only
+// emphasis, line breaks, links and subscript are kept. sub is included
+// because units are often written with it.
+function dashboard_convert_inline_elements()
+{
+    // The editor prints them in this order, see content_problem in designer.js.
+    return array('b', 'i', 'u', 'sub', 'a', 'br');
 }
 
 // Elements removed with everything inside them. Anything else that is not
@@ -303,10 +325,14 @@ function dashboard_convert_widget($node, $index, $registry, &$warnings)
     }
 
     $holds_html = dashboard_convert_holds_html($type, $known, $registry);
+    $holds_text = dashboard_convert_holds_text($type, $known, $registry);
 
     if ($holds_html) {
         $html = dashboard_convert_html($node, $index, $registry, $warnings);
         if ($html !== '') $widget['html'] = $html;
+    } else if ($holds_text) {
+        $text = dashboard_convert_text($node, $index, $registry, $warnings);
+        if ($text !== '') $widget['text'] = $text;
     } else {
         dashboard_convert_check_discarded($node, $type, $index, $registry, $warnings);
     }
@@ -335,6 +361,34 @@ function dashboard_convert_holds_html($type, $known, $registry)
         if ($option['type'] === 'html') return true;
     }
     return false;
+}
+
+// A widget holds text when the registry gives it an option of type text.
+// Only the text widget does. Text is checked against
+// dashboard_convert_inline_elements and stored in its own field.
+function dashboard_convert_holds_text($type, $known, $registry)
+{
+    if (!$known) return false;
+
+    foreach ($registry[$type]['options'] as $option) {
+        if ($option['type'] === 'text') return true;
+    }
+    return false;
+}
+
+// The element holding the widget content. The text widget render script
+// draws a wrapper inside the box so a rotation turns the text and not the box.
+// The wrapper is generated and not stored. See text_wrapper in
+// widget/text/text_render.js.
+function dashboard_convert_text_body($node)
+{
+    foreach ($node->childNodes as $child) {
+        if ($child->nodeType !== XML_ELEMENT_NODE) continue;
+        if (strtolower($child->nodeName) !== 'div') continue;
+        $class = $child->hasAttribute('class') ? trim($child->getAttribute('class')) : '';
+        if ($class === 'text-content') return $child;
+    }
+    return $node;
 }
 
 // The children of a data widget are all generated: the canvas the render
@@ -539,6 +593,29 @@ function dashboard_convert_option_valid($option, $value)
             // the curl widget sends a json payload through one of these.
             return preg_match('/^[^<>]{1,512}$/u', $value) === 1;
 
+        case 'number':
+            // An integer within the declared range.
+            if (!preg_match('/^-?\d+$/', $value)) return false;
+            $number = (int) $value;
+            if ($option['min'] !== null && $number < $option['min']) return false;
+            if ($option['max'] !== null && $number > $option['max']) return false;
+            return true;
+
+        case 'url':
+            // A link, checked with the same rules as an href in widget html.
+            return dashboard_convert_url_allowed($value, 'href');
+
+        case 'image_url':
+            // Fetched by the browser, so a url on this site must name a static
+            // image, see dashboard_convert_url_own_site.
+            return dashboard_convert_url_allowed($value, 'src');
+
+        case 'text':
+            // The text of a widget is the content of its box, not an
+            // attribute. It is checked against dashboard_convert_inline_elements
+            // and kept in its own field.
+            return false;
+
         case 'html':
             // The html of a widget is the content of its box, never an
             // attribute. The designer writes it with .html(), the document
@@ -599,13 +676,14 @@ function dashboard_convert_artefact($name, $type, $known, $broken, $value)
 // Html of text and container widgets
 // ---------------------------------------------------------------------------
 
-function dashboard_convert_html($node, $index, $registry, &$warnings)
+function dashboard_convert_html($node, $index, $registry, &$warnings,
+                                $allowed = null, $allow_style = true)
 {
     $doc = $node->ownerDocument;
 
     // Worked on a copy so the caller's tree is not modified.
     $copy = $node->cloneNode(true);
-    dashboard_convert_clean($copy, $index, $registry, $warnings);
+    dashboard_convert_clean($copy, $index, $registry, $warnings, $allowed, $allow_style);
 
     $html = '';
     foreach ($copy->childNodes as $child) {
@@ -613,6 +691,37 @@ function dashboard_convert_html($node, $index, $registry, &$warnings)
     }
 
     return trim(dashboard_convert_from_entities($html));
+}
+
+// The body of a text widget, limited to the inline elements with no style
+// attributes.
+function dashboard_convert_text($node, $index, $registry, &$warnings)
+{
+    return dashboard_convert_html(dashboard_convert_text_body($node), $index, $registry,
+        $warnings, dashboard_convert_inline_elements(), false);
+}
+
+/**
+ * Removes elements and attributes that are not allowed in a text widget.
+ * Used by the renderer, the same as dashboard_convert_sanitise_html.
+ *
+ * @param string $text
+ * @param array $warnings added to in place
+ * @param int $index widget the text belongs to, for the warnings
+ * @return string
+ */
+function dashboard_convert_sanitise_text($text, &$warnings, $index = null)
+{
+    if (trim($text) === '') return '';
+
+    $root = dashboard_convert_parse($text);
+    if ($root === null) {
+        dashboard_convert_warn($warnings, $index, 'unparsable', '');
+        return '';
+    }
+
+    return dashboard_convert_html($root, $index, widget_registry(), $warnings,
+        dashboard_convert_inline_elements(), false);
 }
 
 /**
@@ -639,9 +748,10 @@ function dashboard_convert_sanitise_html($html, &$warnings, $index = null)
     return dashboard_convert_html($root, $index, widget_registry(), $warnings);
 }
 
-function dashboard_convert_clean($node, $index, $registry, &$warnings)
+function dashboard_convert_clean($node, $index, $registry, &$warnings,
+                                 $allowed = null, $allow_style = true)
 {
-    $allowed = dashboard_convert_allowed_elements();
+    if ($allowed === null) $allowed = dashboard_convert_allowed_elements();
     $strip = dashboard_convert_stripped_elements();
 
     // Collected first because the list is modified while walking it.
@@ -689,7 +799,7 @@ function dashboard_convert_clean($node, $index, $registry, &$warnings)
             // Not dangerous, just not part of the vocabulary, so the text
             // inside it is kept and the element itself is unwrapped.
             dashboard_convert_warn($warnings, $index, 'tag_unwrapped', $tag);
-            dashboard_convert_clean($child, $index, $registry, $warnings);
+            dashboard_convert_clean($child, $index, $registry, $warnings, $allowed, $allow_style);
             while ($child->firstChild) {
                 $node->insertBefore($child->firstChild, $child);
             }
@@ -697,12 +807,12 @@ function dashboard_convert_clean($node, $index, $registry, &$warnings)
             continue;
         }
 
-        dashboard_convert_attributes($child, $tag, $index, $warnings);
-        dashboard_convert_clean($child, $index, $registry, $warnings);
+        dashboard_convert_attributes($child, $tag, $index, $warnings, $allow_style);
+        dashboard_convert_clean($child, $index, $registry, $warnings, $allowed, $allow_style);
     }
 }
 
-function dashboard_convert_attributes($element, $tag, $index, &$warnings)
+function dashboard_convert_attributes($element, $tag, $index, &$warnings, $allow_style = true)
 {
     $per_element = dashboard_convert_allowed_attributes();
     $extensions = dashboard_convert_extension_attributes();
@@ -724,6 +834,13 @@ function dashboard_convert_attributes($element, $tag, $index, &$warnings)
         $value = $attribute->nodeValue;
 
         if ($lower === 'style') {
+            // Styling in a text widget is set with options, so a style
+            // attribute is dropped.
+            if (!$allow_style) {
+                dashboard_convert_warn($warnings, $index, 'attribute_dropped', "$tag/style");
+                $element->removeAttributeNode($attribute);
+                continue;
+            }
             $declarations = dashboard_convert_parse_style($value);
             $kept = dashboard_convert_styles($declarations, $index, $warnings, false);
             if (count($kept)) {

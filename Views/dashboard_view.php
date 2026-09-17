@@ -44,13 +44,15 @@ if (isset($dashboard['fullscreen']) && $dashboard['fullscreen']) { $embed=1; ?>
     right: .25rem;
   }
   </style>
-  <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
+  <?php load_css("Modules/dashboard/Views/js/widget.css"); ?>
   <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
   <script type="text/javascript"><?php require "Modules/vis/vis_langjs.php"; ?></script>
-  <script type="text/javascript" src="<?php echo $path; ?>Lib/flot/jquery.flot.min.js"></script>
-  <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/widgetlist.js?ver=<?php echo $js_css_version; ?>"></script>
-  <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/render.js?ver=<?php echo $js_css_version; ?>"></script>
-  <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js?ver=<?php echo $js_css_version; ?>"></script>
+  <?php
+  load_js("Lib/flot/jquery.flot.min.js");
+  load_js("Modules/dashboard/Views/js/widgetlist.js");
+  load_js("Modules/dashboard/Views/js/render.js");
+  load_js("Modules/feed/feed.js");
+  ?>
   <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 <h2 class="d-none"><?php echo htmlspecialchars($dashboard['name'], ENT_QUOTES, 'UTF-8'); ?></h2>
  <div id="editicon" class="hidden-phone">

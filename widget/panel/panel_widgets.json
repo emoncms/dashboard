@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/panel/panel_render.js",
+  "widgets": {
+    "panel": {
+      "options": {
+        "colour": {
+          "type": "colour_picker"
+        },
+        "opacity": {
+          "type": "number",
+          "min": 0,
+          "max": 100
+        },
+        "bordercolour": {
+          "type": "colour_picker"
+        },
+        "borderwidth": {
+          "type": "number",
+          "min": 0,
+          "max": 20
+        },
+        "radius": {
+          "type": "number",
+          "min": 0,
+          "max": 100
+        },
+        "shadow": {
+          "type": "dropbox",
+          "values": [
+            "none",
+            "drop-small",
+            "drop",
+            "drop-large",
+            "glow",
+            "glow-soft",
+            "glow-strong",
+            "glow-border"
+          ]
+        }
+      }
+    }
+  }
+}

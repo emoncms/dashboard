@@ -982,6 +982,618 @@ check('an allowed attribute survives a reserved one',
     '<a href="https://example.com/x">x</a>');
 
 // ---------------------------------------------------------------------------
+// The text widget, which takes options instead of html
+// ---------------------------------------------------------------------------
+
+// The wrapper is drawn by the render script, so the body is read through it
+// and never stored. See text_wrapper in widget/text/text_render.js.
+$html = '<div id="1" class="text" style="position:absolute; margin: 0; top:20px; '
+    . 'left:40px; width:120px; height:40px;" size="18" colour="ff0000" weight="bold" '
+    . 'font="Arial" align="center" valign="bottom" rotate="-90">'
+    . '<div class="text-content">Power in m<sub>3</sub></div></div>';
+
+$result = convert($html);
+$widget = widgets($result)[0];
+
+check('text type', $widget['type'], 'text');
+check('text geometry', array($widget['x'], $widget['y'], $widget['w'], $widget['h']),
+    array(40, 20, 120, 40));
+check('text options', $widget['options'], array('size' => '18', 'colour' => 'ff0000',
+    'weight' => 'bold', 'font' => 'Arial', 'align' => 'center', 'valign' => 'bottom',
+    'rotate' => '-90'));
+check('text body read through the wrapper', $widget['text'], 'Power in m<sub>3</sub>');
+check('text keeps no html field', isset($widget['html']), false);
+check('text keeps no box style', isset($widget['style']), false);
+check('text is clean', codes($result), array());
+
+// A widget saved before its render script drew the wrapper
+$result = convert('<div id="1" class="text" style="position:absolute; top:0px; '
+    . 'left:0px; width:10px; height:10px;">bare</div>');
+check('text body without a wrapper', widgets($result)[0]['text'], 'bare');
+
+// The element list is narrower than the html one. Block elements are
+// unwrapped and their text is kept, the same as any other tag not in the list.
+$result = convert('<div id="1" class="text" style="position:absolute; top:0px; left:0px; '
+    . 'width:10px; height:10px;"><div class="text-content">See '
+    . '<a href="https://example.com/x">this</a> <b>now</b><i>i</i><u>u</u><br>'
+    . '<script>alert(1)</script><p>block</p><span style="font-size:99px">s</span>'
+    . '<img src="https://example.com/a.png"></div></div>');
+$widget = widgets($result)[0];
+
+check('text keeps the inline subset', $widget['text'],
+    'See <a href="https://example.com/x">this</a> <b>now</b><i>i</i><u>u</u><br>blocks');
+check('text drops a script and unwraps the rest', codes($result),
+    array('tag_dropped', 'tag_unwrapped', 'tag_unwrapped', 'tag_unwrapped'));
+
+// Styling is set with options, so a style attribute inside the text is
+// dropped.
+$result = convert('<div id="1" class="text" style="position:absolute; top:0px; left:0px; '
+    . 'width:10px; height:10px;"><div class="text-content"><b style="color:red">x</b>'
+    . '</div></div>');
+check('style inside text is dropped', widgets($result)[0]['text'], '<b>x</b>');
+check('style inside text is named', codes($result), array('attribute_dropped'));
+
+// An option is refused when it is outside the range the declaration gives, or
+// is not one of the values it lists.
+$result = convert('<div id="1" class="text" style="position:absolute; top:0px; left:0px; '
+    . 'width:10px; height:10px;" size="9999" rotate="abc" align="middle" valign="center" '
+    . 'weight="heavy">x</div>');
+check('text refuses options out of range', widgets($result)[0]['options'], array());
+check('text names each refused option', count(codes($result)), 5);
+
+foreach (array('-180', '-90', '0', '180') as $degrees) {
+    $result = convert('<div id="1" class="text" style="position:absolute; top:0px; '
+        . 'left:0px; width:10px; height:10px;" rotate="' . $degrees . '">x</div>');
+    check("rotate $degrees is accepted", widgets($result)[0]['options'],
+        array('rotate' => $degrees));
+}
+foreach (array('181', '-181', '90.5', ' 90') as $degrees) {
+    $result = convert('<div id="1" class="text" style="position:absolute; top:0px; '
+        . 'left:0px; width:10px; height:10px;" rotate="' . $degrees . '">x</div>');
+    check("rotate $degrees is refused", widgets($result)[0]['options'], array());
+}
+
+// Only the body field the type declares is rendered.
+$document = array('version' => 1, 'widgets' => array(
+    array('type' => 'text', 'x' => 0, 'y' => 0, 'w' => 10, 'h' => 10,
+          'options' => array(), 'html' => '<p style="color:red">html</p>')));
+$rendered = dashboard_render($document);
+check('html is refused on a text widget', strpos($rendered['html'], '<p') === false, true);
+check('html on a text widget is named', $rendered['errors'][0]['code'], 'html_not_allowed_on_type');
+
+$document = array('version' => 1, 'widgets' => array(
+    array('type' => 'paragraph', 'x' => 0, 'y' => 0, 'w' => 10, 'h' => 10,
+          'options' => array(), 'text' => 'text')));
+$rendered = dashboard_render($document);
+check('text is refused on a widget that does not declare it',
+    $rendered['errors'][0]['code'], 'text_not_allowed_on_type');
+
+// Text is checked on render as well as on conversion.
+$document = array('version' => 1, 'widgets' => array(
+    array('type' => 'text', 'x' => 0, 'y' => 0, 'w' => 10, 'h' => 10,
+          'options' => array(), 'text' => '<img src="x" onerror="alert(1)"><b>ok</b>')));
+$rendered = dashboard_render($document);
+check('text is held to the vocabulary on the way out',
+    dashboard_test_attributes($rendered['html']), array('id', 'class', 'style'));
+
+// Converting what was rendered gives the same document back
+$html = '<div id="1" class="text" style="position:absolute; margin: 0; top:20px; '
+    . 'left:40px; width:120px; height:40px;" size="18" align="center">m<sub>3</sub></div>';
+$once = convert($html);
+$twice = convert(render($once));
+check('text is a fixed point', widgets($twice), widgets($once));
+
+// ---------------------------------------------------------------------------
+// The image widget
+// ---------------------------------------------------------------------------
+
+// The img drawn by the render script is generated, the same as a canvas, so
+// no warning is raised.
+$html = '<div id="1" class="image" style="position:absolute; margin: 0; top:0px; '
+    . 'left:0px; width:120px; height:120px;" src="https://example.com/a.png" '
+    . 'alt="A diagram" fit="cover" link="https://example.com/">'
+    . '<img src="https://example.com/a.png" alt="A diagram"></div>';
+
+$result = convert($html);
+$widget = widgets($result)[0];
+
+check('image options', $widget['options'], array('src' => 'https://example.com/a.png',
+    'alt' => 'A diagram', 'fit' => 'cover', 'link' => 'https://example.com/'));
+check('image keeps no body', isset($widget['html']) || isset($widget['text']), false);
+check('the drawn img is not a warning', codes($result), array());
+
+$result = convert('<div id="1" class="image" style="position:absolute; top:0px; left:0px; '
+    . 'width:10px; height:10px;" src="javascript:alert(1)" link="data:text/html,x" '
+    . 'fit="wobble"></div>');
+check('image refuses a url that is not http', widgets($result)[0]['options'], array());
+check('image names each refused option', count(codes($result)), 3);
+
+$result = convert('<div id="1" class="image" style="position:absolute; top:0px; left:0px; '
+    . 'width:10px; height:10px;" alt="&lt;b&gt;x&lt;/b&gt;"></div>');
+check('image alt holding a tag keeps its words',
+    widgets($result)[0]['options'], array('alt' => 'x'));
+
+$once = convert($html);
+$twice = convert(render($once));
+check('image is a fixed point', widgets($twice), widgets($once));
+
+// ---------------------------------------------------------------------------
+// The url rules an image widget is held to
+//
+// The editor mirrors these rules in url_problem in designer.js. A change here
+// needs the same change there.
+// ---------------------------------------------------------------------------
+
+$was_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
+$_SERVER['HTTP_HOST'] = 'dash.example.org';
+
+$src_cases = array(
+    'https://example.com/a.png' => true,
+    'http://example.com/a.png' => true,
+    '//example.com/a.png' => true,
+    'javascript:alert(1)' => false,
+    'data:image/png;base64,AAA' => false,
+    'images/logo.png' => false,
+    'Modules/dashboard/Views/images/logo.png' => true,
+    '/Modules/dashboard/Views/images/logo.png' => true,
+    'Modules/dashboard/Views/images/logo.txt' => false,
+    'Modules/dashboard/Views/images/../../x.png' => false,
+    'Modules/dashboard/Views/images/logo.png?v=1' => false,
+    'http://dash.example.org/Modules/dashboard/Views/images/logo.png' => true,
+    'http://dash.example.org/feed/list.json' => false,
+    'http://dash.example.org./feed/list.json' => false,
+);
+foreach ($src_cases as $url => $want) {
+    check("image src $url", dashboard_convert_url_allowed($url, 'src'), $want);
+}
+
+$href_cases = array(
+    'https://example.com/' => true,
+    '/dashboard/view?id=2' => false,
+    'http://dash.example.org/x' => false,
+);
+foreach ($href_cases as $url => $want) {
+    check("image link $url", dashboard_convert_url_allowed($url, 'href'), $want);
+}
+
+// The option types the widget declares are what carry those rules
+$result = convert('<div id="1" class="image" style="position:absolute; top:0px; left:0px; '
+    . 'width:10px; height:10px;" src="images/logo.png" link="/dashboard/view?id=2"></div>');
+check('image refuses a src and a link pointing back at this site',
+    widgets($result)[0]['options'], array());
+
+if ($was_host === null) unset($_SERVER['HTTP_HOST']);
+else $_SERVER['HTTP_HOST'] = $was_host;
+
+// ---------------------------------------------------------------------------
+// Stage 4: the old text widgets converted to the new ones
+//
+// A conversion either keeps the same meaning or is refused, so each case
+// checks one of the two. Rendering is measured on the corpus by
+// convert_text.php --render.
+// ---------------------------------------------------------------------------
+
+// Converts an old widget written as html and returns the new widget, or the
+// reason it was refused.
+function convert_text($type, $html, $extra = array())
+{
+    $widget = $extra + array('type' => $type, 'x' => 10, 'y' => 20, 'w' => 100, 'h' => 60,
+        'options' => array());
+    if ($html !== null) $widget['html'] = $html;
+
+    $reason = '';
+    $new = dashboard_convert_text_widget($widget, $reason);
+    if ($new === null) return 'refused ' . $reason;
+
+    unset($new['x'], $new['y'], $new['w'], $new['h']);
+    return $new;
+}
+
+// A converted paragraph as a check expects it. A paragraph draws from the
+// top, so every one carries valign top ahead of its other options.
+function paragraph($options, $text = null)
+{
+    $widget = array('type' => 'text', 'options' => array('valign' => 'top') + $options);
+    if ($text !== null) $widget['text'] = $text;
+    return $widget;
+}
+
+// The widget.css styling of an old widget is written out as options
+check('a paragraph carries only its top alignment',
+    convert_text('paragraph', 'Some text'),
+    paragraph(array(), 'Some text'));
+
+check('a heading carries its size and weight',
+    convert_text('heading', 'Title'),
+    array('type' => 'text', 'options' => array('size' => '24', 'weight' => 'bold'),
+        'text' => 'Title'));
+
+check('a centred heading carries its alignment as well',
+    convert_text('heading-center', 'Title'),
+    array('type' => 'text',
+        'options' => array('size' => '24', 'weight' => 'bold', 'align' => 'center'),
+        'text' => 'Title'));
+
+check('an empty widget converts to an empty text widget',
+    convert_text('paragraph', ''),
+    paragraph(array()));
+
+check('the geometry is the one the old widget had',
+    dashboard_convert_text_widget(array('type' => 'paragraph', 'x' => 5, 'y' => 6,
+        'w' => 7, 'h' => 8, 'wunit' => 'pc', 'options' => array(), 'html' => 'x')),
+    array('type' => 'text', 'x' => 5, 'y' => 6, 'w' => 7, 'h' => 8, 'wunit' => 'pc',
+        'options' => array('valign' => 'top'), 'text' => 'x'));
+
+// A heading has 20px of top padding and the text widget centres, which draw
+// the same only at the default box height.
+check('a heading at the default height converts',
+    convert_text('heading', 'x', array('h' => 60)),
+    array('type' => 'text', 'options' => array('size' => '24', 'weight' => 'bold'), 'text' => 'x'));
+
+check('a heading at another height is refused',
+    convert_text('heading', 'x', array('h' => 40)),
+    'refused heading_height: 40px');
+
+check('a centred heading at another height is refused',
+    convert_text('heading-center', 'x', array('h' => 100)),
+    'refused heading_height: 100px');
+
+check('a heading with a per cent height is refused',
+    convert_text('heading', 'x', array('h' => 60, 'hunit' => 'pc')),
+    'refused heading_height: 60%');
+
+check('a paragraph converts at any height',
+    convert_text('paragraph', 'x', array('h' => 300)),
+    paragraph(array(), 'x'));
+
+// The styling is read from the elements inside the widget
+check('a span carries its size and colour',
+    convert_text('paragraph', '<span style="font-size:20px;color:#ff0000">Hot</span>'),
+    paragraph(array('size' => '20', 'colour' => 'ff0000'), 'Hot'));
+
+check('a font tag carries its three attributes',
+    convert_text('paragraph', '<font size="5" color="red" face="Verdana">Big</font>'),
+    paragraph(array('size' => '24', 'colour' => 'ff0000', 'font' => 'Verdana'), 'Big'));
+
+check('a centre tag is an alignment',
+    convert_text('paragraph', '<center>Middle</center>'),
+    paragraph(array('align' => 'center'), 'Middle'));
+
+check('a bold wrapping everything is a weight',
+    convert_text('paragraph', '<b>All bold</b>'),
+    paragraph(array('weight' => 'bold'), 'All bold'));
+
+check('the inside wins over what widget.css gave the box',
+    convert_text('heading', '<span style="font-size:40px;font-weight:normal">Small</span>'),
+    array('type' => 'text', 'options' => array('size' => '40', 'weight' => 'normal'),
+        'text' => 'Small'));
+
+// The old widget turns an element the height of its text, the new one turns
+// the box, so the text lands somewhere else.
+check('a rotation is refused',
+    convert_text('paragraph', '<div style="transform:rotate(-90deg)">Side</div>'),
+    'refused rotation_moves_text: rotate(-90deg)');
+
+check('pt converts to px',
+    convert_text('paragraph', '<span style="font-size:18pt">x</span>'),
+    paragraph(array('size' => '24'), 'x'));
+
+check('rgb converts to hex',
+    convert_text('paragraph', '<span style="color:rgb(0, 128, 255)">x</span>'),
+    paragraph(array('colour' => '0080ff'), 'x'));
+
+check('three hex digits become six',
+    convert_text('paragraph', '<span style="color:#f00">x</span>'),
+    paragraph(array('colour' => 'ff0000'), 'x'));
+
+check('a font family keeps the first name it offers',
+    convert_text('paragraph', '<span style="font-family:Verdana, Geneva, sans-serif">x</span>'),
+    paragraph(array('font' => 'Verdana'), 'x'));
+
+// The editor and the browser wrote these, not the author
+check('vertical-align inherit is passed over',
+    convert_text('paragraph', '<span style="vertical-align:inherit;user-select:text">x</span>'),
+    paragraph(array(), 'x'));
+
+// The inline elements stay as markup
+check('the inline vocabulary is kept as text',
+    convert_text('paragraph', 'P<sub>L1</sub>: <b>now</b><br>next'),
+    paragraph(array(), 'P<sub>L1</sub>: <b>now</b><br>next'));
+
+check('strong and em are spelled b and i',
+    convert_text('paragraph', '<em>it</em> and <strong>bold</strong>'),
+    paragraph(array(), '<i>it</i> and <b>bold</b>'));
+
+check('a link inside the text keeps its href',
+    convert_text('paragraph', 'see <a href="https://example.com/x">this</a>'),
+    paragraph(array(), 'see <a href="https://example.com/x">this</a>'));
+
+check('a link around the whole widget becomes one inside it',
+    convert_text('paragraph', '<a href="https://example.com/x">all of it</a>'),
+    paragraph(array(), '<a href="https://example.com/x">all of it</a>'));
+
+// An image and no text is the image widget
+check('an image with no text is an image widget',
+    convert_text('paragraph', '<img src="https://example.com/a.png" alt="a">'),
+    array('type' => 'image',
+        'options' => array('src' => 'https://example.com/a.png', 'fit' => 'contain',
+            'alt' => 'a')));
+
+check('a linked image carries the link',
+    convert_text('paragraph',
+        '<a href="https://example.com"><img src="https://example.com/a.png"></a>'),
+    array('type' => 'image',
+        'options' => array('src' => 'https://example.com/a.png', 'fit' => 'contain',
+            'link' => 'https://example.com')));
+
+// Refused when a value cannot be carried
+$refusals = array(
+    'blocks' => array('paragraph', '<p>one</p><p>two</p>', 'tag_not_in_vocabulary: p'),
+    'a table' => array('paragraph', '<table><tr><td>x</td></tr></table>',
+        'tag_not_in_vocabulary: table'),
+    'a stylesheet' => array('paragraph', '<style>.x{}</style>hi',
+        'tag_not_in_vocabulary: style'),
+    'an iframe' => array('paragraph', '<iframe src="https://example.com"></iframe>',
+        'tag_not_in_vocabulary: iframe'),
+    'a heading tag' => array('paragraph', '<h2>Big</h2>', 'tag_not_in_vocabulary: h2'),
+    'a superscript' => array('paragraph', 'm<sup>3</sup>', 'tag_not_in_vocabulary: sup'),
+    'a line height' => array('paragraph', '<div style="line-height:2">x</div>',
+        'style_not_carried: line-height'),
+    'a background' => array('paragraph', '<div style="background-color:#eee">x</div>',
+        'style_not_carried: background-color'),
+    'padding' => array('paragraph', '<div style="padding-top:20px">x</div>',
+        'style_not_carried: padding-top'),
+    'an em font size' => array('paragraph', '<span style="font-size:1.4em">x</span>',
+        'font_size_not_carried: 1.4em'),
+    'a relative font size' => array('paragraph', '<font size="+2">x</font>',
+        'font_size_not_carried: size=+2'),
+    'a colour it cannot name' => array('paragraph',
+        '<span style="color:lightgoldenrodyellow">x</span>',
+        'colour_not_carried: lightgoldenrodyellow'),
+    'a font it does not offer' => array('paragraph',
+        '<span style="font-family:Papyrus">x</span>', 'font_not_carried: Papyrus'),
+    'a justified alignment' => array('paragraph',
+        '<div style="text-align:justify">x</div>', 'align_not_carried: justify'),
+    'a fraction of a degree' => array('paragraph',
+        '<div style="transform:rotate(-70.5deg)">x</div>',
+        'rotation_moves_text: rotate(-70.5deg)'),
+    'a transform that is not a rotation' => array('paragraph',
+        '<div style="transform:scale(2)">x</div>', 'transform_not_carried: scale(2)'),
+    'a link it would drop' => array('paragraph',
+        'see <a href="javascript:x">this</a>', 'link_url_not_allowed: javascript:x'),
+    'an image it would drop' => array('paragraph', '<img src="javascript:x">',
+        'image_url_not_allowed: javascript:x'),
+);
+foreach ($refusals as $name => $case) {
+    check("refuses $name", convert_text($case[0], $case[1]), 'refused ' . $case[2]);
+}
+
+// There is no font-style option, so an italic stays as markup.
+check('an italic is kept as markup',
+    convert_text('paragraph', '<i>all italic</i>'),
+    paragraph(array(), '<i>all italic</i>'));
+
+check('refuses a widget with box styling, which has nowhere to go',
+    convert_text('paragraph', 'x', array('style' => array('border' => '1px solid #000'))),
+    'refused box_style');
+
+check('refuses a type that is not one of the three',
+    convert_text('text', 'x'), 'refused not_an_old_text_widget');
+
+check('refuses a size outside the range the option allows',
+    convert_text('paragraph', '<span style="font-size:400px">x</span>'),
+    'refused font_size_not_carried: 400px');
+
+// The result must be storable and renderable
+$new = convert_text('paragraph', '<span style="font-size:20px;color:#ff0000">Hot</span>');
+$errors = array();
+check('what comes back renders with its options on the box',
+    dashboard_render_widget($new + array('x' => 0, 'y' => 0, 'w' => 10, 'h' => 10),
+        0, widget_registry(), $errors),
+    '<div id="1" class="text" style="position:absolute; margin: 0; top:0px; left:0px; '
+    . 'width:10px; height:10px;" valign="top" size="20" colour="ff0000">Hot</div>');
+check('and raises nothing on the way out', $errors, array());
+
+// ---------------------------------------------------------------------------
+// Stage 5. Converting an old container to a panel
+// ---------------------------------------------------------------------------
+
+function sorted($options)
+{
+    ksort($options);
+    return $options;
+}
+
+function convert_panel($type, $style = array(), $extra = array())
+{
+    $widget = array('type' => $type, 'x' => 10, 'y' => 20, 'w' => 100, 'h' => 60,
+        'options' => array()) + $extra;
+    if (count($style)) $widget['style'] = $style;
+
+    $reason = '';
+    $new = dashboard_convert_panel_widget($widget, $reason);
+    if ($new === null) return 'refused ' . $reason;
+
+    // Sorted so a test can name the options in any order
+    ksort($new['options']);
+    return $new['options'];
+}
+
+$white = array('bordercolour' => 'e5e5e5', 'borderwidth' => '1', 'colour' => 'ffffff',
+    'opacity' => '100', 'radius' => '0', 'shadow' => 'drop');
+
+// The widget.css styling of each container is written out as options
+check('a white container carries its look', convert_panel('Container-White'), $white);
+check('a grey container carries its look', convert_panel('Container-Grey'),
+    sorted(array('colour' => 'dddddd', 'bordercolour' => 'cccccc') + $white));
+check('a black container carries its look', convert_panel('Container-Black'),
+    sorted(array('colour' => '000000', 'bordercolour' => '888888') + $white));
+check('a blue line container is clear with a glow', convert_panel('Container-BlueLine'),
+    sorted(array('colour' => 'ffffff', 'opacity' => '0', 'bordercolour' => '0d97f3',
+        'borderwidth' => '3', 'radius' => '0', 'shadow' => 'glow')));
+
+$kept = dashboard_convert_panel_widget(array('type' => 'Container-White', 'x' => 5, 'y' => 6,
+    'w' => 50, 'h' => 40, 'wunit' => 'pc', 'options' => array()));
+ksort($kept['options']);
+check('the geometry is kept', $kept,
+    array('type' => 'panel', 'x' => 5, 'y' => 6, 'w' => 50, 'h' => 40, 'wunit' => 'pc',
+        'options' => $white));
+
+// Box styling an author put over the class
+check('a background colour is carried',
+    convert_panel('Container-White', array('background-color' => '#ff0000')),
+    sorted(array('colour' => 'ff0000') + $white));
+check('the widget.css background shorthand is read',
+    convert_panel('Container-White', array('background' => 'none repeat scroll 0 0 #DDD')),
+    sorted(array('colour' => 'dddddd') + $white));
+check('a clear background is an opacity of 0',
+    convert_panel('Container-Grey', array('background' => 'transparent')),
+    sorted(array('colour' => 'dddddd', 'bordercolour' => 'cccccc', 'opacity' => '0') + $white));
+check('a border shorthand is carried',
+    convert_panel('Container-White', array('border' => '2px solid red')),
+    sorted(array('borderwidth' => '2', 'bordercolour' => 'ff0000') + $white));
+check('a border with no style draws nothing',
+    convert_panel('Container-White', array('border' => '2px #ff0000')),
+    sorted(array('borderwidth' => '0') + $white));
+check('border none is a width of 0',
+    convert_panel('Container-White', array('border' => 'none')),
+    sorted(array('borderwidth' => '0') + $white));
+check('border longhands are carried',
+    convert_panel('Container-White', array('border-width' => '4px', 'border-color' => '#123456',
+        'border-style' => 'solid')),
+    sorted(array('borderwidth' => '4', 'bordercolour' => '123456') + $white));
+check('a radius is carried',
+    convert_panel('Container-White', array('border-radius' => '10px')),
+    sorted(array('radius' => '10') + $white));
+check('the glow shadow is recognised',
+    convert_panel('Container-White', array('box-shadow' => '0px 0px 2px 2px rgba(200, 200, 200, 0.7)')),
+    sorted(array('shadow' => 'glow') + $white));
+check('no shadow is recognised',
+    convert_panel('Container-White', array('box-shadow' => 'none')),
+    sorted(array('shadow' => 'none') + $white));
+check('a zero padding is passed over',
+    convert_panel('Container-White', array('padding' => '0px')), $white);
+
+// What cannot be carried
+check('refuses a container holding html',
+    convert_panel('Container-White', array(), array('html' => '<table><tr><td>x</td></tr></table>')),
+    'refused holds_html');
+check('an empty html field is not content',
+    convert_panel('Container-White', array(), array('html' => ' ')), $white);
+check('refuses a type that is not a container',
+    convert_panel('panel'), 'refused not_an_old_container');
+check('refuses a container someone made up',
+    convert_panel('Container-red'), 'refused not_an_old_container');
+check('refuses a background image',
+    convert_panel('Container-White', array('background' => 'url(https://example.com/a.png)')),
+    'refused background_not_carried: url(https://example.com/a.png)');
+check('refuses a dashed border',
+    convert_panel('Container-White', array('border' => '1px dashed #000')),
+    'refused border_not_carried: 1px dashed #000');
+check('refuses a border wider than the option allows',
+    convert_panel('Container-White', array('border-width' => '30px')),
+    'refused border_not_carried: 30px');
+check('refuses a radius in per cent',
+    convert_panel('Container-White', array('border-radius' => '50%')),
+    'refused radius_not_carried: 50%');
+check('refuses a shadow of the author\'s own',
+    convert_panel('Container-White', array('box-shadow' => '2px 2px 4px #000')),
+    'refused shadow_not_carried: 2px 2px 4px #000');
+check('refuses an opacity on the box',
+    convert_panel('Container-White', array('opacity' => '0.5')),
+    'refused style_not_carried: opacity');
+check('refuses a padding',
+    convert_panel('Container-White', array('padding' => '10px')),
+    'refused style_not_carried: padding');
+
+// The result must be storable and renderable
+$new = dashboard_convert_panel_widget(array('type' => 'Container-BlueLine', 'x' => 0,
+    'y' => 0, 'w' => 10, 'h' => 10, 'options' => array()));
+$errors = array();
+check('a panel renders with its options on the box',
+    dashboard_render_widget($new, 0, widget_registry(), $errors),
+    '<div id="1" class="panel" style="position:absolute; margin: 0; top:0px; left:0px; '
+    . 'width:10px; height:10px;" colour="ffffff" opacity="0" bordercolour="0d97f3" '
+    . 'borderwidth="3" radius="0" shadow="glow"></div>');
+check('and raises nothing on the way out', $errors, array());
+
+// A panel saved by the designer converts like any other option widget
+$result = convert('<div id="1" class="panel" style="position:absolute; margin: 0; top:0px; '
+    . 'left:0px; width:10px; height:10px; background-color: rgba(255, 255, 255, 1); '
+    . 'border: 1px solid rgb(229, 229, 229);" colour="ffffff" opacity="100" '
+    . 'bordercolour="e5e5e5" borderwidth="1" radius="8" shadow="drop"></div>');
+$widget = widgets($result)[0];
+check('a saved panel keeps its options', $widget['options'], array('colour' => 'ffffff',
+    'opacity' => '100', 'bordercolour' => 'e5e5e5', 'borderwidth' => '1', 'radius' => '8',
+    'shadow' => 'drop'));
+check('a saved panel drops the drawn box style', isset($widget['style']), false);
+check('a saved panel holds no html', isset($widget['html']), false);
+check('a panel refuses an option out of range',
+    widgets(convert('<div id="1" class="panel" style="position:absolute; top:0px; left:0px; '
+    . 'width:10px; height:10px;" radius="500" shadow="big"></div>'))[0]['options'], array());
+
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Replacing the old widgets of a document
+// ---------------------------------------------------------------------------
+
+$document = array('version' => 1, 'widgets' => array(
+    array('type' => 'paragraph', 'x' => 1, 'y' => 2, 'w' => 100, 'h' => 60,
+        'options' => array(), 'html' => 'plain'),
+    array('type' => 'dial', 'x' => 1, 'y' => 2, 'w' => 100, 'h' => 60,
+        'options' => array('feedid' => '1')),
+    array('type' => 'heading', 'x' => 1, 'y' => 2, 'w' => 100, 'h' => 90,
+        'options' => array(), 'html' => 'tall'),
+    array('type' => 'Container-Grey', 'x' => 1, 'y' => 2, 'w' => 100, 'h' => 60,
+        'options' => array(), 'html' => ''),
+    array('type' => 'Container-White', 'x' => 1, 'y' => 2, 'w' => 100, 'h' => 60,
+        'options' => array(), 'html' => '<table><tr><td>x</td></tr></table>'),
+    array('type' => 'paragraph', 'x' => 1, 'y' => 2, 'w' => 100, 'h' => 60,
+        'options' => array(), 'html' => '<p>one</p><p style="color:red">two</p>')
+));
+
+$kept = array();
+$swapped = dashboard_migrate_widgets($document, $kept);
+
+check('the widgets the converters accept are replaced',
+    $swapped,
+    array(array('index' => 0, 'from' => 'paragraph', 'to' => 'text'),
+        array('index' => 3, 'from' => 'Container-Grey', 'to' => 'panel')));
+
+check('the ones they refuse are kept with the reason',
+    $kept,
+    array(array('index' => 2, 'type' => 'heading', 'reason' => 'heading_height: 90px'),
+        array('index' => 4, 'type' => 'Container-White', 'reason' => 'holds_html'),
+        array('index' => 5, 'type' => 'paragraph', 'reason' => 'tag_not_in_vocabulary: p')));
+
+check('the document is changed in place',
+    array_map(function ($w) { return $w['type']; }, $document['widgets']),
+    array('text', 'dial', 'heading', 'panel', 'Container-White', 'paragraph'));
+
+check('a replaced widget keeps its place and geometry',
+    $document['widgets'][0],
+    array('type' => 'text', 'x' => 1, 'y' => 2, 'w' => 100, 'h' => 60,
+        'options' => array('valign' => 'top'), 'text' => 'plain'));
+
+check('a widget that is not old is left alone',
+    $document['widgets'][1],
+    array('type' => 'dial', 'x' => 1, 'y' => 2, 'w' => 100, 'h' => 60,
+        'options' => array('feedid' => '1')));
+
+check('the summary counts by old and new type',
+    dashboard_migrate_summary($swapped),
+    'paragraph to text: 1, Container-Grey to panel: 1');
+
+$nothing = array('version' => 1, 'widgets' => array(
+    array('type' => 'dial', 'options' => array())));
+check('a document with no old widget is untouched',
+    dashboard_migrate_widgets($nothing, $kept), array());
+check('and keeps nothing', $kept, array());
+
+$broken = 'not a document';
+check('something that is not a document is passed over',
+    dashboard_migrate_widgets($broken, $kept), array());
 
 echo "\n$passed passed, $failed failed\n";
 exit($failed ? 1 : 0);

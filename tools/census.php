@@ -125,6 +125,9 @@ $c['text_widget'] = array(
     'tiers_by_class' => array(),
     'tier_tags' => array(),       // the tags that put widgets in each tier
     'box_style_values' => array(),// authored property => value => count
+    'inner_style_values' => array(),
+    'tier_dashboards' => array(),  // tier => dashboards holding one
+    'hardest_tier' => array(),     // dashboards by the hardest tier they hold
     'font_tag' => array(),        // attribute on a <font> => count
     'font_tag_values' => array(),
     'img_src' => array(),         // kind of url => count
@@ -258,17 +261,19 @@ function census_url_kind($url)
     return 'relative path';
 }
 
-function census_text_style_value($prop, $val)
+function census_text_style_value($bucket, $prop, $val)
 {
     global $c, $generated_box_props;
 
-    if (in_array($prop, $generated_box_props)) return;
+    // On the box these six are written by the designer, so they are skipped.
+    // Inside the html they are written by the author and are kept.
+    if ($bucket === 'box_style_values' && in_array($prop, $generated_box_props)) return;
     $val = trim($val);
     if ($val === '') return;
-    if (!isset($c['text_widget']['box_style_values'][$prop])) {
-        $c['text_widget']['box_style_values'][$prop] = array();
+    if (!isset($c['text_widget'][$bucket][$prop])) {
+        $c['text_widget'][$bucket][$prop] = array();
     }
-    $vals =& $c['text_widget']['box_style_values'][$prop];
+    $vals =& $c['text_widget'][$bucket][$prop];
     if (isset($vals[$val]) || count($vals) < 40) bump($vals, $val);
     else bump($vals, '(further values)');
 }
@@ -324,7 +329,11 @@ function census_text_element($node, $tag)
 // Sort one text widget into the most demanding thing it contains. The tiers are
 // exclusive and they add up to the widget count, so the share an options only
 // widget could express can be read straight off them.
-function census_text_widget($node, $class, $dashid)
+$tier_order = array('empty', 'plain text', 'one style throughout', 'image, no text',
+                    'mixed, inline', 'mixed, inline with a link', 'mixed, across blocks',
+                    'table or list', 'embed or nested widget');
+
+function census_text_widget($node, $class, $dashid, &$per)
 {
     global $c, $inline_tags, $block_tags, $table_tags;
 
@@ -380,6 +389,7 @@ function census_text_widget($node, $class, $dashid)
     if (!isset($c['text_widget']['tier_tags'][$tier])) $c['text_widget']['tier_tags'][$tier] = array();
     foreach ($tags as $t => $n) bump($c['text_widget']['tier_tags'][$tier], $t, $n);
 
+    $per['text_tiers'][$tier] = true;
     sample('text_widget:' . $tier, $dashid);
 }
 
@@ -436,7 +446,7 @@ function walk($node, $depth, $widget, $dashid, &$per)
             $per['widgets']++;
 
             if (in_array($this_widget, $text_widgets)) {
-                census_text_widget($child, $this_widget, $dashid);
+                census_text_widget($child, $this_widget, $dashid, $per);
             }
         } else {
             $wkey = $widget === null ? '(none)' : $widget;
@@ -488,12 +498,15 @@ function walk($node, $depth, $widget, $dashid, &$per)
                 $wkey = $this_widget === null ? '(none)' : $this_widget;
                 $where = $depth === 0 ? 'box_style_props_by_class' : 'inner_style_props_by_class';
                 if (!isset($c[$where][$wkey])) $c[$where][$wkey] = array();
-                $authored_box = $depth === 0 && in_array($wkey, $text_widgets);
+                $text_bucket = null;
+                if (in_array($wkey, $text_widgets)) {
+                    $text_bucket = $depth === 0 ? 'box_style_values' : 'inner_style_values';
+                }
 
                 foreach (parse_style($value) as $prop => $val) {
                     bump($c['style_props'], $prop);
                     bump($c[$where][$wkey], $prop);
-                    if ($authored_box) census_text_style_value($prop, $val);
+                    if ($text_bucket !== null) census_text_style_value($text_bucket, $prop, $val);
                     if (!isset($c['style_values'][$prop])) $c['style_values'][$prop] = array();
                     if (count($c['style_values'][$prop]) < 25 && !in_array($val, $c['style_values'][$prop])) {
                         $c['style_values'][$prop][] = $val;
@@ -518,6 +531,8 @@ function walk($node, $depth, $widget, $dashid, &$per)
 
 $fh = fopen($infile, 'r');
 $per_fh = fopen($opts['out'] . "_dashboards.jsonl", 'w');
+
+global $tier_order;
 
 while (($line = fgets($fh)) !== false) {
     $line = trim($line);
@@ -552,8 +567,19 @@ while (($line = fgets($fh)) !== false) {
         continue;
     }
 
-    $per = array('max_depth' => 0, 'widgets' => 0, 'classes' => array());
+    $per = array('max_depth' => 0, 'widgets' => 0, 'classes' => array(),
+                 'text_tiers' => array());
     walk($root, 0, null, $dashid, $per);
+
+    // A dashboard needs the html widget if any of its text widgets does, so it
+    // is counted by the hardest tier it holds.
+    $hardest = null;
+    foreach (array_keys($per['text_tiers']) as $tier) {
+        bump($c['text_widget']['tier_dashboards'], $tier);
+        $rank = array_search($tier, $tier_order);
+        if ($hardest === null || $rank > $hardest) $hardest = $rank;
+    }
+    if ($hardest !== null) bump($c['text_widget']['hardest_tier'], $tier_order[$hardest]);
 
     bump($c['depth'], $per['max_depth']);
     bump($c['widgets_per_dashboard'], $per['widgets']);
@@ -610,10 +636,14 @@ foreach (array('box_style_props_by_class', 'inner_style_props_by_class') as $k) 
 foreach (array('tiers', 'font_tag', 'img_src', 'link_href') as $k) {
     arsort($c['text_widget'][$k]);
 }
-foreach ($c['text_widget']['box_style_values'] as $prop => $vals) {
-    arsort($vals);
-    $c['text_widget']['box_style_values'][$prop] = $vals;
+foreach (array('box_style_values', 'inner_style_values') as $bucket) {
+    foreach ($c['text_widget'][$bucket] as $prop => $vals) {
+        arsort($vals);
+        $c['text_widget'][$bucket][$prop] = $vals;
+    }
+    uasort($c['text_widget'][$bucket], function ($a, $b) { return array_sum($b) - array_sum($a); });
 }
+foreach (array('tier_dashboards', 'hardest_tier') as $k) arsort($c['text_widget'][$k]);
 foreach ($c['text_widget']['font_tag_values'] as $name => $vals) {
     arsort($vals);
     $c['text_widget']['font_tag_values'][$name] = $vals;
@@ -741,6 +771,30 @@ if (!count($tw['box_style_values'])) {
         printf("  %-20s %s\n", substr($prop, 0, 20), pairs($vals, 10));
     }
 }
+
+// Most styling is on the elements inside the box, so this list is the source
+// of the options.
+$tw_inner = array();
+foreach ($text_widgets as $t) {
+    if (!isset($c['inner_style_props_by_class'][$t])) continue;
+    foreach ($c['inner_style_props_by_class'][$t] as $prop => $n) bump($tw_inner, $prop, $n);
+}
+arsort($tw_inner);
+table("Authored style properties inside a text widget", $tw_inner, 30);
+
+echo "\nThe values those hold\n";
+if (!count($tw['inner_style_values'])) {
+    echo "  none\n";
+} else {
+    $n = 0;
+    foreach ($tw['inner_style_values'] as $prop => $vals) {
+        printf("  %-20s %s\n", substr($prop, 0, 20), pairs($vals, 10));
+        if (++$n >= 20) { echo "  ... see " . $GLOBALS['opts']['out'] . ".json\n"; break; }
+    }
+}
+
+table("Dashboards holding a text widget of each tier", $tw['tier_dashboards']);
+table("Dashboards by the hardest tier they hold", $tw['hardest_tier']);
 
 table("font tag attributes inside a text widget", $tw['font_tag'], 15);
 echo "\nfont tag values\n";

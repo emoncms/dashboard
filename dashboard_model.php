@@ -257,6 +257,14 @@ class Dashboard
         // would otherwise store fragments of whatever was posted.
         unset($document['meta']);
 
+        // Old text and container widgets the converters accept are replaced
+        // with text, image and panel widgets. A refused one stays as it is.
+        $kept = array();
+        $migrated = dashboard_migrate_widgets($document, $kept);
+        if (count($migrated)) {
+            $this->log->info("dashboard $id migrated " . dashboard_migrate_summary($migrated));
+        }
+
         $content_json = dashboard_convert_encode($document);
         if ($content_json === false) {
             return array('success'=>false,
@@ -288,13 +296,14 @@ class Dashboard
             // Anything the allowlist would not keep has gone. Saying so beats
             // letting it disappear without comment, which is what the author
             // would otherwise see.
+            $response = array('success'=>true, 'message'=>'Dashboard updated');
+            if (count($migrated)) $response['migrated'] = count($migrated);
             $dropped = $this->authored_drops($converted['warnings']);
             if (count($dropped)) {
                 $this->log->info("dashboard $id saved, dropped " . implode(', ', $dropped));
-                return array('success'=>true, 'message'=>'Dashboard updated',
-                    'dropped'=>array_values($dropped));
+                $response['dropped'] = array_values($dropped);
             }
-            return array('success'=>true, 'message'=>'Dashboard updated');
+            return $response;
         }
         return array('success'=>false, 'message'=>'Dashboard not updated');
     }

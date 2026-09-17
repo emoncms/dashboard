@@ -144,6 +144,14 @@ function options_of(def) {
             // than a closed set.
             option.suggested = values;
         }
+
+        // A number declares a range as a plain object in optionsdata, see the
+        // text widget.
+        if (option.type === 'number' && data[i]
+            && typeof data[i] === 'object' && !Array.isArray(data[i])) {
+            if (typeof data[i].min === 'number') option.min = data[i].min;
+            if (typeof data[i].max === 'number') option.max = data[i].max;
+        }
         options[key] = option;
     }
     return options;

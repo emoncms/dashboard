@@ -25,14 +25,18 @@ $backgroundcolor = preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backg
 ?>
     <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
     <script type="text/javascript"><?php require "Modules/vis/vis_langjs.php"; ?></script>
-    <link href="<?php echo $path; ?>Modules/dashboard/Views/js/widget.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
-    <link href="<?php echo $path; ?>Modules/dashboard/Views/dashboardeditor.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
+    <?php
+    load_css("Modules/dashboard/Views/js/widget.css");
+    load_css("Modules/dashboard/Views/dashboardeditor.css");
+    ?>
 
-    <script type="text/javascript" src="<?php echo $path; ?>Lib/flot/jquery.flot.min.js"></script>
-    <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/dashboard.js?ver=<?php echo $js_css_version; ?>"></script>
-    <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/widgetlist.js?ver=<?php echo $js_css_version; ?>"></script>
-    <script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/render.js?ver=<?php echo $js_css_version; ?>"></script>
-    <script type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js?ver=<?php echo $js_css_version; ?>"></script>
+    <?php
+    load_js("Lib/flot/jquery.flot.min.js");
+    load_js("Modules/dashboard/dashboard.js");
+    load_js("Modules/dashboard/Views/js/widgetlist.js");
+    load_js("Modules/dashboard/Views/js/render.js");
+    load_js("Modules/feed/feed.js");
+    ?>
 
     <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
     <script>
@@ -53,6 +57,7 @@ $backgroundcolor = preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backg
         </div>
         <div id="widget_options_body" class="modal-body"></div>
         <div class="modal-footer">
+            <span id="options-problem" class="text-error" style="margin-right:10px"></span>
             <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo ctx_tr('dashboard_messages','Cancel'); ?></button>
             <button id="options-save" class="btn btn-primary"><?php echo ctx_tr('dashboard_messages','Save changes'); ?></button>
         </div>
@@ -130,7 +135,7 @@ function toolboxMove(e) {
 }
 </script>
 
-<script type="text/javascript" src="<?php echo $path; ?>Modules/dashboard/Views/js/designer.js"></script>
+<?php load_js("Modules/dashboard/Views/js/designer.js"); ?>
 <script type="application/javascript">
     var dashid = <?php echo $dashid; ?>;
     var apikey = "";
@@ -140,6 +145,15 @@ function toolboxMove(e) {
     // action in dashboard_controller.php.
     var dashboard_owner = true;
     var widget = <?php echo json_encode($widgets); ?>;
+<?php
+// The element lists the converter allows in widget content. The editor uses
+// them to check a value before the dashboard is saved. They are emitted from
+// the converter so there is a single copy.
+require_once "Modules/dashboard/dashboard_convert.php";
+?>
+    var dashboard_html_elements = <?php echo json_encode(dashboard_convert_allowed_elements()); ?>;
+    var dashboard_text_elements = <?php echo json_encode(dashboard_convert_inline_elements()); ?>;
+    var dashboard_stripped_elements = <?php echo json_encode(dashboard_convert_stripped_elements()); ?>;
     var redraw = 0;
     var reloadiframe = -1; // force iframes url to recalculate for all vis widgets
     var _SI = designer.get_SI(); // get a list of International System of Units (SI)
@@ -190,6 +204,12 @@ function toolboxMove(e) {
             $("#save-dashboard").attr("class","btn btn-warning")
                 .text(_Tr("Saved, some content removed"))
                 .attr("title", _Tr("Not saved: ") + data.dropped.join(", "));
+        }
+
+        // The save replaced old text and container widgets with the new
+        // ones. The page is drawn again so the editor shows what is stored.
+        if (data && data.migrated) {
+            location.reload();
         }
     }
 

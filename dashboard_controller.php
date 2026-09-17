@@ -20,8 +20,6 @@ function dashboard_controller()
     $dashboard = new Dashboard($mysqli);
     // id, userid, content, height, name, alias, description, main, public, published, showdescription, fullscreen
     
-    $js_css_version = 18;
-
     $result = false; $submenu = '';
 
     if ($route->format == 'html')
@@ -30,7 +28,6 @@ function dashboard_controller()
         {
             load_language_files("Modules/dashboard/locale", "dashboard_messages");
             $result = view("Modules/dashboard/Views/dashboard_list.php", array(
-                'js_css_version' => $js_css_version,
                 'path' => $path
             ));
         }
@@ -118,7 +115,6 @@ function dashboard_controller()
                     $result = view("Modules/dashboard/Views/dashboard_view.php",array(
                         'dashboard'=>$dash, 
                         'page_html'=>$dashboard->content_html($dash),
-                        'js_css_version'=>$js_css_version, 
                         'apikey'=>$apikey, 
                         'public_userid'=>$public_userid,
                         'owner'=>$owner
@@ -144,16 +140,13 @@ function dashboard_controller()
                 $page_html = $dashboard->content_html($dash);
                 $result = view("Modules/dashboard/Views/dashboard_edit_view.php",array(
                     'dashboard'=>$dash,
-                    'page_html'=>$page_html,
-                    'js_css_version'=>$js_css_version
+                    'page_html'=>$page_html
                 ));
                 $result .= view("Modules/dashboard/Views/dashboard_config.php", array(
-                    'dashboard'=>$dash,
-                    'page_html'=>$page_html,
-                    'js_css_version'=>$js_css_version
+                    'dashboard'=>$dash
                 ));
 
-                $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'],'type'=>"edit", 'js_css_version'=>$js_css_version));
+                $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'],'type'=>"edit"));
             }
         }
     }

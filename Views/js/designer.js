@@ -48,6 +48,7 @@ var designer = {
     'selected_edge': selected_edges.none,
     'edit_mode': true,
     'create': null,
+    'create_button': null,
 
     'boxi': 0,
 
@@ -272,6 +273,7 @@ var designer = {
                 if (id>designer.boxi) {designer.boxi = id;}
                 seenboxes.push(id);
                 designer.boxlist[id] = {
+                    "type": z,
                     "top":parseInt($(this).css("top")),
                     "left":parseInt($(this).css("left")),
                     "width":parseInt($(this).css("width")),
@@ -328,6 +330,26 @@ var designer = {
                 designer.ctx.fillRect((x*designer.grid_size)-1,(y*designer.grid_size)-1,1,1);
             }
         }
+
+        // Faint outline of every box so a widget that renders nothing can
+        // still be found, and a label on a widget that has no feed set
+        designer.ctx.font = "12px sans-serif";
+        designer.ctx.textAlign = "center";
+        designer.ctx.textBaseline = "middle";
+        designer.ctx.setLineDash([3]);
+        for (var id in designer.boxlist) {
+            var box = designer.boxlist[id];
+            designer.ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
+            designer.ctx.strokeRect(box["left"],box["top"],box["width"],box["height"]);
+            var note = designer.unconfigured(id);
+            if (note) {
+                designer.ctx.fillStyle = "rgba(255, 190, 0, 0.12)";
+                designer.ctx.fillRect(box["left"],box["top"],box["width"],box["height"]);
+                designer.ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+                designer.ctx.fillText(box["type"]+": "+note, box["left"]+box["width"]/2, box["top"]+box["height"]/2, box["width"]-4);
+            }
+        }
+        designer.ctx.setLineDash([]);
 
         // Draw selected box points
         if (designer.selected_boxes.length > 0){
@@ -386,6 +408,26 @@ var designer = {
         redraw = 1;
     },
 
+    // Note for a widget that is missing what it needs to show anything:
+    // a feed widget with no feed set, or a text widget with no text.
+    // Returns null when the widget is complete.
+    "unconfigured": function(id){
+        var w = widgets[designer.boxlist[id]["type"]];
+        if (!w || !w["optionstype"]) return null;
+        var hasfeed = false, hastext = false;
+        for (var i in w["optionstype"]) {
+            var type = w["optionstype"][i];
+            if (type == "text" || type == "html") hastext = true;
+            if (type != "feedid") continue;
+            hasfeed = true;
+            var val = $("#"+id).attr(w["options"][i]);
+            if (val !== undefined && val !== "") return null;
+        }
+        if (hasfeed) return _Tr("not configured");
+        if (hastext && $.trim(designer.widget_body(id).text()) === "") return _Tr("no text");
+        return null;
+    },
+
     "draw_options": function(widget){
         var box_options = widgets[widget]["options"];
         var options_type = widgets[widget]["optionstype"];
@@ -398,7 +440,12 @@ var designer = {
 
         // Build options table html
         var options_html = '<div id="box-options">';
+        designer.option_rules = {};
         for (z in box_options){
+            designer.option_rules[box_options[z]] = {
+                "type": options_type ? options_type[z] : "value",
+                "data": optionsdata ? optionsdata[z] : null
+            };
             // look into the designer DOM to extract the div parameters from the selected widget.
             var val = $("#"+selected_box).attr(box_options[z]);
 
@@ -417,6 +464,21 @@ var designer = {
             else if (options_type && options_type[z] == "html"){
                 val = $("#"+selected_box).html();
                 options_html += "<textarea class='options' id='"+box_options[z]+"' >"+designer_escape(val)+"</textarea>"
+            }
+
+            // The body of a text widget, read through the wrapper drawn by the
+            // render script. See text_wrapper in widget/text/text_render.js.
+            else if (options_type && options_type[z] == "text"){
+                val = designer.widget_body(selected_box).html();
+                options_html += "<textarea class='options' id='"+box_options[z]+"' >"+designer_escape(val)+"</textarea>"
+            }
+
+            else if (options_type && options_type[z] == "number"){
+                var range = optionsdata && optionsdata[z] ? optionsdata[z] : {};
+                options_html += "<input class='options' id='"+box_options[z]+"' type='number'";
+                if (range.min !== undefined) options_html += " min='"+range.min+"'";
+                if (range.max !== undefined) options_html += " max='"+range.max+"'";
+                options_html += " value='"+designer_escape(val)+"'/ >";
             }
 
             // Combobox for selecting options
@@ -516,6 +578,15 @@ var designer = {
         // Fill the modal configuration window with options
         $("#widget_options_body").html(options_html);
 
+        // Check each value as it is typed, before the dashboard is saved.
+        $("#widget_options_body").find(".options").on("input change", function(){
+            designer.check_option($(this));
+        }).each(function(){
+            designer.check_option($(this));
+        });
+        // Also called here so a widget with no options resets the save button.
+        designer.update_options_save();
+
         // Change the size of the text for items with class options - size initially set by bootstrap
         // also add height of 30 px for color inputs for Firefox
         $('input, select, textarea').css('font-size','12px');
@@ -560,30 +631,85 @@ var designer = {
         var select = [];
         for (z in widgets){
             var menu = widgets[z]["menu"];
-            if (typeof select[menu] === "undefined")
-                select[menu] = "<li><a id='"+z+"' class='widget-button'>"+z+"</a></li>";
-            else
-                select[menu] += "<li><a id='"+z+"' class='widget-button'>"+z+"</a></li>";
-        } 
+            // A widget with no menu is kept for existing dashboards only
+            if (menu === undefined) continue;
+            if (typeof select[menu] === "undefined") select[menu] = [];
+            select[menu].push(z);
+        }
 
         for (z in select){
-            widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown' style='width:62px; padding:4px;' title='"+_Tr("Add a")+" "+z+" "+_Tr("element to the dashboard")+"'><img style='' src='../Modules/dashboard/Views/icons/"+z+".png'><span class='caret'></span></button>";
-            widget_html += "<ul class='dropdown-menu scrollable-menu' style='min-width: auto; padding: 0px; text-align:left; top:initial' name='d'>"+select[z]+"</ul></div>";
+            var title = _Tr("Add a")+" "+z+" "+_Tr("element to the dashboard");
+            var icon = "<img src='../Modules/dashboard/Views/icons/"+z+".png'>";
+            if (select[z].length == 1) {
+                // A menu with one widget is a plain button that adds it
+                widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button data-widget='"+select[z][0]+"' class='btn widgetmenu widget-button' style='width:62px; padding:4px;' title='"+title+"'>"+icon+"</button></div>";
+                continue;
+            }
+            var items = "";
+            for (var i in select[z]) items += "<li><a data-widget='"+select[z][i]+"' class='widget-button'>"+select[z][i]+"</a></li>";
+            widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown' style='width:62px; padding:4px;' title='"+title+"'>"+icon+"<span class='caret'></span></button>";
+            widget_html += "<ul class='dropdown-menu scrollable-menu' style='min-width: auto; padding: 0px; text-align:left; top:initial' name='d'>"+items+"</ul></div>";
         }
+        // Blank button so the toolbox rows are even
+        widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn widgetmenu' disabled style='width:62px; padding:4px; visibility:hidden;'><img src='../Modules/dashboard/Views/icons/Text.png'></button></div>";
         $("#widget-buttons").html(widget_html);
 
         $(".widget-button").click(function(event) {
-            designer.create = $(this).attr("id");
-            designer.edit_mode = false;
+            var type = $(this).attr("data-widget");
+            // A second click on the pending widget cancels it
+            if (designer.create == type) {
+                designer.clear_create();
+            } else {
+                designer.set_create(type, $(this).closest(".widgetbuttons").find(".widgetmenu"));
+            }
         });
+    },
+
+    // Marks a widget type as waiting to be placed on the next canvas click.
+    // Toolbox button is shown pressed and the canvas cursor changes so the
+    // pending state is visible.
+    "set_create": function(type, button){
+        designer.clear_create();
+        designer.create = type;
+        designer.create_button = button;
+        designer.edit_mode = false;
+        if (button) button.addClass("active");
+        $(designer.canvas).css("cursor","crosshair");
+    },
+
+    "clear_create": function(){
+        if (designer.create_button) designer.create_button.removeClass("active");
+        designer.create = null;
+        designer.create_button = null;
+        designer.edit_mode = true;
+        $(designer.canvas).css("cursor","");
+        designer.draw();
+    },
+
+    // Dashed outline of the pending widget at its snapped position
+    "draw_ghost": function(mx,my){
+        var w = widgets[designer.create];
+        designer.draw();
+        designer.ctx.strokeStyle = "rgba(0, 0, 0, 0.6)";
+        designer.ctx.setLineDash([6]);
+        designer.ctx.strokeRect(designer.snap(mx+w["offsetx"]), designer.snap(my+w["offsety"]), w["width"], w["height"]);
+        designer.ctx.setLineDash([]);
     },
 
     "add_widget": function(mx,my,type){
         designer.start_save_undo_state();
         designer.boxi++;
         var html = widgets[type]["html"];
+        if (html == undefined) html = widgets[type]["text"];
         if (html == undefined) html = "";
         $("#page").append('<div id="'+designer.boxi+'" class="'+type+'" style="position:absolute; margin: 0; top:'+designer.snap(my+widgets[type]["offsety"])+'px; left:'+designer.snap(mx+widgets[type]["offsetx"])+'px; width:'+widgets[type]["width"]+'px; height:'+widgets[type]["height"]+'px;" >'+html+'</div>');
+
+        // A widget list may give starting values for its options, so the
+        // options panel opens showing what is drawn rather than blank fields.
+        var defaults = widgets[type]["defaults"];
+        if (defaults) {
+            for (var name in defaults) $("#"+designer.boxi).attr(name, defaults[name]);
+        }
 
         designer.end_save_undo_state();
         designer.selected_boxes = [designer.boxi];
@@ -593,6 +719,191 @@ var designer = {
         designer.edit_mode = true;
     },
     
+    // Checks one option value against the rules in dashboard_convert_option_valid
+    // in dashboard_convert.php. The server decides what is stored, so this only
+    // reports a problem.
+    "check_option": function(field){
+        var rule = designer.option_rules[field.attr("id")];
+        var group = field.closest(".control-group");
+        var help = group.find(".help-inline").first();
+
+        if (help.data("hint") === undefined) help.data("hint", help.html());
+
+        // A number input reports an empty value for input that is not a number,
+        // so badInput is checked to tell a cleared field from an invalid one.
+        var element = field[0];
+        var problem = "";
+        if (element && element.validity && element.validity.badInput) {
+            problem = _Tr("Must be a whole number");
+        } else if (rule) {
+            problem = designer.option_problem(rule, field.val());
+        }
+        if (problem === ""){
+            group.removeClass("error");
+            help.html(help.data("hint"));
+        } else {
+            group.addClass("error");
+            help.html('<small>' + problem + '</small>');
+        }
+
+        designer.update_options_save();
+    },
+
+    // Save is disabled while any field has an error. Cancel still closes the
+    // panel.
+    "update_options_save": function(){
+        var bad = $("#widget_options_body").find(".control-group.error").length;
+        $("#options-save").prop("disabled", bad > 0);
+        $("#options-problem").text(bad === 0 ? ""
+            : bad + " " + (bad === 1 ? _Tr("error found, fix to save")
+                                     : _Tr("errors found, fix to save")));
+    },
+
+    "option_problem": function(rule, value){
+        if (value === undefined || value === "") return "";
+
+        if (rule.type === "text") {
+            return designer.content_problem(value, window.dashboard_text_elements);
+        }
+        if (rule.type === "html") {
+            return designer.content_problem(value, window.dashboard_html_elements);
+        }
+        if (rule.type === "number") {
+            if (!/^-?\d+$/.test(value)) return _Tr("Must be a whole number");
+            var range = rule.data && !Array.isArray(rule.data) ? rule.data : {};
+            var number = parseInt(value, 10);
+            if (range.min !== undefined && number < range.min) {
+                return _Tr("Must be") + " " + range.min + " " + _Tr("or more");
+            }
+            if (range.max !== undefined && number > range.max) {
+                return _Tr("Must be") + " " + range.max + " " + _Tr("or less");
+            }
+            return "";
+        }
+        if (rule.type === "url" || rule.type === "image_url") {
+            return designer.url_problem(value, rule.type === "image_url");
+        }
+        if (rule.type === "value" || rule.type === "dropbox_other") {
+            if (value.length > 512) return _Tr("Too long, the limit is 512 characters");
+            if (value.indexOf("<") !== -1 || value.indexOf(">") !== -1) {
+                return _Tr("Invalid character");
+            }
+            return "";
+        }
+        return "";
+    },
+
+    // Returns the host of a url, an empty string for a url on this site, or
+    // false for a scheme that is not allowed. Follows dashboard_convert_url_host
+    // in dashboard_convert.php.
+    "url_host": function(url){
+        var absolute = /^https?:\/\/([^/?#]*)/i.exec(url);
+        if (absolute) return designer.url_strip_port(absolute[1]);
+        // Scheme relative, //host/path, points at another site
+        if (url.substring(0, 2) === "//") {
+            return designer.url_strip_port(url.substring(2).split(/[/?#]/)[0]);
+        }
+        if (url.split(/[/?#]/)[0].indexOf(":") !== -1) return false;
+        return "";
+    },
+
+    "url_strip_port": function(host){
+        var at = host.lastIndexOf("@");
+        if (at !== -1) host = host.substring(at + 1);
+        var colon = host.lastIndexOf(":");
+        if (colon !== -1 && host.indexOf("]") === -1) host = host.substring(0, colon);
+        return host.toLowerCase().replace(/\.+$/, "");
+    },
+
+    // A url on this site is fetched with the viewer's session, so it has extra
+    // rules. Follows dashboard_convert_url_allowed and
+    // dashboard_convert_url_own_site.
+    "url_problem": function(value, is_image){
+        var url = value.replace(/[\x00-\x20\x7f]/g, "");
+        if (url === "") return "";
+
+        var host = designer.url_host(url);
+        if (host === false) return _Tr("Must start with http:// or https://");
+        if (host !== "" && host !== designer.url_strip_port(window.location.host)) return "";
+
+        // The url points at this site
+        if (!is_image) return _Tr("Must point at another site");
+
+        if (url.indexOf("?") === -1 && designer.stored_image(url)) return "";
+        return _Tr("Must point at another site, or at an image in")
+            + " Modules/dashboard/Views/images";
+    },
+
+    "stored_image": function(url){
+        var path = url.split(/[?#]/)[0];
+        try { path = decodeURIComponent(path); } catch (e) { return false; }
+
+        var segments = path.split("/");
+        for (var i = 0; i < segments.length; i++) {
+            if (segments[i] === "..") return false;
+        }
+
+        var match = /(?:^|\/)Modules\/dashboard\/Views\/images\/([^/]+)$/.exec(path);
+        if (!match) return false;
+
+        var dot = match[1].lastIndexOf(".");
+        if (dot === -1) return false;
+        var extension = match[1].substring(dot + 1).toLowerCase();
+        return ["png", "jpg", "jpeg", "gif", "webp", "svg", "bmp", "ico", "avif"]
+            .indexOf(extension) !== -1;
+    },
+
+    // Joins names as a list: b, i and sub.
+    "name_list": function(names){
+        if (names.length < 2) return names.join("");
+        return names.slice(0, -1).join(", ") + " " + _Tr("and") + " " + names[names.length - 1];
+    },
+
+    // Reports tags in the markup that are not in the allowed list. See
+    // dashboard_convert_clean in dashboard_convert.php.
+    "content_problem": function(value, allowed){
+        if (!allowed || value.indexOf("<") === -1) return "";
+
+        var parsed = new DOMParser().parseFromString("<div>" + value + "</div>", "text/html");
+        var wrapper = parsed.body.firstElementChild;
+        var elements = wrapper ? wrapper.querySelectorAll("*") : [];
+        var refused = [];
+        var styled = false;
+
+        for (var i = 0; i < elements.length; i++) {
+            var tag = elements[i].tagName.toLowerCase();
+            if (allowed.indexOf(tag) === -1) {
+                if (refused.indexOf(tag) === -1) refused.push(tag);
+            } else if (elements[i].hasAttribute("style")) {
+                styled = true;
+            }
+        }
+
+        var says = [];
+        if (refused.length) {
+            // A short list is printed in full. The html list has around thirty
+            // tags, so the refused tags are named instead.
+            if (allowed.length <= 8) {
+                says.push(_Tr("Must only use") + " " + designer.name_list(allowed));
+            } else {
+                says.push(_Tr("Must not use") + " " + designer.name_list(refused));
+            }
+        }
+        // Styling in a text widget is set with its options.
+        if (styled && allowed === window.dashboard_text_elements) {
+            says.push(_Tr("Must not use style, set it with the options"));
+        }
+        return says.join(". ");
+    },
+
+    // The element holding the widget content. A text widget keeps it in a
+    // wrapper drawn by its render script, so a rotation turns the text and not
+    // the box. Other widgets keep it on the box.
+    "widget_body": function(box){
+        var wrapper = $("#"+box).children(".text-content");
+        return wrapper.length ? wrapper : $("#"+box);
+    },
+
     "delete_selected_boxes": function(){
         if (designer.selected_boxes.length > 0) {
             designer.start_save_undo_state();
@@ -786,8 +1097,9 @@ var designer = {
 
             } else {
                 if (designer.create){
-                    designer.add_widget(mx,my,designer.create);
-                    designer.create = null;
+                    var type = designer.create;
+                    designer.clear_create();
+                    designer.add_widget(mx,my,type);
                     $("#when-selected").show();
                 }
             }
@@ -835,6 +1147,11 @@ var designer = {
             // Force limits to designer area
             if (mx < 0) mx = 0; else if (mx >  designer.page_width) mx = designer.page_width;
             if (my < 0) my = 0;
+
+            if (designer.create) {
+                designer.draw_ghost(mx,my);
+                return false;
+            }
 
             if (designer.mousedown && designer.box_select_mode) {
                 // Draw the box being dragged
@@ -892,10 +1209,18 @@ var designer = {
             }
         });
 
+        // Remove the ghost when the pointer leaves the canvas
+        $(this.canvas).bind('mouseleave', function(e){
+            if (designer.create) designer.draw();
+        });
+
         // Key events
         $(window).keydown(function(e) {
             var keyCode = e.keyCode;
             switch (keyCode) {
+                case 27: // Escape cancels a pending widget
+                    if (designer.create) designer.clear_create();
+                    break;
                 case 37:
                 case 38:
                 case 39:
@@ -930,15 +1255,29 @@ var designer = {
 
         // On save click
         $("#options-save").click(function(){
+            // Checked again on save
+            $("#widget_options_body").find(".options").each(function(){
+                designer.check_option($(this));
+            });
+            var first_bad = $("#widget_options_body").find(".control-group.error").first();
+            if (first_bad.length) {
+                first_bad.find(".options").first().focus();
+                return;
+            }
+
             designer.start_save_undo_state();
             var selected_box = designer.selected_boxes[0];
             $(".options").each(function() {
                 if ($(this).attr("id")=="html"){
                     $("#"+selected_box).html($(this).val());
                 }
-                else if ($(this).attr("id").substring(0,6)=="colour"){
+                else if ($(this).attr("id")=="text"){
+                    designer.widget_body(selected_box).html($(this).val());
+                }
+                else if ($(this).attr("id").substring(0,6)=="colour" || $(this).attr("type")=="color"){
                     // Since colour values are generally prefixed with "#", and "#" isn't valid in URLs, we strip out the "#".
                     // It will be replaced by the value-checking in the actual plot function, so this won't cause issues.
+                    // Colour options were once all named colour*, so the name is still checked.
                     var colour = $(this).val();
                     colour = colour.replace("#","");
                     $("#"+selected_box).attr($(this).attr("id"), colour);

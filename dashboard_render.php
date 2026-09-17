@@ -80,9 +80,9 @@ function dashboard_render($json)
     return array('html' => $html, 'errors' => $errors);
 }
 
-// Ids are assigned here rather than stored. The designer's counter produced
-// ids that collide within a dashboard in at least 37 cases in the corpus, so
-// the array index is used instead, see the widget section of SCHEMA.md.
+// Ids are assigned here rather than stored. The designer's counter can produce
+// colliding ids within a dashboard, so the array index is used instead, see
+// the widget section of SCHEMA.md.
 // Counted from one, as the designer does, because its own counter starts there
 // and nothing else has had to deal with a box numbered zero.
 function dashboard_render_widget($widget, $index, $registry, &$errors)
@@ -103,6 +103,7 @@ function dashboard_render_widget($widget, $index, $registry, &$errors)
     }
 
     $holds_html = dashboard_convert_holds_html($type, $known, $registry);
+    $holds_text = dashboard_convert_holds_text($type, $known, $registry);
     $style = dashboard_render_box_style($widget, $index, $errors);
 
     $attributes = ' id="' . ($index + 1) . '"'
@@ -127,6 +128,16 @@ function dashboard_render_widget($widget, $index, $registry, &$errors)
             $inner = dashboard_convert_sanitise_html($widget['html'], $errors, $index);
         } else {
             dashboard_convert_warn($errors, $index, 'html_not_allowed_on_type', $type);
+        }
+    }
+
+    // A text widget keeps its body in its own field with the narrower element
+    // list. Only the field the type declares is rendered.
+    if (isset($widget['text']) && is_string($widget['text'])) {
+        if ($holds_text) {
+            $inner .= dashboard_convert_sanitise_text($widget['text'], $errors, $index);
+        } else {
+            dashboard_convert_warn($errors, $index, 'text_not_allowed_on_type', $type);
         }
     }
 

@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/text/text_render.js",
+  "widgets": {
+    "text": {
+      "options": {
+        "text": {
+          "type": "text"
+        },
+        "size": {
+          "type": "number",
+          "min": 6,
+          "max": 200
+        },
+        "colour": {
+          "type": "colour_picker"
+        },
+        "weight": {
+          "type": "dropbox",
+          "values": [
+            "normal",
+            "bold"
+          ]
+        },
+        "font": {
+          "type": "dropbox",
+          "values": [
+            "",
+            "Arial",
+            "Arial Black",
+            "Helvetica",
+            "Verdana",
+            "Georgia",
+            "Courier New",
+            "Comic Sans MS",
+            "sans-serif"
+          ]
+        },
+        "align": {
+          "type": "dropbox",
+          "values": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "valign": {
+          "type": "dropbox",
+          "values": [
+            "middle",
+            "top",
+            "bottom"
+          ]
+        },
+        "rotate": {
+          "type": "number",
+          "min": -180,
+          "max": 180
+        }
+      }
+    }
+  }
+}

@@ -1,3 +1,6 @@
+/* The four fixed containers. Kept for the dashboards that hold one, no
+   longer offered by the toolbox. New boxes are panel widgets, see
+   widget/panel/panel_render.js. */
 .Container-White {
   background: none repeat scroll 0 0 #FFFFFF;
   border: 1px solid #E5E5E5;
@@ -72,4 +75,43 @@
   text-align: center;
   padding: 2px;
   overflow: hidden;
+}
+
+/* Text widget, see widget/text/text_render.js. The content sits in a wrapper
+   drawn by the render script, so a rotation turns the text and not the box.
+
+   The wrapper is a block, not a flex container, so inline markup such as
+   P<sub>L1</sub> flows as one line. align-content places the block's content
+   vertically. A browser without it draws from the top.
+
+   Content larger than the box overflows it, the same as a paragraph or
+   heading. */
+.text-content {
+  width: 100%;
+  height: 100%;
+  display: block;
+  align-content: center;
+}
+
+/* An image widget, see widget/image/image_render.js. */
+.image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.image-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  border: 1px dashed #bbb;
+  font-size: 12px;
+}
+
+.image-warning {
+  font-size: 11px;
+  color: #b94a48;
 }

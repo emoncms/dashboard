@@ -30,7 +30,7 @@ $action_widgets_enabled = !empty($settings['dashboard']['enable_action_widgets']
 // A dashboard saved earlier may still hold these widgets. Without their render
 // scripts they draw as an empty box, so label them instead.
 if (!$action_widgets_enabled) {
-    echo "<script type='text/javascript' src='" . $path . "Modules/dashboard/Views/js/disabledwidgets.js?v=1'></script>";
+    load_js("Modules/dashboard/Views/js/disabledwidgets.js");
     echo "<script type='text/javascript'>disabled_widgets_init(" . json_encode($action_widgets) . ");</script>";
 }
 
@@ -67,7 +67,7 @@ function load_widget($folder, $widgetname)
         $gotWidget = true;
     }
     if (is_file($folder . "/" . $widgetname . "_render.js")) {
-        echo "<script type='text/javascript' src='" . $path . $folder . "/" . $widgetname . "_render.js?v=6'></script>";
+        load_js($folder . "/" . $widgetname . "_render.js");
         $gotWidget = true;
     }
     return $gotWidget;

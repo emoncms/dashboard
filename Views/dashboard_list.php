@@ -3,7 +3,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 ?>
 
 <!-- include dashboard_list.css -->
-<link href="<?php echo $path; ?>Modules/dashboard/Views/dashboard_list.css?ver=<?php echo $js_css_version; ?>" rel="stylesheet">
+<?php load_css("Modules/dashboard/Views/dashboard_list.css"); ?>
 
 <div id="app" class="container-fluid" v-cloak>
     <div class="alert mt-2" :class="{'alert-warning':true}" v-if="gridData.length === 0">
@@ -189,9 +189,9 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
 
 
-<script src="<?php echo $path; ?>Modules/dashboard/dashboard.js?v=1"></script>
+<?php load_js("Modules/dashboard/dashboard.js"); ?>
 <?php load_js("Lib/js/vue.global.prod-3.5.22.min.js"); ?>
-<script src="<?php echo $path; ?>Lib/misc/gettext.js?v=2"></script>
+<?php load_js("Lib/misc/gettext.js"); ?>
 <script>
     /**
      * return plain js object with gettext translated strings
