@@ -54,7 +54,9 @@ class Dashboard
                 return '<div class="alert alert-error">This dashboard cannot be shown '
                     . 'because the PHP extension <b>' . implode('</b>, <b>', $missing)
                     . '</b> is not installed. On Debian and Ubuntu run '
-                    . '<code>sudo apt install php-xml php-mbstring</code> '
+                    . '<code>sudo apt install php' . PHP_MAJOR_VERSION . '.'
+                    . PHP_MINOR_VERSION . '-xml php' . PHP_MAJOR_VERSION . '.'
+                    . PHP_MINOR_VERSION . '-mbstring</code> '
                     . 'and restart the web server.</div>';
             }
             $json = $this->convert_content((int) $dash['id'], $content);
