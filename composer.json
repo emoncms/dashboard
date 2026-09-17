@@ -4,6 +4,10 @@
     "support": {
         "forum": "https://community.openenergymonitor.org/"
     },
+    "require": {
+        "ext-dom": "*",
+        "ext-mbstring": "*"
+    },
     "require-dev": {
         "php-parallel-lint/php-parallel-lint": "^1.2.0"
     },

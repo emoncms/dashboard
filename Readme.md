@@ -8,7 +8,7 @@
 $ cd /var/www/emoncms/Modules
 $ git clone https://github.com/emoncms/dashboard
 $ sudo apt-get update 
-$ sudo apt-get install php7.0-mbstring
+$ sudo apt-get install php-xml php-mbstring
 ```
 
 Login to Emoncms then run:  Admin > Check for database updates

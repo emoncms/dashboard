@@ -47,6 +47,16 @@ class Dashboard
         if (trim($json) === '') {
             $content = isset($dash['content']) ? (string) $dash['content'] : '';
             if (trim($content) === '') return '';
+            $missing = $this->missing_extensions();
+            if (count($missing)) {
+                $this->log->error("dashboard " . (int) $dash['id'] . " not converted, "
+                    . "php extension missing: " . implode(", ", $missing));
+                return '<div class="alert alert-error">This dashboard cannot be shown '
+                    . 'because the PHP extension <b>' . implode('</b>, <b>', $missing)
+                    . '</b> is not installed. On Debian and Ubuntu run '
+                    . '<code>sudo apt install php-xml php-mbstring</code> '
+                    . 'and restart the web server.</div>';
+            }
             $json = $this->convert_content((int) $dash['id'], $content);
         }
 
@@ -104,6 +114,17 @@ class Dashboard
             . count($converted['document']['widgets']) . " widgets, $warnings warnings");
 
         return $json;
+    }
+
+    // PHP extensions the converter needs that are not loaded. dom comes from
+    // php-xml on Debian and Ubuntu.
+    public function missing_extensions()
+    {
+        $missing = array();
+        foreach (array('dom', 'mbstring') as $ext) {
+            if (!extension_loaded($ext)) $missing[] = $ext;
+        }
+        return $missing;
     }
 
     public function create($userid)
