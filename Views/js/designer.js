@@ -34,7 +34,9 @@ var designer = {
     'feedmode':"feedid",
     'grid_size':20,
     'page_width':500,
+    'canvas_width':500,
     'page_height':500,
+    'min_height':400,
 
     'cnvs':null,
     'canvas':null,
@@ -284,8 +286,6 @@ var designer = {
 
                 if (designer.boxlist[id]["width"] < designer.grid_size) {designer.boxlist[id]["width"] = designer.grid_size;}    // Zero cant be selected se we default to minimal grid size
                 if (designer.boxlist[id]["height"] < designer.grid_size) {designer.boxlist[id]["height"] = designer.grid_size;}
-                
-                if ((designer.boxlist[id]["top"] + designer.boxlist[id]["height"])>designer.page_height) {designer.page_height = (designer.boxlist[id]["top"] + designer.boxlist[id]["height"]);}
             });
         }
 
@@ -308,24 +308,51 @@ var designer = {
            }
     },
     
+    // Page height is one grid spacing below the lowest widget, with a
+    // minimum so an empty page has room to drop widgets on. Canvas width
+    // is the column width, or one grid spacing past the rightmost widget
+    // when a page built on a wider screen overflows the column.
+    "fit_size": function(){
+        var bottom = 0, right = 0;
+        for (var z in designer.boxlist) {
+            var box = designer.boxlist[z];
+            if (box["top"] + box["height"] > bottom) bottom = box["top"] + box["height"];
+            if (box["left"] + box["width"] > right) right = box["left"] + box["width"];
+        }
+        bottom = Math.ceil(bottom / designer.grid_size) * designer.grid_size + designer.grid_size;
+        right = Math.ceil(right / designer.grid_size) * designer.grid_size + designer.grid_size;
+        designer.page_height = Math.max(bottom, designer.min_height);
+        designer.page_width = parseInt($('#dashboardpage').width());
+        designer.canvas_width = Math.max(right, designer.page_width);
+    },
+
     "draw": function(){
+        designer.fit_size();
         $("#page-container").css("height",designer.page_height);
         $("#can").attr("height",designer.page_height);
-
-        designer.page_width = parseInt($('#dashboardpage').width());
-        $('#can').width($('#dashboardpage').width());
-        designer.cnvs.setAttribute('width', designer.page_width);
+        $('#can').width(designer.canvas_width);
+        designer.cnvs.setAttribute('width', designer.canvas_width);
         designer.ctx = designer.cnvs.getContext("2d");
 
-        designer.ctx.clearRect(0,0,designer.page_width,designer.page_height);
-        designer.ctx.strokeRect(0,0,designer.page_width,designer.page_height);
+        designer.ctx.clearRect(0,0,designer.canvas_width,designer.page_height);
 
         designer.ctx.translate(0.5, 0.5); // Move the canvas by 0.5px to fix blurring
+
+        // Dotted line marking the bottom of the page
+        designer.ctx.save();
+        designer.ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+        designer.ctx.lineWidth = 1;
+        designer.ctx.setLineDash([1, 3]);
+        designer.ctx.beginPath();
+        designer.ctx.moveTo(0, designer.page_height - 1);
+        designer.ctx.lineTo(designer.canvas_width, designer.page_height - 1);
+        designer.ctx.stroke();
+        designer.ctx.restore();
 
         // Draw grid
         designer.ctx.fillStyle    = "rgba(0, 0, 0, 0.2)";
 
-        for (var x=1; x<parseInt(designer.page_width/designer.grid_size); x++){
+        for (var x=1; x<parseInt(designer.canvas_width/designer.grid_size); x++){
             for (var y=1; y<parseInt(designer.page_height/designer.grid_size); y++){
                 designer.ctx.fillRect((x*designer.grid_size)-1,(y*designer.grid_size)-1,1,1);
             }
@@ -977,7 +1004,7 @@ var designer = {
         // First pass - see if anything is going to go off the edge if we do this move
         designer.selected_boxes.forEach(function(selected_box) {
             var newCenterX = designer.boxlist[selected_box]["left"] + (designer.boxlist[selected_box]["width"] / 2) + left_shift;
-            if (newCenterX < 0 || newCenterX > designer.page_width) {
+            if (newCenterX < 0 || newCenterX > designer.canvas_width) {
                 left_shift = 0;
             }
 
@@ -992,12 +1019,6 @@ var designer = {
             designer.selected_boxes.forEach(function(selected_box) {
                 designer.boxlist[selected_box]["left"] = designer.boxlist[selected_box]["left"] + left_shift;
                 designer.boxlist[selected_box]["top"] = designer.boxlist[selected_box]["top"] + top_shift;
-    
-                // Increase the page height if we need to
-                var bottom = designer.boxlist[selected_box]["top"] + designer.boxlist[selected_box]["height"];
-                if (bottom > designer.page_height - designer.grid_size) {
-                    designer.page_height = bottom + designer.grid_size;
-                }
             });
 
             designer.draw();
@@ -1145,7 +1166,7 @@ var designer = {
                 my = event.offsetY;
             }
             // Force limits to designer area
-            if (mx < 0) mx = 0; else if (mx >  designer.page_width) mx = designer.page_width;
+            if (mx < 0) mx = 0; else if (mx > designer.canvas_width) mx = designer.canvas_width;
             if (my < 0) my = 0;
 
             if (designer.create) {
@@ -1197,10 +1218,6 @@ var designer = {
                     // Zero cant be selected se we default to minimal grid size
                     if (resizelocal["width"] < designer.grid_size) resizelocal["width"] = designer.grid_size;
                     if (resizelocal["height"] < designer.grid_size) resizelocal["height"] = designer.grid_size;
-                    
-                    if (bottedge>designer.page_height-designer.grid_size){
-                        designer.page_height = bottedge+designer.grid_size;
-                    }
                 })
                 designer.draw();
                 designer.modified();

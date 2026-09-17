@@ -146,7 +146,7 @@
         }
         
 
-        $('#page-container').css("background-color","#"+fields['backgroundcolor']);
+        $('#page-container, body').css("background-color","#"+fields['backgroundcolor']);
 
         designer.feedmode = fields['feedmode'];
         designer.grid_size = gridsize;

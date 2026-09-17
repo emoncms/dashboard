@@ -92,6 +92,9 @@ $backgroundcolor = preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backg
 </div>
 
 <script type="application/javascript">
+// Match the view page, where the colour covers the whole body and not
+// only the canvas area.
+$('body').css("background-color", <?php echo json_encode('#' . $backgroundcolor); ?>);
 window.onload = addListeners();
 var startx = 0, starty = 0;
 
@@ -157,7 +160,6 @@ require_once "Modules/dashboard/dashboard_convert.php";
     var redraw = 0;
     var reloadiframe = -1; // force iframes url to recalculate for all vis widgets
     var _SI = designer.get_SI(); // get a list of International System of Units (SI)
-    $('#can').width($('#dashboardpage').width());
 
     render_widgets_init(widget); // populate widgets variable
 
@@ -178,9 +180,6 @@ require_once "Modules/dashboard/dashboard_convert.php";
             // If it's not changed, just bypass actual saving and assume success
             showSuccess();
         } else {
-            //recalculate the height so the page_height is shrunk to the minimum but still wrapping all components
-            //otherwise a user can drag a component far down then up again and a too high value will be stored to db.
-            designer.page_height = 0;
             designer.scan();
             designer.draw();
             
