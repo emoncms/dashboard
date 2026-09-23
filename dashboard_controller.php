@@ -156,7 +156,9 @@ function dashboard_controller()
             if ($route->action == 'set') {
                 $result = $dashboard->set($session['userid'], prop('id'), prop('fields'));
             } elseif ($route->action == 'setcontent') {
-                $result = $dashboard->set_content($session['userid'], post('id'), post('document'), post('height'));
+                // Read directly as post() strips the backslashes of JSON escapes.
+                $document = isset($_POST['document']) ? rawurldecode((string) $_POST['document']) : null;
+                $result = $dashboard->set_content($session['userid'], post('id'), $document, post('height'));
             } elseif ($route->action == 'create') {
                 $result = $dashboard->create($session['userid']);
             } elseif ($route->action == 'delete') {
