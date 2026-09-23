@@ -1,0 +1,89 @@
+/*
+  All Emoncms code is released under the GNU Affero General Public License.
+  See COPYRIGHT.txt and LICENSE.txt.
+
+  The chart widgets ported out of the vis module, which draw in the dashboard
+  page. They share a box: the chart fills it, a bar of buttons sits over the
+  top right of the chart and a readout over the top left, and both are out of
+  sight until the pointer is over the box.
+*/
+
+/* The frame fills the box. It is a child of the box rather than the box
+   itself, because the class attribute of a box is its widget type. */
+.chart-widget {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    /* The background is on the box, set by each widget from its colourbg
+       option, see chart_background. The frame is clear so it shows. */
+}
+.chart-widget .chart-plot { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+
+.chart-widget .chart-bar {
+    /* Moved inside the plot area once the chart has been drawn, see
+       chart_place. This is where it sits until then. */
+    position: absolute; top: 5px; right: 5px; z-index: 5;
+    display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 4px;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+}
+.chart-widget:hover .chart-bar,
+.chart-widget .chart-bar:focus-within { opacity: 0.85; pointer-events: auto; }
+
+/* A touch screen has no pointer to hover with, so the bar stays out. */
+@media (hover: none) {
+    .chart-widget .chart-bar { opacity: 0.85; pointer-events: auto; }
+}
+
+.chart-widget .chart-bar .btn { min-width: 30px; }
+
+/* The totals and the reading under the pointer. These drew it over the top
+   left of the chart, above the plot area. */
+.chart-widget .chart-readout {
+    position: absolute; left: 10px; right: 90px; z-index: 4;
+    font-size: 12px; line-height: 1.4; pointer-events: none;
+}
+.chart-widget .chart-readout-top { top: 6px; }
+/* The bottom one sits over the bars, so it is given a mostly clear white
+   panel the width of its text to read against them. A handle at its left
+   edge slides the text away and back. */
+.chart-widget .chart-readout-bottom {
+    bottom: 4px; right: auto; max-width: calc(100% - 20px);
+    display: flex; align-items: center;
+    padding: 1px 6px 1px 0; border-radius: 3px;
+    background: rgba(255, 255, 255, 0.7);
+}
+/* The handle takes the pointer, the rest of the panel lets it through to the
+   bars beneath. */
+.chart-widget .chart-readout-toggle {
+    flex: none; width: 14px; padding: 0; margin: 0 4px 0 0;
+    border: 0; background: none; color: #666; font-size: 12px; line-height: 1.4;
+    cursor: pointer; pointer-events: auto;
+}
+.chart-widget .chart-readout-toggle::before { content: "\2039"; }
+.chart-widget .chart-readout-hidden .chart-readout-toggle::before { content: "\203A"; }
+.chart-widget .chart-readout-text {
+    white-space: nowrap; overflow: hidden; max-width: 2000px;
+    transition: max-width 0.3s ease, opacity 0.3s ease;
+}
+.chart-widget .chart-readout-hidden { padding-right: 0; }
+.chart-widget .chart-readout-hidden .chart-readout-text { max-width: 0; opacity: 0; }
+
+.chart-message { padding: 0.5em; font-size: 13px; }
+
+/* Flot draws the legend over the plot as SVG and leaves the fill of the panel
+   behind it to the stylesheet. Same panel as the graph widget. */
+.chart-widget .legendLayer rect.background { fill: rgba(255, 255, 255, 0.6); }
+.chart-widget .legend { font-size: 13px; }
+/* Legend names take the axis colour of the box, see chart_axis. */
+.chart-widget .legendLayer text { fill: currentColor; }
+
+/* Full screen paints the element over a black page at whatever size its own
+   style gives it, and a dashboard box carries a width and a height. The box
+   has no class of its own, a class on it is its widget type, so it is reached
+   through the frame inside it. */
+:fullscreen:has(> .chart-widget) { width: 100% !important; height: 100% !important; }
+
+.chart-tooltip {
+    position: absolute; visibility: hidden; z-index: 100;
+    font-size: 12px; font-weight: bold; text-align: left;
+    border: 1px solid rgb(255, 221, 221); padding: 2px;
+    background-color: #fff; opacity: 0.9;
+}

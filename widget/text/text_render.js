@@ -7,7 +7,7 @@
 
     A text widget with options instead of html. The body is plain text, with
     b, i, u, br, a and sub allowed inside it, and everything else about how it
-    looks is an option. See notes/TEXT-AND-IMAGE-WIDGETS.md.
+    looks is an option. See notes/TEXT-IMAGE-PANEL.md.
 
     paragraph, heading and heading-center keep their html field and stay
     editable, but are no longer offered by the toolbox.
@@ -74,53 +74,50 @@ function text_widgetlist()
 // The wrapper is drawn here and not stored, the same as the canvas of other
 // widgets, and the converter reads through it. See dashboard_convert_text_body
 // in dashboard_convert.php.
-function text_wrapper(box)
+function text_wrapper(el)
 {
-    var wrapper = box.children(".text-content");
-    if (!wrapper.length) {
-        box.wrapInner('<div class="text-content"></div>');
-        wrapper = box.children(".text-content");
+    var wrapper = el.querySelector(":scope > .text-content");
+    if (!wrapper) {
+        wrapper = document.createElement("div");
+        wrapper.className = "text-content";
+        while (el.firstChild) wrapper.appendChild(el.firstChild);
+        el.appendChild(wrapper);
     }
     return wrapper;
 }
 
-function text_init()
-{
-    $(".text").each(function(){
-        var box = $(this);
-        var wrapper = text_wrapper(box);
+var text_widget = {
+    mount: function(el, config, ctx) {
+        var wrapper = text_wrapper(el);
 
-        var size = box.attr("size");
-        var colour = box.attr("colour");
-        var weight = box.attr("weight");
-        var font = box.attr("font");
-        var align = box.attr("align");
-        var valign = box.attr("valign");
-        var rotate = box.attr("rotate");
+        var size = config.size;
+        var colour = config.colour;
+        var weight = config.weight;
+        var font = config.font;
+        var align = config.align;
+        var valign = config.valign;
+        var rotate = config.rotate;
 
-        var css = {};
-        if (size !== undefined && size !== "") css["font-size"] = parseInt(size, 10) + "px";
-        if (colour !== undefined && colour !== "") css["color"] = "#" + String(colour).replace("#", "");
-        if (weight !== undefined && weight !== "") css["font-weight"] = weight;
-        if (font !== undefined && font !== "") css["font-family"] = font;
-        if (align !== undefined && align !== "") css["text-align"] = align;
-        box.css(css);
+        if (size !== undefined && size !== "") el.style.fontSize = parseInt(size, 10) + "px";
+        if (colour !== undefined && colour !== "") el.style.color = widget_colour(colour);
+        if (weight !== undefined && weight !== "") el.style.fontWeight = weight;
+        if (font !== undefined && font !== "") el.style.fontFamily = font;
+        if (align !== undefined && align !== "") el.style.textAlign = align;
 
         var degrees = parseInt(rotate, 10);
         if (isNaN(degrees)) degrees = 0;
         if (degrees < -180) degrees = -180;
         if (degrees > 180) degrees = 180;
-        wrapper.css("transform", degrees === 0 ? "" : "rotate(" + degrees + "deg)");
+        wrapper.style.transform = degrees === 0 ? "" : "rotate(" + degrees + "deg)";
 
         var place = {"top": "start", "bottom": "end"};
-        wrapper.css("align-content", place[valign] || "center");
-    });
-}
+        wrapper.style.alignContent = place[valign] || "center";
 
-function text_fastupdate()
-{
-}
-
-function text_slowupdate()
-{
-}
+        // No feed and nothing that depends on the size.
+        return {
+            update: function() {},
+            resize: function() {},
+            destroy: function() {}
+        };
+    }
+};

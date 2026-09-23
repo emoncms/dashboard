@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/orderbars/orderbars_render.js",
+  "widgets": {
+    "orderbars": {
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "delta": {
+          "type": "boolean"
+        },
+        "colourbg": {
+          "type": "colour_picker"
+        },
+        "colouraxis": {
+          "type": "colour_picker"
+        }
+      }
+    }
+  }
+}

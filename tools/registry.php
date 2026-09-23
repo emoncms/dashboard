@@ -1,4 +1,5 @@
 <?php
+
 /*
  All Emoncms code is released under the GNU Affero General Public License.
  See COPYRIGHT.txt and LICENSE.txt.
@@ -18,16 +19,18 @@
  The census file is written by tools/census.php. The comparison reports widget
  types in use that no module declares, and attributes in use that the widget
  does not declare as an option. Both are cases the converter has to decide what
- to do with, see tools/SCHEMA.md.
+ to do with, see notes/SCHEMA.md.
 */
 
 define('EMONCMS_EXEC', 1);
 
-if (php_sapi_name() !== 'cli') die("cli only\n");
+if (php_sapi_name() !== 'cli') {
+    die("cli only\n");
+}
 
 require_once dirname(__DIR__) . '/widget_registry.php';
 
-$options = getopt('', array('type::', 'census::', 'audit', 'root::'));
+$options = getopt('', ['type::', 'census::', 'audit', 'root::']);
 $registry = widget_registry();
 
 if (!count($registry)) {
@@ -50,7 +53,7 @@ if (isset($options['audit'])) {
 }
 
 // Default listing, grouped by the module that declares each widget.
-$by_module = array();
+$by_module = [];
 foreach ($registry as $type => $widget) {
     $by_module[$widget['module']][$type] = count($widget['options']);
 }
@@ -79,11 +82,11 @@ function show_type($registry, $type)
         $note = $option['legacy'] ? 'legacy, still read by the render script' : '';
         if ($note !== '') {
             // nothing more to say about it
-        } else if ($option['dynamic']) {
+        } elseif ($option['dynamic']) {
             $note = 'filled per user';
-        } else if ($option['values'] !== null) {
+        } elseif ($option['values'] !== null) {
             $note = implode(' ', $option['values']);
-        } else if ($option['suggested'] !== null) {
+        } elseif ($option['suggested'] !== null) {
             $note = count($option['suggested']) . ' suggested, any value accepted';
         }
         printf("    %-24s %-14s %s\n", $name, $option['type'], $note);
@@ -98,9 +101,9 @@ function show_type($registry, $type)
  still honours it, it belongs in the legacy block of the declaration. This is
  how the existing legacy blocks were arrived at.
 
- The other direction is only worth reading for the dashboard widgets. The vis
- and graph widgets pass every attribute into an iframe URL rather than reading
- them by name, so nothing there is read by name.
+ The other direction is only worth reading for the dashboard widgets. The
+ retired vis types have no render script, and the graph widget reads its
+ options through the config editor rather than by name.
 */
 function audit($registry)
 {
@@ -108,30 +111,44 @@ function audit($registry)
     $gaps = 0;
 
     // Group the declared options by the render script that produced them.
-    $by_source = array();
+    $by_source = [];
     foreach ($registry as $type => $widget) {
         $script = preg_replace('/_widgets\.json$/', '_render.js', $widget['source']);
         foreach ($widget['options'] as $name => $option) {
             $by_source[$script][strtolower($name)] = true;
         }
+        // A widget that declares a config reads it from a config attribute,
+        // which is not an option, see the inline config section of SCHEMA.md.
+        if (!empty($widget['config'])) {
+            $by_source[$script]['config'] = true;
+        }
     }
 
     foreach ($by_source as $script => $declared) {
         $file = $modules . '/' . preg_replace('#^Modules/#', '', $script);
-        if (!is_file($file)) continue;
+        if (!is_file($file)) {
+            continue;
+        }
 
-        preg_match_all('/attr\(\s*["\']([A-Za-z0-9_-]+)["\']/',
-            file_get_contents($file), $matches);
+        preg_match_all(
+            '/attr\(\s*["\']([A-Za-z0-9_-]+)["\']/',
+            file_get_contents($file),
+            $matches
+        );
 
-        $read = array();
+        $read = [];
         foreach ($matches[1] as $name) {
             $name = strtolower($name);
-            if (in_array($name, array('id', 'class', 'style', 'width', 'height'))) continue;
+            if (in_array($name, ['id', 'class', 'style', 'width', 'height'])) {
+                continue;
+            }
             $read[$name] = true;
         }
 
         $missing = array_diff_key($read, $declared);
-        if (!count($missing)) continue;
+        if (!count($missing)) {
+            continue;
+        }
 
         echo $script . "\n";
         foreach (array_keys($missing) as $name) {
@@ -140,7 +157,9 @@ function audit($registry)
         $gaps += count($missing);
     }
 
-    if (!$gaps) echo "No gaps. Every attribute the render scripts read is declared.\n";
+    if (!$gaps) {
+        echo "No gaps. Every attribute the render scripts read is declared.\n";
+    }
     return 0;
 }
 
@@ -158,26 +177,36 @@ function compare($registry, $file)
     }
 
     // Written by the designer onto every widget box rather than being options.
-    $structural = array('id', 'class', 'style');
+    $structural = ['id', 'class', 'style'];
 
-    $unknown_types = array();
-    $artefacts = array();
+    $unknown_types = [];
+    $artefacts = [];
     foreach ($census['toplevel_class'] as $type => $count) {
-        if (!isset($registry[$type])) $unknown_types[$type] = $count;
+        if (!isset($registry[$type])) {
+            $unknown_types[$type] = $count;
+        }
     }
 
-    $undeclared = array();
+    $undeclared = [];
     $undeclared_total = 0;
     if (isset($census['attrs_by_class'])) {
         foreach ($census['attrs_by_class'] as $type => $attrs) {
-            if (!isset($registry[$type])) continue;
+            if (!isset($registry[$type])) {
+                continue;
+            }
             foreach ($attrs as $name => $count) {
-                if (in_array($name, $structural)) continue;
-                if (widget_registry_option($type, $name)) continue;
+                if (in_array($name, $structural)) {
+                    continue;
+                }
+                if (widget_registry_option($type, $name)) {
+                    continue;
+                }
 
                 $reason = artefact_reason($registry, $type, $name);
                 if ($reason !== false) {
-                    if (!isset($artefacts[$reason])) $artefacts[$reason] = 0;
+                    if (!isset($artefacts[$reason])) {
+                        $artefacts[$reason] = 0;
+                    }
                     $artefacts[$reason] += $count;
                     continue;
                 }
@@ -187,15 +216,21 @@ function compare($registry, $file)
         }
     }
 
-    $unused = array();
+    $unused = [];
     foreach ($registry as $type => $widget) {
-        $seen = isset($census['attrs_by_class'][$type]) ? $census['attrs_by_class'][$type] : array();
-        $seen_lc = array();
-        foreach ($seen as $name => $count) $seen_lc[strtolower($name)] = true;
+        $seen = isset($census['attrs_by_class'][$type]) ? $census['attrs_by_class'][$type] : [];
+        $seen_lc = [];
+        foreach ($seen as $name => $count) {
+            $seen_lc[strtolower($name)] = true;
+        }
 
         foreach ($widget['options'] as $name => $option) {
-            if ($option['type'] === 'html' || $option['legacy']) continue;
-            if (!isset($seen_lc[strtolower($name)])) $unused[$type][] = $name;
+            if ($option['type'] === 'html' || $option['legacy']) {
+                continue;
+            }
+            if (!isset($seen_lc[strtolower($name)])) {
+                $unused[$type][] = $name;
+            }
         }
     }
 
@@ -208,7 +243,9 @@ function compare($registry, $file)
         echo "  none\n";
     } else {
         arsort($unknown_types);
-        foreach ($unknown_types as $type => $count) printf("  %-24s %d\n", $type, $count);
+        foreach ($unknown_types as $type => $count) {
+            printf("  %-24s %d\n", $type, $count);
+        }
     }
 
     echo "\nAttributes in use that the widget does not declare ($undeclared_total in total)\n";
@@ -219,7 +256,9 @@ function compare($registry, $file)
         foreach ($undeclared as $type => $attrs) {
             arsort($attrs);
             echo "  $type\n";
-            foreach ($attrs as $name => $count) printf("    %-30s %d\n", $name, $count);
+            foreach ($attrs as $name => $count) {
+                printf("    %-30s %d\n", $name, $count);
+            }
         }
     }
 
@@ -228,7 +267,9 @@ function compare($registry, $file)
         echo "  none\n";
     } else {
         arsort($artefacts);
-        foreach ($artefacts as $reason => $count) printf("  %-40s %d\n", $reason, $count);
+        foreach ($artefacts as $reason => $count) {
+            printf("  %-40s %d\n", $reason, $count);
+        }
     }
 
     echo "\nDeclared options never used in stored content\n";
@@ -250,14 +291,14 @@ function artefact_reason($registry, $type, $name)
 {
     // Browser extensions add attributes to the page, and the designer saves
     // the page back with them in it.
-    $extensions = array(
+    $extensions = [
         'wfd-id' => 'Wappalyzer',
         'bis_skin_checked' => 'Bitdefender',
         '_msttexthash' => 'Microsoft Translator',
         '_msthash' => 'Microsoft Translator',
         'data-darkreader-inline-color' => 'Dark Reader',
         'data-ol-has-click-handler' => 'OneLaunch'
-    );
+    ];
     if (isset($extensions[$name])) {
         return 'browser extension (' . $extensions[$name] . ')';
     }
@@ -279,9 +320,10 @@ function artefact_reason($registry, $type, $name)
     if (substr($name, -1) === ':') {
         return 'broken style attribute (property name)';
     }
-    $fragments = array('arial', 'black', 'narrow', 'helvetica', 'neue', 'comic',
+    $fragments = ['arial', 'black', 'narrow', 'helvetica', 'neue', 'comic',
         'sans', 'ms', 'courier', 'new', 'center', 'left', 'right', 'normal',
-        'none', 'auto', 'absolute', 'rgb');
+        'none', 'auto', 'absolute', 'rgb'
+    ];
     if (in_array($name, $fragments)) {
         return 'broken style attribute (value fragment)';
     }

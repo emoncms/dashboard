@@ -10,9 +10,6 @@
         http://openenergymonitor.org/emon/forum
  */
 
-// Convenience function for shoving things into the widget object
-// I'm not sure about calling optionKey "optionKey", but I don't want to just use "options" (because that's what this whole function returns), and it's confusing enough as it is.
-
 function bar_widgetlist()
 {
     var widgets =
@@ -29,72 +26,30 @@ function bar_widgetlist()
 
         }
     };
-    var decimalsDropBoxOptions = [        // Options for the type combobox. Each item is [typeID, "description"]
-                    [-1,   _Tr("Automatic")],
-                    [0,    "0"],
-                    [1,    "1"],
-                    [2,    "2"],
-                    [3,    "3"],
-                    [4,    "4"],
-                    [5,    "5"],
-                    [6,    "6"]
-    ];
 
-    var fontoptions = [
-                    [9, "Arial Black"],
-                    [8, "Arial Narrow"],
-                    [7, "sans-serif"],
-                    [6, "Helvetica Neue"],
-                    [5, "Helvetica"],
-                    [4, "Comic Sans MS"],
-                    [3, "Courier New"],
-                    [2, "Arial"],
-                    [1, "Georgia"],
-                    [0, "Impact"]
-                ];
-
-    var fstyleoptions = [
-                    [2, _Tr("Normal")],
-                    [1, _Tr("Italic")],
-                    [0, _Tr("Oblique")]
-                ];
-
+    // Normal first, so a new bar is not bold. Kept apart from the helper
+    // list, which offers Bold first.
     var fweightoptions = [
-                    [0, _Tr("Normal")],
-                    [1, _Tr("Bold")]
-                ];
-    
-    var unitEndOptions = [
-                    [0, _Tr("Back")],
-                    [1, _Tr("Front")]
-                ];
-    
-    var graduationDropBoxOptions = [
-                    [0, _Tr("No")],
-                    [1, _Tr("Yes")]
-                    ];
-
-    var displayminmaxDropBoxOptions = [
-                    [0, _Tr("No")],
-                    [1, _Tr("Yes")]
-                    ];
+        [0, _Tr("Normal")],
+        [1, _Tr("Bold")]
+    ];
 
     addOption(widgets["bar"], "title_bar",      "value",            _Tr("Title"),           _Tr("Title of bar"),                                                                []);
     addOption(widgets["bar"], "colour_label",   "colour_picker",    _Tr("Label Colour"),    _Tr("Colour of title and values"),                                                  []);
-    addOption(widgets["bar"], "font",           "dropbox",          _Tr("Font used"),       _Tr("Font used"),                                                                   fontoptions);
-    addOption(widgets["bar"], "fstyle",         "dropbox",          _Tr("Font style"),      _Tr("Font style used for display"),                                                 fstyleoptions);
+    addOption(widgets["bar"], "font",           "dropbox",          _Tr("Font used"),       _Tr("Font used"),                                                                   widget_font_options());
+    addOption(widgets["bar"], "fstyle",         "dropbox",          _Tr("Font style"),      _Tr("Font style used for display"),                                                 widget_style_options());
     addOption(widgets["bar"], "fweight",        "dropbox",          _Tr("Font weight"),     _Tr("Font weight used for display"),                                                fweightoptions);
     addOption(widgets["bar"], "feedid",         "feedid",           _Tr("Feed"),            _Tr("Feed value"),                                                                  []);
     addOption(widgets["bar"], "max",            "value",            _Tr("Max value"),       _Tr("Max value to show"),                                                           []);
     addOption(widgets["bar"], "scale",          "value",            _Tr("Scale"),           _Tr("Value is multiplied by scale before display. Defaults to 1"),                  []);
     addOption(widgets["bar"], "units",          "dropbox_other",    _Tr("Units"),           _Tr("Units to show"),                                                               _SI);
-    addOption(widgets["bar"], "unitend",        "dropbox",          _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                              unitEndOptions);
-    addOption(widgets["bar"], "decimals",       "dropbox",          _Tr("Decimals"),        _Tr("Decimals to show"),                                                            decimalsDropBoxOptions);
+    addOption(widgets["bar"], "unitend",        "dropbox",          _Tr("Unit position"),   _Tr("Where should the unit be shown"),                                              widget_unitend_options());
+    addOption(widgets["bar"], "decimals",       "dropbox",          _Tr("Decimals"),        _Tr("Decimals to show"),                                                            widget_decimals_options());
     addOption(widgets["bar"], "offset",         "value",            _Tr("Offset"),          _Tr("Static offset. Subtracted from value before computing"),                       []);
     addOption(widgets["bar"], "colour",         "colour_picker",    _Tr("Colour"),          _Tr("Colour to draw bar in"),                                                       []);
-    addOption(widgets["bar"], "graduations",    "dropbox",          _Tr("Graduations"),     _Tr("Should the graduations be shown"),                                             graduationDropBoxOptions);
+    addOption(widgets["bar"], "graduations",    "dropbox",          _Tr("Graduations"),     _Tr("Should the graduations be shown"),                                             widget_yesno_options());
     addOption(widgets["bar"], "gradNumber",     "value",            _Tr("Grad. Num."),      _Tr("How many graduation lines to draw (only relevant if graduations are on)"),     []);
-    addOption(widgets["bar"], "displayminmax",  "dropbox",          _Tr("Min / Max ?"),     _Tr("Display Min. and Max. ?"),                                                     displayminmaxDropBoxOptions);
+    addOption(widgets["bar"], "displayminmax",  "dropbox",          _Tr("Min / Max ?"),     _Tr("Display Min. and Max. ?"),                                                     widget_yesno_options());
     addOption(widgets["bar"], "minvaluefeed",   "feedid",           _Tr("Min. feed"),       _Tr("The feed for the minimum value"),                                              []);
     addOption(widgets["bar"], "maxvaluefeed",   "feedid",           _Tr("Max. feed"),       _Tr("The feed for the maximum value"),                                              []);
     addOption(widgets["bar"], "colour_minmax",  "colour_picker",    _Tr("Colour"),          _Tr("Colour for min. and max. bars"),                                               []);
@@ -106,137 +61,60 @@ function bar_widgetlist()
 }
 
 
-function draw_bar(context,
-                  canvasid,
-                  x_pos,              // these x and y coords seem unused?
-                  y_pos,
-                  title,
-                  font,
-                  fstyle,
-                  fweight,
-                  width,
-                  height,
-                  raw_value,
-                  max_value,
-                  units_string,
-                  decimals,
-                  unitend,
-                  display_colour,
-                  colour_label,
-                  static_offset,
-                  graduationBool,
-                  graduationQuant,
-                  displayminmax,
-                  minvaluefeed,
-                  maxvaluefeed,
-                  colour_minmax,
-                  errorCode,
-                  errorMessage
-                  )
+// Draws the bar and returns the tooltip hotspots of the min and max lines,
+// as {x, y, w, h, tip} in canvas pixels. Empty when min and max are off.
+// config holds the widget settings. reading holds the scaled feed values as
+// {title, value, min, max, displayminmax, errorCode, errorMessage}.
+function draw_bar(context, width, height, config, reading)
 {
-    if (!context) {return;}
+    if (!context) return [];
 
     context.clearRect(0,0,width+10,height+10); // Clear old drawing
 
-    // if (1 * max_value) == false: 3000. Else 1 * max_value
-    max_value = 1 * max_value || 3000;
-    // if units_string == false: "". Else units_string
-    units_string = units_string || "";
-    title_bar = title_bar || "";
-    fstyle = fstyle || "2";
-    fweight = fweight || "0";
-    unitend = unitend || "0";
-    colour_label = colour_label || "000";
-    colour_minmax = colour_minmax || "555";
-    static_offset = 1*static_offset || 0;
-    var display_value = raw_value;
-    display_value = display_value-static_offset;
+    var raw_value = reading.value;
+    var minvaluefeed = reading.min;
+    var maxvaluefeed = reading.max;
+    var displayminmax = reading.displayminmax;
+    var errorCode = reading.errorCode;
+    var errorMessage = reading.errorMessage;
 
-    var scaled_value = (display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
+    var max_value = 1 * config.max || 3000;
+    var units_string = config.units || "";
+    var title_bar = reading.title || "";
+    var font = config.font || "9";
+    var fstyle = config.fstyle || "2";
+    var fweight = config.fweight || "0";
+    var unitend = config.unitend || "0";
+    var decimals = config.decimals;
+    var display_colour = config.colour;
+    var colour_label = config.colour_label;
+    var colour_minmax = config.colour_minmax;
+    var graduationBool = config.graduations;
+    var graduationQuant = config.gradnumber;
+    var static_offset = 1*config.offset || 0;
+    var display_value = raw_value - static_offset;
+
+    // Scaled 0-1 values corresponding to min-max
+    var scaled_value = display_value/max_value;
     if (scaled_value < 0){scaled_value = 0;}
 
-    var min_display_value = minvaluefeed;
-    min_display_value = min_display_value-static_offset;
-
-    var min_scaled_value = (min_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
+    var min_scaled_value = (minvaluefeed-static_offset)/max_value;
     if (min_scaled_value < 0){min_scaled_value = 0;}
 
-    var max_display_value = maxvaluefeed;
-    max_display_value = max_display_value-static_offset;
-
-    var max_scaled_value = (max_display_value/max_value);    // Produce a scaled 0-1 value corresponding to min-max
+    var max_scaled_value = (maxvaluefeed-static_offset)/max_value;
     if (max_scaled_value < 0){max_scaled_value = 0;}
 
-        if (decimals<0){
-            if (raw_value>=100) {
-            raw_value = raw_value.toFixed(0);
-            } else if (raw_value>=10) {
-            raw_value = raw_value.toFixed(1);
-            } else  {
-            raw_value = raw_value.toFixed(2);
-            }
-        raw_value = parseFloat(raw_value);
-        }
-        else {
-             raw_value = raw_value.toFixed(decimals);
-        }
+    raw_value = widget_decimals(raw_value, decimals);
+    minvaluefeed = widget_decimals(minvaluefeed, decimals);
+    maxvaluefeed = widget_decimals(maxvaluefeed, decimals);
 
-        if (decimals<0){
-            if (minvaluefeed>=100) {
-            minvaluefeed = minvaluefeed.toFixed(0);
-            } else if (minvaluefeed>=10) {
-            minvaluefeed = minvaluefeed.toFixed(1);
-            } else  {
-            minvaluefeed = minvaluefeed.toFixed(2);
-            }
-        minvaluefeed = parseFloat(minvaluefeed);
-        }
-        else {
-             minvaluefeed = minvaluefeed.toFixed(decimals);
-        }
-
-        if (decimals<0){
-            if (maxvaluefeed>=100) {
-            maxvaluefeed = maxvaluefeed.toFixed(0);
-            } else if (maxvaluefeed>=10) {
-            maxvaluefeed = maxvaluefeed.toFixed(1);
-            } else  {
-            maxvaluefeed = maxvaluefeed.toFixed(2);
-            }
-        maxvaluefeed = parseFloat(maxvaluefeed);
-        }
-        else {
-             maxvaluefeed = maxvaluefeed.toFixed(decimals);
-        }
     var size = 0;
     if (width<height){size = width/2;}
     else {size = height/2;}
     size = size - (size*0.058/2);
 
-    var fontname;
-
-    if (font === "0"){fontname = "Impact";}
-    if (font === "1"){fontname = "Georgia";}
-    if (font === "2"){fontname = "Arial";}
-    if (font === "3"){fontname = "Courier New";}
-    if (font === "4"){fontname = "Comic Sans MS";}
-    if (font === "5"){fontname = "Helvetica";}
-    if (font === "6"){fontname = "Helvetica Neue";}
-    if (font === "7"){fontname = "sans-serif";}
-    if (font === "8"){fontname = "Arial Narrow";}
-    if (font === "9"){fontname = "Arial Black";}
-    else if (typeof(font) === "undefined") {fontname = "Arial Black";}
-
-    var fontstyle;
-
-    if (fstyle === "0"){fontstyle = "oblique";}
-    if (fstyle === "1"){fontstyle = "italic";}
-    if (fstyle === "2"){fontstyle = "normal";}
-
-    var fontweight;
-
-    if (fweight === "0"){fontweight = "normal";}
-    if (fweight === "1"){fontweight = "bold";}
+    var f = widget_font(font, fstyle, fweight);
+    var fontcss = function(px){ return f.style + " " + f.weight + " " + px + "px " + f.name; };
 
     if (graduationBool === "1")
     {
@@ -245,8 +123,6 @@ function draw_bar(context,
     }
 
     var half_width = width/2;
-    var half_height = height/2;
-
 
     if (!display_value) {display_value = 0;}  // Clamp value so we don't draw negative values.
 
@@ -254,131 +130,59 @@ function draw_bar(context,
     context.strokeStyle = "#000";
     var border_space = 5;
     context.strokeRect(border_space,
-                       border_space,
-                       width-(border_space*2),
-                       height-(border_space*2));
+        border_space,
+        width-(border_space*2),
+        height-(border_space*2));
     context.lineWidth = 0;
-    
-    if (display_colour.indexOf("#") === -1) {display_colour = "#" + display_colour;}  // Fix missing "#" on colour if needed
 
-    context.fillStyle = display_colour;
+    context.fillStyle = widget_colour(display_colour);
 
     var bar_border_space = 10;
     var bar_top = ((height-bar_border_space) - (scaled_value * (height - (bar_border_space*2))));
 
     if (bar_top < bar_border_space)     // Clamp value so we don't overshoot the top of the bargraph.
-       {bar_top = bar_border_space;}
+    {bar_top = bar_border_space;}
 
     context.fillRect(bar_border_space,
-                    bar_top,
-                    width-(bar_border_space*2),
-                    (height-bar_border_space) - bar_top );
-    if(displayminmax==="1"){
+        bar_top,
+        width-(bar_border_space*2),
+        (height-bar_border_space) - bar_top );
 
-    if (colour_minmax.indexOf("#") === -1) {colour_minmax = "#" + colour_minmax;}  // Fix missing "#" on colour if needed
-    context.fillStyle = colour_minmax;
     var bar_min = ((height-bar_border_space) - (min_scaled_value * (height - (bar_border_space*2))));
+    if (bar_min < bar_border_space) {bar_min = bar_border_space;}
 
-    if (bar_min < bar_border_space)     // Clamp value so we don't overshoot the top of the bargraph.
-       {bar_min = bar_border_space;}
-
-    context.fillRect(bar_border_space,
-                    bar_min,
-                    width-(bar_border_space*2),
-                    2 );
-
-    context.fillStyle = colour_minmax;
     var bar_max = ((height-bar_border_space) - (max_scaled_value * (height - (bar_border_space*2))));
+    if (bar_max < bar_border_space) {bar_max = bar_border_space;}
 
-    if (bar_max < bar_border_space)     // Clamp value so we don't overshoot the top of the bargraph.
-       {bar_max = bar_border_space;}
+    var hotspots = [];
+    if(displayminmax==="1"){
+        context.fillStyle = widget_colour(colour_minmax, "555");
+        context.fillRect(bar_border_space, bar_min, width-(bar_border_space*2), 2);
+        context.fillRect(bar_border_space, bar_max, width-(bar_border_space*2), 2);
 
-    context.fillRect(bar_border_space,
-                    bar_max,
-                    width-(bar_border_space*2),
-                    2 );
+        hotspots = [
+            {x: bar_border_space, y: bar_min, w: width-(bar_border_space*2), h: 2, tip: minvaluefeed},
+            {x: bar_border_space, y: bar_max, w: width-(bar_border_space*2), h: 2, tip: maxvaluefeed}
+        ];
     }
 
-      var canvas = document.getElementById(canvasid);
-      var cw=canvas.width;
-      var ch=canvas.height;
-      var offsetX,offsetY;
-      var mouseX,mouseY;
-      var h;
-      var dx,dy;
-
-      var tt1 = document.getElementById(canvas.id + "-tooltip-1");
-      var tt2 = document.getElementById(canvas.id + "-tooltip-2");
-
-      function reOffset(){
-       var BB=canvas.getBoundingClientRect();
-       offsetX=BB.left;
-       offsetY=BB.top;
-      };
-
-      reOffset();
-      window.onscroll=function(e){ reOffset(); };
-      window.onresize=function(e){ reOffset(); };
-
-     var hotspots=[ // declare hotspots in order to active associated tooltips
-      {xspot:(bar_border_space),yspot:(bar_min),wspot:(width-(bar_border_space*2)),hspot:2,tip: minvaluefeed},
-      {xspot:(bar_border_space),yspot:(bar_max),wspot:(width-(bar_border_space*2)),hspot:2,tip: maxvaluefeed},
-      ];
-
-       function handleMouseMove(e){
-       e.preventDefault();
-       e.stopPropagation();
-
-       mouseX=parseInt(e.clientX-offsetX);
-       mouseY=parseInt(e.clientY-offsetY);
-
-        dx=mouseX;
-        dy=mouseY;
-
-        h=hotspots[0];
-        if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
-        tt1.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold; z-index: 100;";
-        tt1.style.left = e.clientX + 15 + "px";
-        tt1.style.top =  e.clientY + 15+ "px";
-        tt1.style.visibility ="visible";
-        tt1.innerHTML = "&nbsp;"+h.tip+"&nbsp;";
-        }
-        else {
-          tt1.style.visibility ="hidden";
-          }
-
-        h=hotspots[1];
-        if(dx >= h.xspot && dx < h.xspot + h.wspot && dy >= h.yspot && dy < h.yspot + h.hspot){
-        tt2.style.cssText = "position:fixed;background-color:#DDDDDD;opacity:0.8;border: 1px solid rgb(255, 221, 221);pointer-events:none;font-weight: bold; z-index: 100;";
-        tt2.style.left = e.clientX + 15 + "px";
-        tt2.style.top =  e.clientY + 15+ "px";
-        tt2.style.visibility ="visible";
-        tt2.innerHTML = "&nbsp"+h.tip+"&nbsp";
-        }
-        else {
-          tt2.style.visibility ="hidden";
-          }
-       }
-
-    $("#"+canvasid).mousemove(function(e){handleMouseMove(e);});
-
-    if (colour_label.indexOf("#") === -1) {colour_label = "#" + colour_label;} // Fix missing "#" on colour if needed
+    colour_label = widget_colour(colour_label, "000");
     context.fillStyle = colour_label;
-    
+
     if (graduationBool == 1)
     {
         if (graduationQuant > 0)
         {
             context.textAlign    = "start";
-            context.font = (fontstyle+ " "+ fontweight+ " "+(size*0.15)+"px "+ fontname);
+            context.font = fontcss(size*0.15);
 
             var step = (height-border_space*2)/(Number(graduationQuant)+1);
             var curY;
-            
+
             if (unitend ==="0"){context.fillText((static_offset+max_value)+units_string, width+(size*0.1), (size*0.15)+2);}
             if (unitend ==="1"){context.fillText(units_string+(static_offset+max_value), width+(size*0.1), (size*0.15)+2);}
             var divisions = Number(graduationQuant)+1;
-            
+
             for (var y = 0; y < graduationQuant; y++)
             {
                 curY = Number(((y+1)*step).toFixed(0))+0.5;  // Bin down so we're drawing in the middle of the pixel, so the line is exactly 1 px wide
@@ -387,9 +191,9 @@ function draw_bar(context,
 
                 var unitOffset = Number(static_offset+((graduationQuant-y)*(max_value/divisions)));
                 if (unitOffset < 1000)
-                    {unitOffset = unitOffset.toFixed(1);}
+                {unitOffset = unitOffset.toFixed(1);}
                 else
-                    {unitOffset = unitOffset.toFixed(0);}
+                {unitOffset = unitOffset.toFixed(0);}
                 if (unitend ==="0"){context.fillText(parseFloat(unitOffset)+units_string, width+(size*0.1), curY+(size*0.05));}
                 if (unitend ==="1"){context.fillText(units_string+parseFloat(unitOffset), width+(size*0.1), curY+(size*0.05));}
             }
@@ -402,17 +206,17 @@ function draw_bar(context,
     }
 
     context.fillStyle = colour_label;
-    
+
     var bartext;
     if (errorCode === "1")
-      {
+    {
         bartext = errorMessage;
-      }
-  else
-     {
-      if (unitend ==="0"){bartext= raw_value+units_string;}
-      if (unitend ==="1"){bartext= units_string+raw_value;}
-     }
+    }
+    else
+    {
+        if (unitend ==="0"){bartext= raw_value+units_string;}
+        if (unitend ==="1"){bartext= units_string+raw_value;}
+    }
 
     var valsize;
     if (bartext.length >4){ valsize = (size / (bartext.length+2)) * 5.5;}
@@ -420,160 +224,110 @@ function draw_bar(context,
     var titlesize ;
     if (title_bar.length >10) {titlesize = (size / (title_bar.length+2)) * 9;}
     else {titlesize = (size / 12) * 9.5;}
-    
+
     if (graduationBool == 1) {
-    context.textAlign    = "start";
+        context.textAlign    = "start";
         if (title_bar) {
-            context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.3)+"px "+ fontname);
-            context.fillText(bartext, bar_border_space, height + (size*0.42))
-            context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.35)+"px "+ fontname);
+            context.font = fontcss(valsize*0.3);
+            context.fillText(bartext, bar_border_space, height + (size*0.42));
+            context.font = fontcss(titlesize*0.35);
             context.fillText(title_bar, bar_border_space, height + (size * 0.2));
         } else {
-            context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.45)+"px "+ fontname);
+            context.font = fontcss(valsize*0.45);
             context.fillText(bartext, bar_border_space, height + (size*0.3));
         }
     }
     else
     {
-    context.textAlign    = "center";
-        context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.5)+"px "+ fontname);
+        context.textAlign    = "center";
+        context.font = fontcss(valsize*0.5);
         context.fillText(bartext, half_width, height/2 + (size*0.2));
-        context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.4)+"px "+ fontname);
+        context.font = fontcss(titlesize*0.4);
         context.fillText(title_bar, half_width, height/7 + (size *0.1));
     }
 
     context.fillStyle = "#000";
 
+    return hotspots;
 }
 
-function bar_define_tooltips(){
-  $(".bar").each(function(index) {
-      var id2 = "can-"+$(this).attr("id");
-      var canvas2 = document.getElementById(id2);
-      var parent = canvas2.parentNode;           // parent node for canvas
-      if(document.getElementById(id2 + "-tooltip-1")){}
-      else{
-      var div1 = document.createElement("div");      // the tool-tip div 1
-      div1.id = id2 + "-tooltip-1";
-      parent.appendChild(div1);}
-      if(document.getElementById(id2 + "-tooltip-2")){}
-      else{
-      var div2 = document.createElement("div");      // the tool-tip div 2
-      div2.id = id2 + "-tooltip-2";
-      parent.appendChild(div2);}
-  });
-}
-function bar_draw()
-{
-    $(".bar").each(function(index)
-    {
-        var errorMessage = $(this).attr("errormessagedisplayed");
-        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
-          errorMessage = "TO Error";
-        }
-        var errorTimeout = $(this).attr("timeout");
-        if (errorTimeout === "" || errorTimeout === undefined)            //Timeout parameter is empty
-          errorTimeout = 0;
+var bar_widget = {
+    mount: function(el, config, ctx){
+        var canvas = ctx.canvas(el);
+        var canvasid = "can-" + config.id;
+        canvas.canvas.id = canvasid;
+        var tips = widget_tooltips(el, canvas.canvas, 2, canvasid);
+        var feeds = ctx.feeds;
 
-        var feedid = $(this).attr("feedid");
-        if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
-        var minvaluefeed = $(this).attr("minvaluefeed")||"0";
-        if (assocfeed[minvaluefeed]!=undefined) minvaluefeed = assocfeed[minvaluefeed];
-        var maxvaluefeed = $(this).attr("maxvaluefeed")||"0";
-        if (assocfeed[maxvaluefeed]!=undefined) maxvaluefeed = assocfeed[maxvaluefeed];
-    
-        if($(this).attr("title")){ //transform the title property in the div by title_bar in order to avoid title tootip displayed by the browser
-        title_bar=$(this).attr("title");
-        $(this).removeAttr("title");
-        }
-        else {title_bar= $(this).attr("title_bar");
-        }
-        if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-        var val = (associd[feedid]["value"] * 1).toFixed(3);
-        var val_curve = curve_value(feedid,dialrate).toFixed(3);
+        // A dashboard saved before title_bar existed holds the title in title,
+        // which the browser also shows as a tooltip over the box.
+        var title_bar = config.title_bar || config.title || "";
+        if (config.title) el.removeAttribute("title");
 
-        // The minval and maxval feed settings default to the first feed in the feedlist 
-        // which may not be public for use in public dashboards, which will then result in
-        // an error. Here we set the min/max values to 0 where the feed settings are not valid
+        // Each reading eases towards its value over several frames.
+        var curve = { val: 0, minval: 0, maxval: 0 };
+        var force = true;
+        var last_code = null;
 
-        var minval = 0;
-        var minval_curve = 0; 
-        if (associd[minvaluefeed] != undefined) {
-            minval = (associd[minvaluefeed]["value"] * 1).toFixed(3);
-            minval_curve = curve_value(minvaluefeed,dialrate).toFixed(3);
-        }
+        var draw = function(){
+            var feed = feeds.get(config.feedid);
+            var minfeed = feeds.get(config.minvaluefeed || "0");
+            var maxfeed = feeds.get(config.maxvaluefeed || "0");
 
-        var maxval = 0;
-        var maxval_curve = 0;
-        if (associd[maxvaluefeed] != undefined) {
-            maxval = (associd[maxvaluefeed]["value"] * 1).toFixed(3);
-            maxval_curve = curve_value(maxvaluefeed,dialrate).toFixed(3);
-        }
+            if (!feed) return;
+            var val = (feed.value * 1).toFixed(3);
+            curve.val = render_curve(curve.val, feed.value);
+            var val_curve = curve.val.toFixed(3);
 
-        // Here we disable the min/max values feature when one of the feed settings is not valid
-        var displayminmax = $(this).attr("displayminmax")||"0";
-        if (associd[minvaluefeed] == undefined || associd[maxvaluefeed] == undefined) {
-            displayminmax = "0";
-        }
+            // Min and max feed settings default to the first feed in the feed
+            // list, which may not be public on a public dashboard. Values are 0
+            // where the feed settings are not valid.
+            var minval = 0;
+            if (minfeed) {
+                minval = (minfeed.value * 1).toFixed(3);
+                curve.minval = render_curve(curve.minval, minfeed.value);
+            }
+            var minval_curve = curve.minval.toFixed(3);
 
-        var errorCode = 0;
+            var maxval = 0;
+            if (maxfeed) {
+                maxval = (maxfeed.value * 1).toFixed(3);
+                curve.maxval = render_curve(curve.maxval, maxfeed.value);
+            }
+            var maxval_curve = curve.maxval.toFixed(3);
 
-        if (errorTimeout !== 0)
-        {
-          if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
-          {
-            errorCode = "1";
-            val = 0;    
-          }
-        }
-        // ONLY UPDATE ON CHANGE
-        if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval ||redraw == 1 || errorTimeout != 0)
-        {
-            var id = "can-"+$(this).attr("id");
-            var scale = 1*$(this).attr("scale") || 1;
-            draw_bar(widgetcanvas[id],
-                     id,
-                     0,
-                     0,
-                     $(this).attr("title_bar"),
-                     $(this).attr("font"),
-                     $(this).attr("fstyle"),
-                     $(this).attr("fweight"),
-                     $(this).width(),
-                     $(this).height(),
-                     val*scale,
-                     $(this).attr("max"),
-                     $(this).attr("units"),
-                     $(this).attr("decimals"),
-                     $(this).attr("unitend"),
-                     $(this).attr("colour"),
-                     $(this).attr("colour_label"),
-                     $(this).attr("offset"),
-                     $(this).attr("graduations"),
-                     $(this).attr("gradNumber"),
-                     displayminmax,
-                     minval*scale,
-                     maxval*scale,
-                     $(this).attr("colour_minmax"),
-                     errorCode,
-                     errorMessage
-                     );
-        }
-    });
-}
+            // Min and max are off when one of the feed settings is not valid
+            var displayminmax = config.displayminmax || "0";
+            if (!minfeed || !maxfeed) {
+                displayminmax = "0";
+            }
 
+            var timeout = widget_timeout(config, feed);
+            if (timeout.code === "1") val = 0;
 
-function bar_init()
-{
-    setup_widget_canvas("bar");
-    bar_define_tooltips();
-}
-function bar_slowupdate()
-{
+            // Only drawn on change
+            if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval || force || timeout.code !== last_code)
+            {
+                var scale = 1*config.scale || 1;
+                tips.set(draw_bar(canvas.context, el.clientWidth, el.clientHeight, config, {
+                    title: title_bar,
+                    value: val*scale,
+                    min: minval*scale,
+                    max: maxval*scale,
+                    displayminmax: displayminmax,
+                    errorCode: timeout.code,
+                    errorMessage: timeout.message
+                }));
+                force = false;
+            }
+            last_code = timeout.code;
+        };
 
-}
-
-function bar_fastupdate()
-{
-    bar_draw();
-}
+        return {
+            update: function(live){ feeds = live; },
+            frame: function(){ draw(); },
+            resize: function(){ canvas.fit(); force = true; draw(); },
+            destroy: function(){ tips.destroy(); }
+        };
+    }
+};

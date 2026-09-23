@@ -1,1 +1,0 @@
-![How to use this widget.](kwhperiod_doco.png)

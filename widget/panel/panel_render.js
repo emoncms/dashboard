@@ -7,7 +7,7 @@
 
     A panel is a styled box that other widgets sit on. It replaces the four
     fixed Container-* widgets, which stay for the dashboards that hold one.
-    See notes/PANEL-WIDGET.md.
+    See notes/TEXT-IMAGE-PANEL.md.
 
     Not called container: Bootstrap owns the .container class.
  */
@@ -71,9 +71,9 @@ function panel_widgetlist()
     return widgets;
 }
 
-function panel_option(box, name)
+function panel_option(config, name)
 {
-    var value = box.attr(name);
+    var value = config[name];
     if (value === undefined || value === "") return panelDefaults[name];
     return String(value);
 }
@@ -91,45 +91,39 @@ function panel_rgba(hex, opacity)
     return "rgba(" + r + ", " + g + ", " + b + ", " + opacity + ")";
 }
 
-function panel_init()
-{
-    $(".panel").each(function(){
-        var box = $(this);
-
-        var opacity = parseInt(panel_option(box, "opacity"), 10);
+var panel_widget = {
+    mount: function(el, config, ctx) {
+        var opacity = parseInt(panel_option(config, "opacity"), 10);
         if (isNaN(opacity)) opacity = 100;
         opacity = Math.min(100, Math.max(0, opacity)) / 100;
 
-        var width = parseInt(panel_option(box, "borderwidth"), 10);
+        var width = parseInt(panel_option(config, "borderwidth"), 10);
         if (isNaN(width) || width < 0) width = 0;
 
-        var radius = parseInt(panel_option(box, "radius"), 10);
+        var radius = parseInt(panel_option(config, "radius"), 10);
         if (isNaN(radius) || radius < 0) radius = 0;
 
-        var shadowName = panel_option(box, "shadow");
+        var shadowName = panel_option(config, "shadow");
         var shadow = panelShadows[shadowName];
         if (shadowName === "glow-border") {
-            shadow = "0 0 12px 4px " + panel_rgba(panel_option(box, "bordercolour"), 0.6);
+            shadow = "0 0 12px 4px " + panel_rgba(panel_option(config, "bordercolour"), 0.6);
         }
         if (shadow === undefined) shadow = panelShadows["drop"];
 
         // The border sits outside the geometry, the same as the Container-*
         // classes, so a converted panel is the same size as the old box.
-        box.css({
-            "background-color": panel_rgba(panel_option(box, "colour"), opacity),
-            "border": width + "px solid " + panel_rgba(panel_option(box, "bordercolour"), 1),
-            "border-radius": radius + "px",
-            "box-shadow": shadow,
-            "margin": "0",
-            "padding": "0"
-        });
-    });
-}
+        el.style.backgroundColor = panel_rgba(panel_option(config, "colour"), opacity);
+        el.style.border = width + "px solid " + panel_rgba(panel_option(config, "bordercolour"), 1);
+        el.style.borderRadius = radius + "px";
+        el.style.boxShadow = shadow;
+        el.style.margin = "0";
+        el.style.padding = "0";
 
-function panel_fastupdate()
-{
-}
-
-function panel_slowupdate()
-{
-}
+        // No feed and nothing that depends on the size.
+        return {
+            update: function() {},
+            resize: function() {},
+            destroy: function() {}
+        };
+    }
+};

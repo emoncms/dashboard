@@ -1,4 +1,5 @@
 <?php
+
 /*
 All Emoncms code is released under the GNU Affero General Public License.
 See COPYRIGHT.txt and LICENSE.txt.
@@ -9,7 +10,6 @@ Part of the OpenEnergyMonitor project:
 http://openenergymonitor.org
 */
 
-// Stage 1 of the move to JSON dashboard content.
 // Exports the dashboard content column to a JSONL file for the census script.
 // Read only, it makes no changes to the database.
 //
@@ -21,12 +21,14 @@ http://openenergymonitor.org
 
 define('EMONCMS_EXEC', 1);
 
-if (php_sapi_name() !== 'cli') die("cli only\n");
+if (php_sapi_name() !== 'cli') {
+    die("cli only\n");
+}
 
 chdir(dirname(__FILE__) . "/../../../");
 require "process_settings.php";
 
-$opts = getopt("", array("out::", "limit::", "help"));
+$opts = getopt("", ["out::", "limit::", "help"]);
 
 if (isset($opts['help'])) {
     echo "usage: php export_content.php [--out=FILE] [--limit=N]\n";
@@ -39,7 +41,9 @@ $outfile = isset($opts['out']) ? $opts['out'] : "dashboards.jsonl";
 $limit = isset($opts['limit']) ? (int) $opts['limit'] : 0;
 
 $salt = getenv("EXPORT_SALT");
-if ($salt === false || $salt === "") $salt = bin2hex(random_bytes(16));
+if ($salt === false || $salt === "") {
+    $salt = bin2hex(random_bytes(16));
+}
 
 $mysqli = @new mysqli(
     $settings["sql"]["server"],
@@ -48,18 +52,26 @@ $mysqli = @new mysqli(
     $settings["sql"]["database"],
     $settings["sql"]["port"]
 );
-if ($mysqli->connect_error) die("Cannot connect to database: " . $mysqli->connect_error . "\n");
+if ($mysqli->connect_error) {
+    die("Cannot connect to database: " . $mysqli->connect_error . "\n");
+}
 $mysqli->set_charset("utf8mb4");
 
 $fh = fopen($outfile, "w");
-if (!$fh) die("Cannot write to $outfile\n");
+if (!$fh) {
+    die("Cannot write to $outfile\n");
+}
 
 $sql = "SELECT id, userid, content, height, gridsize, public, published FROM dashboard ORDER BY id";
-if ($limit > 0) $sql .= " LIMIT $limit";
+if ($limit > 0) {
+    $sql .= " LIMIT $limit";
+}
 
 // Unbuffered so a large table does not have to fit in memory
 $result = $mysqli->query($sql, MYSQLI_USE_RESULT);
-if (!$result) die("Query failed: " . $mysqli->error . "\n");
+if (!$result) {
+    die("Query failed: " . $mysqli->error . "\n");
+}
 
 $count = 0;
 $empty = 0;
@@ -67,10 +79,12 @@ $bytes = 0;
 
 while ($row = $result->fetch_assoc()) {
     $content = $row['content'] === null ? "" : $row['content'];
-    if (trim($content) === "") $empty++;
+    if (trim($content) === "") {
+        $empty++;
+    }
     $bytes += strlen($content);
 
-    $record = array(
+    $record = [
         'id' => (int) $row['id'],
         'user' => substr(hash('sha256', $salt . ':' . $row['userid']), 0, 12),
         'height' => (int) $row['height'],
@@ -78,7 +92,7 @@ while ($row = $result->fetch_assoc()) {
         'public' => (int) $row['public'],
         'published' => (int) $row['published'],
         'content' => $content
-    );
+    ];
 
     $json = json_encode($record, JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
     if ($json === false) {

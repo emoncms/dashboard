@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/timecompare/timecompare_render.js",
+  "widgets": {
+    "timecompare": {
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "fill": {
+          "type": "value"
+        },
+        "depth": {
+          "type": "value"
+        },
+        "npoints": {
+          "type": "value"
+        },
+        "initzoom": {
+          "type": "dropbox",
+          "values": [
+            "8",
+            "24",
+            "168",
+            "672",
+            "8760"
+          ]
+        },
+        "colourbg": {
+          "type": "colour_picker"
+        },
+        "colouraxis": {
+          "type": "colour_picker"
+        }
+      }
+    }
+  }
+}

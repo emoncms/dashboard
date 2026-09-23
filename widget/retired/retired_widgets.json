@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "source": "hand written, see dashboard_convert_chart.php",
+  "widgets": {
+    "bargraph": {
+      "iframe": true,
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "colour": {
+          "type": "colour_picker"
+        },
+        "colourbg": {
+          "type": "colour_picker"
+        },
+        "interval": {
+          "type": "value"
+        },
+        "units": {
+          "type": "value"
+        },
+        "dp": {
+          "type": "value"
+        },
+        "scale": {
+          "type": "value"
+        },
+        "delta": {
+          "type": "boolean"
+        },
+        "mode": {
+          "type": "value"
+        },
+        "initzoom": {
+          "type": "dropbox",
+          "values": [
+            "1",
+            "7",
+            "30",
+            "365"
+          ]
+        }
+      }
+    },
+    "multigraph": {
+      "iframe": true,
+      "options": {
+        "mid": {
+          "type": "dropbox",
+          "dynamic": true
+        }
+      }
+    },
+    "rawdata": {
+      "iframe": true,
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "colour": {
+          "type": "colour_picker"
+        },
+        "colourbg": {
+          "type": "colour_picker"
+        },
+        "units": {
+          "type": "value"
+        },
+        "dp": {
+          "type": "value"
+        },
+        "scale": {
+          "type": "value"
+        },
+        "fill": {
+          "type": "value"
+        },
+        "initzoom": {
+          "type": "dropbox",
+          "values": [
+            "1",
+            "7",
+            "30",
+            "365"
+          ]
+        }
+      }
+    },
+    "simplezoom": {
+      "iframe": true,
+      "options": {
+        "power": {
+          "type": "feedid"
+        },
+        "kwhd": {
+          "type": "feedid"
+        },
+        "delta": {
+          "type": "boolean"
+        }
+      }
+    },
+    "smoothie": {
+      "iframe": true,
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "ufac": {
+          "type": "value"
+        }
+      }
+    },
+    "stacked": {
+      "iframe": true,
+      "options": {
+        "bottom": {
+          "type": "feedid"
+        },
+        "top": {
+          "type": "feedid"
+        },
+        "colourt": {
+          "type": "colour_picker"
+        },
+        "colourb": {
+          "type": "colour_picker"
+        },
+        "delta": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

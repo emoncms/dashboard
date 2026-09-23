@@ -1,4 +1,5 @@
 <?php
+
 /*
 All Emoncms code is released under the GNU Affero General Public License.
 See COPYRIGHT.txt and LICENSE.txt.
@@ -9,17 +10,15 @@ Part of the OpenEnergyMonitor project:
 http://openenergymonitor.org
 
 ---------------------------------------------------------------------
-Stage 5 of the move to JSON dashboard content.
-
 Converts a Container-White, Container-Grey, Container-Black or
 Container-BlueLine widget to a panel widget. Nothing is written to the
-database. It is called by tools/convert_panel.php to measure the corpus, and
-by dashboard_migrate.php on save and in bulk.
+database. It is called by dashboard_migrate.php on load and on save, and
+by tools/migrate.php in bulk.
 
 A conversion either keeps the same drawing or is refused. When a value cannot
 be carried, the widget is refused and the reason is recorded.
 
-See notes/PANEL-WIDGET.md.
+See notes/TEXT-IMAGE-PANEL.md.
 */
 
 defined('EMONCMS_EXEC') or die('Restricted access');
@@ -29,25 +28,26 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 // panel defaults.
 function dashboard_convert_panel_defaults()
 {
-    $box = array('opacity' => '100', 'borderwidth' => '1', 'radius' => '0', 'shadow' => 'drop');
-    return array(
-        'Container-White' => array('colour' => 'ffffff', 'bordercolour' => 'e5e5e5') + $box,
-        'Container-Grey' => array('colour' => 'dddddd', 'bordercolour' => 'cccccc') + $box,
-        'Container-Black' => array('colour' => '000000', 'bordercolour' => '888888') + $box,
-        'Container-BlueLine' => array('colour' => 'ffffff', 'opacity' => '0',
-            'bordercolour' => '0d97f3', 'borderwidth' => '3', 'radius' => '0', 'shadow' => 'glow')
-    );
+    $box = ['opacity' => '100', 'borderwidth' => '1', 'radius' => '0', 'shadow' => 'drop'];
+    return [
+        'Container-White' => ['colour' => 'ffffff', 'bordercolour' => 'e5e5e5'] + $box,
+        'Container-Grey' => ['colour' => 'dddddd', 'bordercolour' => 'cccccc'] + $box,
+        'Container-Black' => ['colour' => '000000', 'bordercolour' => '888888'] + $box,
+        'Container-BlueLine' => ['colour' => 'ffffff', 'opacity' => '0',
+            'bordercolour' => '0d97f3', 'borderwidth' => '3', 'radius' => '0', 'shadow' => 'glow'
+        ]
+    ];
 }
 
 // The box-shadow of each shadow option, the same strings as panelShadows in
 // panel_render.js with the spacing normalised.
 function dashboard_convert_panel_shadows()
 {
-    return array(
+    return [
         'none' => 'none',
         'drop' => '0 4px 10px -1px rgba(200,200,200,0.7)',
         'glow' => '0 0 2px 2px rgba(200,200,200,0.7)'
-    );
+    ];
 }
 
 /**
@@ -63,7 +63,9 @@ function dashboard_convert_panel_widget($widget, &$reason = null)
     $defaults = dashboard_convert_panel_defaults();
 
     $type = isset($widget['type']) ? (string) $widget['type'] : '';
-    if (!isset($defaults[$type])) return dashboard_convert_panel_refuse($reason, 'not_an_old_container');
+    if (!isset($defaults[$type])) {
+        return dashboard_convert_panel_refuse($reason, 'not_an_old_container');
+    }
 
     // The containers declare no options, so any option is unexpected.
     if (!empty($widget['options'])) {
@@ -78,8 +80,12 @@ function dashboard_convert_panel_widget($widget, &$reason = null)
 
     $values = $defaults[$type];
     if (!empty($widget['style'])) {
-        if (!is_array($widget['style'])) return dashboard_convert_panel_refuse($reason, 'style_unreadable');
-        if (!dashboard_convert_panel_styles($widget['style'], $values, $reason)) return null;
+        if (!is_array($widget['style'])) {
+            return dashboard_convert_panel_refuse($reason, 'style_unreadable');
+        }
+        if (!dashboard_convert_panel_styles($widget['style'], $values, $reason)) {
+            return null;
+        }
     }
 
     return dashboard_convert_panel_build($widget, $values, $reason);
@@ -101,7 +107,9 @@ function dashboard_convert_panel_styles($declarations, &$values, &$reason)
         }
         $property = strtolower(trim($property));
         $value = trim($value);
-        if ($value === '') continue;
+        if ($value === '') {
+            continue;
+        }
 
         switch ($property) {
             case 'background':
@@ -188,7 +196,9 @@ function dashboard_convert_panel_background($value, &$values)
     }
 
     $colour = dashboard_convert_text_colour($value);
-    if ($colour === null) return false;
+    if ($colour === null) {
+        return false;
+    }
 
     $values['colour'] = $colour;
     $values['opacity'] = '100';
@@ -205,26 +215,34 @@ function dashboard_convert_panel_border($value, &$values)
     }
 
     $parts = preg_split('/\s+/', $value);
-    if (count($parts) > 3) return false;
+    if (count($parts) > 3) {
+        return false;
+    }
 
     $width = null;
     $style = null;
     $colour = null;
     foreach ($parts as $part) {
-        if (in_array($part, array('solid', 'none', 'hidden'))) {
-            if ($style !== null) return false;
+        if (in_array($part, ['solid', 'none', 'hidden'])) {
+            if ($style !== null) {
+                return false;
+            }
             $style = $part;
             continue;
         }
         $px = dashboard_convert_panel_px($part, 0, 20);
         if ($px !== null) {
-            if ($width !== null) return false;
+            if ($width !== null) {
+                return false;
+            }
             $width = $px;
             continue;
         }
         $hex = dashboard_convert_text_colour($part);
         if ($hex !== null) {
-            if ($colour !== null) return false;
+            if ($colour !== null) {
+                return false;
+            }
             $colour = $hex;
             continue;
         }
@@ -243,14 +261,18 @@ function dashboard_convert_panel_border($value, &$values)
     }
     // The initial width is medium, which is 3px in every browser.
     $values['borderwidth'] = (string) ($width === null ? 3 : $width);
-    if ($colour !== null) $values['bordercolour'] = $colour;
+    if ($colour !== null) {
+        $values['bordercolour'] = $colour;
+    }
     return true;
 }
 
 function dashboard_convert_panel_border_style($value, &$values)
 {
     $value = strtolower(trim($value));
-    if ($value === 'solid') return true;
+    if ($value === 'solid') {
+        return true;
+    }
     if ($value === 'none' || $value === 'hidden') {
         $values['borderwidth'] = '0';
         return true;
@@ -265,10 +287,14 @@ function dashboard_convert_panel_shadow($value)
     $normal = strtolower(preg_replace('/\s*,\s*/', ',', preg_replace('/\s+/', ' ', trim($value))));
     // A zero length may be written with or without a unit
     $normal = preg_replace('/\b0px\b/', '0', $normal);
-    if ($normal === 'none') return 'none';
+    if ($normal === 'none') {
+        return 'none';
+    }
 
     foreach (dashboard_convert_panel_shadows() as $name => $shadow) {
-        if ($normal === $shadow) return $name;
+        if ($normal === $shadow) {
+            return $name;
+        }
     }
     return null;
 }
@@ -278,13 +304,25 @@ function dashboard_convert_panel_shadow($value)
 function dashboard_convert_panel_px($value, $min, $max)
 {
     $value = strtolower(trim($value));
-    if ($value === 'thin') return 1;
-    if ($value === 'medium') return 3;
-    if ($value === 'thick') return 5;
-    if (!preg_match('/^(\d+(\.\d+)?)(px)?$/', $value, $match)) return null;
-    if ($match[1] !== '0' && !isset($match[3])) return null;
+    if ($value === 'thin') {
+        return 1;
+    }
+    if ($value === 'medium') {
+        return 3;
+    }
+    if ($value === 'thick') {
+        return 5;
+    }
+    if (!preg_match('/^(\d+(\.\d+)?)(px)?$/', $value, $match)) {
+        return null;
+    }
+    if ($match[1] !== '0' && !isset($match[3])) {
+        return null;
+    }
     $px = (int) round((float) $match[1]);
-    if ($px < $min || $px > $max) return null;
+    if ($px < $min || $px > $max) {
+        return null;
+    }
     return $px;
 }
 
@@ -296,18 +334,25 @@ function dashboard_convert_panel_px($value, $min, $max)
  */
 function dashboard_convert_panel_build($widget, $values, &$reason)
 {
-    $new = array('type' => 'panel');
-    foreach (array('x', 'y', 'w', 'h', 'wunit', 'hunit') as $key) {
-        if (isset($widget[$key])) $new[$key] = $widget[$key];
+    $new = ['type' => 'panel'];
+    foreach (['x', 'y', 'w', 'h', 'wunit', 'hunit'] as $key) {
+        if (isset($widget[$key])) {
+            $new[$key] = $widget[$key];
+        }
     }
 
-    $options = array();
+    $options = [];
     foreach ($values as $name => $value) {
         $option = widget_registry_option('panel', $name);
-        if ($option === false) return dashboard_convert_panel_refuse($reason, 'option_unknown', $name);
+        if ($option === false) {
+            return dashboard_convert_panel_refuse($reason, 'option_unknown', $name);
+        }
         if (!dashboard_convert_option_valid($option, (string) $value)) {
-            return dashboard_convert_panel_refuse($reason, 'option_value_refused',
-                $name . '=' . dashboard_convert_snippet($value));
+            return dashboard_convert_panel_refuse(
+                $reason,
+                'option_value_refused',
+                $name . '=' . dashboard_convert_snippet($value)
+            );
         }
         $options[$option['name']] = (string) $value;
     }

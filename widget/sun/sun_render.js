@@ -10,257 +10,173 @@
     http://openenergymonitor.org/emon/forum
  */
 
-// Convenience function for shoving things into the widget object
-// I'm not sure about calling optionKey "optionKey", but I don't want to just use "options" (because that's what this whole function returns), and it's confusing enough as it is.
 function sun_widgetlist(){
-  var widgets =
-  {
-    "sun":
+    var widgets =
     {
-      "offsetx":-80,"offsety":-80,"width":160,"height":160,
-      "menu":"Widgets",
-      "options":    [],
-      "optionstype":[],
-      "optionsname":[],
-      "optionshint":[],
-      "optionsdata":[]
-
-    }
-  };
-
-  var decimalsDropBoxOptions = [        // Options for the type combobox. Each item is [typeID, "description"]
-    [-1,   _Tr("Automatic")],
-    [0,    "0"],
-    [1,    "1"],
-    [2,    "2"],
-    [3,    "3"],
-    [4,    "4"],
-    [5,    "5"],
-    [6,    "6"]
-    ];
-  var fontoptions = [
-    [8, "Arial Black"],
-    [7, "Arial Narrow"],
-    [6, "sans-serif"],
-    [5, "Helvetica"],
-    [4, "Comic Sans MS"],
-    [3, "Courier New"],
-    [2, "Arial"],
-    [1, "Georgia"],
-    [0, "Impact"]
-  ];
-  var fstyleoptions = [
-    [2, _Tr("Normal")],
-    [1, _Tr("Italic")],
-    [0, _Tr("Oblique")]
-  ];
-
-  var fweightoptions = [
-    [0, _Tr("Normal")],
-    [1, _Tr("Bold")]
-  ];
-
-  var unitEndOptions = [
-    [0, _Tr("Back")],
-    [1, _Tr("Front")]
-  ];
-
-  addOption(widgets["sun"],   "feedid",                "feedid",          _Tr("Feed"),          _Tr("Feed value"),                                            []);
-  addOption(widgets["sun"],   "max",                   "value",           _Tr("Max value"),     _Tr("Max value to show"),                                     []);
-  addOption(widgets["sun"],   "scale",                 "value",           _Tr("Scale"),         _Tr("Value is multiplied by scale before display"),           []);
-  addOption(widgets["sun"],   "units",                 "dropbox_other",   _Tr("Units"),         _Tr("Units to show"),                                         _SI);
-  addOption(widgets["sun"],   "unitend",               "dropbox",         _Tr("Unit position"), _Tr("Where should the unit be shown"),                        unitEndOptions);
-  addOption(widgets["sun"],   "decimals",              "dropbox",         _Tr("Decimals"),      _Tr("Decimals to show"),                                      decimalsDropBoxOptions);
-  addOption(widgets["sun"],   "offset",                "value",           _Tr("Offset"),        _Tr("Static offset. Subtracted from value before computing"), []);
-  addOption(widgets["sun"],   "solar_title",           "value",           _Tr("solar title"),   _Tr("Solar title"),                                           []);
-  addOption(widgets["sun"],   "colour",                "colour_picker",   _Tr("Colour label"),  _Tr("Color of the label"),                                    []);
-  addOption(widgets["sun"],   "font",                  "dropbox",         _Tr("Font"),          _Tr("Label font"),                                            fontoptions);
-  addOption(widgets["sun"],   "fstyle",                "dropbox",         _Tr("Font style"),    _Tr("Font style used for display"),                           fstyleoptions);
-  addOption(widgets["sun"],   "fweight",               "dropbox",         _Tr("Font weight"),   _Tr("Font weight used for display"),                          fweightoptions);
-  addOption(widgets["sun"],   "timeout",               "value",           _Tr("Timeout"),       _Tr("Timeout without feed update in seconds (empty is never)"),[]);
-  addOption(widgets["sun"],   "errormessagedisplayed", "value",           _Tr("Error Message"), _Tr("Error message displayed when timeout is reached"),        []);
-
-  return widgets;
-}
-
-function sun_init(){
-  setup_widget_canvas('sun');
-}
-
-function sun_draw(){
-  $('.sun').each(function(index) {
-    var errorMessage = $(this).attr("errormessagedisplayed");
-        if (errorMessage === "" || errorMessage === undefined){            //Error Message parameter is empty
-          errorMessage = "TO Error";
-        }
-    var errorTimeout = $(this).attr("timeout");
-        if (errorTimeout === "" || errorTimeout === undefined){            //Timeout parameter is empty
-          errorTimeout = 0;
-        }
-
-    var errorCode = "0";
-
-    var feedid = $(this).attr("feedid");
-    if (assocfeed[feedid]!=undefined) feedid = assocfeed[feedid]; // convert tag:name to feedid
-    if (associd[feedid] === undefined) { console.log("Review config for feed id of " + $(this).attr("class")); return; }
-    var val = curve_value(feedid,dialrate).toFixed(3);
-
-    if (errorTimeout !== 0)
-      {
-        if (((new Date()).getTime() / 1000 - offsetofTime - (associd[feedid]["time"] * 1)) > errorTimeout) 
+        "sun":
         {
-          errorCode = "1";
+            "offsetx":-80,"offsety":-80,"width":160,"height":160,
+            "menu":"Widgets",
+            "options":    [],
+            "optionstype":[],
+            "optionsname":[],
+            "optionshint":[],
+            "optionsdata":[]
+
         }
-      }
-    // ONLY UPDATE ON CHANGE
-    if (val != (associd[feedid]['value'] * 1).toFixed(3) || redraw == 1 || errorTimeout != 0)
-    {
-      var id = "can-"+$(this).attr("id");
-      var scale = 1*$(this).attr("scale") || 1;
-      var offset = 1*$(this).attr("offset") || 0;
-      var max_val = 1*$(this).attr("max") || 100;
-      var units = $(this).attr("units");
-      var decimals = $(this).attr("decimals");
-      var unitend = $(this).attr("unitend") || "0";
-      var font = $(this).attr("font");
-      var fstyle = $(this).attr("fstyle") || "2";
-      var fweight = $(this).attr("fweight") || "0";
-      var color = $(this).attr("colour") || "000";
-      var title = $(this).attr("solar_title");
+    };
 
-      var fontname;
-      if (font === "0"){fontname = "Impact";}
-      if (font === "1"){fontname = "Georgia";}
-      if (font === "2"){fontname = "Arial";}
-      if (font === "3"){fontname = "Courier New";}
-      if (font === "4"){fontname = "Comic Sans MS";}
-      if (font === "5"){fontname = "Helvetica";}
-      if (font === "6"){fontname = "sans-serif";}
-      if (font === "7"){fontname = "Arial Narrow";}
-      if (font === "8"){fontname = "Arial Black";}
-      else if (typeof(font) === "undefined") {fontname = "Arial Black";}
+    // Normal first, as this widget has always offered it. The shared list
+    // puts Bold first, which would change the default of a new widget.
+    var fweightoptions = [
+        [0, _Tr("Normal")],
+        [1, _Tr("Bold")]
+    ];
 
-      var fontstyle;
+    addOption(widgets["sun"],   "feedid",                "feedid",          _Tr("Feed"),          _Tr("Feed value"),                                            []);
+    addOption(widgets["sun"],   "max",                   "value",           _Tr("Max value"),     _Tr("Max value to show"),                                     []);
+    addOption(widgets["sun"],   "scale",                 "value",           _Tr("Scale"),         _Tr("Value is multiplied by scale before display"),           []);
+    addOption(widgets["sun"],   "units",                 "dropbox_other",   _Tr("Units"),         _Tr("Units to show"),                                         _SI);
+    addOption(widgets["sun"],   "unitend",               "dropbox",         _Tr("Unit position"), _Tr("Where should the unit be shown"),                        widget_unitend_options());
+    addOption(widgets["sun"],   "decimals",              "dropbox",         _Tr("Decimals"),      _Tr("Decimals to show"),                                      widget_decimals_options());
+    addOption(widgets["sun"],   "offset",                "value",           _Tr("Offset"),        _Tr("Static offset. Subtracted from value before computing"), []);
+    addOption(widgets["sun"],   "solar_title",           "value",           _Tr("solar title"),   _Tr("Solar title"),                                           []);
+    addOption(widgets["sun"],   "colour",                "colour_picker",   _Tr("Colour label"),  _Tr("Color of the label"),                                    []);
+    addOption(widgets["sun"],   "font",                  "dropbox",         _Tr("Font"),          _Tr("Label font"),                                            widget_font_options(true));
+    addOption(widgets["sun"],   "fstyle",                "dropbox",         _Tr("Font style"),    _Tr("Font style used for display"),                           widget_style_options());
+    addOption(widgets["sun"],   "fweight",               "dropbox",         _Tr("Font weight"),   _Tr("Font weight used for display"),                          fweightoptions);
+    addOption(widgets["sun"],   "timeout",               "value",           _Tr("Timeout"),       _Tr("Timeout without feed update in seconds (empty is never)"),[]);
+    addOption(widgets["sun"],   "errormessagedisplayed", "value",           _Tr("Error Message"), _Tr("Error message displayed when timeout is reached"),        []);
 
-      if (fstyle === "0"){fontstyle = "oblique";}
-      if (fstyle === "1"){fontstyle = "italic";}
-      if (fstyle === "2"){fontstyle = "normal";}
+    return widgets;
+}
 
-      var fontweight;
 
-      if (fweight === "0"){fontweight = "normal";}
-      if (fweight === "1"){fontweight = "bold";}
+var sun_widget = {
+    mount: function(el, config, ctx){
+        var canvas = ctx.canvas(el);
+        var feeds = ctx.feeds;
 
-      if (color.indexOf("#") === -1) color = "#" + color;
+        // Reading eases towards its value over several frames.
+        var curve = 0;
+        var force = true;
 
-      var start_x = 0, start_y = 0;
-      var sun_height = $(this).height();
-      var sun_width = $(this).width();
-      var line_width = 2;
-      var margin = 1;
-      var number_of_blocks = 5;
+        var draw = function(){
+            var feed = feeds.get(config.feedid);
+            if (!feed) return;
+            curve = render_curve(curve, feed.value);
+            var val = curve.toFixed(3);
 
-      var data = val*scale + offset;
-      
-      if(data > max_val)
-        data = max_val;
+            var timeout = widget_timeout(config, feed);
+            var errorCode = timeout.code;
+            var errorMessage = timeout.message;
+            var errorTimeout = parseFloat(config.timeout) || 0;
 
-      if (decimals<0){
-        if (data>=100) {
-            data = data.toFixed(0);
-        } else if (data>=10) {
-            data = data.toFixed(1);
-        } else  {
-            data = data.toFixed(2);
-        }
-        data = parseFloat(data);
-      }
-      else {
-           data = data.toFixed(decimals);
-      }
+            // ONLY UPDATE ON CHANGE
+            if (val != (feed.value * 1).toFixed(3) || force || errorTimeout != 0)
+            {
+                var scale = 1*config.scale || 1;
+                var offset = 1*config.offset || 0;
+                var max_val = 1*config.max || 100;
+                var units = config.units || "";
+                var decimals = config.decimals;
+                var unitend = config.unitend || "0";
+                var font = widget_font(config.font || "8", config.fstyle || "2", config.fweight || "0", undefined, true);
+                var color = widget_colour(config.colour, "000");
+                var title = config.solar_title || "";
 
-      var context = widgetcanvas[id];
+                var sun_height = el.clientHeight;
+                var sun_width = el.clientWidth;
+                var line_width = 2;
 
-      context.globalAlpha = 1;
+                var data = val*scale + offset;
 
-      var bar_length = 10;
-      var bar_width = 5;
-      var number_of_bars = 5;
+                if(data > max_val)
+                data = max_val;
 
-      var radius = Math.max(Math.min(sun_width/2,sun_height) - bar_length - bar_width,0);
-  
-      var centerX = sun_width / 2;
-      var centerY = sun_height;
+                data = widget_decimals(data, decimals);
 
-      context.beginPath();
-      context.arc(start_x + centerX, start_y + centerY, radius, 1 * Math.PI, 2 * Math.PI, false);
-      context.closePath();
+                var context = canvas.context;
 
-      var fill = 255;//Math.floor(data/240*100 + 100);
-      if(fill > 255)
-        fill = 255;
+                context.clearRect(0,0,sun_width,sun_height);
+                context.globalAlpha = 1;
 
-      context.fillStyle = 'rgb('+fill+', '+(fill-27)+', 124)';
-      context.fill();
-      context.lineWidth = line_width+2;
-      context.strokeStyle = '#ffffff';
-      context.stroke();
+                var bar_length = 10;
+                var bar_width = 5;
 
-      //Draw the bars
+                var radius = Math.max(Math.min(sun_width/2,sun_height) - bar_length - bar_width,0);
 
-      context.lineWidth = line_width;
-      context.strokeStyle = '#FFE87C';//'#FDB813';
-      context.beginPath();
-      var lxs, lys, lxe, lye;
-      var theta = 1;
-      for(var i=180;i<360;i+=theta)
-      {
-        lxs = (radius+line_width)*Math.cos(i);
-        lys = (radius+line_width)*Math.sin(i);
+                var centerX = sun_width / 2;
+                var centerY = sun_height;
 
-        lxe = (radius+line_width + bar_length)*Math.cos(i);
-        lye = (radius+line_width + + bar_length)*Math.sin(i);
+                context.beginPath();
+                context.arc(centerX, centerY, radius, 1 * Math.PI, 2 * Math.PI, false);
+                context.closePath();
 
-        context.moveTo(start_x + centerX + lxs, start_y + centerY + lys);
-        context.lineTo(start_x + centerX + lxe, start_y + centerY + lye);
-      }
-      context.stroke();
+                context.fillStyle = "rgb(255, 228, 124)";
+                context.fill();
+                context.lineWidth = line_width+2;
+                context.strokeStyle = "#ffffff";
+                context.stroke();
 
-      var size = radius;
+                //Draw the bars
 
-      if(errorCode == "1")
-      {
-      data = errorMessage;
-      }
-      var unitsandval = data +units;
-      var valsize;
-      if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
-      else {valsize = (size / 6) * 5.5;}
-      var titlesize ;
-      if (title.length >10) {titlesize = (size / (title.length+2)) * 9;}
-      else {titlesize = (size / 12) * 9.5;}
+                context.lineWidth = line_width;
+                context.strokeStyle = "#FFE87C";
+                context.beginPath();
+                var lxs, lys, lxe, lye;
+                var theta = 1;
+                for(var i=180;i<360;i+=theta)
+                {
+                    lxs = (radius+line_width)*Math.cos(i);
+                    lys = (radius+line_width)*Math.sin(i);
 
-      context.fillStyle = color;
-      context.textAlign = "center";
-      context.font = (fontstyle+ " "+ fontweight+ " "+(valsize*0.50)+"px "+ fontname);
-      if (errorCode === "1"){context.fillText(errorMessage, start_x + sun_width/2, start_y + centerY - radius*0.2);}
-      else{
-      if (unitend ==="0"){context.fillText(data + units, start_x + sun_width/2, start_y + centerY - radius*0.2);}
-      if (unitend ==="1"){context.fillText(units + data, start_x + sun_width/2, start_y + centerY - radius*0.2);}
-      }
-      if(title)
-      {
-        context.fillStyle = color;
-        context.textAlign = "center";
-        context.font = (fontstyle+ " "+ fontweight+ " "+(titlesize*0.25)+"px "+ fontname);
-        context.fillText(title, start_x + sun_width/2, start_y + centerY - radius*0.6);
-      }
+                    lxe = (radius+line_width + bar_length)*Math.cos(i);
+                    lye = (radius+line_width + bar_length)*Math.sin(i);
+
+                    context.moveTo(centerX + lxs, centerY + lys);
+                    context.lineTo(centerX + lxe, centerY + lye);
+                }
+                context.stroke();
+
+                var size = radius;
+
+                if(errorCode == "1")
+                {
+                    data = errorMessage;
+                }
+                var unitsandval = data +units;
+                var valsize;
+                if (unitsandval.length >4){ valsize = (size / (unitsandval.length+2)) * 5.5;}
+                else {valsize = (size / 6) * 5.5;}
+                var titlesize ;
+                if (title.length >10) {titlesize = (size / (title.length+2)) * 9;}
+                else {titlesize = (size / 12) * 9.5;}
+
+                context.fillStyle = color;
+                context.textAlign = "center";
+                context.font = (font.style+ " "+ font.weight+ " "+(valsize*0.50)+"px "+ font.name);
+                if (errorCode === "1"){context.fillText(errorMessage, sun_width/2, centerY - radius*0.2);}
+                else{
+                    if (unitend ==="0"){context.fillText(data + units, sun_width/2, centerY - radius*0.2);}
+                    if (unitend ==="1"){context.fillText(units + data, sun_width/2, centerY - radius*0.2);}
+                }
+                if(title)
+                {
+                    context.fillStyle = color;
+                    context.textAlign = "center";
+                    context.font = (font.style+ " "+ font.weight+ " "+(titlesize*0.25)+"px "+ font.name);
+                    context.fillText(title, sun_width/2, centerY - radius*0.6);
+                }
+                force = false;
+            }
+        };
+
+        return {
+            update: function(live){ feeds = live; },
+            frame: function(){ draw(); },
+            resize: function(){ canvas.fit(); force = true; draw(); },
+            destroy: function(){}
+        };
     }
-  });
-}
-
-function sun_slowupdate(){}
-
-function sun_fastupdate(){
-  sun_draw();
-}
+};

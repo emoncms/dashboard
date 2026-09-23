@@ -21,42 +21,46 @@
   labels, hints and box geometry stay in the JavaScript, which is where the
   designer reads them.
 
+  A widget may also declare a config block, for a nested config it holds in the
+  dashboard document rather than in an attribute. It is copied out the same
+  way, see the inline config section of notes/SCHEMA.md.
+
   With --check nothing is written. The generated JSON is compared against what
   is on disk and the exit code is 1 if they differ, so drift between the two
   can be caught after a widget changes.
 */
 
-const fs = require('fs');
-const path = require('path');
-const vm = require('vm');
-const { execFileSync } = require('child_process');
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
+const { execFileSync } = require("child_process");
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
-    const hit = args.find(a => a.startsWith('--' + name + '='));
+    const hit = args.find(a => a.startsWith("--" + name + "="));
     return hit ? hit.slice(name.length + 3) : def;
 };
-const CHECK = args.includes('--check');
-const ROOT = path.resolve(opt('root', path.join(__dirname, '..', '..', '..')));
-const MODULES = path.join(ROOT, 'Modules');
+const CHECK = args.includes("--check");
+const ROOT = path.resolve(opt("root", path.join(__dirname, "..", "..", "..")));
+const MODULES = path.join(ROOT, "Modules");
 
 // Marker returned for any global the widget list reads that we cannot supply,
 // such as the multigraph and saved graph lists that vis_widget.php and
 // graph_widget.php build per user. A dropbox filled from one of these has no
 // fixed set of values, so the registry marks it dynamic instead.
-const DYNAMIC = Symbol('dynamic');
+const DYNAMIC = Symbol("dynamic");
 
 // The unit list offered by the dropbox_other options. The designer fetches
 // this over ajax from Lib/units.php, see designer.get_SI. It is a static file
 // rather than per user data, so the real list can be read here.
 function si_units() {
-    const file = path.join(ROOT, 'Lib', 'units.php');
+    const file = path.join(ROOT, "Lib", "units.php");
     if (!fs.existsSync(file)) return DYNAMIC;
     try {
-        const units = JSON.parse(execFileSync('php', [file], { encoding: 'utf8' }));
-        return units.map(u => [u.short, u.long + ' (' + u.short + ')']);
+        const units = JSON.parse(execFileSync("php", [file], { encoding: "utf8" }));
+        return units.map(u => [u.short, u.long + " (" + u.short + ")"]);
     } catch (e) {
-        console.error('warning: could not read ' + path.relative(ROOT, file) + ', unit lists left dynamic');
+        console.error("warning: could not read " + path.relative(ROOT, file) + ", unit lists left dynamic");
         return DYNAMIC;
     }
 }
@@ -68,10 +72,10 @@ function sandbox() {
     // button_events in button_render.js. Nothing is rendered here, so a stub
     // that accepts any call and any property lets them run.
     const chain = new Proxy(function () {}, {
-        get: () => chain,
-        apply: () => chain,
-        construct: () => chain
-    });
+            get: () => chain,
+            apply: () => chain,
+            construct: () => chain
+        });
 
     const base = {
         console: console,
@@ -87,33 +91,40 @@ function sandbox() {
         // Copied from Views/js/render.js. Widget lists call this to append an
         // option to the parallel arrays.
         addOption: (widget, key, type, name, hint, data) => {
-            widget['options'].push(key);
-            widget['optionstype'].push(type);
-            widget['optionsname'].push(name);
-            widget['optionshint'].push(hint);
-            widget['optionsdata'].push(data);
+            widget["options"].push(key);
+            widget["optionstype"].push(type);
+            widget["optionsname"].push(name);
+            widget["optionshint"].push(hint);
+            widget["optionsdata"].push(data);
         }
     };
 
     // Reading an undeclared global normally throws. Return the marker instead
-    // so a widget list that depends on per user data still builds.
+    // so a widget list that depends on per user data still builds. The
+    // language builtins, String and the rest, are answered from this process.
     return new Proxy(base, {
-        has: () => true,
-        get: (target, key) => {
-            if (key === Symbol.unscopables) return undefined;
-            if (key in target) return target[key];
-            return DYNAMIC;
-        }
-    });
+            has: () => true,
+            get: (target, key) => {
+                if (key === Symbol.unscopables) return undefined;
+                if (key in target) return target[key];
+                if (typeof key === "string" && key in globalThis) return globalThis[key];
+                return DYNAMIC;
+            }
+        });
 }
 
 // Runs one JavaScript file and returns the widget object it defines. Files
 // under widget/ define a named *_widgetlist function. Views/js/widgetlist.js
 // is a bare var widgets assignment, so it is handled by name.
+// The option lists the data widgets share, see Views/js/widget.helper.js.
+// Run in each sandbox before the widget list, as the page loads it first.
+const HELPER = fs.readFileSync(path.join(MODULES, "dashboard", "Views", "js", "widget.helper.js"), "utf8");
+
 function widgets_from(file, fname) {
-    const src = fs.readFileSync(file, 'utf8');
+    const src = fs.readFileSync(file, "utf8");
     const context = vm.createContext(sandbox());
-    const call = fname ? `\n;${fname}();` : '\n;widgets;';
+    vm.runInContext(HELPER, context, { filename: "widget.helper.js" });
+    const call = fname ? `\n;${fname}();` : "\n;widgets;";
     return vm.runInContext(src + call, context, { filename: file, timeout: 10000 });
 }
 
@@ -121,24 +132,24 @@ function widgets_from(file, fname) {
 // against. Values are kept as strings because the render scripts compare
 // them with strict equality, see draw_feedvalue in feedvalue_render.js.
 function options_of(def) {
-    const keys = def['options'] || [];
-    const types = def['optionstype'] || [];
-    const data = def['optionsdata'] || [];
+    const keys = def["options"] || [];
+    const types = def["optionstype"] || [];
+    const data = def["optionsdata"] || [];
     const options = {};
 
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
-        if (typeof key !== 'string' || key === '') continue;
-        const option = { type: types[i] || 'value' };
+        if (typeof key !== "string" || key === "") continue;
+        const option = { type: types[i] || "value" };
         const values = value_list(data[i]);
 
         if (values === DYNAMIC) {
             // Filled from the database per user, so the set is not knowable
             // here. The validator checks the shape of the value only.
             option.dynamic = true;
-        } else if (values && option.type === 'dropbox') {
+        } else if (values && option.type === "dropbox") {
             option.values = values;
-        } else if (values && option.type === 'dropbox_other') {
+        } else if (values && option.type === "dropbox_other") {
             // The designer offers these in a list but writes whatever the
             // user types in the Other box, so they are suggestions rather
             // than a closed set.
@@ -147,14 +158,41 @@ function options_of(def) {
 
         // A number declares a range as a plain object in optionsdata, see the
         // text widget.
-        if (option.type === 'number' && data[i]
-            && typeof data[i] === 'object' && !Array.isArray(data[i])) {
-            if (typeof data[i].min === 'number') option.min = data[i].min;
-            if (typeof data[i].max === 'number') option.max = data[i].max;
+        if (option.type === "number" && data[i]
+            && typeof data[i] === "object" && !Array.isArray(data[i])) {
+            if (typeof data[i].min === "number") option.min = data[i].min;
+            if (typeof data[i].max === "number") option.max = data[i].max;
         }
         options[key] = option;
     }
     return options;
+}
+
+// A widget that holds a nested config in the dashboard document declares what
+// the config may contain, in blocks of named entries shaped like an option.
+// Only the validation fields are copied out, the same as for an option.
+function config_of(def) {
+    const declared = def["config"];
+    if (!declared || typeof declared !== "object") return null;
+
+    const config = {};
+    for (const block of Object.keys(declared).sort()) {
+        const entries = declared[block];
+        if (!entries || typeof entries !== "object") continue;
+
+        const kept = {};
+        for (const name of Object.keys(entries).sort()) {
+            const entry = entries[name];
+            if (!entry || typeof entry !== "object") continue;
+            const copy = { type: entry.type || "value" };
+            if (Array.isArray(entry.values)) copy.values = entry.values.map(String);
+            if (Array.isArray(entry.suggested)) copy.suggested = entry.suggested.map(String);
+            if (entry.dynamic) copy.dynamic = true;
+            kept[name] = copy;
+        }
+        if (Object.keys(kept).length) config[block] = kept;
+    }
+    return Object.keys(config).length ? config : null;
 }
 
 // optionsdata holds [value, label] pairs for a dropbox, a bare default colour
@@ -176,18 +214,18 @@ function value_list(entry) {
 // name_render.js beside name_widgets.json.
 function sources() {
     const found = [];
-    const dashboard = path.join(MODULES, 'dashboard');
+    const dashboard = path.join(MODULES, "dashboard");
 
     // Text and container widgets. These have no render script, the designer
     // reads them straight from widgetlist.js.
     found.push({
-        src: path.join(dashboard, 'Views', 'js', 'widgetlist.js'),
-        fname: null,
-        out: path.join(dashboard, 'widget', 'dashboard_widgets.json')
-    });
+            src: path.join(dashboard, "Views", "js", "widgetlist.js"),
+            fname: null,
+            out: path.join(dashboard, "widget", "dashboard_widgets.json")
+        });
 
     for (const module of fs.readdirSync(MODULES).sort()) {
-        const base = path.join(MODULES, module, 'widget');
+        const base = path.join(MODULES, module, "widget");
         if (!isdir(base)) continue;
         add_if_present(found, base, module);
         for (const entry of fs.readdirSync(base).sort()) {
@@ -199,10 +237,10 @@ function sources() {
 }
 
 function add_if_present(found, folder, name) {
-    const src = path.join(folder, name + '_render.js');
+    const src = path.join(folder, name + "_render.js");
     if (!fs.existsSync(src)) return;
-    if (!/function\s+[A-Za-z0-9_$]+_widgetlist/.test(fs.readFileSync(src, 'utf8'))) return;
-    found.push({ src: src, fname: name + '_widgetlist', out: path.join(folder, name + '_widgets.json') });
+    if (!/function\s+[A-Za-z0-9_$]+_widgetlist/.test(fs.readFileSync(src, "utf8"))) return;
+    found.push({ src: src, fname: name + "_widgetlist", out: path.join(folder, name + "_widgets.json") });
 }
 
 // Regenerating a declaration must not lose the hand written legacy lists, so
@@ -214,12 +252,12 @@ function legacy_blocks(existing, outrel) {
         const previous = JSON.parse(existing);
         for (const name of Object.keys(previous.widgets || {})) {
             const legacy = previous.widgets[name].legacy;
-            if (legacy && typeof legacy === 'object' && Object.keys(legacy).length) {
+            if (legacy && typeof legacy === "object" && Object.keys(legacy).length) {
                 kept[name] = legacy;
             }
         }
     } catch (e) {
-        console.error('warning: could not read ' + outrel + ', any legacy list in it is lost');
+        console.error("warning: could not read " + outrel + ", any legacy list in it is lost");
     }
     return kept;
 }
@@ -241,55 +279,58 @@ for (const source of sources()) {
     try {
         list = widgets_from(source.src, source.fname);
     } catch (e) {
-        console.error('FAIL  ' + rel + ': ' + e.message);
+        console.error("FAIL  " + rel + ": " + e.message);
         failed++;
         continue;
     }
-    if (!list || typeof list !== 'object') {
-        console.error('FAIL  ' + rel + ': no widget object returned');
+    if (!list || typeof list !== "object") {
+        console.error("FAIL  " + rel + ": no widget object returned");
         failed++;
         continue;
     }
 
     const outrel = path.relative(ROOT, source.out);
-    const existing = fs.existsSync(source.out) ? fs.readFileSync(source.out, 'utf8') : null;
+    const existing = fs.existsSync(source.out) ? fs.readFileSync(source.out, "utf8") : null;
     const kept = legacy_blocks(existing, outrel);
 
-    const out = { version: 1, source: rel.split(path.sep).join('/'), widgets: {} };
+    const out = { version: 1, source: rel.split(path.sep).join("/"), widgets: {} };
     for (const name of Object.keys(list).sort()) {
         const widget = { options: options_of(list[name]) };
         for (const option of Object.keys(widget.options)) {
-            if (widget.options[option].dynamic) dynamic.push(name + '.' + option);
+            if (widget.options[option].dynamic) dynamic.push(name + "." + option);
         }
         // Options the designer no longer offers but the render script still
         // reads, so stored dashboards keep working. Hand written, see the
         // legacy note in tools/SCHEMA.md.
         if (kept[name]) widget.legacy = kept[name];
+        // What a nested config on this widget may hold, if it takes one.
+        const config = config_of(list[name]);
+        if (config) widget.config = config;
         out.widgets[name] = widget;
         types++;
     }
 
-    const json = JSON.stringify(out, null, 2) + '\n';
+    const json = JSON.stringify(out, null, 2) + "\n";
 
     if (CHECK) {
         if (existing === json) { unchanged++; continue; }
-        console.error((existing === null ? 'MISSING  ' : 'STALE    ') + outrel);
+        console.error((existing === null ? "MISSING  " : "STALE    ") + outrel);
         differs++;
         continue;
     }
     if (existing === json) { unchanged++; continue; }
     fs.writeFileSync(source.out, json);
-    console.log('wrote ' + outrel + ' (' + Object.keys(out.widgets).length + ' types)');
+    console.log("wrote " + outrel + " (" + Object.keys(out.widgets).length + " types)");
     written++;
 }
 
 if (dynamic.length) {
-    console.log('\nfilled per user, so their values are not checked: ' + dynamic.join(' '));
-    console.log('any option here that should have a fixed list is a gap in this script\n');
+    console.log("\nfilled per user, so their values are not checked: " + dynamic.join(" "));
+    console.log("any option here that should have a fixed list is a gap in this script\n");
 }
 
-console.log((CHECK ? 'checked' : 'done') + ': ' + types + ' widget types, '
-    + (CHECK ? differs + ' stale, ' : written + ' written, ')
-    + unchanged + ' unchanged, ' + failed + ' failed');
+console.log((CHECK ? "checked" : "done") + ": " + types + " widget types, "
+    + (CHECK ? differs + " stale, " : written + " written, ")
+    + unchanged + " unchanged, " + failed + " failed");
 
 process.exit(failed || differs ? 1 : 0);

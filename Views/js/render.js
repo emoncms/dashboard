@@ -5,188 +5,287 @@
   Emoncms - open source energy visualisation
   Part of the OpenEnergyMonitor project:  http://openenergymonitor.org
 
-  render.js goes through all the dashboard html elements that specify the dashboard widgets
-  and inserts the dials, visualisations to be displayed inside the element.
-  see designer.js for more information on the html element widget box model.
+  Mounts a widget in each box under #page and keeps it fed, sized and taken
+  down. A widget is a global object named <type>_widget with one method,
+  mount(el, config, ctx), returning an instance with update, resize, destroy
+  and optionally frame. See notes/WIDGET-INTERFACE.md.
 
-  render.js calls the render scripts of all the widgets which is where all the 
-  individual widget render code is located.
+  The designer's box model is described in designer.js. The page is the same
+  markup whether it was rendered from the stored document or built by the
+  designer, so this runs unchanged in both views.
 */
 
-// Global page vars definition
+// Live values of every feed the viewer can see, by feed id, from feed/list.json.
+var render_live = {};
+// "tag:name" => feed id, so an option may name a feed either way.
+var render_assoc = {};
 
-// Array for all feed details by feed id
-var associd = {};
-var assocfeed = {};
-// Array for smooth change values - creation of smooth dial widget
-var assoc_curve = {};
-// Stores timeout state of widgets used for updating a widget on a timeout event
-var last_errorCode = {};
+// Box id => { el, type, instance, width, height, timer }
+var render_instances = {};
 
-var widgetcanvas = {};
+var render_observer = null;
+var render_mutations = null;
 
-var dialrate = 0.15;
-var browserVersion = 999;
-var fast_update_fps = 25;
+var RENDER_POLL_INTERVAL = 5000;
+var RENDER_FRAME_RATE = 25;
+var RENDER_RESIZE_DELAY = 150;
+// Share of the distance a needle moves each frame, see render_curve.
+var RENDER_CURVE_RATE = 0.15;
 
-var Browser = {
-  Version : function()
-  {
-    var version = 999;
-    if (navigator.appVersion.indexOf("MSIE") != -1)
-      version = parseFloat(navigator.appVersion.split("MSIE")[1]);
-    return version;
-  }
-}
+/* ── What every widget is given ──────────────────────────────────────── */
 
-// populate widgets variable with *_widgetlist from all dashboards
-function render_widgets_init(widget){
-  for (z in widget){
-    var fname = widget[z]+"_widgetlist";
-    var fn = window[fname];
-    $.extend(widgets,fn());
-  }
-}
+var render_feeds = {
+    online: true,
 
-//start dashboard init and update processes
-function render_widgets_start(){
-  update(true);
+    // Feed id as a string from an option value, which may be an id or a
+    // tag:name pair. Empty when the pair names no feed the viewer can see.
+    id: function(feed){
+        var key = feed === undefined || feed === null ? "" : String(feed);
+        if (key === "") return "";
+        if (render_assoc[key] !== undefined) return String(render_assoc[key]);
+        return key;
+    },
 
-  browserVersion = Browser.Version();
-  if (browserVersion < 9) dialrate = 0.4;
-
-  for (z in widget){
-    var fname = widget[z]+"_init";
-    var fn = window[fname];
-    fn();
-  }
-
-  setInterval(function() { update(false); }, 5000);
-  gpu_fast_update();
-  //setInterval(function() { fast_update(); }, 100);
-}
-
-// GPU friendly fast update loop
-function gpu_fast_update() { 
-  setTimeout( 
-   function() {
-      window.requestAnimationFrame(gpu_fast_update);
-      fast_update();
+    // Feed's row from the poll, or null.
+    get: function(feed){
+        var id = render_feeds.id(feed);
+        if (id === "" || render_live[id] === undefined) return null;
+        return render_live[id];
     }
-  , 1000/fast_update_fps);
 };
 
-// update function
-function update(first_time){
+var render_ctx = {
+    feeds: render_feeds,
+    history: function(options){ return chart_feed_data(options); },
+    canvas: function(el){ return render_canvas(el); }
+};
 
-  var public_userid_str = "";
-  if (public_userid>0) public_userid_str = "?userid="+public_userid;
-
-  var query = path + "feed/list.json" + public_userid_str;
-  if (apikey) query += "&apikey="+apikey;
-  $.ajax(
-  {
-    type: "GET",
-    url : query,
-    dataType : 'json',
-    async: !first_time,
-    success : function(data){
-      for (z in data){
-        associd[data[z]['id']] = data[z];
-        assocfeed[data[z]['tag']+":"+data[z]['name']] = data[z]['id'];
-      }
-      if (!first_time){
-        slow_update();
-      } else {
-        setTimeout(function() {
-          slow_update();
-        }, 100);
-      }
-    },
-    error : function(){
-          for (z in widget){ 
-          var fname = widget[z]+"_isnonetwork";
-          var fn = window[fname];
-             if(typeof(fn) == 'function') {
-             fn();
-             }
-         }
-    }
-  });
+// A canvas filling the element. fit() sizes it to the element again and
+// returns the context, for a resize.
+function render_canvas(el){
+    var canvas = document.createElement("canvas");
+    el.innerHTML = "";
+    el.appendChild(canvas);
+    var api = {
+        canvas: canvas,
+        context: canvas.getContext("2d"),
+        fit: function(){
+            var width = el.clientWidth;
+            var height = el.clientHeight;
+            if (canvas.width !== width) canvas.width = width;
+            if (canvas.height !== height) canvas.height = height;
+            return api.context;
+        }
+    };
+    api.fit();
+    return api;
 }
 
-function slow_update() {
-  for (z in widget){
-    var fname = widget[z]+"_slowupdate";
-    var fn = window[fname];
-    if (typeof(fn) == 'function') {
-      fn();
-    }
-  }
+// One easing step towards a value, for a needle or a bar drawn each frame.
+function render_curve(current, target){
+    var to = parseFloat(target);
+    if (!isFinite(to)) to = 0;
+    var from = parseFloat(current);
+    if (!isFinite(from)) from = 0;
+    return from + (to - from) * RENDER_CURVE_RATE;
 }
 
-function fast_update(){
-  if (redraw){ 
-    for (z in widget){
-      var fname = widget[z]+"_init";
-      var fn = window[fname];
-      fn();
-    }
-  }
+/* ── The widget lists, for the designer ──────────────────────────────── */
 
-  for (z in widget){
-    var fname = widget[z]+"_fastupdate";
-    var fn = window[fname];
-    fn();
-  }
-  redraw = 0;
+// Populate widgets with the *_widgetlist of every loaded widget.
+function render_widgets_init(widget){
+    for (var z in widget){
+        var fn = window[widget[z] + "_widgetlist"];
+        if (typeof fn === "function") $.extend(widgets, fn());
+    }
 }
 
-function curve_value(feed,rate){
-  var val = 0;
-  if (feed){
-    if (assoc_curve[feed] === undefined) assoc_curve[feed] = 0;
-    if (associd[feed] !== undefined) assoc_curve[feed] = assoc_curve[feed] + ((parseFloat(associd[feed]['value']) - assoc_curve[feed]) * rate);
-    val = assoc_curve[feed] * 1;
-  }
-  if (isNaN(val)) val = 0;
-  return val;
-}
-
-function setup_widget_canvas(elementclass){
-  $('.'+elementclass).each(function(index){
-    var widgetId = $(this).attr("id");
-    var width = $(this).width();
-    var height = $(this).height();
-    var canvas = $(this).children('canvas');
-    var canvasid = "can-"+widgetId;
-
-    // 1) Create canvas if it does not exist
-    if (!canvas[0]){
-      $(this).html('<canvas id="'+canvasid+'"></canvas>');
-    }
-
-    // 2) Resize canvas if it needs resizing
-    if (canvas.attr("width") != width) canvas.attr("width", width);
-    if (canvas.attr("height") != height) canvas.attr("height", height);
-
-    var canvas = document.getElementById(canvasid);
-    if (browserVersion != 999) {
-      canvas.setAttribute('width', width);
-      canvas.setAttribute('height', height);
-      if ( typeof G_vmlCanvasManager != "undefined") G_vmlCanvasManager.initElement(canvas);
-    }
-    // 3) Get and store the canvas context
-    widgetcanvas[canvasid] = canvas.getContext("2d");
-  });
-}
-
-// Convenience function for shoving things into the widget object
-// I'm not sure about calling optionKey "optionKey", but I don't want to just use "options" (because that's what this whole function returns), and it's confusing enough as it is.
+// Convenience function for adding an option to a widget list entry.
 function addOption(widget, optionKey, optionType, optionName, optionHint, optionData){
-  widget["options"    ].push(optionKey);
-  widget["optionstype"].push(optionType);
-  widget["optionsname"].push(optionName);
-  widget["optionshint"].push(optionHint);
-  widget["optionsdata"].push(optionData);
+    widget["options"    ].push(optionKey);
+    widget["optionstype"].push(optionType);
+    widget["optionsname"].push(optionName);
+    widget["optionshint"].push(optionHint);
+    widget["optionsdata"].push(optionData);
+}
+
+/* ── Start ───────────────────────────────────────────────────────────── */
+
+function render_widgets_start(){
+    if (typeof ResizeObserver === "function") {
+        render_observer = new ResizeObserver(render_resized);
+    }
+
+    render_mount();
+
+    var page = document.getElementById("page");
+    if (page && typeof MutationObserver === "function") {
+        render_mutations = new MutationObserver(function(){ render_mount(); });
+        render_mutations.observe(page, { childList: true });
+    }
+
+    render_poll();
+    setInterval(render_poll, RENDER_POLL_INTERVAL);
+    render_frames();
+}
+
+/* ── Mounting ────────────────────────────────────────────────────────── */
+
+// Mounts a widget in every box under #page that has none, and takes down the
+// instances whose box has gone. Called on start and after the boxes change.
+function render_mount(){
+    var page = document.getElementById("page");
+    if (!page) return;
+
+    for (var id in render_instances){
+        var held = render_instances[id];
+        if (!page.contains(held.el)) render_unmount(id);
+    }
+
+    var boxes = page.children;
+    for (var i = 0; i < boxes.length; i++){
+        var el = boxes[i];
+        var id = el.id;
+        if (!id) continue;
+
+        var held = render_instances[id];
+        if (held && held.el === el) continue;
+        // Designer undo puts back page html, so a box may be a new element
+        // with the id of one already mounted.
+        if (held) render_unmount(id);
+
+        var type = String(el.className || "").split(/\s+/)[0];
+        var widget = window[type + "_widget"];
+        if (!widget || typeof widget.mount !== "function") continue;
+
+        var instance;
+        try {
+            instance = widget.mount(el, render_config(el), render_ctx);
+        } catch (err) {
+            console.error("widget " + type + " " + id + " failed to mount", err);
+            continue;
+        }
+        if (!instance) continue;
+
+        render_instances[id] = {
+            el: el, type: type, instance: instance,
+            width: el.clientWidth, height: el.clientHeight, timer: 0
+        };
+        if (render_observer) render_observer.observe(el);
+
+        if (typeof instance.update === "function") {
+            try { instance.update(render_feeds); }
+            catch (err) { console.error("widget " + type + " " + id + " failed to update", err); }
+        }
+    }
+}
+
+function render_unmount(id){
+    var held = render_instances[id];
+    if (!held) return;
+    delete render_instances[id];
+    clearTimeout(held.timer);
+    if (render_observer) render_observer.unobserve(held.el);
+    if (typeof held.instance.destroy === "function") {
+        try { held.instance.destroy(); }
+        catch (err) { console.error("widget " + held.type + " " + id + " failed to destroy", err); }
+    }
+}
+
+// Box attributes as the widget's settings. Every attribute but id,
+// class and style, which are the box, plus the id. Attribute names are
+// lowercase, as the browser stores them.
+function render_config(el){
+    var config = { id: el.id };
+    for (var i = 0; i < el.attributes.length; i++){
+        var name = el.attributes[i].name;
+        if (name === "id" || name === "class" || name === "style") continue;
+        config[name] = el.attributes[i].value;
+    }
+    return config;
+}
+
+/* ── The poll ────────────────────────────────────────────────────────── */
+
+function render_poll(){
+    var query = path + "feed/list.json";
+    var params = [];
+    if (typeof public_userid !== "undefined" && public_userid > 0) params.push("userid=" + public_userid);
+    if (typeof apikey === "string" && apikey) params.push("apikey=" + encodeURIComponent(apikey));
+    if (params.length) query += "?" + params.join("&");
+
+    $.ajax({
+            type: "GET",
+            url: query,
+            dataType: "json",
+            success: function(data){
+                var live = {};
+                var assoc = {};
+                for (var z in data){
+                    var row = data[z];
+                    if (!row || row.id === undefined) continue;
+                    live[String(row.id)] = row;
+                    assoc[row.tag + ":" + row.name] = row.id;
+                }
+                render_live = live;
+                render_assoc = assoc;
+                render_feeds.online = true;
+                render_update();
+            },
+            error: function(){
+                render_feeds.online = false;
+                render_update();
+            }
+        });
+}
+
+function render_update(){
+    for (var id in render_instances){
+        var held = render_instances[id];
+        if (typeof held.instance.update !== "function") continue;
+        try { held.instance.update(render_feeds); }
+        catch (err) { console.error("widget " + held.type + " " + id + " failed to update", err); }
+    }
+}
+
+/* ── Size ────────────────────────────────────────────────────────────── */
+
+// A box changed size. The instance is told once the size has settled, so a
+// drag that changes it many times draws once.
+function render_resized(entries){
+    for (var i = 0; i < entries.length; i++){
+        var el = entries[i].target;
+        var held = render_instances[el.id];
+        if (!held || held.el !== el) continue;
+        if (el.clientWidth === held.width && el.clientHeight === held.height) continue;
+        held.width = el.clientWidth;
+        held.height = el.clientHeight;
+        clearTimeout(held.timer);
+        held.timer = setTimeout(render_resize_one(held, el.id), RENDER_RESIZE_DELAY);
+    }
+}
+
+function render_resize_one(held, id){
+    return function(){
+        if (render_instances[id] !== held) return;
+        if (typeof held.instance.resize !== "function") return;
+        try { held.instance.resize(); }
+        catch (err) { console.error("widget " + held.type + " " + id + " failed to resize", err); }
+    };
+}
+
+/* ── Frames ──────────────────────────────────────────────────────────── */
+
+// Calls frame(now) on every instance that has one, at RENDER_FRAME_RATE.
+function render_frames(){
+    setTimeout(function(){
+            window.requestAnimationFrame(render_frames);
+            var now = Date.now();
+            for (var id in render_instances){
+                var held = render_instances[id];
+                if (typeof held.instance.frame !== "function") continue;
+                try { held.instance.frame(now); }
+                catch (err) { console.error("widget " + held.type + " " + id + " failed to draw", err); }
+            }
+        }, 1000 / RENDER_FRAME_RATE);
 }

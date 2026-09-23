@@ -1,4 +1,5 @@
 <?php
+
 /*
 All Emoncms code is released under the GNU Affero General Public License.
 See COPYRIGHT.txt and LICENSE.txt.
@@ -9,17 +10,15 @@ Part of the OpenEnergyMonitor project:
 http://openenergymonitor.org
 
 ---------------------------------------------------------------------
-Stage 4 of the move to JSON dashboard content.
-
 Converts a paragraph, heading or heading-center widget to a text or image
 widget. Nothing is written to the database. It is called by
-tools/convert_text.php to measure the corpus, and by dashboard_migrate.php on
-save and in bulk.
+dashboard_migrate.php on load and on save, and by tools/migrate.php
+in bulk.
 
 A conversion either keeps the same meaning or is refused. When a value cannot
 be carried, the widget is refused and the reason is recorded.
 
-See notes/TEXT-AND-IMAGE-WIDGETS.md.
+See notes/TEXT-IMAGE-PANEL.md.
 */
 
 defined('EMONCMS_EXEC') or die('Restricted access');
@@ -29,14 +28,14 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 // the top of its box, so it is aligned top. A heading has 20px of top
 // padding, which has no option, so it is centred and only converted at the
 // default box height, where the two draw the same. See the heading defaults
-// section of notes/TEXT-AND-IMAGE-WIDGETS.md.
+// section of notes/TEXT-IMAGE-PANEL.md.
 function dashboard_convert_text_widget_defaults()
 {
-    return array(
-        'paragraph' => array('valign' => 'top'),
-        'heading' => array('size' => '24', 'weight' => 'bold'),
-        'heading-center' => array('size' => '24', 'weight' => 'bold', 'align' => 'center')
-    );
+    return [
+        'paragraph' => ['valign' => 'top'],
+        'heading' => ['size' => '24', 'weight' => 'bold'],
+        'heading-center' => ['size' => '24', 'weight' => 'bold', 'align' => 'center']
+    ];
 }
 
 // Box height in px at which a heading draws the same centred as it does with
@@ -46,7 +45,9 @@ define('DASHBOARD_CONVERT_TEXT_HEADING_HEIGHT', 60);
 // Whether a heading sits at the height its padding was measured against.
 function dashboard_convert_text_heading_height_ok($widget)
 {
-    if (isset($widget['hunit']) && $widget['hunit'] !== 'px') return false;
+    if (isset($widget['hunit']) && $widget['hunit'] !== 'px') {
+        return false;
+    }
     $h = isset($widget['h']) ? $widget['h'] : null;
     return is_numeric($h) && (int) $h === DASHBOARD_CONVERT_TEXT_HEADING_HEIGHT;
 }
@@ -55,19 +56,19 @@ function dashboard_convert_text_heading_height_ok($widget)
 // one wraps the whole widget, so its styling applies to the whole box.
 function dashboard_convert_text_wrapper_elements()
 {
-    return array('div', 'span', 'center', 'font', 'b', 'strong', 'a');
+    return ['div', 'span', 'center', 'font', 'b', 'strong', 'a'];
 }
 
 // Elements rewritten to their equivalent in the allowed list.
 function dashboard_convert_text_synonyms()
 {
-    return array('strong' => 'b', 'em' => 'i');
+    return ['strong' => 'b', 'em' => 'i'];
 }
 
 // Colour names used in the corpus. Any other name is refused.
 function dashboard_convert_text_colour_names()
 {
-    return array(
+    return [
         'black' => '000000', 'white' => 'ffffff', 'red' => 'ff0000',
         'green' => '008000', 'blue' => '0000ff', 'yellow' => 'ffff00',
         'orange' => 'ffa500', 'purple' => '800080', 'grey' => '808080',
@@ -75,22 +76,23 @@ function dashboard_convert_text_colour_names()
         'navy' => '000080', 'teal' => '008080', 'maroon' => '800000',
         'olive' => '808000', 'aqua' => '00ffff', 'cyan' => '00ffff',
         'fuchsia' => 'ff00ff', 'magenta' => 'ff00ff'
-    );
+    ];
 }
 
 // The px size of each font tag size attribute. These are absolute in every
 // browser.
 function dashboard_convert_text_font_sizes()
 {
-    return array(1 => 10, 2 => 13, 3 => 16, 4 => 18, 5 => 24, 6 => 32, 7 => 48);
+    return [1 => 10, 2 => 13, 3 => 16, 4 => 18, 5 => 24, 6 => 32, 7 => 48];
 }
 
 // Declarations written by the editor and the browser, not the author. Each
 // has one value throughout the corpus, so they are skipped.
 function dashboard_convert_text_ignored_styles()
 {
-    return array('vertical-align', 'user-select', '-webkit-user-select',
-        '-moz-user-select', '-ms-user-select');
+    return ['vertical-align', 'user-select', '-webkit-user-select',
+        '-moz-user-select', '-ms-user-select'
+    ];
 }
 
 /**
@@ -107,7 +109,9 @@ function dashboard_convert_text_widget($widget, &$reason = null)
     $defaults = dashboard_convert_text_widget_defaults();
 
     $type = isset($widget['type']) ? (string) $widget['type'] : '';
-    if (!isset($defaults[$type])) return dashboard_convert_text_refuse($reason, 'not_an_old_text_widget');
+    if (!isset($defaults[$type])) {
+        return dashboard_convert_text_refuse($reason, 'not_an_old_text_widget');
+    }
 
     // paragraph, heading and heading-center declare only the html option, so
     // any other option is unexpected.
@@ -132,19 +136,27 @@ function dashboard_convert_text_widget($widget, &$reason = null)
     $html = isset($widget['html']) && is_string($widget['html']) ? $widget['html'] : '';
 
     if (trim($html) === '') {
-        return dashboard_convert_text_build($widget, 'text',
-            $defaults[$type] + array('text' => ''), $reason);
+        return dashboard_convert_text_build(
+            $widget,
+            'text',
+            $defaults[$type] + ['text' => ''],
+            $reason
+        );
     }
 
     $root = dashboard_convert_parse($html);
-    if ($root === null) return dashboard_convert_text_refuse($reason, 'unparsable');
+    if ($root === null) {
+        return dashboard_convert_text_refuse($reason, 'unparsable');
+    }
 
     // The author's styling is on the elements inside the box. The wrappers are
     // removed first and their styling becomes options.
     $styles = $defaults[$type];
     $link = '';
     $body = dashboard_convert_text_peel($root, $styles, $link, $reason);
-    if ($body === null) return null;
+    if ($body === null) {
+        return null;
+    }
 
     $image = dashboard_convert_text_image($body);
     if ($image !== null) {
@@ -155,15 +167,21 @@ function dashboard_convert_text_widget($widget, &$reason = null)
         // The text widget has no link option, so a link around the whole widget
         // is written back as an a element in the body.
         $inner = dashboard_convert_text_body_text($body, $reason);
-        if ($inner === null) return null;
-        if (trim(strip_tags($inner)) === '') return dashboard_convert_text_refuse($reason, 'empty_link');
+        if ($inner === null) {
+            return null;
+        }
+        if (trim(strip_tags($inner)) === '') {
+            return dashboard_convert_text_refuse($reason, 'empty_link');
+        }
         $styles['text'] = '<a href="' . htmlspecialchars($link, ENT_QUOTES, 'UTF-8') . '">'
             . $inner . '</a>';
         return dashboard_convert_text_build($widget, 'text', $styles, $reason);
     }
 
     $text = dashboard_convert_text_body_text($body, $reason);
-    if ($text === null) return null;
+    if ($text === null) {
+        return null;
+    }
 
     $styles['text'] = $text;
     return dashboard_convert_text_build($widget, 'text', $styles, $reason);
@@ -192,22 +210,35 @@ function dashboard_convert_text_peel($node, &$styles, &$link, &$reason)
 
     while (true) {
         $element = dashboard_convert_text_only_child($node);
-        if ($element === null) return $node;
+        if ($element === null) {
+            return $node;
+        }
 
         $tag = strtolower($element->nodeName);
-        if (!in_array($tag, $wrappers)) return $node;
+        if (!in_array($tag, $wrappers)) {
+            return $node;
+        }
 
-        if ($tag === 'center') $styles['align'] = 'center';
-        if ($tag === 'b' || $tag === 'strong') $styles['weight'] = 'bold';
+        if ($tag === 'center') {
+            $styles['align'] = 'center';
+        }
+        if ($tag === 'b' || $tag === 'strong') {
+            $styles['weight'] = 'bold';
+        }
 
         if ($tag === 'a') {
             // Only one link is carried. The text widget writes it as a single
             // a around the body and the image widget as one link option.
-            if ($link !== '') return dashboard_convert_text_refuse($reason, 'nested_link');
+            if ($link !== '') {
+                return dashboard_convert_text_refuse($reason, 'nested_link');
+            }
             $href = $element->getAttribute('href');
             if (!dashboard_convert_url_allowed($href, 'href')) {
-                return dashboard_convert_text_refuse($reason, 'link_url_not_allowed',
-                    dashboard_convert_snippet($href));
+                return dashboard_convert_text_refuse(
+                    $reason,
+                    'link_url_not_allowed',
+                    dashboard_convert_snippet($href)
+                );
             }
             $link = $href;
         }
@@ -216,7 +247,9 @@ function dashboard_convert_text_peel($node, &$styles, &$link, &$reason)
             return null;
         }
 
-        if (!dashboard_convert_text_attributes($element, $tag, $styles, $reason)) return null;
+        if (!dashboard_convert_text_attributes($element, $tag, $styles, $reason)) {
+            return null;
+        }
 
         $node = $element;
     }
@@ -230,12 +263,20 @@ function dashboard_convert_text_only_child($node)
     $element = null;
     foreach ($node->childNodes as $child) {
         if ($child->nodeType === XML_TEXT_NODE) {
-            if (trim($child->nodeValue) !== '') return null;
+            if (trim($child->nodeValue) !== '') {
+                return null;
+            }
             continue;
         }
-        if ($child->nodeType === XML_COMMENT_NODE) continue;
-        if ($child->nodeType !== XML_ELEMENT_NODE) return null;
-        if ($element !== null) return null;
+        if ($child->nodeType === XML_COMMENT_NODE) {
+            continue;
+        }
+        if ($child->nodeType !== XML_ELEMENT_NODE) {
+            return null;
+        }
+        if ($element !== null) {
+            return null;
+        }
         $element = $child;
     }
     return $element;
@@ -245,22 +286,37 @@ function dashboard_convert_text_only_child($node)
 // carried. Any other attribute refuses the widget.
 function dashboard_convert_text_attributes($element, $tag, &$styles, &$reason)
 {
-    $taken = array('style');
-    if ($tag === 'font') $taken = array('style', 'size', 'color', 'face');
-    if ($tag === 'a') $taken = array('style', 'href', 'target', 'rel', 'title');
+    $taken = ['style'];
+    if ($tag === 'font') {
+        $taken = ['style', 'size', 'color', 'face'];
+    }
+    if ($tag === 'a') {
+        $taken = ['style', 'href', 'target', 'rel', 'title'];
+    }
 
     foreach ($element->attributes as $attribute) {
         $name = strtolower($attribute->nodeName);
-        if (in_array($name, $taken)) continue;
-        if (in_array($name, dashboard_convert_extension_attributes())) continue;
-        if ($name === 'class' || $name === 'id') continue;
+        if (in_array($name, $taken)) {
+            continue;
+        }
+        if (in_array($name, dashboard_convert_extension_attributes())) {
+            continue;
+        }
+        if ($name === 'class' || $name === 'id') {
+            continue;
+        }
         return dashboard_convert_text_refuse($reason, 'attribute_not_carried', $tag . ' ' . $name);
     }
 
-    if (!$element->hasAttribute('style')) return true;
+    if (!$element->hasAttribute('style')) {
+        return true;
+    }
 
     return dashboard_convert_text_styles(
-        dashboard_convert_parse_style($element->getAttribute('style')), $styles, $reason);
+        dashboard_convert_parse_style($element->getAttribute('style')),
+        $styles,
+        $reason
+    );
 }
 
 // Reads style declarations into options. A property with no matching option
@@ -274,7 +330,9 @@ function dashboard_convert_text_styles($declarations, &$styles, &$reason)
             return dashboard_convert_text_refuse($reason, 'style_unreadable');
         }
         $value = trim($value);
-        if ($value === '' || in_array($property, $ignored)) continue;
+        if ($value === '' || in_array($property, $ignored)) {
+            continue;
+        }
 
         switch ($property) {
             case 'font-size':
@@ -311,7 +369,7 @@ function dashboard_convert_text_styles($declarations, &$styles, &$reason)
 
             case 'text-align':
                 $align = strtolower($value);
-                if (!in_array($align, array('left', 'center', 'right'))) {
+                if (!in_array($align, ['left', 'center', 'right'])) {
                     return dashboard_convert_text_refuse($reason, 'align_not_carried', $value);
                 }
                 $styles['align'] = $align;
@@ -352,8 +410,11 @@ function dashboard_convert_text_font_tag($element, &$styles, &$reason)
     if ($element->hasAttribute('color')) {
         $colour = dashboard_convert_text_colour($element->getAttribute('color'));
         if ($colour === null) {
-            return dashboard_convert_text_refuse($reason, 'colour_not_carried',
-                'color=' . $element->getAttribute('color'));
+            return dashboard_convert_text_refuse(
+                $reason,
+                'colour_not_carried',
+                'color=' . $element->getAttribute('color')
+            );
         }
         $styles['colour'] = $colour;
     }
@@ -361,8 +422,11 @@ function dashboard_convert_text_font_tag($element, &$styles, &$reason)
     if ($element->hasAttribute('face')) {
         $font = dashboard_convert_text_font_family($element->getAttribute('face'));
         if ($font === null) {
-            return dashboard_convert_text_refuse($reason, 'font_not_carried',
-                'face=' . $element->getAttribute('face'));
+            return dashboard_convert_text_refuse(
+                $reason,
+                'font_not_carried',
+                'face=' . $element->getAttribute('face')
+            );
         }
         $styles['font'] = $font;
     }
@@ -374,11 +438,17 @@ function dashboard_convert_text_font_tag($element, &$styles, &$reason)
 // relative to a size that is not known here, so they are refused.
 function dashboard_convert_text_size($value)
 {
-    if (!preg_match('/^(\d+(\.\d+)?)\s*(px|pt)?$/i', trim($value), $match)) return null;
+    if (!preg_match('/^(\d+(\.\d+)?)\s*(px|pt)?$/i', trim($value), $match)) {
+        return null;
+    }
     $number = (float) $match[1];
-    if (isset($match[3]) && strtolower($match[3]) === 'pt') $number = $number * 4 / 3;
+    if (isset($match[3]) && strtolower($match[3]) === 'pt') {
+        $number = $number * 4 / 3;
+    }
     $px = (int) round($number);
-    if ($px < 6 || $px > 200) return null;
+    if ($px < 6 || $px > 200) {
+        return null;
+    }
     return $px;
 }
 
@@ -387,7 +457,9 @@ function dashboard_convert_text_colour($value)
 {
     $value = strtolower(trim($value));
 
-    if (preg_match('/^#?([0-9a-f]{6})$/', $value, $match)) return $match[1];
+    if (preg_match('/^#?([0-9a-f]{6})$/', $value, $match)) {
+        return $match[1];
+    }
     if (preg_match('/^#?([0-9a-f]{3})$/', $value, $match)) {
         return $match[1][0] . $match[1][0] . $match[1][1] . $match[1][1]
             . $match[1][2] . $match[1][2];
@@ -395,7 +467,9 @@ function dashboard_convert_text_colour($value)
     if (preg_match('/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/', $value, $match)) {
         $hex = '';
         for ($i = 1; $i <= 3; $i++) {
-            if ((int) $match[$i] > 255) return null;
+            if ((int) $match[$i] > 255) {
+                return null;
+            }
             $hex .= sprintf('%02x', (int) $match[$i]);
         }
         return $hex;
@@ -408,8 +482,12 @@ function dashboard_convert_text_colour($value)
 function dashboard_convert_text_weight($value)
 {
     $value = strtolower(trim($value));
-    if (in_array($value, array('bold', 'bolder', '600', '700', '800', '900'))) return 'bold';
-    if (in_array($value, array('normal', 'lighter', '100', '200', '300', '400', '500'))) return 'normal';
+    if (in_array($value, ['bold', 'bolder', '600', '700', '800', '900'])) {
+        return 'bold';
+    }
+    if (in_array($value, ['normal', 'lighter', '100', '200', '300', '400', '500'])) {
+        return 'normal';
+    }
     return null;
 }
 
@@ -419,13 +497,19 @@ function dashboard_convert_text_font_family($value)
 {
     $first = trim(explode(',', $value)[0]);
     $first = trim($first, "\"'");
-    if ($first === '') return null;
+    if ($first === '') {
+        return null;
+    }
 
     $option = widget_registry_option('text', 'font');
-    if ($option === false || $option['values'] === null) return null;
+    if ($option === false || $option['values'] === null) {
+        return null;
+    }
 
     foreach ($option['values'] as $offered) {
-        if ($offered !== '' && strcasecmp($offered, $first) === 0) return $offered;
+        if ($offered !== '' && strcasecmp($offered, $first) === 0) {
+            return $offered;
+        }
     }
     return null;
 }
@@ -440,13 +524,23 @@ function dashboard_convert_text_image($body)
     $image = null;
     foreach ($body->childNodes as $child) {
         if ($child->nodeType === XML_TEXT_NODE) {
-            if (trim($child->nodeValue) !== '') return null;
+            if (trim($child->nodeValue) !== '') {
+                return null;
+            }
             continue;
         }
-        if ($child->nodeType === XML_COMMENT_NODE) continue;
-        if ($child->nodeType !== XML_ELEMENT_NODE) return null;
-        if (strtolower($child->nodeName) !== 'img') return null;
-        if ($image !== null) return null;
+        if ($child->nodeType === XML_COMMENT_NODE) {
+            continue;
+        }
+        if ($child->nodeType !== XML_ELEMENT_NODE) {
+            return null;
+        }
+        if (strtolower($child->nodeName) !== 'img') {
+            return null;
+        }
+        if ($image !== null) {
+            return null;
+        }
         $image = $child;
     }
     return $image;
@@ -456,14 +550,21 @@ function dashboard_convert_text_image_widget($widget, $image, $link, &$reason)
 {
     $src = $image->getAttribute('src');
     if (!dashboard_convert_url_allowed($src, 'src')) {
-        return dashboard_convert_text_refuse($reason, 'image_url_not_allowed',
-            dashboard_convert_snippet($src));
+        return dashboard_convert_text_refuse(
+            $reason,
+            'image_url_not_allowed',
+            dashboard_convert_snippet($src)
+        );
     }
 
     // The image widget fills the box. contain keeps the aspect ratio.
-    $options = array('src' => $src, 'fit' => 'contain');
-    if ($image->hasAttribute('alt')) $options['alt'] = $image->getAttribute('alt');
-    if ($link !== '') $options['link'] = $link;
+    $options = ['src' => $src, 'fit' => 'contain'];
+    if ($image->hasAttribute('alt')) {
+        $options['alt'] = $image->getAttribute('alt');
+    }
+    if ($link !== '') {
+        $options['link'] = $link;
+    }
 
     return dashboard_convert_text_build($widget, 'image', $options, $reason);
 }
@@ -481,33 +582,49 @@ function dashboard_convert_text_body_text($body, &$reason)
     $vocabulary = dashboard_convert_inline_elements();
     $synonyms = dashboard_convert_text_synonyms();
 
-    $stack = array($body);
+    $stack = [$body];
     while (count($stack)) {
         $current = array_pop($stack);
         foreach ($current->childNodes as $child) {
-            if ($child->nodeType === XML_TEXT_NODE) continue;
-            if ($child->nodeType === XML_COMMENT_NODE) continue;
+            if ($child->nodeType === XML_TEXT_NODE) {
+                continue;
+            }
+            if ($child->nodeType === XML_COMMENT_NODE) {
+                continue;
+            }
             if ($child->nodeType !== XML_ELEMENT_NODE) {
                 return dashboard_convert_text_refuse($reason, 'node_not_carried');
             }
 
             $tag = strtolower($child->nodeName);
-            if (isset($synonyms[$tag])) $tag = $synonyms[$tag];
+            if (isset($synonyms[$tag])) {
+                $tag = $synonyms[$tag];
+            }
             if (!in_array($tag, $vocabulary)) {
                 return dashboard_convert_text_refuse($reason, 'tag_not_in_vocabulary', $tag);
             }
 
             foreach ($child->attributes as $attribute) {
                 $name = strtolower($attribute->nodeName);
-                if (in_array($name, dashboard_convert_extension_attributes())) continue;
-                if ($tag === 'a' && in_array($name, array('href', 'target', 'rel', 'title'))) continue;
-                return dashboard_convert_text_refuse($reason, 'inline_attribute_not_carried',
-                    $tag . ' ' . $name);
+                if (in_array($name, dashboard_convert_extension_attributes())) {
+                    continue;
+                }
+                if ($tag === 'a' && in_array($name, ['href', 'target', 'rel', 'title'])) {
+                    continue;
+                }
+                return dashboard_convert_text_refuse(
+                    $reason,
+                    'inline_attribute_not_carried',
+                    $tag . ' ' . $name
+                );
             }
 
             if ($tag === 'a' && !dashboard_convert_url_allowed($child->getAttribute('href'), 'href')) {
-                return dashboard_convert_text_refuse($reason, 'link_url_not_allowed',
-                    dashboard_convert_snippet($child->getAttribute('href')));
+                return dashboard_convert_text_refuse(
+                    $reason,
+                    'link_url_not_allowed',
+                    dashboard_convert_snippet($child->getAttribute('href'))
+                );
             }
 
             $stack[] = $child;
@@ -518,13 +635,21 @@ function dashboard_convert_text_body_text($body, &$reason)
     // and i before the body is read back.
     dashboard_convert_text_rewrite_synonyms($body);
 
-    $warnings = array();
-    $text = dashboard_convert_html($body, null, widget_registry(), $warnings,
-        $vocabulary, false);
+    $warnings = [];
+    $text = dashboard_convert_html(
+        $body,
+        null,
+        widget_registry(),
+        $warnings,
+        $vocabulary,
+        false
+    );
 
     foreach ($warnings as $warning) {
-        if ($warning['code'] === 'url_dropped' || $warning['code'] === 'attribute_dropped'
-            || $warning['code'] === 'tag_dropped' || $warning['code'] === 'tag_unwrapped') {
+        if (
+            $warning['code'] === 'url_dropped' || $warning['code'] === 'attribute_dropped'
+            || $warning['code'] === 'tag_dropped' || $warning['code'] === 'tag_unwrapped'
+        ) {
             return dashboard_convert_text_refuse($reason, 'lost_on_the_way_out', $warning['code']);
         }
     }
@@ -544,32 +669,43 @@ function dashboard_convert_text_body_text($body, &$reason)
  */
 function dashboard_convert_text_build($widget, $type, $values, &$reason)
 {
-    $new = array('type' => $type);
-    foreach (array('x', 'y', 'w', 'h', 'wunit', 'hunit') as $key) {
-        if (isset($widget[$key])) $new[$key] = $widget[$key];
+    $new = ['type' => $type];
+    foreach (['x', 'y', 'w', 'h', 'wunit', 'hunit'] as $key) {
+        if (isset($widget[$key])) {
+            $new[$key] = $widget[$key];
+        }
     }
 
     $text = '';
-    $options = array();
+    $options = [];
     foreach ($values as $name => $value) {
-        if ($value === '') continue;
+        if ($value === '') {
+            continue;
+        }
 
         $option = widget_registry_option($type, $name);
-        if ($option === false) return dashboard_convert_text_refuse($reason, 'option_unknown', $name);
+        if ($option === false) {
+            return dashboard_convert_text_refuse($reason, 'option_unknown', $name);
+        }
 
         if ($option['type'] === 'text') {
             $text = (string) $value;
             continue;
         }
         if (!dashboard_convert_option_valid($option, (string) $value)) {
-            return dashboard_convert_text_refuse($reason, 'option_value_refused',
-                $name . '=' . dashboard_convert_snippet($value));
+            return dashboard_convert_text_refuse(
+                $reason,
+                'option_value_refused',
+                $name . '=' . dashboard_convert_snippet($value)
+            );
         }
         $options[$option['name']] = (string) $value;
     }
 
     $new['options'] = $options;
-    if ($text !== '') $new['text'] = $text;
+    if ($text !== '') {
+        $new['text'] = $text;
+    }
 
     return $new;
 }
@@ -580,21 +716,28 @@ function dashboard_convert_text_rewrite_synonyms($body)
 {
     $synonyms = dashboard_convert_text_synonyms();
 
-    $found = array();
-    $stack = array($body);
+    $found = [];
+    $stack = [$body];
     while (count($stack)) {
         $current = array_pop($stack);
         foreach ($current->childNodes as $child) {
-            if ($child->nodeType !== XML_ELEMENT_NODE) continue;
-            if (isset($synonyms[strtolower($child->nodeName)])) $found[] = $child;
+            if ($child->nodeType !== XML_ELEMENT_NODE) {
+                continue;
+            }
+            if (isset($synonyms[strtolower($child->nodeName)])) {
+                $found[] = $child;
+            }
             $stack[] = $child;
         }
     }
 
     foreach ($found as $element) {
         $replacement = $element->ownerDocument->createElement(
-            $synonyms[strtolower($element->nodeName)]);
-        while ($element->firstChild) $replacement->appendChild($element->firstChild);
+            $synonyms[strtolower($element->nodeName)]
+        );
+        while ($element->firstChild) {
+            $replacement->appendChild($element->firstChild);
+        }
         $element->parentNode->replaceChild($replacement, $element);
     }
 }

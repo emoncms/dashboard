@@ -12,76 +12,71 @@
     defined('EMONCMS_EXEC') or die('Restricted access');
 
     // Escaped for the place each one is printed into, as in dashboard_view.php.
-    function dashboard_config_attr($value) {
-        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-    }
+function dashboard_config_attr($value)
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+}
 ?>
 
 <div id="dashConfigModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="dashConfigModalLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="dashConfigModalLabel"><?php echo ctx_tr('dashboard_messages','Dashboard Configuration'); ?></h3>
+        <h3 id="dashConfigModalLabel"><?php echo ctx_tr('dashboard_messages', 'Dashboard Configuration'); ?></h3>
     </div>
     <div class="modal-body">
-        <label><?php echo ctx_tr('dashboard_messages','Dashboard name: '); ?></label>
+        <label><?php echo ctx_tr('dashboard_messages', 'Dashboard name: '); ?></label>
         <input type="text" name="name" value="<?php echo dashboard_config_attr($dashboard['name']); ?>" />
-        <label><?php echo ctx_tr('dashboard_messages','Alias name: '); ?></label>
+        <label><?php echo ctx_tr('dashboard_messages', 'Alias name: '); ?></label>
         <input type="text" name="alias" value="<?php echo dashboard_config_attr($dashboard['alias']); ?>" />
-        <label><?php echo ctx_tr('dashboard_messages','Background color: '); ?></label>
+        <label><?php echo ctx_tr('dashboard_messages', 'Background color: '); ?></label>
         <input type="color" name="backgroundcolor" value="#<?php echo preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backgroundcolor']); ?>" />
-        <label><?php echo ctx_tr('dashboard_messages','Description: '); ?></label>
+        <label><?php echo ctx_tr('dashboard_messages', 'Description: '); ?></label>
         <textarea name="description"><?php echo dashboard_config_attr($dashboard['description']); ?></textarea>
-        <label><?php echo ctx_tr('dashboard_messages','Grid size: '); ?></label>
+        <label><?php echo ctx_tr('dashboard_messages', 'Grid size: '); ?></label>
         <input type="text" name="gridsize" value="<?php echo (int) $dashboard['gridsize']; ?>" />
 
 
-        <label><?php echo ctx_tr('dashboard_messages','Feed selection mode: '); ?></label>
-        <i style="font-size:12px"><?php echo ctx_tr('dashboard_messages','Note: Reset feeds in all widgets in dashboard if changing'); ?><br><?php echo ctx_tr('dashboard_messages','this part way through a dashboard build'); ?></i><br>
+        <label><?php echo ctx_tr('dashboard_messages', 'Feed selection mode: '); ?></label>
+        <i style="font-size:12px"><?php echo ctx_tr('dashboard_messages', 'Note: Reset feeds in all widgets in dashboard if changing'); ?><br><?php echo ctx_tr('dashboard_messages', 'this part way through a dashboard build'); ?></i><br>
         <select name="feedmode">
-            <option value="tagname" <?php if ($dashboard['feedmode'] == "tagname") echo 'selected'; ?>><?php echo ctx_tr('dashboard_messages','By tag:name'); ?></option>
-            <option value="feedid" <?php if ($dashboard['feedmode'] == "feedid") echo 'selected'; ?>><?php echo ctx_tr('dashboard_messages','By feedid'); ?></option>
+            <option value="tagname" <?php echo $dashboard['feedmode'] == "tagname" ? 'selected' : ''; ?>><?php echo ctx_tr('dashboard_messages', 'By tag:name'); ?></option>
+            <option value="feedid" <?php echo $dashboard['feedmode'] == "feedid" ? 'selected' : ''; ?>><?php echo ctx_tr('dashboard_messages', 'By feedid'); ?></option>
         </select>
 
         <label class="checkbox">
-            <input type="checkbox" name="main" id="chk_main" value="1" <?php if ($dashboard['main'] == true) echo 'checked'; ?> />
-            <abbr title="<?php echo ctx_tr('dashboard_messages','Make this dashboard the first shown'); ?>"><?php echo ctx_tr('dashboard_messages','Main'); ?></abbr>
+            <input type="checkbox" name="main" id="chk_main" value="1" <?php echo $dashboard['main'] ? 'checked' : ''; ?> />
+            <abbr title="<?php echo ctx_tr('dashboard_messages', 'Make this dashboard the first shown'); ?>"><?php echo ctx_tr('dashboard_messages', 'Main'); ?></abbr>
         </label>
 
         <label class="checkbox">
-            <input type="checkbox" name="published" id="chk_published" value="1" <?php if ($dashboard['published'] == true) echo 'checked'; ?> />
-            <abbr title="<?php echo ctx_tr('dashboard_messages','Activate this dashboard'); ?>"><?php echo ctx_tr('dashboard_messages','Published'); ?></abbr>
+            <input type="checkbox" name="published" id="chk_published" value="1" <?php echo $dashboard['published'] ? 'checked' : ''; ?> />
+            <abbr title="<?php echo ctx_tr('dashboard_messages', 'Activate this dashboard'); ?>"><?php echo ctx_tr('dashboard_messages', 'Published'); ?></abbr>
         </label>
 
         <label class="checkbox">
-            <input type="checkbox" name="public" id="chk_public" value="1" <?php if ($dashboard['public'] == true) echo 'checked'; ?> />
-            <abbr title="<?php echo ctx_tr('dashboard_messages','Anyone with the URL can see this dashboard'); ?>"><?php echo ctx_tr('dashboard_messages','Public'); ?></abbr>
+            <input type="checkbox" name="public" id="chk_public" value="1" <?php echo $dashboard['public'] ? 'checked' : ''; ?> />
+            <abbr title="<?php echo ctx_tr('dashboard_messages', 'Anyone with the URL can see this dashboard'); ?>"><?php echo ctx_tr('dashboard_messages', 'Public'); ?></abbr>
         </label>
 
         <label class="checkbox">
-            <input type="checkbox" name="showdescription" id="chk_showdescription" value="1" <?php if ($dashboard['showdescription'] == true) echo 'checked'; ?> />
-            <abbr title="<?php echo ctx_tr('dashboard_messages','Shows dashboard description on mouse over dashboard name in menu project'); ?>"><?php echo ctx_tr('dashboard_messages','Show description'); ?></abbr>
+            <input type="checkbox" name="showdescription" id="chk_showdescription" value="1" <?php echo $dashboard['showdescription'] ? 'checked' : ''; ?> />
+            <abbr title="<?php echo ctx_tr('dashboard_messages', 'Shows dashboard description on mouse over dashboard name in menu project'); ?>"><?php echo ctx_tr('dashboard_messages', 'Show description'); ?></abbr>
         </label>
 
         <label class="checkbox">
-            <input type="checkbox" name="fullscreen" id="chk_fullscreen" value="1" <?php if ($dashboard['fullscreen'] == true) echo 'checked'; ?> />
-            <abbr title="<?php echo ctx_tr('dashboard_messages','Hide menus on dashboard. Make full screen.'); ?>"><?php echo ctx_tr('dashboard_messages','Hide Menus'); ?></abbr>
+            <input type="checkbox" name="fullscreen" id="chk_fullscreen" value="1" <?php echo $dashboard['fullscreen'] ? 'checked' : ''; ?> />
+            <abbr title="<?php echo ctx_tr('dashboard_messages', 'Hide menus on dashboard. Make full screen.'); ?>"><?php echo ctx_tr('dashboard_messages', 'Hide Menus'); ?></abbr>
         </label>
     </div>
     <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo ctx_tr('dashboard_messages','Close'); ?></button>
-        <button id="configure-save" class="btn btn-primary"><?php echo ctx_tr('dashboard_messages','Save changes'); ?></button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo ctx_tr('dashboard_messages', 'Close'); ?></button>
+        <button id="configure-save" class="btn btn-primary"><?php echo ctx_tr('dashboard_messages', 'Save changes'); ?></button>
     </div>
 </div>
 
 <script type="application/javascript">
     var dashid = <?php echo (int) $dashboard['id']; ?>;
     var height = <?php echo (int) $dashboard['height']; ?>;
-
-    $("#dashboard-config-button").click(function (){
-
-         $("textarea[name=content]").val($("#page").html());
-         $("textarea[name=content]").data('original', $("#page").html());// used to test for changes
-    });
 
     $("#configure-save").click(function (){
         var fields = {};
@@ -124,28 +119,6 @@
                 }
             }
         });
-        var contentChanged = $("textarea[name=content]").val() != $("textarea[name=content]").data('original');
-        if (contentChanged) {
-            $.ajax({
-                type: "POST",
-                url :  path+"dashboard/setcontent.json",
-                data : "&id="+dashid+'&content='+encodeURIComponent($("textarea[name=content]").val())+'&height='+height,
-                dataType: 'json',
-                async: true,
-                success : function(result) {
-                    if (!result.success) {
-                        alert(result.message);
-                    } else {
-                        $("#page").html($("textarea[name=content]").val());
-                        redraw = 1;
-                        reloadiframe = 0; // dont re-calculate vis iframe urls
-                        $('#dashConfigModal').modal('hide');
-                    }
-                }
-            });
-        }
-        
-
         $('#page-container, body').css("background-color","#"+fields['backgroundcolor']);
 
         designer.feedmode = fields['feedmode'];

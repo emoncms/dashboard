@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/zoom/zoom_render.js",
+  "widgets": {
+    "zoom": {
+      "options": {
+        "power": {
+          "type": "feedid"
+        },
+        "kwhd": {
+          "type": "feedid"
+        },
+        "currency": {
+          "type": "value"
+        },
+        "currency_after_val": {
+          "type": "value"
+        },
+        "pricekwh": {
+          "type": "value"
+        },
+        "delta": {
+          "type": "boolean"
+        },
+        "scale": {
+          "type": "value"
+        },
+        "colour": {
+          "type": "colour_picker"
+        },
+        "colourbg": {
+          "type": "colour_picker"
+        },
+        "colouraxis": {
+          "type": "colour_picker"
+        },
+        "view": {
+          "type": "dropbox",
+          "values": [
+            "days",
+            "months",
+            "years"
+          ]
+        }
+      }
+    }
+  }
+}

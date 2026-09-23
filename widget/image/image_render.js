@@ -6,7 +6,7 @@
     http://openenergymonitor.org
 
     An image widget. Most stored images are an external absolute url rather
-    than an upload, so the widget takes a url. See notes/TEXT-AND-IMAGE-WIDGETS.md.
+    than an upload, so the widget takes a url. See notes/TEXT-IMAGE-PANEL.md.
  */
 
 var imageFitOptions = [
@@ -45,40 +45,50 @@ function image_warning(src)
     return _Tr("This http image is blocked on an https page");
 }
 
-function image_init()
-{
-    $(".image").each(function(){
-        var box = $(this);
-        var src = box.attr("src");
-        var alt = box.attr("alt");
-        var fit = box.attr("fit");
-        var link = box.attr("link");
+var image_widget = {
+    mount: function(el, config, ctx) {
+        var src = config.src;
+        var alt = config.alt;
+        var fit = config.fit;
+        var link = config.link;
 
+        el.innerHTML = "";
         if (src === undefined || src === "") {
-            box.html('<div class="image-empty">' + _Tr("No image url") + '</div>');
-            return;
+            var empty = document.createElement("div");
+            empty.className = "image-empty";
+            empty.textContent = _Tr("No image url");
+            el.appendChild(empty);
+        } else {
+            var img = document.createElement("img");
+            img.src = src;
+            img.alt = alt === undefined ? "" : alt;
+            img.style.objectFit = fit === undefined || fit === "" ? "contain" : fit;
+
+            var content = img;
+            if (link !== undefined && link !== "") {
+                content = document.createElement("a");
+                content.href = link;
+                content.target = "_blank";
+                content.rel = "noopener noreferrer";
+                content.appendChild(img);
+            }
+
+            el.appendChild(content);
+
+            var warning = image_warning(src);
+            if (warning !== "") {
+                var note = document.createElement("div");
+                note.className = "image-warning";
+                note.textContent = warning;
+                el.appendChild(note);
+            }
         }
 
-        var img = $('<img>').attr("src", src).attr("alt", alt === undefined ? "" : alt);
-        img.css("object-fit", fit === undefined || fit === "" ? "contain" : fit);
-
-        var content = img;
-        if (link !== undefined && link !== "") {
-            content = $('<a>').attr("href", link).attr("target", "_blank")
-                              .attr("rel", "noopener noreferrer").append(img);
-        }
-
-        box.empty().append(content);
-
-        var warning = image_warning(src);
-        if (warning !== "") box.append($('<div class="image-warning"></div>').text(warning));
-    });
-}
-
-function image_fastupdate()
-{
-}
-
-function image_slowupdate()
-{
-}
+        // No feed. The image scales with the box through object-fit.
+        return {
+            update: function() {},
+            resize: function() {},
+            destroy: function() {}
+        };
+    }
+};

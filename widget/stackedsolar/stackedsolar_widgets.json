@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/stackedsolar/stackedsolar_render.js",
+  "widgets": {
+    "stackedsolar": {
+      "options": {
+        "solar": {
+          "type": "feedid"
+        },
+        "consumption": {
+          "type": "feedid"
+        },
+        "delta": {
+          "type": "boolean"
+        },
+        "colourbg": {
+          "type": "colour_picker"
+        },
+        "colouraxis": {
+          "type": "colour_picker"
+        }
+      }
+    }
+  }
+}

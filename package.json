@@ -1,0 +1,15 @@
+{
+  "name": "emoncms-dashboard",
+  "private": true,
+  "description": "JavaScript lint for the emoncms dashboard module",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "lint:js": "eslint .",
+    "lint:js:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.2.0",
+    "eslint": "^10.0.0",
+    "globals": "^17.0.0"
+  }
+}

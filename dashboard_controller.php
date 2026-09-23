@@ -19,21 +19,17 @@ function dashboard_controller()
     require "Modules/dashboard/dashboard_model.php";
     $dashboard = new Dashboard($mysqli);
     // id, userid, content, height, name, alias, description, main, public, published, showdescription, fullscreen
-    
-    $result = false; $submenu = '';
 
-    if ($route->format == 'html')
-    {
-        if ($route->action == "list" && $session['write'])
-        {
+    $result = false;
+    $submenu = '';
+
+    if ($route->format == 'html') {
+        if ($route->action == "list" && $session['write']) {
             load_language_files("Modules/dashboard/locale", "dashboard_messages");
-            $result = view("Modules/dashboard/Views/dashboard_list.php", array(
+            $result = view("Modules/dashboard/Views/dashboard_list.php", [
                 'path' => $path
-            ));
-        }
-
-        else if ($route->action == "view")
-        {
+            ]);
+        } elseif ($route->action == "view") {
             // 4 access modes:
             // - as a session user either login or apikey
             // - with a readkey, does not create a session
@@ -58,33 +54,32 @@ function dashboard_controller()
                 if (isset($_GET['apikey'])) {
                     $apikey = $user->get_apikey_read($session['userid']);
                 }
-            } else if (isset($_GET['readkey'])) {
+            } elseif (isset($_GET['readkey'])) {
                 if ($userid = $user->get_id_from_apikey($_GET['readkey'])) {
                     $apikey = $user->get_apikey_read($userid);
                     $owner_context = true;
                 }
-            } else if ($session['public_userid']) {
+            } elseif ($session['public_userid']) {
                 $userid = (int) $session['public_userid'];
             }
-            
+
             $dashid = (int) get('id');
             if ($dashid) {
                 $dash = $dashboard->get($dashid);
-            } else if ($route->subaction && $userid) {
-                $dash = $dashboard->get_from_alias($userid,$route->subaction);
-            } else if ($userid) {
+            } elseif ($route->subaction && $userid) {
+                $dash = $dashboard->get_from_alias($userid, $route->subaction);
+            } elseif ($userid) {
                 $dash = $dashboard->get_main($userid);
-            } else if (!$userid and $route->subaction) {
-               $dash = $dashboard->get_from_public_alias($route->subaction);
+            } elseif (!$userid and $route->subaction) {
+                $dash = $dashboard->get_from_public_alias($route->subaction);
             }
-            
-            if (isset($dash)) {
 
+            if (isset($dash)) {
                 $public_userid = 0;
                 if (!$session['read'] && $dash['public']) {
                     $public_userid = $dash['userid'];
                 }
-                
+
                 // Access control. A dashboard is shown if it is public, or - only in
                 // an owner context (session or the owner's own readkey) - if the
                 // requester owns it. On the public-profile path $userid is the content
@@ -95,7 +90,7 @@ function dashboard_controller()
                 // key injected into the page so the feed widgets can load data, and in
                 // the logged-in branch it is the requester's own key. Testing it here
                 // previously let any key holder open any dashboard by id.
-                $owner = ($owner_context && $userid && $dash['userid']==$userid);
+                $owner = ($owner_context && $userid && $dash['userid'] == $userid);
 
                 if ($dash['public'] || $owner) {
                     // A dashboard is meant to sit in an iframe on another
@@ -112,58 +107,64 @@ function dashboard_controller()
                     // this is.
                     allow_public_embed();
 
-                    $result = view("Modules/dashboard/Views/dashboard_view.php",array(
-                        'dashboard'=>$dash, 
-                        'page_html'=>$dashboard->content_html($dash),
-                        'apikey'=>$apikey, 
-                        'public_userid'=>$public_userid,
-                        'owner'=>$owner
-                    ));
+                    $result = view("Modules/dashboard/Views/dashboard_view.php", [
+                        'dashboard' => $dash,
+                        'page_html' => $dashboard->content_html($dash),
+                        'apikey' => $apikey,
+                        'public_userid' => $public_userid,
+                        'owner' => $owner
+                    ]);
                 }
             }
-        }
-
-        else if ($route->action == "edit" && $session['write'])
-        {
+        } elseif ($route->action == "edit" && $session['write']) {
             // The editor only ever opens the requester's own dashboard. It was
             // loaded by id alone, so any writer could read the content of a
             // private dashboard by asking for its id.
             $dash = false;
-            if ($route->subaction) $dash = $dashboard->get_from_alias($session['userid'],$route->subaction);
-            elseif (isset($_GET['id'])) $dash = $dashboard->get_owned($session['userid'], get('id'));
+            if ($route->subaction) {
+                $dash = $dashboard->get_from_alias($session['userid'], $route->subaction);
+            } elseif (isset($_GET['id'])) {
+                $dash = $dashboard->get_owned($session['userid'], get('id'));
+            }
 
             if (!$dash) {
                 $result = EMPTY_ROUTE;
             } else {
-                // Rendered once and given to both views, so the config modal shows
-                // the same content the page does.
+                // Rendered for the first paint. The document is read after,
+                // so it is the one the page was drawn from.
                 $page_html = $dashboard->content_html($dash);
-                $result = view("Modules/dashboard/Views/dashboard_edit_view.php",array(
-                    'dashboard'=>$dash,
-                    'page_html'=>$page_html
-                ));
-                $result .= view("Modules/dashboard/Views/dashboard_config.php", array(
-                    'dashboard'=>$dash
-                ));
+                $result = view("Modules/dashboard/Views/dashboard_edit_view.php", [
+                    'dashboard' => $dash,
+                    'page_html' => $page_html,
+                    'document' => $dashboard->document($dash['id'])
+                ]);
+                $result .= view("Modules/dashboard/Views/dashboard_config.php", [
+                    'dashboard' => $dash
+                ]);
 
-                $submenu = view("Modules/dashboard/Views/dashboard_menu.php", array('id'=>$dash['id'],'type'=>"edit"));
+                $submenu = view("Modules/dashboard/Views/dashboard_menu.php", ['id' => $dash['id'],'type' => "edit"]);
+            }
+        }
+    } elseif ($route->format == 'json') {
+        if ($session['read']) {
+            if ($route->action == 'list') {
+                $result = $dashboard->get_list($session['userid'], false, false);
+            }
+        }
+
+        if ($session['write']) {
+            if ($route->action == 'set') {
+                $result = $dashboard->set($session['userid'], prop('id'), prop('fields'));
+            } elseif ($route->action == 'setcontent') {
+                $result = $dashboard->set_content($session['userid'], post('id'), post('document'), post('height'));
+            } elseif ($route->action == 'create') {
+                $result = $dashboard->create($session['userid']);
+            } elseif ($route->action == 'delete') {
+                $result = $dashboard->delete($session['userid'], get('id'));
+            } elseif ($route->action == 'clone') {
+                $result = $dashboard->dashclone($session['userid'], get('id'));
             }
         }
     }
-    else if ($route->format == 'json')
-    {
-        if ($session['read']) {
-            if ($route->action=='list') $result = $dashboard->get_list($session['userid'], false, false);
-        }
-        
-        if ($session['write']) {
-            if ($route->action=='set') $result = $dashboard->set($session['userid'],prop('id'),prop('fields'));
-            else if ($route->action=='getcontent') $result = $dashboard->get_content($session['userid'],get('id'));
-            else if ($route->action=='setcontent') $result = $dashboard->set_content($session['userid'],post('id'),post('content'),post('height'));
-            else if ($route->action=='create') $result = $dashboard->create($session['userid']);
-            else if ($route->action=='delete') $result = $dashboard->delete($session['userid'],get('id'));
-            else if ($route->action=='clone') $result = $dashboard->dashclone($session['userid'], get('id'));
-        }
-    }
-    return array('content'=>$result, 'submenu'=>$submenu);
+    return ['content' => $result, 'submenu' => $submenu];
 }

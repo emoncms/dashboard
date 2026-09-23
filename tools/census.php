@@ -1,4 +1,5 @@
 <?php
+
 /*
 All Emoncms code is released under the GNU Affero General Public License.
 See COPYRIGHT.txt and LICENSE.txt.
@@ -9,7 +10,6 @@ Part of the OpenEnergyMonitor project:
 http://openenergymonitor.org
 */
 
-// Stage 1 of the move to JSON dashboard content.
 // Reads the export produced by export_content.php and reports what the stored
 // dashboard html actually contains. It measures, it does not convert or repair.
 //
@@ -20,10 +20,14 @@ http://openenergymonitor.org
 
 define('EMONCMS_EXEC', 1);
 
-if (php_sapi_name() !== 'cli') die("cli only\n");
+if (php_sapi_name() !== 'cli') {
+    die("cli only\n");
+}
 
-$argv_files = array();
-$opts = array('out' => 'census', 'samples' => 10, 'root' => dirname(__FILE__) . "/../../..");
+require_once dirname(__FILE__) . "/cli.php";
+
+$argv_files = [];
+$opts = ['out' => 'census', 'samples' => 10, 'root' => dirname(__FILE__) . "/../../.."];
 for ($i = 1; $i < $argc; $i++) {
     if (substr($argv[$i], 0, 2) === '--') {
         $parts = explode('=', substr($argv[$i], 2), 2);
@@ -42,7 +46,9 @@ if (isset($opts['help']) || !count($argv_files)) {
 }
 
 $infile = $argv_files[0];
-if (!is_readable($infile)) die("Cannot read $infile\n");
+if (!is_readable($infile)) {
+    die("Cannot read $infile\n");
+}
 $max_samples = (int) $opts['samples'];
 
 // ---------------------------------------------------------------------------
@@ -55,15 +61,17 @@ $max_samples = (int) $opts['samples'];
 
 function harvest_registry($root)
 {
-    $names = array();
-    $files = array($root . "/Modules/dashboard/Views/js/widgetlist.js");
+    $names = [];
+    $files = [$root . "/Modules/dashboard/Views/js/widgetlist.js"];
     foreach (glob($root . "/Modules/*/widget", GLOB_ONLYDIR) as $dir) {
         foreach (array_merge(glob("$dir/*_render.js"), glob("$dir/*/*_render.js")) as $f) {
             $files[] = $f;
         }
     }
     foreach ($files as $f) {
-        if (!is_readable($f)) continue;
+        if (!is_readable($f)) {
+            continue;
+        }
         $js = file_get_contents($f);
         // Keys may be quoted or bare, see kwhperiod_render.js for the bare form
         $re = '/(?:"([^"\r\n]+)"|\'([^\'\r\n]+)\'|([A-Za-z0-9_$-]+))'
@@ -71,7 +79,9 @@ function harvest_registry($root)
         if (preg_match_all($re, $js, $m, PREG_SET_ORDER)) {
             foreach ($m as $set) {
                 $name = $set[1] !== '' ? $set[1] : (isset($set[2]) && $set[2] !== '' ? $set[2] : (isset($set[3]) ? $set[3] : ''));
-                if ($name !== '') $names[$name] = true;
+                if ($name !== '') {
+                    $names[$name] = true;
+                }
             }
         }
     }
@@ -88,59 +98,61 @@ if (!count($registry)) {
 // Counters
 // ---------------------------------------------------------------------------
 
-$c = array(
+$c = [
     'dashboards' => 0,
     'empty' => 0,
     'parse_errors' => 0,
-    'toplevel_class' => array(),      // widget type => count
-    'toplevel_class_dashboards' => array(),
-    'toplevel_tag' => array(),        // tag name of top level nodes
+    'toplevel_class' => [],      // widget type => count
+    'toplevel_class_dashboards' => [],
+    'toplevel_tag' => [],        // tag name of top level nodes
     'toplevel_text' => 0,             // bare text sitting outside any widget
     'multi_token_class' => 0,         // class="dial something-else"
     'no_class' => 0,
-    'unknown_class' => array(),       // class not in the widget registry
-    'tags' => array(),                // every element, at any depth
-    'attrs_by_class' => array(),      // widget type => attribute => count
-    'nested_tags_by_class' => array(),// widget type => inner tag => count
-    'nested_attrs' => array(),        // attribute names below the top level
-    'style_props' => array(),         // inline style property => count
-    'style_values' => array(),        // property => distinct sample values
-    'box_style_props_by_class' => array(),   // widget type => property on the box => count
-    'inner_style_props_by_class' => array(), // widget type => property below the box => count
-    'text_widget' => array(),         // what the text widgets hold, see below
-    'depth' => array(),               // nesting depth histogram
-    'widgets_per_dashboard' => array(),
-    'flags' => array(),               // finding => count
-    'parse_error_shapes' => array(),  // libxml complaint => count
-    'blank_option_attrs' => array(),  // option present but left empty, normal
-    'malformed_attrs' => array(),     // fragments of an unquoted value, not normal
-    'names_with_value' => array(),    // every attribute name seen holding a value
-);
+    'unknown_class' => [],       // class not in the widget registry
+    'tags' => [],                // every element, at any depth
+    'attrs_by_class' => [],      // widget type => attribute => count
+    'nested_tags_by_class' => [],// widget type => inner tag => count
+    'nested_attrs' => [],        // attribute names below the top level
+    'style_props' => [],         // inline style property => count
+    'style_values' => [],        // property => distinct sample values
+    'box_style_props_by_class' => [],   // widget type => property on the box => count
+    'inner_style_props_by_class' => [], // widget type => property below the box => count
+    'text_widget' => [],         // what the text widgets hold, see below
+    'depth' => [],               // nesting depth histogram
+    'widgets_per_dashboard' => [],
+    'flags' => [],               // finding => count
+    'parse_error_shapes' => [],  // libxml complaint => count
+    'blank_option_attrs' => [],  // option present but left empty, normal
+    'malformed_attrs' => [],     // fragments of an unquoted value, not normal
+    'names_with_value' => [],    // every attribute name seen holding a value
+];
 
 // The text widget sub report. Declared up here so the report prints the same
 // shape whether or not the corpus holds a text widget.
-$c['text_widget'] = array(
+$c['text_widget'] = [
     'widgets' => 0,
-    'tiers' => array(),           // what a widget would need to be expressible
-    'tiers_by_class' => array(),
-    'tier_tags' => array(),       // the tags that put widgets in each tier
-    'box_style_values' => array(),// authored property => value => count
-    'inner_style_values' => array(),
-    'tier_dashboards' => array(),  // tier => dashboards holding one
-    'hardest_tier' => array(),     // dashboards by the hardest tier they hold
-    'font_tag' => array(),        // attribute on a <font> => count
-    'font_tag_values' => array(),
-    'img_src' => array(),         // kind of url => count
-    'link_href' => array(),
+    'tiers' => [],           // what a widget would need to be expressible
+    'tiers_by_class' => [],
+    'tier_tags' => [],       // the tags that put widgets in each tier
+    'box_style_values' => [],// authored property => value => count
+    'inner_style_values' => [],
+    'tier_dashboards' => [],  // tier => dashboards holding one
+    'hardest_tier' => [],     // dashboards by the hardest tier they hold
+    'font_tag' => [],        // attribute on a <font> => count
+    'font_tag_values' => [],
+    'img_src' => [],         // kind of url => count
+    'link_href' => [],
     'holds_br' => 0,
-);
+];
 
-$samples = array();  // finding => list of dashboard ids
+$samples = [];  // finding => list of dashboard ids
 
 function sample($key, $dashid)
 {
     global $samples, $max_samples;
-    if (!isset($samples[$key])) $samples[$key] = array();
+    if (!isset($samples[$key])) {
+        $samples[$key] = [];
+    }
     if (count($samples[$key]) < $max_samples && !in_array($dashid, $samples[$key])) {
         $samples[$key][] = $dashid;
     }
@@ -149,91 +161,76 @@ function sample($key, $dashid)
 function flag($name, $dashid)
 {
     global $c;
-    if (!isset($c['flags'][$name])) $c['flags'][$name] = 0;
+    if (!isset($c['flags'][$name])) {
+        $c['flags'][$name] = 0;
+    }
     $c['flags'][$name]++;
     sample("flag:$name", $dashid);
 }
 
-function bump(&$arr, $key, $n = 1)
-{
-    if (!isset($arr[$key])) $arr[$key] = 0;
-    $arr[$key] += $n;
-}
 
 // Tags that have no business in dashboard content
-$tag_flags = array('script', 'iframe', 'object', 'embed', 'link', 'meta', 'base',
-                   'form', 'input', 'button', 'svg', 'math', 'style', 'frame', 'frameset');
+$tag_flags = ['script', 'iframe', 'object', 'embed', 'link', 'meta', 'base',
+    'form', 'input', 'button', 'svg', 'math', 'style', 'frame', 'frameset'
+];
 
 // Attributes that carry a url
-$url_attrs = array('href', 'src', 'action', 'formaction', 'data', 'poster', 'xlink:href', 'background');
+$url_attrs = ['href', 'src', 'action', 'formaction', 'data', 'poster', 'xlink:href', 'background'];
 
 // The widgets whose only option is html, see widgetlist.js. Container-* widgets
 // hold html too, but they are a grouping box rather than a text box.
-$text_widgets = array('paragraph', 'heading', 'heading-center');
+$text_widgets = ['paragraph', 'heading', 'heading-center'];
 
 // Styling that wraps text without dividing it
-$inline_tags = array('b', 'strong', 'i', 'em', 'u', 'sub', 'sup', 'font', 'span', 'small');
+$inline_tags = ['b', 'strong', 'i', 'em', 'u', 'sub', 'sup', 'font', 'span', 'small'];
 // Structure that divides text into blocks
-$block_tags = array('p', 'div', 'center', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6');
+$block_tags = ['p', 'div', 'center', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 // Rows and bullets
-$table_tags = array('table', 'thead', 'tbody', 'tr', 'th', 'td', 'colgroup', 'col', 'ul', 'ol', 'li');
+$table_tags = ['table', 'thead', 'tbody', 'tr', 'th', 'td', 'colgroup', 'col', 'ul', 'ol', 'li'];
 
 // Written by the designer on every widget box, not by the author, so their
 // values say nothing about what an author wanted.
-$generated_box_props = array('position', 'top', 'left', 'width', 'height', 'margin',
-                             'margin-top', 'margin-right', 'margin-bottom', 'margin-left');
+$generated_box_props = ['position', 'top', 'left', 'width', 'height', 'margin',
+    'margin-top', 'margin-right', 'margin-bottom', 'margin-left'
+];
 
 // ---------------------------------------------------------------------------
 // Parsing
 // ---------------------------------------------------------------------------
 
-function to_entities($html)
-{
-    return mb_encode_numericentity($html, array(0x80, 0x10FFFF, 0, 0x1FFFFF), 'UTF-8');
-}
 
-function parse_fragment($html, &$nerrors, &$messages)
-{
-    $doc = new DOMDocument();
-    libxml_use_internal_errors(true);
-    libxml_clear_errors();
-    $ok = $doc->loadHTML('<div>' . to_entities($html) . '</div>',
-                         LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-    $errs = libxml_get_errors();
-    $nerrors = count($errs);
-    $messages = array();
-    foreach ($errs as $e) $messages[] = trim($e->message);
-    libxml_clear_errors();
-    libxml_use_internal_errors(false);
-    if (!$ok || !$doc->documentElement) return null;
-    return $doc->documentElement;
-}
 
 // Collapse a libxml message down to its shape so the same complaint about
 // different tag names counts as one kind of problem.
 function error_shape($msg)
 {
-    $rules = array(
+    $rules = [
         '/mismatch:\s*\S+ and \S+/i' => 'mismatch: X and Y',
         '/\bTag [A-Za-z0-9_:-]+ invalid/i' => 'Tag X invalid',
         '/end tag\s*:\s*[A-Za-z0-9_:-]+/i' => 'end tag : X',
         '/Attribute [A-Za-z0-9_:.-]+ redefined/i' => 'Attribute X redefined',
         '/[A-Za-z0-9_:-]+ line \d+/' => 'X line N',
         '/\d+/' => 'N',
-    );
+    ];
     $m = $msg;
-    foreach ($rules as $re => $to) $m = preg_replace($re, $to, $m);
+    foreach ($rules as $re => $to) {
+        $m = preg_replace($re, $to, $m);
+    }
     return $m;
 }
 
 function parse_style($style)
 {
-    $out = array();
+    $out = [];
     foreach (explode(';', $style) as $decl) {
-        if (strpos($decl, ':') === false) continue;
+        if (strpos($decl, ':') === false) {
+            continue;
+        }
         list($prop, $val) = explode(':', $decl, 2);
         $prop = strtolower(trim($prop));
-        if ($prop === '') continue;
+        if ($prop === '') {
+            continue;
+        }
         $out[$prop] = trim($val);
     }
     return $out;
@@ -244,20 +241,34 @@ function parse_style($style)
 //
 // What paragraph, heading and heading-center actually hold, so the options for
 // a text widget that takes options instead of html can be drawn from the corpus
-// rather than guessed. See notes/TEXT-WIDGET-OPTIONS.md.
+// rather than guessed. See notes/TEXT-IMAGE-PANEL.md.
 // ---------------------------------------------------------------------------
 
 function census_url_kind($url)
 {
     $u = trim($url);
-    if ($u === '') return '(empty)';
+    if ($u === '') {
+        return '(empty)';
+    }
     $l = strtolower($u);
-    if (strpos($l, 'data:') === 0) return 'data uri';
-    if (strpos($l, '//') === 0) return 'protocol relative';
-    if (strpos($l, 'http://') === 0) return 'http';
-    if (strpos($l, 'https://') === 0) return 'https';
-    if (preg_match('/^[a-z][a-z0-9+.-]*:/', $l)) return 'other scheme';
-    if (substr($u, 0, 1) === '/') return 'absolute path';
+    if (strpos($l, 'data:') === 0) {
+        return 'data uri';
+    }
+    if (strpos($l, '//') === 0) {
+        return 'protocol relative';
+    }
+    if (strpos($l, 'http://') === 0) {
+        return 'http';
+    }
+    if (strpos($l, 'https://') === 0) {
+        return 'https';
+    }
+    if (preg_match('/^[a-z][a-z0-9+.-]*:/', $l)) {
+        return 'other scheme';
+    }
+    if (substr($u, 0, 1) === '/') {
+        return 'absolute path';
+    }
     return 'relative path';
 }
 
@@ -267,15 +278,22 @@ function census_text_style_value($bucket, $prop, $val)
 
     // On the box these six are written by the designer, so they are skipped.
     // Inside the html they are written by the author and are kept.
-    if ($bucket === 'box_style_values' && in_array($prop, $generated_box_props)) return;
+    if ($bucket === 'box_style_values' && in_array($prop, $generated_box_props)) {
+        return;
+    }
     $val = trim($val);
-    if ($val === '') return;
+    if ($val === '') {
+        return;
+    }
     if (!isset($c['text_widget'][$bucket][$prop])) {
-        $c['text_widget'][$bucket][$prop] = array();
+        $c['text_widget'][$bucket][$prop] = [];
     }
     $vals =& $c['text_widget'][$bucket][$prop];
-    if (isset($vals[$val]) || count($vals) < 40) bump($vals, $val);
-    else bump($vals, '(further values)');
+    if (isset($vals[$val]) || count($vals) < 40) {
+        bump($vals, $val);
+    } else {
+        bump($vals, '(further values)');
+    }
 }
 
 // Does every element in this widget wrap all of its text, so one set of options
@@ -285,19 +303,29 @@ function census_text_one_style($node)
 {
     $current = $node;
     while (true) {
-        $elements = array();
+        $elements = [];
         $text = false;
         foreach ($current->childNodes as $child) {
             if ($child->nodeType === XML_TEXT_NODE) {
-                if (trim($child->nodeValue) !== '') $text = true;
-            } else if ($child->nodeType === XML_ELEMENT_NODE) {
-                if (strtolower($child->nodeName) !== 'br') $elements[] = $child;
+                if (trim($child->nodeValue) !== '') {
+                    $text = true;
+                }
+            } elseif ($child->nodeType === XML_ELEMENT_NODE) {
+                if (strtolower($child->nodeName) !== 'br') {
+                    $elements[] = $child;
+                }
             }
         }
-        if (!count($elements)) return true;
-        if (count($elements) > 1) return false;
+        if (!count($elements)) {
+            return true;
+        }
+        if (count($elements) > 1) {
+            return false;
+        }
         // Text beside an element is text styled two ways
-        if ($text) return false;
+        if ($text) {
+            return false;
+        }
         $current = $elements[0];
     }
 }
@@ -311,17 +339,22 @@ function census_text_element($node, $tag)
             $name = strtolower($attr->nodeName);
             bump($c['text_widget']['font_tag'], $name);
             $value = strtolower(trim($attr->nodeValue));
-            if ($value === '' || !in_array($name, array('size', 'color', 'face'))) continue;
+            if ($value === '' || !in_array($name, ['size', 'color', 'face'])) {
+                continue;
+            }
             if (!isset($c['text_widget']['font_tag_values'][$name])) {
-                $c['text_widget']['font_tag_values'][$name] = array();
+                $c['text_widget']['font_tag_values'][$name] = [];
             }
             $vals =& $c['text_widget']['font_tag_values'][$name];
-            if (isset($vals[$value]) || count($vals) < 40) bump($vals, $value);
-            else bump($vals, '(further values)');
+            if (isset($vals[$value]) || count($vals) < 40) {
+                bump($vals, $value);
+            } else {
+                bump($vals, '(further values)');
+            }
         }
-    } else if ($tag === 'img') {
+    } elseif ($tag === 'img') {
         bump($c['text_widget']['img_src'], census_url_kind($node->getAttribute('src')));
-    } else if ($tag === 'a') {
+    } elseif ($tag === 'a') {
         bump($c['text_widget']['link_href'], census_url_kind($node->getAttribute('href')));
     }
 }
@@ -329,9 +362,10 @@ function census_text_element($node, $tag)
 // Sort one text widget into the most demanding thing it contains. The tiers are
 // exclusive and they add up to the widget count, so the share an options only
 // widget could express can be read straight off them.
-$tier_order = array('empty', 'plain text', 'one style throughout', 'image, no text',
-                    'mixed, inline', 'mixed, inline with a link', 'mixed, across blocks',
-                    'table or list', 'embed or nested widget');
+$tier_order = ['empty', 'plain text', 'one style throughout', 'image, no text',
+    'mixed, inline', 'mixed, inline with a link', 'mixed, across blocks',
+    'table or list', 'embed or nested widget'
+];
 
 function census_text_widget($node, $class, $dashid, &$per)
 {
@@ -339,42 +373,48 @@ function census_text_widget($node, $class, $dashid, &$per)
 
     $c['text_widget']['widgets']++;
 
-    $tags = array();
+    $tags = [];
     $has_text = false;
-    $stack = array($node);
+    $stack = [$node];
     while (count($stack)) {
         $current = array_pop($stack);
         foreach ($current->childNodes as $child) {
             if ($child->nodeType === XML_TEXT_NODE) {
-                if (trim($child->nodeValue) !== '') $has_text = true;
+                if (trim($child->nodeValue) !== '') {
+                    $has_text = true;
+                }
                 continue;
             }
-            if ($child->nodeType !== XML_ELEMENT_NODE) continue;
+            if ($child->nodeType !== XML_ELEMENT_NODE) {
+                continue;
+            }
             $tag = strtolower($child->nodeName);
             bump($tags, $tag);
             census_text_element($child, $tag);
             $stack[] = $child;
         }
     }
-    if (isset($tags['br'])) $c['text_widget']['holds_br']++;
+    if (isset($tags['br'])) {
+        $c['text_widget']['holds_br']++;
+    }
 
     $names = array_keys($tags);
-    $expected = array_merge($inline_tags, $block_tags, $table_tags, array('a', 'img', 'br'));
+    $expected = array_merge($inline_tags, $block_tags, $table_tags, ['a', 'img', 'br']);
     $other = array_diff($names, $expected);
 
     if (count($other)) {
         $tier = 'embed or nested widget';
-    } else if (count(array_intersect($names, $table_tags))) {
+    } elseif (count(array_intersect($names, $table_tags))) {
         $tier = 'table or list';
-    } else if (!count($tags)) {
+    } elseif (!count($tags)) {
         $tier = $has_text ? 'plain text' : 'empty';
-    } else if (!$has_text && in_array('img', $names)) {
+    } elseif (!$has_text && in_array('img', $names)) {
         $tier = 'image, no text';
-    } else if (census_text_one_style($node)) {
+    } elseif (census_text_one_style($node)) {
         $tier = 'one style throughout';
-    } else if (count(array_intersect($names, $block_tags))) {
+    } elseif (count(array_intersect($names, $block_tags))) {
         $tier = 'mixed, across blocks';
-    } else if (in_array('a', $names)) {
+    } elseif (in_array('a', $names)) {
         $tier = 'mixed, inline with a link';
     } else {
         $tier = 'mixed, inline';
@@ -382,12 +422,16 @@ function census_text_widget($node, $class, $dashid, &$per)
 
     bump($c['text_widget']['tiers'], $tier);
     if (!isset($c['text_widget']['tiers_by_class'][$class])) {
-        $c['text_widget']['tiers_by_class'][$class] = array();
+        $c['text_widget']['tiers_by_class'][$class] = [];
     }
     bump($c['text_widget']['tiers_by_class'][$class], $tier);
 
-    if (!isset($c['text_widget']['tier_tags'][$tier])) $c['text_widget']['tier_tags'][$tier] = array();
-    foreach ($tags as $t => $n) bump($c['text_widget']['tier_tags'][$tier], $t, $n);
+    if (!isset($c['text_widget']['tier_tags'][$tier])) {
+        $c['text_widget']['tier_tags'][$tier] = [];
+    }
+    foreach ($tags as $t => $n) {
+        bump($c['text_widget']['tier_tags'][$tier], $t, $n);
+    }
 
     $per['text_tiers'][$tier] = true;
     sample('text_widget:' . $tier, $dashid);
@@ -406,14 +450,22 @@ function walk($node, $depth, $widget, $dashid, &$per)
             }
             continue;
         }
-        if ($child->nodeType === XML_COMMENT_NODE) continue;
-        if ($child->nodeType !== XML_ELEMENT_NODE) continue;
+        if ($child->nodeType === XML_COMMENT_NODE) {
+            continue;
+        }
+        if ($child->nodeType !== XML_ELEMENT_NODE) {
+            continue;
+        }
 
         $tag = strtolower($child->nodeName);
         bump($c['tags'], $tag);
-        if ($depth + 1 > $per['max_depth']) $per['max_depth'] = $depth + 1;
+        if ($depth + 1 > $per['max_depth']) {
+            $per['max_depth'] = $depth + 1;
+        }
 
-        if (in_array($tag, $tag_flags)) flag("tag:$tag", $dashid);
+        if (in_array($tag, $tag_flags)) {
+            flag("tag:$tag", $dashid);
+        }
 
         $this_widget = $widget;
 
@@ -450,7 +502,9 @@ function walk($node, $depth, $widget, $dashid, &$per)
             }
         } else {
             $wkey = $widget === null ? '(none)' : $widget;
-            if (!isset($c['nested_tags_by_class'][$wkey])) $c['nested_tags_by_class'][$wkey] = array();
+            if (!isset($c['nested_tags_by_class'][$wkey])) {
+                $c['nested_tags_by_class'][$wkey] = [];
+            }
             bump($c['nested_tags_by_class'][$wkey], $tag);
         }
 
@@ -460,7 +514,9 @@ function walk($node, $depth, $widget, $dashid, &$per)
             $value = $attr->nodeValue;
 
             if ($depth === 0) {
-                if (!isset($c['attrs_by_class'][$this_widget])) $c['attrs_by_class'][$this_widget] = array();
+                if (!isset($c['attrs_by_class'][$this_widget])) {
+                    $c['attrs_by_class'][$this_widget] = [];
+                }
                 bump($c['attrs_by_class'][$this_widget], $name);
                 // An unquoted attribute value that contains a space is parsed as
                 // the first word plus one valueless attribute per remaining word,
@@ -468,11 +524,13 @@ function walk($node, $depth, $widget, $dashid, &$per)
                 // center="". A name carrying css punctuation or a leading digit
                 // can only have come from a value, never from an option name. An
                 // option that is simply blank is a different thing and normal.
-                if ($value !== '') $c['names_with_value'][$name] = true;
+                if ($value !== '') {
+                    $c['names_with_value'][$name] = true;
+                }
                 if (preg_match('/[:()\/;]|^[0-9]/', $name)) {
                     bump($c['malformed_attrs'], $name);
                     sample('malformed_attr', $dashid);
-                } else if ($value === '') {
+                } elseif ($value === '') {
                     bump($c['blank_option_attrs'], $name);
                     sample('blank_or_malformed:' . $name, $dashid);
                 }
@@ -480,14 +538,20 @@ function walk($node, $depth, $widget, $dashid, &$per)
                 bump($c['nested_attrs'], $name);
             }
 
-            if (substr($name, 0, 2) === 'on') flag("event_handler:$name", $dashid);
+            if (substr($name, 0, 2) === 'on') {
+                flag("event_handler:$name", $dashid);
+            }
 
             if (in_array($name, $url_attrs)) {
                 $v = strtolower(ltrim($value));
                 $v = preg_replace('/[\x00-\x20]/', '', $v);
-                if (strpos($v, 'javascript:') === 0) flag('url:javascript', $dashid);
-                else if (strpos($v, 'vbscript:') === 0) flag('url:vbscript', $dashid);
-                else if (strpos($v, 'data:') === 0) flag('url:data', $dashid);
+                if (strpos($v, 'javascript:') === 0) {
+                    flag('url:javascript', $dashid);
+                } elseif (strpos($v, 'vbscript:') === 0) {
+                    flag('url:vbscript', $dashid);
+                } elseif (strpos($v, 'data:') === 0) {
+                    flag('url:data', $dashid);
+                }
             }
 
             if ($name === 'style') {
@@ -497,7 +561,9 @@ function walk($node, $depth, $widget, $dashid, &$per)
                 // the box style of a text or container widget was authored.
                 $wkey = $this_widget === null ? '(none)' : $this_widget;
                 $where = $depth === 0 ? 'box_style_props_by_class' : 'inner_style_props_by_class';
-                if (!isset($c[$where][$wkey])) $c[$where][$wkey] = array();
+                if (!isset($c[$where][$wkey])) {
+                    $c[$where][$wkey] = [];
+                }
                 $text_bucket = null;
                 if (in_array($wkey, $text_widgets)) {
                     $text_bucket = $depth === 0 ? 'box_style_values' : 'inner_style_values';
@@ -506,15 +572,23 @@ function walk($node, $depth, $widget, $dashid, &$per)
                 foreach (parse_style($value) as $prop => $val) {
                     bump($c['style_props'], $prop);
                     bump($c[$where][$wkey], $prop);
-                    if ($text_bucket !== null) census_text_style_value($text_bucket, $prop, $val);
-                    if (!isset($c['style_values'][$prop])) $c['style_values'][$prop] = array();
+                    if ($text_bucket !== null) {
+                        census_text_style_value($text_bucket, $prop, $val);
+                    }
+                    if (!isset($c['style_values'][$prop])) {
+                        $c['style_values'][$prop] = [];
+                    }
                     if (count($c['style_values'][$prop]) < 25 && !in_array($val, $c['style_values'][$prop])) {
                         $c['style_values'][$prop][] = $val;
                     }
                 }
                 $lv = strtolower($value);
-                if (strpos($lv, 'expression(') !== false) flag('style:expression', $dashid);
-                if (strpos($lv, 'url(') !== false) flag('style:url', $dashid);
+                if (strpos($lv, 'expression(') !== false) {
+                    flag('style:expression', $dashid);
+                }
+                if (strpos($lv, 'url(') !== false) {
+                    flag('style:url', $dashid);
+                }
                 if (strpos($lv, 'position:fixed') !== false || strpos($lv, 'position: fixed') !== false) {
                     flag('style:position_fixed', $dashid);
                 }
@@ -536,9 +610,13 @@ global $tier_order;
 
 while (($line = fgets($fh)) !== false) {
     $line = trim($line);
-    if ($line === '') continue;
+    if ($line === '') {
+        continue;
+    }
     $row = json_decode($line, true);
-    if (!is_array($row) || !isset($row['content'])) continue;
+    if (!is_array($row) || !isset($row['content'])) {
+        continue;
+    }
 
     $c['dashboards']++;
     $dashid = $row['id'];
@@ -550,16 +628,19 @@ while (($line = fgets($fh)) !== false) {
     }
 
     $nerrors = 0;
-    $messages = array();
+    $messages = [];
     $root = parse_fragment($content, $nerrors, $messages);
     if ($nerrors > 0) {
         $c['parse_errors']++;
         sample('parse_errors', $dashid);
-        $seen = array();
+        $seen = [];
         foreach ($messages as $msg) {
             $shape = error_shape($msg);
             bump($c['parse_error_shapes'], $shape);
-            if (!isset($seen[$shape])) { sample('parse_error:' . $shape, $dashid); $seen[$shape] = true; }
+            if (!isset($seen[$shape])) {
+                sample('parse_error:' . $shape, $dashid);
+                $seen[$shape] = true;
+            }
         }
     }
     if ($root === null) {
@@ -567,8 +648,9 @@ while (($line = fgets($fh)) !== false) {
         continue;
     }
 
-    $per = array('max_depth' => 0, 'widgets' => 0, 'classes' => array(),
-                 'text_tiers' => array());
+    $per = ['max_depth' => 0, 'widgets' => 0, 'classes' => [],
+        'text_tiers' => []
+    ];
     walk($root, 0, null, $dashid, $per);
 
     // A dashboard needs the html widget if any of its text widgets does, so it
@@ -577,15 +659,21 @@ while (($line = fgets($fh)) !== false) {
     foreach (array_keys($per['text_tiers']) as $tier) {
         bump($c['text_widget']['tier_dashboards'], $tier);
         $rank = array_search($tier, $tier_order);
-        if ($hardest === null || $rank > $hardest) $hardest = $rank;
+        if ($hardest === null || $rank > $hardest) {
+            $hardest = $rank;
+        }
     }
-    if ($hardest !== null) bump($c['text_widget']['hardest_tier'], $tier_order[$hardest]);
+    if ($hardest !== null) {
+        bump($c['text_widget']['hardest_tier'], $tier_order[$hardest]);
+    }
 
     bump($c['depth'], $per['max_depth']);
     bump($c['widgets_per_dashboard'], $per['widgets']);
-    foreach (array_keys($per['classes']) as $cl) bump($c['toplevel_class_dashboards'], $cl);
+    foreach (array_keys($per['classes']) as $cl) {
+        bump($c['toplevel_class_dashboards'], $cl);
+    }
 
-    fwrite($per_fh, json_encode(array(
+    fwrite($per_fh, json_encode([
         'id' => $dashid,
         'user' => isset($row['user']) ? $row['user'] : null,
         'bytes' => strlen($content),
@@ -593,7 +681,7 @@ while (($line = fgets($fh)) !== false) {
         'max_depth' => $per['max_depth'],
         'parse_errors' => $nerrors,
         'classes' => array_keys($per['classes'])
-    )) . "\n");
+    ]) . "\n");
 }
 
 fclose($fh);
@@ -615,35 +703,48 @@ foreach ($c['blank_option_attrs'] as $name => $count) {
     }
 }
 foreach (array_keys($samples) as $k) {
-    if (strpos($k, 'blank_or_malformed:') === 0) unset($samples[$k]);
+    if (strpos($k, 'blank_or_malformed:') === 0) {
+        unset($samples[$k]);
+    }
 }
 $c['names_with_value'] = count($c['names_with_value']);
 
-foreach (array('toplevel_class', 'toplevel_class_dashboards', 'unknown_class', 'tags',
-               'nested_attrs', 'style_props', 'flags', 'parse_error_shapes',
-               'malformed_attrs', 'blank_option_attrs') as $k) {
-    if (isset($c[$k]) && is_array($c[$k])) arsort($c[$k]);
+foreach (
+    ['toplevel_class', 'toplevel_class_dashboards', 'unknown_class', 'tags',
+        'nested_attrs', 'style_props', 'flags', 'parse_error_shapes',
+        'malformed_attrs', 'blank_option_attrs'
+    ] as $k
+) {
+    if (isset($c[$k]) && is_array($c[$k])) {
+        arsort($c[$k]);
+    }
 }
 ksort($c['depth']);
 
-foreach (array('box_style_props_by_class', 'inner_style_props_by_class') as $k) {
+foreach (['box_style_props_by_class', 'inner_style_props_by_class'] as $k) {
     foreach ($c[$k] as $cls => $props) {
         arsort($props);
         $c[$k][$cls] = $props;
     }
-    uasort($c[$k], function ($a, $b) { return array_sum($b) - array_sum($a); });
+    uasort($c[$k], function ($a, $b) {
+        return array_sum($b) - array_sum($a);
+    });
 }
-foreach (array('tiers', 'font_tag', 'img_src', 'link_href') as $k) {
+foreach (['tiers', 'font_tag', 'img_src', 'link_href'] as $k) {
     arsort($c['text_widget'][$k]);
 }
-foreach (array('box_style_values', 'inner_style_values') as $bucket) {
+foreach (['box_style_values', 'inner_style_values'] as $bucket) {
     foreach ($c['text_widget'][$bucket] as $prop => $vals) {
         arsort($vals);
         $c['text_widget'][$bucket][$prop] = $vals;
     }
-    uasort($c['text_widget'][$bucket], function ($a, $b) { return array_sum($b) - array_sum($a); });
+    uasort($c['text_widget'][$bucket], function ($a, $b) {
+        return array_sum($b) - array_sum($a);
+    });
 }
-foreach (array('tier_dashboards', 'hardest_tier') as $k) arsort($c['text_widget'][$k]);
+foreach (['tier_dashboards', 'hardest_tier'] as $k) {
+    arsort($c['text_widget'][$k]);
+}
 foreach ($c['text_widget']['font_tag_values'] as $name => $vals) {
     arsort($vals);
     $c['text_widget']['font_tag_values'][$name] = $vals;
@@ -661,7 +762,10 @@ file_put_contents($opts['out'] . ".json", json_encode($c, JSON_PRETTY_PRINT | JS
 function table($title, $arr, $limit = 0)
 {
     echo "\n$title\n";
-    if (!count($arr)) { echo "  none\n"; return; }
+    if (!count($arr)) {
+        echo "  none\n";
+        return;
+    }
     $n = 0;
     foreach ($arr as $k => $v) {
         printf("  %-40s %s\n", substr((string) $k, 0, 40), $v);
@@ -693,14 +797,21 @@ if (!count($c['nested_tags_by_class'])) {
     echo "  none\n";
 } else {
     $nb = $c['nested_tags_by_class'];
-    uasort($nb, function ($a, $b) { return array_sum($b) - array_sum($a); });
+    uasort($nb, function ($a, $b) {
+        return array_sum($b) - array_sum($a);
+    });
     $n = 0;
     foreach ($nb as $cls => $tags) {
         arsort($tags);
-        $parts = array();
-        foreach ($tags as $t => $v) $parts[] = "$t($v)";
+        $parts = [];
+        foreach ($tags as $t => $v) {
+            $parts[] = "$t($v)";
+        }
         printf("  %-30s %s\n", substr((string) $cls, 0, 30), implode(' ', array_slice($parts, 0, 12)));
-        if (++$n >= 30) { echo "  ... see " . $GLOBALS['opts']['out'] . ".json\n"; break; }
+        if (++$n >= 30) {
+            echo "  ... see " . $GLOBALS['opts']['out'] . ".json\n";
+            break;
+        }
     }
 }
 
@@ -710,10 +821,14 @@ if (!count($c['nested_tags_by_class'])) {
 
 function pairs($arr, $limit = 12)
 {
-    $parts = array();
-    foreach ($arr as $k => $v) $parts[] = "$k($v)";
+    $parts = [];
+    foreach ($arr as $k => $v) {
+        $parts[] = "$k($v)";
+    }
     $out = implode(' ', array_slice($parts, 0, $limit));
-    if (count($parts) > $limit) $out .= ' ...';
+    if (count($parts) > $limit) {
+        $out .= ' ...';
+    }
     return $out;
 }
 
@@ -749,13 +864,18 @@ if (!count($tw['tier_tags'])) {
 
 // Only the box style of a text widget was typed by an author, so this is the
 // list the style options should be drawn from.
-$tw_box = array();
+$tw_box = [];
 $tw_box_generated = 0;
 foreach ($text_widgets as $t) {
-    if (!isset($c['box_style_props_by_class'][$t])) continue;
+    if (!isset($c['box_style_props_by_class'][$t])) {
+        continue;
+    }
     foreach ($c['box_style_props_by_class'][$t] as $prop => $n) {
-        if (in_array($prop, $generated_box_props)) $tw_box_generated += $n;
-        else bump($tw_box, $prop, $n);
+        if (in_array($prop, $generated_box_props)) {
+            $tw_box_generated += $n;
+        } else {
+            bump($tw_box, $prop, $n);
+        }
     }
 }
 arsort($tw_box);
@@ -774,10 +894,14 @@ if (!count($tw['box_style_values'])) {
 
 // Most styling is on the elements inside the box, so this list is the source
 // of the options.
-$tw_inner = array();
+$tw_inner = [];
 foreach ($text_widgets as $t) {
-    if (!isset($c['inner_style_props_by_class'][$t])) continue;
-    foreach ($c['inner_style_props_by_class'][$t] as $prop => $n) bump($tw_inner, $prop, $n);
+    if (!isset($c['inner_style_props_by_class'][$t])) {
+        continue;
+    }
+    foreach ($c['inner_style_props_by_class'][$t] as $prop => $n) {
+        bump($tw_inner, $prop, $n);
+    }
 }
 arsort($tw_inner);
 table("Authored style properties inside a text widget", $tw_inner, 30);
@@ -789,7 +913,10 @@ if (!count($tw['inner_style_values'])) {
     $n = 0;
     foreach ($tw['inner_style_values'] as $prop => $vals) {
         printf("  %-20s %s\n", substr($prop, 0, 20), pairs($vals, 10));
-        if (++$n >= 20) { echo "  ... see " . $GLOBALS['opts']['out'] . ".json\n"; break; }
+        if (++$n >= 20) {
+            echo "  ... see " . $GLOBALS['opts']['out'] . ".json\n";
+            break;
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
 All Emoncms code is released under the GNU Affero General Public License.
 See COPYRIGHT.txt and LICENSE.txt.
@@ -22,23 +23,27 @@ http://openenergymonitor.org
 //   php Modules/dashboard/tools/show.php dashboards.jsonl 42694
 //
 // This prints the content column, which after the switch over holds what was
-// there before the dashboard was converted. Use convert.php --id=N to see the
-// document a dashboard holds now.
+// there before the dashboard was converted. Use migrate.php --html --id=N to
+// see the document it converts to.
 //
 // Add --raw for the content on one line, unwrapped.
 
 define('EMONCMS_EXEC', 1);
 
-if (php_sapi_name() !== 'cli') die("cli only\n");
+if (php_sapi_name() !== 'cli') {
+    die("cli only\n");
+}
 
-$ids = array();
-$opts = array();
+require_once dirname(__FILE__) . "/cli.php";
+
+$ids = [];
+$opts = [];
 $infile = null;
 for ($i = 1; $i < $argc; $i++) {
     if (substr($argv[$i], 0, 2) === '--') {
         $parts = explode('=', substr($argv[$i], 2), 2);
         $opts[$parts[0]] = isset($parts[1]) ? $parts[1] : true;
-    } else if ($infile === null && !ctype_digit($argv[$i])) {
+    } elseif ($infile === null && !ctype_digit($argv[$i])) {
         $infile = $argv[$i];
     } else {
         $ids[] = (int) $argv[$i];
@@ -51,7 +56,9 @@ if (isset($opts['help']) || (!count($ids) && !isset($opts['grep']) && $infile ==
     echo "Reads the dashboard table unless an export file is named.\n";
     exit(0);
 }
-if ($infile !== null && !is_readable($infile)) die("Cannot read $infile\n");
+if ($infile !== null && !is_readable($infile)) {
+    die("Cannot read $infile\n");
+}
 
 $grep = isset($opts['grep']) ? $opts['grep'] : null;
 $max = isset($opts['max']) ? (int) $opts['max'] : 5;
@@ -60,11 +67,17 @@ $raw = isset($opts['raw']);
 $shown = 0;
 
 foreach (rows($infile, $ids) as $row) {
-    if (!is_array($row) || !isset($row['content'])) continue;
+    if (!is_array($row) || !isset($row['content'])) {
+        continue;
+    }
 
     $wanted = count($ids) && in_array((int) $row['id'], $ids);
-    if ($grep !== null && strpos($row['content'], $grep) !== false) $wanted = true;
-    if (!$wanted) continue;
+    if ($grep !== null && strpos($row['content'], $grep) !== false) {
+        $wanted = true;
+    }
+    if (!$wanted) {
+        continue;
+    }
 
     echo "===== dashboard " . $row['id'] . "  (" . strlen($row['content']) . " bytes) =====\n";
     if ($raw) {
@@ -80,7 +93,9 @@ foreach (rows($infile, $ids) as $row) {
     }
 }
 
-if (!$shown) echo "No matching dashboards found\n";
+if (!$shown) {
+    echo "No matching dashboards found\n";
+}
 
 // Either the export, or the dashboard table when no export was named.
 function rows($infile, $ids)
@@ -94,28 +109,19 @@ function rows($infile, $ids)
         return;
     }
 
-    $cwd = getcwd();
-    chdir(dirname(__FILE__) . "/../../..");
-    require "process_settings.php";
-    chdir($cwd);
-
-    $mysqli = @new mysqli(
-        $settings["sql"]["server"],
-        $settings["sql"]["username"],
-        $settings["sql"]["password"],
-        $settings["sql"]["database"],
-        $settings["sql"]["port"]
-    );
-    if ($mysqli->connect_error) die("Cannot connect to database: " . $mysqli->connect_error . "\n");
-    $mysqli->set_charset("utf8mb4");
+    $mysqli = cli_connect();
 
     $where = count($ids) ? " WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")" : "";
-    $result = $mysqli->query("SELECT id, content FROM dashboard" . $where . " ORDER BY id",
-        MYSQLI_USE_RESULT);
-    if (!$result) die("Query failed: " . $mysqli->error . "\n");
+    $result = $mysqli->query(
+        "SELECT id, content FROM dashboard" . $where . " ORDER BY id",
+        MYSQLI_USE_RESULT
+    );
+    if (!$result) {
+        die("Query failed: " . $mysqli->error . "\n");
+    }
 
     while ($row = $result->fetch_assoc()) {
-        yield array('id' => $row['id'], 'content' => $row['content'] === null ? '' : $row['content']);
+        yield ['id' => $row['id'], 'content' => $row['content'] === null ? '' : $row['content']];
     }
     $result->free();
     $mysqli->close();

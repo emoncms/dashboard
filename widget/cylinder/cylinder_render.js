@@ -11,60 +11,49 @@
 
 function cylinder_widgetlist()
 {
-  var widgets = {
-    "cylinder":
-    {
-      "offsetx":-80,"offsety":-165,"width":160,"height":330,
-      "menu":"Widgets",
-      "options":[],
-      "optionstype":[],
-      "optionsname":[],
-      "optionshint":[],
-      "optionsdata":[]
-    }
-  }
-  var decimalsDropBoxOptions = [
-        [-1,   _Tr("Automatic")],
-        [0,    "0"],
-        [1,    "1"],
-        [2,    "2"],
-        [3,    "3"],
-        [4,    "4"],
-        [5,    "5"],
-        [6,    "6"]
+    var widgets = {
+        "cylinder":
+        {
+            "offsetx":-80,"offsety":-165,"width":160,"height":330,
+            "menu":"Widgets",
+            "options":[],
+            "optionstype":[],
+            "optionsname":[],
+            "optionshint":[],
+            "optionsdata":[]
+        }
+    };
+    // Has a third choice, so it is not the helper list
+    var unitDropBoxOptions = [
+        [0, _Tr("Back")],
+        [1, _Tr("Front")],
+        [2, _Tr("No display")]
     ];
-  var unitDropBoxOptions = [
-          [0, _Tr("Back")],
-          [1, _Tr("Front")],
-          [2, _Tr("No display")]
-        ];
     var tempDropBoxOptions = [        // Options for the type combobox. Each item is [typeID, "description"]
         [0,    "ºC"],
         [1,    "ºF"]
     ];
-  addOption(widgets["cylinder"], "topfeedid",    "feedid",  _Tr("Feed Top"),      _Tr("Top feed value"),                []);
-  addOption(widgets["cylinder"], "botfeedid",    "feedid",  _Tr("Feed Bottom"),   _Tr("Bottom feed value"),             []);
-  addOption(widgets["cylinder"], "temptype",     "dropbox", _Tr("Temp unit"),     _Tr("Units of the choosen temp feed"),tempDropBoxOptions);
-  addOption(widgets["cylinder"], "decimals",     "dropbox", _Tr("Decimals"),      _Tr("Decimals to show"),               decimalsDropBoxOptions);
-  addOption(widgets["cylinder"], "unitend",      "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitDropBoxOptions);
-  return widgets;
+    addOption(widgets["cylinder"], "topfeedid",    "feedid",  _Tr("Feed Top"),      _Tr("Top feed value"),                []);
+    addOption(widgets["cylinder"], "botfeedid",    "feedid",  _Tr("Feed Bottom"),   _Tr("Bottom feed value"),             []);
+    addOption(widgets["cylinder"], "temptype",     "dropbox", _Tr("Temp unit"),     _Tr("Units of the choosen temp feed"),tempDropBoxOptions);
+    addOption(widgets["cylinder"], "decimals",     "dropbox", _Tr("Decimals"),      _Tr("Decimals to show"),               widget_decimals_options());
+    addOption(widgets["cylinder"], "unitend",      "dropbox", _Tr("Unit position"), _Tr("Where should the unit be shown"), unitDropBoxOptions);
+    return widgets;
 }
 
-  function get_color(temperature,temptype)
-  {
-    if (temptype === "1") { 
-    temperature = (temperature - 32) * (5 / 9); // Fahrenheit to Celsius
+function get_color(temperature,temptype)
+{
+    if (temptype === "1") {
+        temperature = (temperature - 32) * (5 / 9); // Fahrenheit to Celsius
     }
     var red = (32+(temperature*3.95)).toFixed(0);
     var green = 40;
     var blue = (191-(temperature*3.65)).toFixed(0);
     return "rgb("+red+","+green+","+blue+")";
-  }
+}
 
-  function drawCylinder(ctx,cylBot,cylTop,width,height,temptype,unitend,decimals)
-  {
-    // console.log("Draw cylinder");
-    if (!ctx) console.log("No CTX");
+function drawCylinder(ctx,cylBot,cylTop,width,height,temptype,unitend,decimals)
+{
     if (!ctx) return;
 
     var midx = width / 2;
@@ -73,7 +62,7 @@ function cylinder_widgetlist()
     var topPos = midx;
     var botPos = height - 4 - (cylWidth/2);
 
-    ctx.clearRect(0,0,width,500);
+    ctx.clearRect(0,0,width,height);
     cylTop = cylTop || 0;
     cylBot = cylBot || 0;
     ctx.strokeStyle = "#fff";
@@ -109,96 +98,51 @@ function cylinder_widgetlist()
     ctx.textAlign    = "center";
     ctx.font = "bold "+((width/168)*30)+"px arial";
 
-    if (isNaN(cylTop)){
-    cylTop = 0;}
-    else if(Number(decimals)>=0){ //specified decimals
-    cylTop = cylTop.toFixed(decimals);}
-    else { //automatic decimals
-     if (cylTop>=100){
-     cylTop = cylTop.toFixed(0);}
-     else if (cylTop>=10){
-     cylTop = cylTop.toFixed(1);}
-     else if (cylTop<=-100){
-     cylTop = cylTop.toFixed(0);}
-     else if (cylTop<=-10){
-     cylTop = cylTop.toFixed(1);}
-     else{
-     cylTop = cylTop.toFixed(2);}
+    cylTop = widget_decimals(cylTop, decimals);
+    cylBot = widget_decimals(cylBot, decimals);
 
-     cylTop = parseFloat(cylTop);
-    }
-
-    if (isNaN(cylBot)){
-    cylBot = 0;}
-    else if(Number(decimals)>=0){ //specified decimals
-    cylBot = cylBot.toFixed(decimals);}
-    else { //automatic decimals
-     if (cylBot>=100){
-     cylBot = cylBot.toFixed(0);}
-     else if (cylBot>=10){
-     cylBot = cylBot.toFixed(1);}
-     else if (cylBot<=-100){
-     cylBot = cylBot.toFixed(0);}
-     else if (cylBot<=-10){
-     cylBot = cylBot.toFixed(1);}
-     else{
-     cylBot = cylBot.toFixed(2);}
-
-     cylBot = parseFloat(cylBot);
-    }
     var unit;
     if (temptype === "0") {
-    unit = "ºC";
+        unit = "ºC";
     } else {
-    unit = "ºF";
+        unit = "ºF";
     }
     if (unitend ==="0"){
-      ctx.fillText(cylTop+unit,midx,topPos);
-      ctx.fillText(cylBot+unit,midx,botPos+15);}
+        ctx.fillText(cylTop+unit,midx,topPos);
+        ctx.fillText(cylBot+unit,midx,botPos+15);}
     if (unitend ==="1"){
-      ctx.fillText(unit+cylTop,midx,topPos);
-      ctx.fillText(unit+cylBot,midx,botPos+15);}
+        ctx.fillText(unit+cylTop,midx,topPos);
+        ctx.fillText(unit+cylBot,midx,botPos+15);}
     if (unitend ==="2"){
-      ctx.fillText(cylTop,midx,topPos);
-      ctx.fillText(cylBot,midx,botPos+15);}
-  }
-
-function cylinder_draw()
-{
-  $(".cylinder").each(function(index)
-  {
-    var feedid1 = $(this).attr("topfeedid");
-    if (assocfeed[feedid1]!=undefined) feedid1 = assocfeed[feedid1]; // convert tag:name to feedid
-    var feedid2 = $(this).attr("botfeedid");
-    if (assocfeed[feedid2]!=undefined) feedid2 = assocfeed[feedid2]; // convert tag:name to feedid
-    
-    var cylTop = 60;
-    var cylBot = 20;
-    
-    if (associd[feedid1] != undefined) cylTop = associd[feedid1]["value"]*1;
-    if (associd[feedid2] != undefined) cylBot = associd[feedid2]["value"]*1;
-    
-    var unitend = $(this).attr("unitend") || "0";
-    var temptype= $(this).attr("temptype") || "0";
-    var decimals = $(this).attr("decimals") || "-1";
-
-    var id = "can-"+$(this).attr("id");
-    
-    drawCylinder(widgetcanvas[id],cylBot,cylTop,$(this).width(),$(this).height(),temptype,unitend,decimals);
-  });
+        ctx.fillText(cylTop,midx,topPos);
+        ctx.fillText(cylBot,midx,botPos+15);}
 }
 
-function cylinder_init()
-{
-  setup_widget_canvas("cylinder");
-}
+var cylinder_widget = {
+    mount: function(el, config, ctx){
+        var canvas = ctx.canvas(el);
+        var feeds = ctx.feeds;
 
-function cylinder_slowupdate()
-{
-  cylinder_draw();
-}
+        var draw = function(){
+            var topfeed = feeds.get(config.topfeedid);
+            var botfeed = feeds.get(config.botfeedid);
 
-function cylinder_fastupdate()
-{
-  if (redraw) cylinder_draw();
-}
+            var cylTop = 60;
+            var cylBot = 20;
+
+            if (topfeed) cylTop = topfeed.value*1;
+            if (botfeed) cylBot = botfeed.value*1;
+
+            var unitend = config.unitend || "0";
+            var temptype= config.temptype || "0";
+
+            drawCylinder(canvas.context,cylBot,cylTop,el.clientWidth,el.clientHeight,temptype,unitend,config.decimals || "-1");
+        };
+
+        return {
+            update: function(live){ feeds = live; draw(); },
+            resize: function(){ canvas.fit(); draw(); },
+            destroy: function(){}
+        };
+    }
+};

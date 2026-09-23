@@ -12,11 +12,14 @@ http://openenergymonitor.org
 defined('EMONCMS_EXEC') or die('Restricted access');
 global $session,$path;
 
-load_language_files("Modules/vis/locale", "vis_messages");
 load_language_files("Modules/dashboard/locale", "dashboard_messages");
 
-if (!$dashboard['height']) $dashboard['height'] = 400;
-if (!isset($dashboard['feedmode'])) $dashboard['feedmode'] = "feedid";
+if (!$dashboard['height']) {
+    $dashboard['height'] = 400;
+}
+if (!isset($dashboard['feedmode'])) {
+    $dashboard['feedmode'] = "feedid";
+}
 
 // Escaped for the place each one is printed into, as in dashboard_view.php.
 $dashid = (int) $dashboard['id'];
@@ -24,16 +27,15 @@ $dashheight = (int) $dashboard['height'];
 $backgroundcolor = preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backgroundcolor']);
 ?>
     <script type="text/javascript"><?php require "Modules/dashboard/dashboard_langjs.php"; ?></script>
-    <script type="text/javascript"><?php require "Modules/vis/vis_langjs.php"; ?></script>
     <?php
     load_css("Modules/dashboard/Views/js/widget.css");
     load_css("Modules/dashboard/Views/dashboardeditor.css");
     ?>
 
     <?php
-    load_js("Lib/flot/jquery.flot.min.js");
     load_js("Modules/dashboard/dashboard.js");
     load_js("Modules/dashboard/Views/js/widgetlist.js");
+    load_js("Modules/dashboard/Views/js/widget.helper.js");
     load_js("Modules/dashboard/Views/js/render.js");
     load_js("Modules/feed/feed.js");
     ?>
@@ -43,9 +45,9 @@ $backgroundcolor = preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backg
     // @see: Lib/misc/gettext.js
     function getTranslations() {
         return Object.assign({
-            "Saved": "<?php echo tr("Saved") ?>",
-            "Could not save Dashboard": "<?php echo tr("Could not save Dashboard") ?>",
-            "Items Saved": "<?php echo tr("Items Saved") ?>"
+            "Saved": <?php echo json_encode(tr("Saved")) ?>,
+            "Could not save Dashboard": <?php echo json_encode(tr("Could not save Dashboard")) ?>,
+            "Items Saved": <?php echo json_encode(tr("Items Saved")) ?>
         }, LANG_JS);
     }
     </script>
@@ -53,35 +55,41 @@ $backgroundcolor = preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backg
     <div id="widget_options" class="modal hide keyboard" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="myModalLabel"><?php echo ctx_tr('dashboard_messages','Configure element'); ?></h3>
+            <h3 id="myModalLabel"><?php echo ctx_tr('dashboard_messages', 'Configure element'); ?></h3>
         </div>
         <div id="widget_options_body" class="modal-body"></div>
         <div class="modal-footer">
             <span id="options-problem" class="text-error" style="margin-right:10px"></span>
-            <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo ctx_tr('dashboard_messages','Cancel'); ?></button>
-            <button id="options-save" class="btn btn-primary"><?php echo ctx_tr('dashboard_messages','Save changes'); ?></button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo ctx_tr('dashboard_messages', 'Cancel'); ?></button>
+            <button id="options-save" class="btn btn-primary"><?php echo ctx_tr('dashboard_messages', 'Save changes'); ?></button>
         </div>
     </div>
 </div>
 
-<div id="toolbox" style="cursor:move; text-align: center; background-color:#ddd; padding-left:5px; padding-right:5px; padding-bottom:15px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top: 5rem; right: 1rem;"><?php echo ctx_tr('dashboard_messages','Toolbox'); ?>
-	<div id="separator" style="height:1.5px; background:#717171"></div>
-	<div id="Buttons" style="position:relative; top:5px; cursor:pointer">
-	<span id="dashboard-config-buttons">
-	<button id="dashboard-config-button" style="padding:4px; float:left; width:31px" class="btn" href="#dashConfigModal" role="button" data-toggle="modal" title="<?php echo ctx_tr('dashboard_messages','Configure dashboard basic data'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>"></span></button>
-	<button id="undo-button" class="btn" style="padding:4px; float:left; width:31px" title="<?php echo ctx_tr('dashboard_messages','Undo last step'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>"></span></button>
-	<button id="redo-button" class="btn" style="padding:4px; float:left; width:31px" title="<?php echo ctx_tr('dashboard_messages','Redo last step'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>"></span></button>
-	<button id="view-mode" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages','Return to view mode'); ?>" onclick="window.location.href='view?id=<?php echo $dashid; ?>'"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>" ></span></button>
-	</span>
-	<span id="when-selected">
-		<button id="options-button" class="btn" style="float:left; padding:4px; width:31px" data-toggle="modal" data-target="#widget_options" title="<?php echo ctx_tr('dashboard_messages','Configure selected item'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>"></span></button>
-		<button id="move-forward-button" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages','Move selected item in front of other items'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-front.png'); ?>"></span></button>
-		<button id="move-backward-button" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages','Move selected item to back of other items'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-back.png'); ?>"></span></button>
-		<button id="delete-button" class="btn btn-danger" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages','Delete selected items'); ?>"><span><img src="<?php echo ($path.'Modules/dashboard/Views/icons/emon-icon-delete.png'); ?>"></span></button>
-	</span>
-	<span id="widget-buttons" ></span>
-	<span><button id="save-dashboard" class="btn btn-success" style="float:left; padding:2px; width:125px" title="<?php echo ctx_tr('dashboard_messages','Nothing to save'); ?>" ><?php echo ctx_tr('dashboard_messages','Not modified'); ?></button></span>
-	</div>
+<div id="toolbox" style="cursor:move; text-align: center; background-color:#ddd; padding-left:5px; padding-right:5px; padding-bottom:15px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top: 5rem; right: 1rem;"><?php echo ctx_tr('dashboard_messages', 'Toolbox'); ?>
+    <div id="separator" style="height:1.5px; background:#717171"></div>
+    <div id="Buttons" style="position:relative; top:5px; cursor:pointer">
+    <span id="dashboard-config-buttons">
+    <button id="dashboard-config-button" style="padding:4px; float:left; width:31px" class="btn" href="#dashConfigModal" role="button" data-toggle="modal" title="<?php echo ctx_tr('dashboard_messages', 'Configure dashboard basic data'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>"></span></button>
+    <button id="undo-button" class="btn" style="padding:4px; float:left; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Undo last step'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>"></span></button>
+    <button id="redo-button" class="btn" style="padding:4px; float:left; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Redo last step'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>"></span></button>
+    <button id="view-mode" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Return to view mode'); ?>" onclick="window.location.href='view?id=<?php echo $dashid; ?>'"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>" ></span></button>
+    </span>
+    <span id="when-selected">
+        <button id="options-button" class="btn" style="float:left; padding:4px; width:31px" data-toggle="modal" data-target="#widget_options" title="<?php echo ctx_tr('dashboard_messages', 'Configure selected item'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>"></span></button>
+        <button id="move-forward-button" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Move selected item in front of other items'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-front.png'); ?>"></span></button>
+        <button id="move-backward-button" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Move selected item to back of other items'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-back.png'); ?>"></span></button>
+        <button id="delete-button" class="btn btn-danger" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Delete selected items'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-delete.png'); ?>"></span></button>
+    </span>
+    <span id="clipboard-buttons">
+        <button id="copy-button" class="btn" style="float:left; padding:4px; width:31px" disabled title="<?php echo ctx_tr('dashboard_messages', 'Copy selected items (Ctrl+C)'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-copy.png'); ?>"></span></button>
+        <button id="cut-button" class="btn" style="float:left; padding:4px; width:31px" disabled title="<?php echo ctx_tr('dashboard_messages', 'Cut selected items (Ctrl+X)'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-cut.png'); ?>"></span></button>
+        <button id="paste-button" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Paste copied items (Ctrl+V)'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-paste.png'); ?>"></span></button>
+        <button class="btn" style="float:left; padding:4px; width:31px; visibility:hidden" disabled><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-paste.png'); ?>"></span></button>
+    </span>
+    <span id="widget-buttons" ></span>
+    <span><button id="save-dashboard" class="btn btn-success" style="float:left; padding:2px; width:125px" title="<?php echo ctx_tr('dashboard_messages', 'Nothing to save'); ?>" ><?php echo ctx_tr('dashboard_messages', 'Not modified'); ?></button></span>
+    </div>
 
 </div>
 
@@ -99,24 +107,24 @@ window.onload = addListeners();
 var startx = 0, starty = 0;
 
 function addListeners() {
-  $("#toolbox").on("touchstart mousedown", null, null, mouseDown);
-  $(window).on("touchend touchcancel mouseup", null, null, mouseUp);
+    $("#toolbox").on("touchstart mousedown", null, null, mouseDown);
+    $(window).on("touchend touchcancel mouseup", null, null, mouseUp);
 }
 
 function mouseUp() {
-  $(window).off("touchmove mousemove", null, toolboxMove);
+    $(window).off("touchmove mousemove", null, toolboxMove);
 }
 
 function mouseDown(e) {
-  var toolbox = $('#toolbox');
-  if (toolbox[0] === e.target) {
+    var toolbox = $('#toolbox');
+    if (toolbox[0] === e.target) {
     var position = toolbox.position();
     startx = e.clientX - position.left;
     starty = e.clientY - position.top;
     $(window).on("touchmove mousemove", null, null, toolboxMove);
-	e=e || window.event;
-	pauseEvent(e);
-  }
+    e=e || window.event;
+    pauseEvent(e);
+    }
 }
 
 function pauseEvent(e){
@@ -128,13 +136,12 @@ function pauseEvent(e){
 }
 
 function toolboxMove(e) {
-  var posx = e.clientX - startx;
-  var posy = e.clientY - starty;
-  if (posx < 0 ) posx = 0;
-  if (posy < 50 ) posy = 50;
+    var posx = e.clientX - startx;
+    var posy = e.clientY - starty;
+    if (posx < 0 ) posx = 0;
+    if (posy < 50 ) posy = 50;
 
-  $('#toolbox').css({position: 'absolute', left: posx+'px', top: posy+'px'});
-  console.log("posx:" + posx + "posy:" + posy);
+    $('#toolbox').css({position: 'absolute', left: posx+'px', top: posy+'px'});
 }
 </script>
 
@@ -156,36 +163,36 @@ require_once "Modules/dashboard/dashboard_convert.php";
 ?>
     var dashboard_html_elements = <?php echo json_encode(dashboard_convert_allowed_elements()); ?>;
     var dashboard_text_elements = <?php echo json_encode(dashboard_convert_inline_elements()); ?>;
-    var dashboard_stripped_elements = <?php echo json_encode(dashboard_convert_stripped_elements()); ?>;
-    var redraw = 0;
-    var reloadiframe = -1; // force iframes url to recalculate for all vis widgets
     var _SI = designer.get_SI(); // get a list of International System of Units (SI)
 
     render_widgets_init(widget); // populate widgets variable
 
     designer.canvas = "#can";
+    designer.dashboard_id = dashid;
     designer.grid_size = <?php echo (int) $dashboard['gridsize']; ?>;
     designer.feedmode = <?php echo json_encode((string) $dashboard['feedmode']); ?>;
-    console.log("designer.feedmode: "+designer.feedmode);
-    designer.widgets = widgets;
+    // The document the page was drawn from, see notes/EDITOR.md.
+    // JSON_HEX_TAG keeps a text body from closing the script.
+    designer.document = <?php echo json_encode(json_decode($document), JSON_HEX_TAG | JSON_HEX_AMP); ?>;
+    if (!designer.document || !designer.document.widgets) {
+        designer.document = {"version": 2, "next_id": 1, "widgets": []};
+    }
     designer.init();
 
     render_widgets_start(); // start widgets refresh
 
-    var lastsavecontent = $("#page").html();
+    var lastsavecontent = designer.encode();
     
     $("#save-dashboard").click(function (){
-        var currentcontent = $("#page").html();
+        designer.draw();
+        var currentcontent = designer.encode();
         if (currentcontent === lastsavecontent) {
             // If it's not changed, just bypass actual saving and assume success
             showSuccess();
         } else {
-            designer.scan();
-            designer.draw();
-            
             dashboard_v2.setcontent(dashid,currentcontent,designer.page_height)
-              .done(showSuccess)
-              .fail(showError)
+                .done(showSuccess)
+                .fail(showError)
         }
     });
     function showError(xhr,status) {
@@ -194,7 +201,7 @@ require_once "Modules/dashboard/dashboard_convert.php";
     function showSuccess(data) {
         $("#save-dashboard").attr("class","btn btn-success").text(_Tr("Saved"));
         $("#save-dashboard").attr("title",_Tr("Items Saved"));
-        lastsavecontent = $("#page").html();
+        lastsavecontent = designer.encode();
 
         // The server keeps what the widget list and the html allowlist allow,
         // so a save can drop something. Say what, rather than letting it go

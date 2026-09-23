@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "source": "Modules/dashboard/widget/realtime/realtime_render.js",
+  "widgets": {
+    "realtime": {
+      "options": {
+        "feedid": {
+          "type": "feedid"
+        },
+        "colour": {
+          "type": "colour_picker"
+        },
+        "colourbg": {
+          "type": "colour_picker"
+        },
+        "colouraxis": {
+          "type": "colour_picker"
+        },
+        "initzoom": {
+          "type": "dropbox",
+          "values": [
+            "1",
+            "5",
+            "15",
+            "30",
+            "60"
+          ]
+        },
+        "kw": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

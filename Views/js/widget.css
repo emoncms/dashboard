@@ -115,3 +115,13 @@
   font-size: 11px;
   color: #b94a48;
 }
+
+/* Options modal for a widget that holds a config. Bootstrap fixes a modal at
+   560px, which is enough for a table of options and not for a form beside it.
+   The wide modal takes 900px and most of the height of the window, and folds
+   back to the width of the screen on a narrow one. */
+#widget_options.modal-wide { width: 900px; margin-left: -450px; }
+#widget_options.modal-wide .modal-body { max-height: 70vh; }
+@media (max-width: 940px) {
+    #widget_options.modal-wide { width: auto; left: 10px; right: 10px; margin-left: 0; }
+}
