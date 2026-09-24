@@ -45,10 +45,10 @@ function zoom_widgetlist(){
             "menu":"Visualisations",
             "title":_Tr("Zoom"),
             "description":_Tr("Draws energy per day as bars with a cost worked out from the unit price. Opens on years and steps into the months of a year, the days of a month and the power of one day when a bar is clicked."),
-            "options":["power","kwhd","currency","currency_after_val","pricekwh","delta","scale","colour","colourbg","colouraxis","view"],
-            "optionstype":["feedid","feedid","value","value","value","boolean","value","colour_picker","colour_picker","colour_picker","dropbox"],
-            "optionsname":[_Tr("Power"),_Tr("kwhd"),_Tr("Currency"),_Tr("Currency position"),_Tr("Kwh price"),_Tr("delta"),_Tr("Scale"),_Tr("Colour"),_Tr("Background"),_Tr("Axis colour"),_Tr("Opens on")],
-            "optionshint":[_Tr("Power to show. Leave empty to draw the bars only"),_Tr("kwhd source"),_Tr("Currency to show"),_Tr("0 = before value, 1 = after value"),_Tr("Set kwh price"),_Tr("Show difference between each bar"),_Tr("Multiply the kwhd feed by this"),_Tr("Bar colour in hex. Blank is use default."),_Tr("Background colour in hex. Blank is clear."),_Tr("Axis, label and legend colour in hex. Blank is use default."),_Tr("The view the widget opens on")],
+            "options":["power","kwhd","currency","currency_after_val","pricekwh","delta","scale","colour","colourbg","colouraxis","view","units"],
+            "optionstype":["feedid","feedid","value","value","value","boolean","value","colour_picker","colour_picker","colour_picker","dropbox","value"],
+            "optionsname":[_Tr("Power"),_Tr("kwhd"),_Tr("Currency"),_Tr("Currency position"),_Tr("Kwh price"),_Tr("delta"),_Tr("Scale"),_Tr("Colour"),_Tr("Background"),_Tr("Axis colour"),_Tr("Opens on"),_Tr("Units")],
+            "optionshint":[_Tr("Power to show. Leave empty to draw the bars only"),_Tr("kwhd source"),_Tr("Currency to show"),_Tr("0 = before value, 1 = after value"),_Tr("Set kwh price"),_Tr("Show difference between each bar"),_Tr("Multiply the kwhd feed by this"),_Tr("Bar colour in hex. Blank is use default."),_Tr("Background colour in hex. Blank is clear."),_Tr("Axis, label and legend colour in hex. Blank is use default."),_Tr("The view the widget opens on"),_Tr("Units of the daily feed. Blank is kWh.")],
             "optionsdata":[ , , , , , , , ZOOM_COLOUR.substr(1), , , [["days", _Tr("Days")], ["months", _Tr("Months")], ["years", _Tr("Years")]] ],
             "html":""
         }
@@ -71,13 +71,14 @@ var zoom_widget = {
         var colour = chart_hex(config.colour) || ZOOM_COLOUR;
         var open = config.view;
         if (open !== "months" && open !== "years") open = "days";
+        var units = (config.units || "").trim();
 
         chart_background(el, config.colourbg, "");
         chart_axis(el, config.colouraxis);
 
         var chart = zoom_build(el, ctx, {
                 power: power, kwhd: kwhd, currency: currency, after: after, price: price,
-                delta: delta, scale: scale, colour: colour, open: open
+                delta: delta, scale: scale, colour: colour, open: open, units: units
             });
 
         return {
@@ -113,6 +114,8 @@ function zoom_build(element, ctx, opts){
         delta: opts.delta,
         scale: opts.scale,
         colour: opts.colour,
+        // Units of the daily feed, blank for kWh.
+        units: opts.units,
         // The view the widget opens on, and goes back to after a read.
         open: opts.open,
         // years, months, days or power.
@@ -320,7 +323,7 @@ function zoom_totals(chart){
     if (!days) return "";
 
     var perday = total / days;
-    var kwh = _Tr("kWh");
+    var kwh = zoom_units(chart);
 
     var line = _Tr("Total:") + " " + total.toFixed(0) + " " + kwh + zoom_priced(chart, total, 0)
     + " | " + _Tr("Average:") + " " + perday.toFixed(1) + " " + kwh + zoom_priced(chart, perday, 2);
@@ -330,6 +333,11 @@ function zoom_totals(chart){
     + " | " + zoom_cost(chart, perday * chart.price * 7, 0) + " " + _Tr("a week")
     + ", " + zoom_cost(chart, perday * chart.price * 365, 0) + " " + _Tr("a year")
     + " | " + _Tr("Unit price:") + " " + zoom_cost(chart, chart.price, 2);
+}
+
+// Units of the daily feed as shown in the readouts.
+function zoom_units(chart){
+    return chart.units || _Tr("kWh");
 }
 
 // Whether a unit price was given. Without one the readouts say the energy
@@ -560,7 +568,7 @@ function zoom_reading(chart, item){
     var value = item.datapoint[1];
     if (typeof value !== "number" || !isFinite(value)) return "";
 
-    var kwh = _Tr("kWh");
+    var kwh = zoom_units(chart);
     var average = _Tr("Average:");
 
     if (chart.view === "power") return value.toFixed(0) + "W | " + chart_date(item.datapoint[0]);

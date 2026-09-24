@@ -211,7 +211,7 @@ const declares = {
         "ZOOM_DAYS", "ZOOM_REFRESH", "ZOOM_COLOUR", "zoom_widgetlist", "zoom_widget",
         "zoom_build", "zoom_start", "ZOOM_LENGTHS", "zoom_toolbar", "zoom_length", "zoom_nav",
         "zoom_buttons", "zoom_step", "zoom_periods", "zoom_floor", "zoom_period_length",
-        "zoom_fetch", "zoom_totals", "zoom_has_price", "zoom_priced", "zoom_cost",
+        "zoom_fetch", "zoom_totals", "zoom_units", "zoom_has_price", "zoom_priced", "zoom_cost",
         "zoom_bars_view", "zoom_years_view", "zoom_months_view", "zoom_days_view",
         "zoom_power", "zoom_open", "zoom_back", "zoom_plot", "zoom_bind", "zoom_title",
         "zoom_reading", "zoom_refresh",

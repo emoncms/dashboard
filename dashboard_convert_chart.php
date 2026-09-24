@@ -350,9 +350,9 @@ function dashboard_convert_preset_bargraph($options, $now)
 
 // A bargraph as a zoom widget: the feed goes in as the daily feed, with no
 // power feed, and the widget opens on the view the step asked for. The
-// colour, background, delta and scale carry over. units, dp and initzoom do
-// not, the zoom widget says kWh and chooses its own window, and they are
-// counted.
+// colour, background, delta, scale and units carry over. dp and initzoom do
+// not, the zoom widget chooses its own decimal places and window, and they
+// are counted.
 function dashboard_convert_preset_bargraph_zoom($options, $window, $dropped)
 {
     $views = ['daily' => 'days', 'monthly' => 'months', 'annual' => 'years'];
@@ -362,11 +362,12 @@ function dashboard_convert_preset_bargraph_zoom($options, $window, $dropped)
         dashboard_convert_preset_count($dropped, 'widget_without_feed');
     }
 
-    foreach (['units', 'dp', 'initzoom'] as $key) {
+    foreach (['dp', 'initzoom'] as $key) {
         if (dashboard_convert_preset_text($options, $key) !== '') {
             dashboard_convert_preset_count($dropped, $key);
         }
     }
+    $units = dashboard_convert_preset_zoom_units($options, $dropped);
 
     $zoom = [
         'power'    => '',
@@ -380,8 +381,33 @@ function dashboard_convert_preset_bargraph_zoom($options, $window, $dropped)
     if ($scale !== '1') {
         $zoom['scale'] = $scale;
     }
+    if ($units !== '') {
+        $zoom['units'] = $units;
+    }
 
     return ['type' => 'zoom', 'options' => $zoom, 'dropped' => $dropped];
+}
+
+// Units of a bargraph as the zoom widget takes them. Blank means kWh, so any
+// spelling of kWh is left blank: kwh, KWH, kWh/d and kWh per day would
+// otherwise read "kWh/d/d" in the per day average. A bare number is a
+// mistyped option and is left blank too. Anything else is kept as written,
+// or counted as units when it holds an angle bracket, which a value option
+// may not.
+function dashboard_convert_preset_zoom_units($options, &$dropped)
+{
+    $units = dashboard_convert_preset_text($options, 'units');
+    if ($units === '' || preg_match('/^[\d.]+$/', $units)) {
+        return '';
+    }
+    if (preg_match('#kwh|kw\s*/\s*h#i', $units)) {
+        return '';
+    }
+    if (strpbrk($units, '<>') !== false || mb_strlen($units, 'UTF-8') > 64) {
+        dashboard_convert_preset_count($dropped, 'units');
+        return '';
+    }
+    return $units;
 }
 
 // The step and the window a bargraph opened on.

@@ -2049,10 +2049,26 @@ $scaled = dashboard_convert_preset_to_graph(
 );
 check('the scale carries over', $scaled['options']['scale'], '0.001');
 check(
-    'units, dp and initzoom do not, and are counted',
+    'dp and initzoom do not, and are counted',
     $scaled['dropped'],
-    ['units' => 1, 'dp' => 1, 'initzoom' => 1]
+    ['dp' => 1, 'initzoom' => 1]
 );
+check('kWh is the default, so it is left blank', isset($scaled['options']['units']), false);
+
+// Units carry over unless they are kWh or a bare number.
+$units = function ($units) use ($now) {
+    $zoom = dashboard_convert_preset_to_graph('bargraph', ['feedid' => '7', 'units' => $units], $now);
+    return [isset($zoom['options']['units']) ? $zoom['options']['units'] : '', $zoom['dropped']];
+};
+check('units m³ carry over', $units('m³'), ['m³', []]);
+check('units °C carry over', $units(' °C '), ['°C', []]);
+check('units kW heat carry over', $units('kW heat'), ['kW heat', []]);
+check('units Wh carry over', $units('Wh'), ['Wh', []]);
+check('units kWh/d are kWh', $units('kWh/d'), ['', []]);
+check('units KW/h are kWh', $units('KW/h'), ['', []]);
+check('units kWh per day are kWh', $units('Energy, kwh per day'), ['', []]);
+check('units that are a number are blank', $units('100'), ['', []]);
+check('units holding a tag are counted', $units('<b>L</b>'), ['', ['units' => 1]]);
 check(
     'the colour it drew in when none was set',
     dashboard_convert_preset_to_graph('bargraph', ['feedid' => '7'], $now)['options']['colour'],

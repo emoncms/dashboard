@@ -41,6 +41,9 @@
             "months",
             "years"
           ]
+        },
+        "units": {
+          "type": "value"
         }
       }
     }
