@@ -538,7 +538,10 @@ var designer = {
             if (val !== undefined && val !== "") return null;
         }
         if (hasfeed) return _Tr("not configured");
-        if (hastext && $("<div>").html(widget.text || "").text().trim() === "") return _Tr("no text");
+        // The old paragraph and heading types hold their content in html, the
+        // text widget in text, and both are drawn. An image counts as content.
+        var content = $("<div>").html((widget.html || "") + (widget.text || ""));
+        if (hastext && content.text().trim() === "" && !content.find("img").length) return _Tr("no text");
         return null;
     },
 
