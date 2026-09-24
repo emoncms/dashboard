@@ -871,6 +871,7 @@ function migrate_charts($mysqli, $o, &$failed)
     // takes only what it could fetch when it drew the saved graph.
     global $settings;
     $graph_table = cli_has_table($mysqli, 'graph');
+    $redis = $graph_table ? cli_redis() : false;
 
     $update = $mysqli->prepare("UPDATE dashboard SET content_json=? WHERE id=?");
     if (!$update) {
@@ -914,7 +915,7 @@ function migrate_charts($mysqli, $o, &$failed)
             $from_html++;
         }
         $graph = $graph_table
-            ? dashboard_migrate_graph_loader($mysqli, (int) $row['userid'], false, $settings) : null;
+            ? dashboard_migrate_graph_loader($mysqli, (int) $row['userid'], $redis, $settings) : null;
         $touched = dashboard_upgrade_document($document);
         if ($touched) {
             $upgraded++;

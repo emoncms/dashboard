@@ -86,6 +86,35 @@ function cli_connect()
     return $mysqli;
 }
 
+// Redis connection as index.php makes it, or false when redis is disabled.
+// Call after cli_connect. Feed model on emoncms.org reads feed metadata from
+// redis only, so a tool that reads saved graphs passes this rather than false.
+function cli_redis()
+{
+    global $settings;
+
+    if (empty($settings['redis']['enabled'])) {
+        return false;
+    }
+    if (!extension_loaded('redis')) {
+        die("Redis is enabled in settings but the php redis extension is not loaded\n");
+    }
+    $redis = new Redis();
+    if (!@$redis->connect($settings['redis']['host'], $settings['redis']['port'])) {
+        die("Cannot connect to redis at " . $settings['redis']['host'] . ":" . $settings['redis']['port'] . "\n");
+    }
+    if (!empty($settings['redis']['prefix'])) {
+        $redis->setOption(Redis::OPT_PREFIX, $settings['redis']['prefix']);
+    }
+    if (!empty($settings['redis']['auth']) && !$redis->auth($settings['redis']['auth'])) {
+        die("Redis authentication failed\n");
+    }
+    if (!empty($settings['redis']['dbnum'])) {
+        $redis->select($settings['redis']['dbnum']);
+    }
+    return $redis;
+}
+
 function cli_has_table($mysqli, $table)
 {
     $check = $mysqli->query("SHOW TABLES LIKE '" . $mysqli->real_escape_string($table) . "'");

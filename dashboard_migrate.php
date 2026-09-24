@@ -248,7 +248,7 @@ function dashboard_migrate_graph_loader($mysqli, $userid, $redis, $settings, $lo
             $feed = new Feed($mysqli, $redis, $feed_settings);
             $graph = new Graph($mysqli, $feed);
             $saved = $graph->get($userid, (int) $graphid);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             if ($log) {
                 $log->warn("saved graph $graphid not read: " . $e->getMessage());
             }

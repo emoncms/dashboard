@@ -45,6 +45,8 @@ if (isset($opts['help'])) {
 // The model requires its files relative to the emoncms root.
 chdir(cli_root());
 $mysqli = cli_connect();
+// Global, as index.php leaves it. Dashboard::migrate_context reads it.
+$redis = cli_redis();
 require "Lib/EmonLogger.php";
 require "Modules/dashboard/dashboard_model.php";
 require_once "Modules/dashboard/dashboard_migrate.php";
