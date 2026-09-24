@@ -1074,14 +1074,22 @@ var designer = {
         var elements = wrapper ? wrapper.querySelectorAll("*") : [];
         var refused = [];
         var styled = false;
+        var url_problems = [];
 
         for (var i = 0; i < elements.length; i++) {
             var tag = elements[i].tagName.toLowerCase();
             if (allowed.indexOf(tag) === -1) {
                 if (refused.indexOf(tag) === -1) refused.push(tag);
-            } else if (elements[i].hasAttribute("style")) {
-                styled = true;
+                continue;
             }
+            if (elements[i].hasAttribute("style")) styled = true;
+            // Links and images are held to the rules the server applies on
+            // save, see dashboard_convert_url_allowed.
+            ["href", "src"].forEach(function(attribute){
+                if (!elements[i].hasAttribute(attribute)) return;
+                var problem = designer.url_problem(elements[i].getAttribute(attribute), attribute === "src");
+                if (problem && url_problems.indexOf(problem) === -1) url_problems.push(problem);
+            });
         }
 
         var says = [];
@@ -1098,6 +1106,7 @@ var designer = {
         if (styled && allowed === window.dashboard_text_elements) {
             says.push(_Tr("Must not use style, set it with the options"));
         }
+        url_problems.forEach(function(problem){ says.push(problem); });
         return says.join(". ");
     },
 
