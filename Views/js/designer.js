@@ -538,7 +538,7 @@ var designer = {
             if (val !== undefined && val !== "") return null;
         }
         if (hasfeed) return _Tr("not configured");
-        if (hastext && $.trim($("<div>").html(widget.text || "").text()) === "") return _Tr("no text");
+        if (hastext && $("<div>").html(widget.text || "").text().trim() === "") return _Tr("no text");
         return null;
     },
 
