@@ -283,13 +283,17 @@ function dashboard_convert_ids(&$widgets)
 // Parsing
 // ---------------------------------------------------------------------------
 
+// Null bytes are removed before parsing, as the HTML5 parser in libxml 2.14
+// and later ignores them. Earlier libxml (2.9 on Ubuntu 24.04) drops the rest
+// of the document after a null byte in an attribute value, including any
+// widgets that follow.
 function dashboard_convert_parse($html)
 {
     $doc = new DOMDocument();
     libxml_use_internal_errors(true);
     libxml_clear_errors();
     $ok = $doc->loadHTML(
-        '<div>' . dashboard_convert_to_entities($html) . '</div>',
+        '<div>' . dashboard_convert_to_entities(str_replace("\0", "", $html)) . '</div>',
         LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
     );
     libxml_clear_errors();

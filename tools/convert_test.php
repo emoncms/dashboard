@@ -149,12 +149,18 @@ check(
     $widget['options'],
     ['feedid' => '821', 'font' => '9', 'size' => '6']
 );
-check('broken style fragments named', count(array_filter(
-    codes($result),
-    function ($c) {
-        return $c === 'broken_style_attribute';
+// libxml before 2.14 drops the fragment named ";", so it is not checked.
+$fragments = [];
+foreach ($result['warnings'] as $warning) {
+    if ($warning['code'] === 'broken_style_attribute') {
+        $fragments[] = $warning['detail'];
     }
-)), 5);
+}
+check(
+    'broken style fragments named',
+    array_values(array_intersect(['arial', 'black', 'text-align:', 'center'], $fragments)),
+    ['arial', 'black', 'text-align:', 'center']
+);
 check('broken style extension attribute named', in_array('browser_extension_attribute', codes($result)), true);
 check('broken style loses nothing else', in_array('option_unknown_dropped', codes($result)), false);
 
@@ -1062,6 +1068,14 @@ attack(
     ['alert'],
     'go'
 );
+
+// libxml before 2.14 drops the rest of the document after a null byte in an
+// attribute value.
+$result = convert(box("<a href=\"x\0y\">go</a> after")
+    . '<div id="2" class="heading" style="position:absolute; top:0px; left:0px; '
+    . 'width:10px; height:6px;">second</div>');
+check('null byte keeps following widgets', count(widgets($result)), 2);
+check('null byte keeps following text', strpos(render($result), 'after') !== false, true);
 
 attack(
     'colon dressed up as a path',
