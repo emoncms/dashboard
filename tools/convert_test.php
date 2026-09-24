@@ -545,6 +545,17 @@ $view_links = [
     '/EnergyPi\\..\\feed\\delete.json' => false,
     '/EnergyPi/%2e%2e/feed/delete.json' => false,
     '/dashboard/view%3fid=1/../../feed/delete' => false,
+    // The rewrite rule writes the decoded path into the query string, so an
+    // encoded & starts a q of its own and the last q is the route.
+    '/EnergyPi%26q=feed/delete.json?id=5' => false,
+    'https://emoncms.example/EnergyPi%26q%3dfeed%2fdelete.json' => false,
+    '/EnergyPi%3Fq=feed/delete.json' => false,
+    '/EnergyPi%2526q=feed/delete.json' => false,
+    '/EnergyPi/mobile%23top' => false,
+    '/EnergyPi;q=feed/delete' => false,
+    '/x/shell.phtml' => false,
+    '/x/tool.phar' => false,
+    '/x/old.php5' => false,
 ];
 foreach ($view_links as $url => $want) {
     check("own site link $url", dashboard_convert_url_allowed($url, 'href'), $want);

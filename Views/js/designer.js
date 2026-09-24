@@ -1019,6 +1019,7 @@ var designer = {
             query = decodeURIComponent(query);
         } catch (e) { return false; }
         if (/(?:^|[&;])\s*q\s*(?:[\[=&;]|$)/i.test(query)) return false;
+        if (/[&?#=;%]/.test(path)) return false;
 
         var segments = [];
         if (path !== "" && path.charAt(0) !== "/") segments.push("dashboard");
@@ -1029,7 +1030,7 @@ var designer = {
         }
 
         for (var i = 0; i < segments.length; i++) {
-            if (segments[i].slice(-4) === ".php") return false;
+            if (/\.(?:php\d*|phtml|phar|phps)$/.test(segments[i])) return false;
             if (modules.indexOf(segments[i]) === -1) continue;
             if (!views.hasOwnProperty(segments[i])) return false;
             var action = i + 1 < segments.length ? segments[i + 1] : "";

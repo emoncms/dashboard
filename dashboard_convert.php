@@ -1395,8 +1395,11 @@ const DASHBOARD_CONVERT_VIEW_ROUTES = [
  * viewer.
  *
  * Refused whatever the path: a q parameter, since the rewrite rule appends
- * the query string and a q in it replaces the route, and a .php file, which
- * reaches index.php or a script directly.
+ * the query string and a q in it replaces the route, and a php file, which
+ * reaches index.php or a script directly. Also refused, a path that decodes
+ * to & ? # = ; or a further %. The rewrite rule (Apache without the B flag,
+ * nginx with $uri) writes the decoded path into the query string, so
+ * EnergyPi%26q=feed/delete.json routes to feed/delete.json.
  */
 function dashboard_convert_url_is_view_link($url)
 {
@@ -1407,6 +1410,9 @@ function dashboard_convert_url_is_view_link($url)
 
     $parts = preg_split('/[?#]/', $url, 2);
     $path = urldecode($parts[0]);
+    if (preg_match('/[&?#=;%]/', $path)) {
+        return false;
+    }
     $query = '';
     if (preg_match('/\?([^#]*)/', $url, $match)) {
         $query = urldecode($match[1]);
@@ -1431,7 +1437,7 @@ function dashboard_convert_url_is_view_link($url)
 
     $modules = dashboard_convert_installed_modules();
     foreach ($segments as $i => $segment) {
-        if (substr($segment, -4) === '.php') {
+        if (preg_match('/\.(?:php\d*|phtml|phar|phps)$/', $segment)) {
             return false;
         }
         if (!in_array($segment, $modules, true)) {
