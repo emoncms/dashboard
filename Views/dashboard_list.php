@@ -191,7 +191,6 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
 <?php load_js("Modules/dashboard/dashboard.js"); ?>
 <?php load_js("Lib/js/vue.global.prod-3.5.22.min.js"); ?>
-<?php load_js("Lib/misc/gettext.js"); ?>
 <script>
     /**
      * return plain js object with gettext translated strings

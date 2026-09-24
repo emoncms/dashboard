@@ -42,7 +42,7 @@ $backgroundcolor = preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backg
 
     <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
     <script>
-    // @see: Lib/misc/gettext.js
+    // @see: Lib/js/gettext.js
     function getTranslations() {
         return Object.assign({
             "Saved": <?php echo json_encode(tr("Saved")) ?>,
