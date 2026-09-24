@@ -18,59 +18,63 @@ function dashboard_config_attr($value)
 }
 ?>
 
-<div id="dashConfigModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="dashConfigModalLabel" aria-hidden="true" data-backdrop="static">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="dashConfigModalLabel"><?php echo ctx_tr('dashboard_messages', 'Dashboard Configuration'); ?></h3>
-    </div>
-    <div class="modal-body">
-        <label><?php echo ctx_tr('dashboard_messages', 'Dashboard name: '); ?></label>
-        <input type="text" name="name" value="<?php echo dashboard_config_attr($dashboard['name']); ?>" />
-        <label><?php echo ctx_tr('dashboard_messages', 'Alias name: '); ?></label>
-        <input type="text" name="alias" value="<?php echo dashboard_config_attr($dashboard['alias']); ?>" />
-        <label><?php echo ctx_tr('dashboard_messages', 'Background color: '); ?></label>
-        <input type="color" name="backgroundcolor" value="#<?php echo preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backgroundcolor']); ?>" />
-        <label><?php echo ctx_tr('dashboard_messages', 'Description: '); ?></label>
-        <textarea name="description"><?php echo dashboard_config_attr($dashboard['description']); ?></textarea>
-        <label><?php echo ctx_tr('dashboard_messages', 'Grid size: '); ?></label>
-        <input type="text" name="gridsize" value="<?php echo (int) $dashboard['gridsize']; ?>" />
-
-
-        <label><?php echo ctx_tr('dashboard_messages', 'Feed selection mode: '); ?></label>
-        <i style="font-size:12px"><?php echo ctx_tr('dashboard_messages', 'Note: Reset feeds in all widgets in dashboard if changing'); ?><br><?php echo ctx_tr('dashboard_messages', 'this part way through a dashboard build'); ?></i><br>
-        <select name="feedmode">
-            <option value="tagname" <?php echo $dashboard['feedmode'] == "tagname" ? 'selected' : ''; ?>><?php echo ctx_tr('dashboard_messages', 'By tag:name'); ?></option>
-            <option value="feedid" <?php echo $dashboard['feedmode'] == "feedid" ? 'selected' : ''; ?>><?php echo ctx_tr('dashboard_messages', 'By feedid'); ?></option>
-        </select>
-
-        <label class="checkbox">
-            <input type="checkbox" name="main" id="chk_main" value="1" <?php echo $dashboard['main'] ? 'checked' : ''; ?> />
-            <abbr title="<?php echo ctx_tr('dashboard_messages', 'Make this dashboard the first shown'); ?>"><?php echo ctx_tr('dashboard_messages', 'Main'); ?></abbr>
-        </label>
-
-        <label class="checkbox">
-            <input type="checkbox" name="published" id="chk_published" value="1" <?php echo $dashboard['published'] ? 'checked' : ''; ?> />
-            <abbr title="<?php echo ctx_tr('dashboard_messages', 'Activate this dashboard'); ?>"><?php echo ctx_tr('dashboard_messages', 'Published'); ?></abbr>
-        </label>
-
-        <label class="checkbox">
-            <input type="checkbox" name="public" id="chk_public" value="1" <?php echo $dashboard['public'] ? 'checked' : ''; ?> />
-            <abbr title="<?php echo ctx_tr('dashboard_messages', 'Anyone with the URL can see this dashboard'); ?>"><?php echo ctx_tr('dashboard_messages', 'Public'); ?></abbr>
-        </label>
-
-        <label class="checkbox">
-            <input type="checkbox" name="showdescription" id="chk_showdescription" value="1" <?php echo $dashboard['showdescription'] ? 'checked' : ''; ?> />
-            <abbr title="<?php echo ctx_tr('dashboard_messages', 'Shows dashboard description on mouse over dashboard name in menu project'); ?>"><?php echo ctx_tr('dashboard_messages', 'Show description'); ?></abbr>
-        </label>
-
-        <label class="checkbox">
-            <input type="checkbox" name="fullscreen" id="chk_fullscreen" value="1" <?php echo $dashboard['fullscreen'] ? 'checked' : ''; ?> />
-            <abbr title="<?php echo ctx_tr('dashboard_messages', 'Hide menus on dashboard. Make full screen.'); ?>"><?php echo ctx_tr('dashboard_messages', 'Hide Menus'); ?></abbr>
-        </label>
-    </div>
-    <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo ctx_tr('dashboard_messages', 'Close'); ?></button>
-        <button id="configure-save" class="btn btn-primary"><?php echo ctx_tr('dashboard_messages', 'Save changes'); ?></button>
+<div id="dashConfigModal" class="modal" tabindex="-1" aria-labelledby="dashConfigModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="dashConfigModalLabel" class="modal-title"><?php echo ctx_tr('dashboard_messages', 'Dashboard Configuration'); ?></h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label><?php echo ctx_tr('dashboard_messages', 'Dashboard name: '); ?></label>
+                <input type="text" name="name" value="<?php echo dashboard_config_attr($dashboard['name']); ?>" />
+                <label><?php echo ctx_tr('dashboard_messages', 'Alias name: '); ?></label>
+                <input type="text" name="alias" value="<?php echo dashboard_config_attr($dashboard['alias']); ?>" />
+                <label><?php echo ctx_tr('dashboard_messages', 'Background color: '); ?></label>
+                <input type="color" name="backgroundcolor" value="#<?php echo preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backgroundcolor']); ?>" />
+                <label><?php echo ctx_tr('dashboard_messages', 'Description: '); ?></label>
+                <textarea name="description"><?php echo dashboard_config_attr($dashboard['description']); ?></textarea>
+                <label><?php echo ctx_tr('dashboard_messages', 'Grid size: '); ?></label>
+                <input type="text" name="gridsize" value="<?php echo (int) $dashboard['gridsize']; ?>" />
+        
+        
+                <label><?php echo ctx_tr('dashboard_messages', 'Feed selection mode: '); ?></label>
+                <i style="font-size:12px"><?php echo ctx_tr('dashboard_messages', 'Note: Reset feeds in all widgets in dashboard if changing'); ?><br><?php echo ctx_tr('dashboard_messages', 'this part way through a dashboard build'); ?></i><br>
+                <select name="feedmode">
+                    <option value="tagname" <?php echo $dashboard['feedmode'] == "tagname" ? 'selected' : ''; ?>><?php echo ctx_tr('dashboard_messages', 'By tag:name'); ?></option>
+                    <option value="feedid" <?php echo $dashboard['feedmode'] == "feedid" ? 'selected' : ''; ?>><?php echo ctx_tr('dashboard_messages', 'By feedid'); ?></option>
+                </select>
+        
+                <label class="checkbox">
+                    <input type="checkbox" name="main" id="chk_main" value="1" <?php echo $dashboard['main'] ? 'checked' : ''; ?> />
+                    <abbr title="<?php echo ctx_tr('dashboard_messages', 'Make this dashboard the first shown'); ?>"><?php echo ctx_tr('dashboard_messages', 'Main'); ?></abbr>
+                </label>
+        
+                <label class="checkbox">
+                    <input type="checkbox" name="published" id="chk_published" value="1" <?php echo $dashboard['published'] ? 'checked' : ''; ?> />
+                    <abbr title="<?php echo ctx_tr('dashboard_messages', 'Activate this dashboard'); ?>"><?php echo ctx_tr('dashboard_messages', 'Published'); ?></abbr>
+                </label>
+        
+                <label class="checkbox">
+                    <input type="checkbox" name="public" id="chk_public" value="1" <?php echo $dashboard['public'] ? 'checked' : ''; ?> />
+                    <abbr title="<?php echo ctx_tr('dashboard_messages', 'Anyone with the URL can see this dashboard'); ?>"><?php echo ctx_tr('dashboard_messages', 'Public'); ?></abbr>
+                </label>
+        
+                <label class="checkbox">
+                    <input type="checkbox" name="showdescription" id="chk_showdescription" value="1" <?php echo $dashboard['showdescription'] ? 'checked' : ''; ?> />
+                    <abbr title="<?php echo ctx_tr('dashboard_messages', 'Shows dashboard description on mouse over dashboard name in menu project'); ?>"><?php echo ctx_tr('dashboard_messages', 'Show description'); ?></abbr>
+                </label>
+        
+                <label class="checkbox">
+                    <input type="checkbox" name="fullscreen" id="chk_fullscreen" value="1" <?php echo $dashboard['fullscreen'] ? 'checked' : ''; ?> />
+                    <abbr title="<?php echo ctx_tr('dashboard_messages', 'Hide menus on dashboard. Make full screen.'); ?>"><?php echo ctx_tr('dashboard_messages', 'Hide Menus'); ?></abbr>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-bs-dismiss="modal" aria-hidden="true"><?php echo ctx_tr('dashboard_messages', 'Close'); ?></button>
+                <button id="configure-save" class="btn btn-primary"><?php echo ctx_tr('dashboard_messages', 'Save changes'); ?></button>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -567,7 +567,7 @@ var designer = {
         var title = widgets[widget]["title"] ? widgets[widget]["title"] : widget;
         $("#myModalLabel").text(_Tr("Configure") + " " + String(title).toLowerCase());
         if (widgets[widget]["description"]) {
-            options_html += '<p class="muted" style="font-size:12px;">'+designer_escape(widgets[widget]["description"])+"</p>";
+            options_html += '<p class="text-muted" style="font-size:12px;">'+designer_escape(widgets[widget]["description"])+"</p>";
         }
 
         // A widget whose settings do not fit in attributes holds them in one
@@ -595,8 +595,8 @@ var designer = {
             if (val == undefined) val="";
 
             options_html += '<div class="control-group"><div class="controls">';
-            options_html += '<div class="input-prepend" style="margin-bottom: 0px;">';
-            options_html += '<span class="add-on" style="width:100px; text-align: right; font-size:12px;">'+options_name[z]+"</span>";
+            options_html += '<div class="input-group" style="margin-bottom: 0px;">';
+            options_html += '<span class="input-group-text justify-content-end" style="width:100px; box-sizing:content-box; text-align: right; font-size:12px;">'+options_name[z]+"</span>";
 
             // all feeds
 
@@ -659,7 +659,7 @@ var designer = {
                 options_html += "<option " + other_selected + " value='__other'>"+_Tr("Other")+"</option>";
                 options_html += "</select>";
                 options_html += "</div>";
-                options_html += '<div class="input-prepend ' + other_hidden + ' other"><span class="add-on" style="width:100px; text-align: right; font-size:12px;background: none;border: none;margin-right: 1px;">' + _Tr("Other") + "</span>";
+                options_html += '<div class="input-group ' + other_hidden + ' other"><span class="input-group-text justify-content-end" style="width:100px; box-sizing:content-box; text-align: right; font-size:12px;background: none;border: none;margin-right: 1px;">' + _Tr("Other") + "</span>";
                 options_html += '<input id="' + box_options[z] + '" type="text" value="' + designer_escape(val) + '" data-last-value="' + designer_escape(val) + '" class="options input-is-other" style="border-radius:0 0 4px 4px;border-top:none">';
             }
 
@@ -696,7 +696,7 @@ var designer = {
             }
 
             options_html += "</div>";
-            options_html += '<span class="help-inline"><small class="muted">'+optionshint[z]+"</small></span>";
+            options_html += '<span class="help-inline"><small class="text-muted">'+optionshint[z]+"</small></span>";
             options_html +="</div></div>";
 
         }
@@ -704,15 +704,15 @@ var designer = {
         // Generic sizing options for all widgets (an hack so we dont add new options to all widgets)
         var selPixel = (designer.boxlist[selected_box]["styleUnitWidth"] == 0 ? "selected" : "");
         var selPercent = (designer.boxlist[selected_box]["styleUnitWidth"] == 1 ? "selected" : "");
-        options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:100px; text-align: right; font-size:12px;" class="add-on">'+_Tr("Width")+"</span>";
+        options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-group"><span style="width:100px; box-sizing:content-box; text-align: right; font-size:12px;" class="input-group-text justify-content-end">'+_Tr("Width")+"</span>";
         options_html += '<select class="options" id="styleUnitWidth"><option value="0" '+selPixel+">"+_Tr("Pixels")+'</option><option value="1" '+selPercent+">"+_Tr("Percentage")+"</option></select>";
-        options_html += '</div><span class="help-inline"><small class="muted">'+_Tr("Choose width unit")+"</small></span></div></div>";
+        options_html += '</div><span class="help-inline"><small class="text-muted">'+_Tr("Choose width unit")+"</small></span></div></div>";
 
         var selPixel = (designer.boxlist[selected_box]["styleUnitHeight"] == 0 ? "selected" : "");
         var selPercent = (designer.boxlist[selected_box]["styleUnitHeight"] == 1 ? "selected" : "");
-        options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:100px; text-align: right; font-size:12px;" class="add-on">'+_Tr("Height")+"</span>";
+        options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-group"><span style="width:100px; box-sizing:content-box; text-align: right; font-size:12px;" class="input-group-text justify-content-end">'+_Tr("Height")+"</span>";
         options_html += '<select class="options" id="styleUnitHeight"><option value="0" '+selPixel+">"+_Tr("Pixels")+'</option><option value="1" '+selPercent+">"+_Tr("Percentage")+"</option></select>";
-        options_html += '</div><span class="help-inline"><small class="muted">'+_Tr("Choose height unit")+"</small></span></div></div>";
+        options_html += '</div><span class="help-inline"><small class="text-muted">'+_Tr("Choose height unit")+"</small></span></div></div>";
 
         // A widget with a config may put settings of its own under the
         // options too, rows that belong with them rather than with its form.
@@ -799,16 +799,16 @@ var designer = {
             var icon = "<img src='../Modules/dashboard/Views/icons/"+z+".png'>";
             if (select[z].length == 1) {
                 // A menu with one widget is a plain button that adds it
-                widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button data-widget='"+select[z][0]+"' class='btn widgetmenu widget-button' style='width:62px; padding:4px;' title='"+title+"'>"+icon+"</button></div>";
+                widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button data-widget='"+select[z][0]+"' class='btn btn-default widgetmenu widget-button' style='width:62px; padding:4px;' title='"+title+"'>"+icon+"</button></div>";
                 continue;
             }
             var items = "";
-            for (var i in select[z]) items += "<li><a data-widget='"+select[z][i]+"' class='widget-button'>"+select[z][i]+"</a></li>";
-            widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown' style='width:62px; padding:4px;' title='"+title+"'>"+icon+"<span class='caret'></span></button>";
+            for (var i in select[z]) items += "<li><a data-widget='"+select[z][i]+"' class='dropdown-item widget-button'>"+select[z][i]+"</a></li>";
+            widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn btn-default dropdown-toggle widgetmenu' data-bs-toggle='dropdown' style='width:62px; padding:4px;' title='"+title+"'>"+icon+"<span class='caret'></span></button>";
             widget_html += "<ul class='dropdown-menu scrollable-menu' style='min-width: auto; padding: 0px; text-align:left; top:initial' name='d'>"+items+"</ul></div>";
         }
         // Blank button so the toolbox rows are even
-        widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn widgetmenu' disabled style='width:62px; padding:4px; visibility:hidden;'><img src='../Modules/dashboard/Views/icons/Text.png'></button></div>";
+        widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn btn-default widgetmenu' disabled style='width:62px; padding:4px; visibility:hidden;'><img src='../Modules/dashboard/Views/icons/Text.png'></button></div>";
         $("#widget-buttons").html(widget_html);
 
         $(".widget-button").click(function(event) {

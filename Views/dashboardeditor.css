@@ -10,6 +10,7 @@ http://openenergymonitor.org
 */
  
 .dropdown-menu-toolbox {
+  box-sizing: content-box;
   position: absolute;
   top: 100%;
   left: 0;
@@ -58,6 +59,11 @@ http://openenergymonitor.org
 {
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.5);
+}
+
+/* Widget group buttons open a menu, without the Bootstrap 5 caret */
+.widgetmenu.dropdown-toggle::after {
+  display: none;
 }
 
 /* Toolbox button for a widget waiting to be placed on the canvas */

@@ -56,7 +56,7 @@ if (isset($dashboard['fullscreen']) && $dashboard['fullscreen']) {
     ?>
     <?php require_once "Modules/dashboard/Views/loadwidgets.php"; ?>
 <h2 class="d-none"><?php echo htmlspecialchars($dashboard['name'], ENT_QUOTES, 'UTF-8'); ?></h2>
-<div id="editicon" class="hidden-phone">
+<div id="editicon" class="d-none d-md-block">
     <div id="innerbutton" style="cursor: default">
         <?php echo $dashboard_editor_icon; ?>
     </div>

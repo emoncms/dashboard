@@ -361,7 +361,7 @@ function chart_frame(element){
 
 // A button in a bar, or in a group inside one.
 function chart_button(group, label, title, handler){
-    var button = $('<button type="button" class="btn btn-small"></button>')
+    var button = $('<button type="button" class="btn btn-default btn-sm"></button>')
     .attr("title", title || label).html(label);
     button.click(handler);
     group.append(button);
