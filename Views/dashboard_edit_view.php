@@ -163,6 +163,8 @@ require_once "Modules/dashboard/dashboard_convert.php";
 ?>
     var dashboard_html_elements = <?php echo json_encode(dashboard_convert_allowed_elements()); ?>;
     var dashboard_text_elements = <?php echo json_encode(dashboard_convert_inline_elements()); ?>;
+    // Installed modules, for the rule on links back at this site in url_problem.
+    var dashboard_modules = <?php echo json_encode(dashboard_convert_installed_modules()); ?>;
     var _SI = designer.get_SI(); // get a list of International System of Units (SI)
 
     render_widgets_init(widget); // populate widgets variable

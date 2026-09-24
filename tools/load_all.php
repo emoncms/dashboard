@@ -36,9 +36,10 @@ require_once dirname(__FILE__) . "/cli.php";
 $opts = cli_options($argv);
 
 if (isset($opts['help'])) {
-    echo "usage: php load_all.php [--id=N] [--quiet]\n";
-    echo "  --id=N    one dashboard only\n";
-    echo "  --quiet   totals only, no line per dashboard\n";
+    echo "usage: php load_all.php [--id=N] [--quiet] [--host=NAME]\n";
+    echo "  --id=N       one dashboard only\n";
+    echo "  --quiet      totals only, no line per dashboard\n";
+    echo "  --host=NAME  host links are judged against, default the domain setting\n";
     exit(0);
 }
 
@@ -47,6 +48,9 @@ chdir(cli_root());
 $mysqli = cli_connect();
 // Global, as index.php leaves it. Dashboard::migrate_context reads it.
 $redis = cli_redis();
+$host = cli_host($opts);
+echo $host !== '' ? "Links back at $host are judged as on a page view.\n\n"
+    : "No --host or domain setting: every absolute link counts as another site.\n\n";
 require "Lib/EmonLogger.php";
 require "Modules/dashboard/dashboard_model.php";
 require_once "Modules/dashboard/dashboard_migrate.php";

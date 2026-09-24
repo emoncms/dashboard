@@ -1357,7 +1357,8 @@ function dashboard_convert_request_host()
  * controller and action whatever the path ends in, so a link back at this site
  * can reach an api that acts on a GET, such as feed/delete or app/remove. The
  * file extension does not say which, and several such actions run whatever the
- * format. So an internal link is dropped. A link to another site is not this
+ * format. So an internal link is kept only when it is a page view, see
+ * dashboard_convert_url_is_view_link. A link to another site is not this
  * module's to police and is left alone, see dashboard_convert_url_allowed.
  */
 function dashboard_convert_url_own_site($url, $attribute)
@@ -1371,8 +1372,94 @@ function dashboard_convert_url_own_site($url, $attribute)
         return dashboard_convert_url_is_stored_image($url);
     }
 
-    // href back at this site: dropped.
-    return false;
+    return dashboard_convert_url_is_view_link($url);
+}
+
+// Controller routes a link back at this site may name: pages that show
+// something and act on nothing.
+const DASHBOARD_CONVERT_VIEW_ROUTES = [
+    'dashboard' => '/^view$/',
+    'app'       => '/^view$/',
+    'graph'     => '/^\d+$/',
+];
+
+/**
+ * Whether a link back at this site is a page view.
+ *
+ * A path segment naming an installed module is a controller route, and is
+ * kept only as one of DASHBOARD_CONVERT_VIEW_ROUTES with nothing after it.
+ * Every segment is checked rather than the first, as an install in a
+ * subdirectory carries its base in front of the route. A path naming no
+ * module is a public profile, username/dashboard for example, which index.php
+ * serves with admin, write and read switched off, so it cannot act for the
+ * viewer.
+ *
+ * Refused whatever the path: a q parameter, since the rewrite rule appends
+ * the query string and a q in it replaces the route, and a .php file, which
+ * reaches index.php or a script directly.
+ */
+function dashboard_convert_url_is_view_link($url)
+{
+    // A browser reads a backslash in an http url as a slash.
+    $url = str_replace('\\', '/', $url);
+    // Drop the scheme and host of an absolute link, leaving the path.
+    $url = preg_replace('#^(?:https?:)?//[^/?\#]*#i', '', $url);
+
+    $parts = preg_split('/[?#]/', $url, 2);
+    $path = urldecode($parts[0]);
+    $query = '';
+    if (preg_match('/\?([^#]*)/', $url, $match)) {
+        $query = urldecode($match[1]);
+    }
+    if (preg_match('/(?:^|[&;])\s*q\s*(?:[\[=&;]|$)/i', $query)) {
+        return false;
+    }
+
+    // A relative path resolves against the page, dashboard/view, so delete
+    // on its own reaches dashboard/delete.
+    $segments = [];
+    if ($path !== '' && $path[0] !== '/') {
+        $segments[] = 'dashboard';
+    }
+    foreach (explode('/', $path) as $segment) {
+        if ($segment === '..') {
+            array_pop($segments);
+        } elseif ($segment !== '' && $segment !== '.') {
+            $segments[] = strtolower($segment);
+        }
+    }
+
+    $modules = dashboard_convert_installed_modules();
+    foreach ($segments as $i => $segment) {
+        if (substr($segment, -4) === '.php') {
+            return false;
+        }
+        if (!in_array($segment, $modules, true)) {
+            continue;
+        }
+        if (!isset(DASHBOARD_CONVERT_VIEW_ROUTES[$segment])) {
+            return false;
+        }
+        $action = isset($segments[$i + 1]) ? $segments[$i + 1] : '';
+        if (!preg_match(DASHBOARD_CONVERT_VIEW_ROUTES[$segment], $action) || count($segments) > $i + 2) {
+            return false;
+        }
+        return true;
+    }
+    return true;
+}
+
+// Names of the directories in Modules, lower case, symlinked modules included.
+function dashboard_convert_installed_modules()
+{
+    static $modules = null;
+    if ($modules === null) {
+        $modules = [];
+        foreach (glob(dirname(__DIR__) . '/*', GLOB_ONLYDIR) as $dir) {
+            $modules[] = strtolower(basename($dir));
+        }
+    }
+    return $modules;
 }
 
 // A file directly inside the dashboard's own images directory, the one place

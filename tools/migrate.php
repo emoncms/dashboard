@@ -1054,6 +1054,7 @@ function migrate_main($argv)
         echo "  --show=CODE       print examples of one warning or reason\n";
         echo "  --samples=N       how many examples to print, default 5\n";
         echo "  --limit=N         stop after N dashboards\n";
+        echo "  --host=NAME       host links are judged against, default the domain setting\n";
         echo "  --force           html stage: convert again where content_json is set\n";
         echo "  --list            widgets stage: list each dashboard still holding an old widget\n";
         echo "  --multigraph=N    charts stage: print what one multigraph row converts to\n";
@@ -1092,6 +1093,9 @@ function migrate_main($argv)
     cli_registry_check($o['write']);
 
     $mysqli = cli_connect();
+    $host = cli_host($opts);
+    echo $host !== '' ? "Links back at $host are judged as on a page view.\n\n"
+        : "No --host or domain setting: every absolute link counts as another site.\n\n";
     if (!cli_has_table($mysqli, 'dashboard')) {
         die("There is no dashboard table.\n");
     }

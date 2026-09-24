@@ -115,6 +115,26 @@ function cli_redis()
     return $redis;
 }
 
+// Sets the host a page view would have, so a url back at this site is judged
+// as it is on a page, see dashboard_convert_url_allowed. From --host, else the
+// domain setting. Call after cli_connect. Returns the host, or '' when there
+// is none and every absolute url counts as another site.
+function cli_host($opts)
+{
+    global $settings;
+
+    $host = '';
+    if (isset($opts['host']) && $opts['host'] !== true) {
+        $host = $opts['host'];
+    } elseif (!empty($settings['domain'])) {
+        $host = $settings['domain'];
+    }
+    if ($host !== '') {
+        $_SERVER['HTTP_HOST'] = $host;
+    }
+    return $host;
+}
+
 function cli_has_table($mysqli, $table)
 {
     $check = $mysqli->query("SHOW TABLES LIKE '" . $mysqli->real_escape_string($table) . "'");

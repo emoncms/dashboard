@@ -994,11 +994,48 @@ var designer = {
         if (host !== "" && host !== designer.url_strip_port(window.location.host)) return "";
 
         // The url points at this site
-        if (!is_image) return _Tr("Must point at another site");
+        if (!is_image) {
+            if (designer.view_link(url)) return "";
+            return _Tr("Must point at another site, or at a dashboard, app or graph view");
+        }
 
         if (url.indexOf("?") === -1 && designer.stored_image(url)) return "";
         return _Tr("Must point at another site, or at an image in")
         + " Modules/dashboard/Views/images";
+    },
+
+    // Whether a link back at this site is a page view. Follows
+    // dashboard_convert_url_is_view_link in dashboard_convert.php.
+    "view_link": function(url){
+        var views = { dashboard: /^view$/, app: /^view$/, graph: /^\d+$/ };
+        var modules = window.dashboard_modules || [];
+
+        url = url.replace(/\\/g, "/").replace(/^(?:https?:)?\/\/[^/?#]*/i, "");
+        var path = url.split(/[?#]/)[0];
+        var query = /\?([^#]*)/.exec(url);
+        query = query ? query[1] : "";
+        try {
+            path = decodeURIComponent(path);
+            query = decodeURIComponent(query);
+        } catch (e) { return false; }
+        if (/(?:^|[&;])\s*q\s*(?:[\[=&;]|$)/i.test(query)) return false;
+
+        var segments = [];
+        if (path !== "" && path.charAt(0) !== "/") segments.push("dashboard");
+        var parts = path.split("/");
+        for (var p = 0; p < parts.length; p++) {
+            if (parts[p] === "..") segments.pop();
+            else if (parts[p] !== "" && parts[p] !== ".") segments.push(parts[p].toLowerCase());
+        }
+
+        for (var i = 0; i < segments.length; i++) {
+            if (segments[i].slice(-4) === ".php") return false;
+            if (modules.indexOf(segments[i]) === -1) continue;
+            if (!views.hasOwnProperty(segments[i])) return false;
+            var action = i + 1 < segments.length ? segments[i + 1] : "";
+            return views[segments[i]].test(action) && segments.length <= i + 2;
+        }
+        return true;
     },
 
     "stored_image": function(url){

@@ -509,6 +509,55 @@ check(
     ['url_dropped', 'url_dropped', 'url_dropped', 'url_dropped', 'url_dropped']
 );
 
+// A link back at this site is kept when it is a page view: dashboard/view,
+// app/view, graph/<id>, or a public profile path, which names no module and
+// is served with admin, write and read off. A controller route is judged at
+// whichever segment names a module, so a subdirectory install is covered, and
+// a relative path is judged from dashboard/, where the page is.
+$view_links = [
+    'https://emoncms.example/dashboard/view?id=38507' => true,
+    'http://emoncms.example/app/view?name=myelectric' => true,
+    'https://emoncms.example/graph/436279' => true,
+    'https://emoncms.example/EnergyPi/mobile' => true,
+    '/EnergyPi/solar' => true,
+    '/emoncms/dashboard/view?id=3' => true,
+    '../EnergyPi/mobile' => true,
+    'view?id=4' => true,
+    '#top' => true,
+    'https://emoncms.example/' => true,
+    'https://emoncms.example/dashboard/view&id=38507' => false,
+    'https://emoncms.example/dashboard/delete?id=1' => false,
+    'https://emoncms.example/dashboard/view/extra' => false,
+    'https://emoncms.example/graph/delete' => false,
+    '/emoncms/feed/delete.json?id=1' => false,
+    '/EnergyPi/feed/delete.json?id=1' => false,
+    '/user/logout' => false,
+    '/admin/users' => false,
+    '/input/post?node=1&json={a:1}' => false,
+    '/FEED/delete.json?id=1' => false,
+    'delete?id=1' => false,
+    '../feed/delete?id=1' => false,
+    '/EnergyPi/mobile?q=feed/delete.json&id=1' => false,
+    '/EnergyPi/mobile?id=1&Q=feed/delete' => false,
+    '/EnergyPi/mobile?q[]=feed/delete' => false,
+    '/index.php?id=1' => false,
+    '/x/index.php' => false,
+    '/EnergyPi\\..\\feed\\delete.json' => false,
+    '/EnergyPi/%2e%2e/feed/delete.json' => false,
+    '/dashboard/view%3fid=1/../../feed/delete' => false,
+];
+foreach ($view_links as $url => $want) {
+    check("own site link $url", dashboard_convert_url_allowed($url, 'href'), $want);
+}
+
+$result = convert(box('<a href="https://emoncms.example/dashboard/view?id=5">a</a>'
+    . '<a href="/EnergyPi/mobile">b</a><a href="/feed/delete.json?id=1">c</a>'));
+check(
+    'own site view links kept, api link dropped',
+    widgets($result)[0]['html'],
+    '<a href="https://emoncms.example/dashboard/view?id=5">a</a><a href="/EnergyPi/mobile">b</a><a>c</a>'
+);
+
 // A link to another site is left alone. mailto is dropped like every scheme
 // that is not http or https: harmless, but no dashboard needs it.
 $result = convert(box('<a href="https://openenergymonitor.org">out</a>'));
@@ -2488,8 +2537,10 @@ foreach ($src_cases as $url => $want) {
 
 $href_cases = [
     'https://example.com/' => true,
-    '/dashboard/view?id=2' => false,
-    'http://dash.example.org/x' => false,
+    '/dashboard/view?id=2' => true,
+    'http://dash.example.org/x' => true,
+    '/feed/delete.json?id=2' => false,
+    'http://dash.example.org/dashboard/delete?id=2' => false,
 ];
 foreach ($href_cases as $url => $want) {
     check("image link $url", dashboard_convert_url_allowed($url, 'href'), $want);
@@ -2497,7 +2548,7 @@ foreach ($href_cases as $url => $want) {
 
 // The option types the widget declares are what carry those rules
 $result = convert('<div id="1" class="image" style="position:absolute; top:0px; left:0px; '
-    . 'width:10px; height:10px;" src="images/logo.png" link="/dashboard/view?id=2"></div>');
+    . 'width:10px; height:10px;" src="images/logo.png" link="/feed/delete.json?id=2"></div>');
 check(
     'image refuses a src and a link pointing back at this site',
     widgets($result)[0]['options'],
