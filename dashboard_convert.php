@@ -1376,10 +1376,10 @@ function dashboard_convert_url_own_site($url, $attribute)
 }
 
 // Controller routes a link back at this site may name: pages that show
-// something and act on nothing.
+// something and act on nothing. app with no action is the app view.
 const DASHBOARD_CONVERT_VIEW_ROUTES = [
     'dashboard' => '/^view$/',
-    'app'       => '/^view$/',
+    'app'       => '/^(?:view)?$/',
     'graph'     => '/^\d+$/',
 ];
 

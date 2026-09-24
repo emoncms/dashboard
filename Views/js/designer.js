@@ -1007,7 +1007,7 @@ var designer = {
     // Whether a link back at this site is a page view. Follows
     // dashboard_convert_url_is_view_link in dashboard_convert.php.
     "view_link": function(url){
-        var views = { dashboard: /^view$/, app: /^view$/, graph: /^\d+$/ };
+        var views = { dashboard: /^view$/, app: /^(?:view)?$/, graph: /^\d+$/ };
         var modules = window.dashboard_modules || [];
 
         url = url.replace(/\\/g, "/").replace(/^(?:https?:)?\/\/[^/?#]*/i, "");

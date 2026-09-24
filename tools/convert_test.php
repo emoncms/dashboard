@@ -517,6 +517,10 @@ check(
 $view_links = [
     'https://emoncms.example/dashboard/view?id=38507' => true,
     'http://emoncms.example/app/view?name=myelectric' => true,
+    '/app?readkey=abc' => true,
+    '../../app?readkey=abc#mysolarpv' => true,
+    '/app/remove?id=1' => false,
+    '/app/view/extra' => false,
     'https://emoncms.example/graph/436279' => true,
     'https://emoncms.example/EnergyPi/mobile' => true,
     '/EnergyPi/solar' => true,
@@ -1737,6 +1741,24 @@ check(
     $converted['data']['feedlist'][0]['color'],
     ''
 );
+
+// A CSS colour name becomes its hex value, as the graph engine, its editor and
+// the colour option read only hex.
+$converted = dashboard_convert_multigraph_to_graph('[{"id":"5","lineColour":"Red"}]', 'Named');
+check('a multigraph colour name becomes hex', $converted['data']['feedlist'][0]['color'], '#ff0000');
+$named = dashboard_convert_multigraph_config(['feedlist' => [
+    ['id' => '1', 'color' => 'red'], ['id' => '2', 'color' => 'rebeccapurple'],
+    ['id' => '3', 'color' => '#abc'], ['id' => '4', 'color' => 'notacolour'], ['id' => '5', 'color' => ''],
+]]);
+check(
+    'a saved graph colour name becomes hex',
+    array_column($named['feedlist'], 'color'),
+    ['#ff0000', '#663399', '#abc', '', '']
+);
+$warnings = [];
+dashboard_convert_config_valid($named, 'graph', 0, $warnings);
+check('a saved graph with colour names is a config the dashboard keeps', $warnings, []);
+check('a vis colour name becomes hex', dashboard_convert_preset_colour(['colour' => 'navy'], 'colour', '#EDC240'), '#000080');
 
 // What is written has to be a config the dashboard keeps whole.
 $converted = dashboard_convert_multigraph_to_graph($feedlist, 'Solar and use', $now);
