@@ -16,9 +16,9 @@ defined('EMONCMS_EXEC') or die('Restricted access');
             <h3><?php echo tr('Dashboards') ?></h3>
             <button class="btn btn-default ms-3" @click.prevent="addNew"><?php echo tr('New') ?>  <span class="svg-icon-plus"></span> </button>
         </div>
-        <form v-if="gridData.length > 0" id="search" class="form-inline position-relative mb-0">
+        <form v-if="gridData.length > 0" id="search" class="d-flex align-items-center position-relative">
             <div class="form-group">
-                <input id="search-box" name="query" v-model="searchQuery" type="search" class="form-control input-medium mb-0" aria-describedby="searchHelp" placeholder="<?php echo tr('Search') ?>" title="<?php echo tr('Search the data by any column') ?>">
+                <input id="search-box" name="query" v-model="searchQuery" type="search" class="form-control input-165" aria-describedby="searchHelp" placeholder="<?php echo tr('Search') ?>" title="<?php echo tr('Search the data by any column') ?>">
                 <button id="searchclear" @click.prevent="searchQuery = ''"style="right:0" class="btn btn-link position-absolute" :class="{'d-none':searchQuery.length===0}"><span class="svg-icon-close"></span></button>
             </div>
         </form>
@@ -85,31 +85,27 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 
                 <!-- Name Column (Editable) -->
                 <td>
-                    <div class="control-group">
-                        <div class="controls">
-                            <input @input="updateName($event, entry)" 
-                                   :value="entry.name" 
-                                   type="text" 
-                                   class="form-control border-0 m-0" 
-                                   @keyup.enter="$event.target.blur()" 
-                                   :title="'#' + entry.id + ' NAME\n' + translations['Label this dashboard with a name']">
-                            <span class="help-inline d-none d-sm-block text-end"></span>
-                        </div>
+                    <div class="field-row">
+                        <input @input="updateName($event, entry)" 
+                               :value="entry.name" 
+                               type="text" 
+                               class="form-control border-0" 
+                               @keyup.enter="$event.target.blur()" 
+                               :title="'#' + entry.id + ' NAME\n' + translations['Label this dashboard with a name']">
+                        <span class="form-text field-hint mt-0 d-none d-sm-block text-end"></span>
                     </div>
                 </td>
                 
                 <!-- Alias Column (Editable) -->
                 <td>
-                    <div class="control-group">
-                        <div class="controls">
-                            <input @input="updateAlias($event, entry)" 
-                                   :value="entry.alias" 
-                                   type="text" 
-                                   class="form-control border-0 m-0" 
-                                   @keyup.enter="$event.target.blur()" 
-                                   :title="'#' + entry.id + ' ALIAS\n' + translations['Must be unique. Short title to use in URL.\neg roof-solar']">
-                            <span class="help-inline d-none d-sm-block text-end"></span>
-                        </div>
+                    <div class="field-row">
+                        <input @input="updateAlias($event, entry)" 
+                               :value="entry.alias" 
+                               type="text" 
+                               class="form-control border-0" 
+                               @keyup.enter="$event.target.blur()" 
+                               :title="'#' + entry.id + ' ALIAS\n' + translations['Must be unique. Short title to use in URL.\neg roof-solar']">
+                        <span class="form-text field-hint mt-0 d-none d-sm-block text-end"></span>
                     </div>
                 </td>
                 
@@ -331,23 +327,26 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
             // Input field feedback helper
             showInputFeedback: function(input, message, type = 'success') {
-                const container = input.parentNode.parentNode;
-                const feedback = input.parentNode.querySelector('.help-inline');
-                if (feedback) {
-                    // Reset classes
-                    container.classList.remove('success', 'error', 'warning');
+                const feedback = input.parentNode.querySelector('.field-hint');
+                const colours = { success: 'text-success', error: 'text-danger', warning: 'text-warning' };
+                const clear = () => {
+                    input.classList.remove('is-invalid');
+                    feedback.classList.remove('text-success', 'text-danger', 'text-warning');
                     feedback.innerText = '';
+                };
+                if (feedback) {
+                    clear();
                     
                     // Add feedback
                     if (message) {
-                        container.classList.add(type);
+                        if (type === 'error') input.classList.add('is-invalid');
+                        feedback.classList.add(colours[type]);
                         feedback.innerText = message;
                         feedback.classList.add('fade');
                         
                         // Auto-clear after delay
                         setTimeout(() => {
-                            container.classList.remove('success', 'error', 'warning');
-                            feedback.innerText = '';
+                            clear();
                             feedback.classList.remove('fade');
                         }, this.wait * 2.3);
                     }

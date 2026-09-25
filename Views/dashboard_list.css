@@ -32,14 +32,10 @@ div:empty{
     padding-left: 0;
     padding-right: 0;
 }
-.table .control-group{
-    margin:0
-}
-.table .control-group {
+.table .field-row {
     position: relative;
 }
-.table .control-group .help-inline{
-    display: block;
+.table .field-row .field-hint {
     top: 0;
     position: absolute;
     font-size: 11px;
@@ -77,9 +73,6 @@ th:nth-child(n+4):nth-child(-n+9) .d-flex{
 }
 [v-cloak] { display: none; }
 
-.caret-dark{
-    border-top-color: #212429!important;
-}
 .table-sm td .form-control[type="text"] {
     padding-top: .4em;
     padding-bottom: .4em;
