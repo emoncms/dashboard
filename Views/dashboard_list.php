@@ -11,7 +11,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
         <h4 class="alert-heading" if="status.title"><?php echo tr('No dashboards created') ?></h4>
         <?php echo tr('Maybe you would like to add your first dashboard using the button below&hellip;') ?>
     </div>
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="page-header">
         <div class="d-flex align-items-center">
             <h3><?php echo tr('Dashboards') ?></h3>
             <button class="btn btn-default ms-3" @click.prevent="addNew"><?php echo tr('New') ?>  <span class="svg-icon-plus"></span> </button>
