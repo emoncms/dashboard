@@ -1,6 +1,6 @@
 {
     "name"         : "Dashboard",
-    "version"      : "4.1.4",
+    "version"      : "4.2.0",
     "location"     : "/var/www/emoncms/Modules",
     "branches_available": ["stable","master"]
 }
