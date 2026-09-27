@@ -71,7 +71,6 @@ th:nth-child(n+4):nth-child(-n+9) .d-flex{
 .table caption{
     caption-side: bottom
 }
-[v-cloak] { display: none; }
 
 .table-sm td .form-control[type="text"] {
     padding-top: .4em;
