@@ -758,20 +758,36 @@ var designer = {
                 feedgroups[group].push(feedlist[f]);
             }
         }
-        var out = "<select id='"+id+"' class='options'>";
+        // A stored value may be a feed id or a tag:name pair whatever the
+        // feed mode, so either form selects the feed. The stored value is
+        // kept as the option value until another feed is picked.
+        var current = (currentval === undefined || currentval === null) ? "" : String(currentval);
+        var found = false;
+        var options = "";
         for (var f in feedgroups){
-            out += "<optgroup label='"+designer_escape(f)+"'>";
+            options += "<optgroup label='"+designer_escape(f)+"'>";
             for (var p in feedgroups[f]) {
-                var feedref = feedgroups[f][p]["id"];
-                if (designer.feedmode=="tagname") feedref = feedgroups[f][p]["tag"]+":"+feedgroups[f][p]["name"];
+                var feed = feedgroups[f][p];
+                var feedref = feed["id"];
+                if (designer.feedmode=="tagname") feedref = feed["tag"]+":"+feed["name"];
                 var selected = "";
-                if (currentval == feedref)
-                selected = "selected";
-                out += "<option value='"+designer_escape(feedref)+"' "+selected+">"+designer_escape(feedgroups[f][p].name)+"</option>";
+                if (!found && current !== "" && (current == feed["id"] || current == feed["tag"]+":"+feed["name"])) {
+                    selected = "selected";
+                    feedref = current;
+                    found = true;
+                }
+                options += "<option value='"+designer_escape(feedref)+"' "+selected+">"+designer_escape(feed.name)+"</option>";
             }
-            out += "</optgroup>";
+            options += "</optgroup>";
         }
-        out += "</select>";
+        var out = "<select id='"+id+"' class='options'>";
+        // A value that names no feed, or no value, is kept on save rather than
+        // replaced by the first feed in the list.
+        if (!found) {
+            var label = current === "" ? "" : current + " (" + _Tr("not found") + ")";
+            out += "<option value='"+designer_escape(current)+"' selected>"+designer_escape(label)+"</option>";
+        }
+        out += options + "</select>";
         return out;
     },
 
