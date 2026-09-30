@@ -43,7 +43,11 @@ var render_feeds = {
         var key = feed === undefined || feed === null ? "" : String(feed);
         if (key === "") return "";
         if (render_assoc[key] !== undefined) return String(render_assoc[key]);
-        return key;
+        // A tag:name pair that the poll has not resolved is not an id. Widgets
+        // mount before the first poll answers.
+        var trimmed = key.trim();
+        if (!/^\d+$/.test(trimmed)) return "";
+        return trimmed;
     },
 
     // Feed's row from the poll, or null.
