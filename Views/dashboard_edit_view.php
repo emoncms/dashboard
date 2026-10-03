@@ -52,40 +52,44 @@ $backgroundcolor = preg_replace('/[^0-9a-fA-F]/', '', (string) $dashboard['backg
     }
     </script>
 <div id="dashboardpage">
-    <div id="widget_options" class="modal hide keyboard" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="myModalLabel"><?php echo ctx_tr('dashboard_messages', 'Configure element'); ?></h3>
-        </div>
-        <div id="widget_options_body" class="modal-body"></div>
-        <div class="modal-footer">
-            <span id="options-problem" class="text-error" style="margin-right:10px"></span>
-            <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo ctx_tr('dashboard_messages', 'Cancel'); ?></button>
-            <button id="options-save" class="btn btn-primary"><?php echo ctx_tr('dashboard_messages', 'Save changes'); ?></button>
+    <div id="widget_options" class="modal keyboard" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="myModalLabel" class="modal-title"><?php echo ctx_tr('dashboard_messages', 'Configure element'); ?></h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div id="widget_options_body" class="modal-body"></div>
+                <div class="modal-footer">
+                    <span id="options-problem" class="text-danger" style="margin-right:10px"></span>
+                    <button class="btn btn-default" data-bs-dismiss="modal" aria-hidden="true"><?php echo ctx_tr('dashboard_messages', 'Cancel'); ?></button>
+                    <button id="options-save" class="btn btn-primary"><?php echo ctx_tr('dashboard_messages', 'Save changes'); ?></button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="toolbox" style="cursor:move; text-align: center; background-color:#ddd; padding-left:5px; padding-right:5px; padding-bottom:15px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top: 5rem; right: 1rem;"><?php echo ctx_tr('dashboard_messages', 'Toolbox'); ?>
+<div id="toolbox" style="box-sizing:content-box; cursor:move; text-align: center; background-color:#ddd; padding-left:5px; padding-right:5px; padding-bottom:15px; position:fixed;z-index:1; border-radius: 5px 5px 5px 5px; border-style:groove; width: 125px; height: auto; top: 5rem; right: 1rem;"><?php echo ctx_tr('dashboard_messages', 'Toolbox'); ?>
     <div id="separator" style="height:1.5px; background:#717171"></div>
     <div id="Buttons" style="position:relative; top:5px; cursor:pointer">
     <span id="dashboard-config-buttons">
-    <button id="dashboard-config-button" style="padding:4px; float:left; width:31px" class="btn" href="#dashConfigModal" role="button" data-toggle="modal" title="<?php echo ctx_tr('dashboard_messages', 'Configure dashboard basic data'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>"></span></button>
-    <button id="undo-button" class="btn" style="padding:4px; float:left; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Undo last step'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>"></span></button>
-    <button id="redo-button" class="btn" style="padding:4px; float:left; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Redo last step'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>"></span></button>
-    <button id="view-mode" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Return to view mode'); ?>" onclick="window.location.href='view?id=<?php echo $dashid; ?>'"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>" ></span></button>
+    <button id="dashboard-config-button" style="padding:4px; float:left; width:31px" class="btn btn-default" href="#dashConfigModal" role="button" data-bs-toggle="modal" title="<?php echo ctx_tr('dashboard_messages', 'Configure dashboard basic data'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-gear.png'); ?>"></span></button>
+    <button id="undo-button" class="btn btn-default" style="padding:4px; float:left; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Undo last step'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-undo.png'); ?>"></span></button>
+    <button id="redo-button" class="btn btn-default" style="padding:4px; float:left; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Redo last step'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-redo.png'); ?>"></span></button>
+    <button id="view-mode" class="btn btn-default" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Return to view mode'); ?>" onclick="window.location.href='view?id=<?php echo $dashid; ?>'"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-view.png'); ?>" ></span></button>
     </span>
     <span id="when-selected">
-        <button id="options-button" class="btn" style="float:left; padding:4px; width:31px" data-toggle="modal" data-target="#widget_options" title="<?php echo ctx_tr('dashboard_messages', 'Configure selected item'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>"></span></button>
-        <button id="move-forward-button" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Move selected item in front of other items'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-front.png'); ?>"></span></button>
-        <button id="move-backward-button" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Move selected item to back of other items'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-back.png'); ?>"></span></button>
+        <button id="options-button" class="btn btn-default" style="float:left; padding:4px; width:31px" data-bs-toggle="modal" data-bs-target="#widget_options" title="<?php echo ctx_tr('dashboard_messages', 'Configure selected item'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-tool.png'); ?>"></span></button>
+        <button id="move-forward-button" class="btn btn-default" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Move selected item in front of other items'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-front.png'); ?>"></span></button>
+        <button id="move-backward-button" class="btn btn-default" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Move selected item to back of other items'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-back.png'); ?>"></span></button>
         <button id="delete-button" class="btn btn-danger" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Delete selected items'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-delete.png'); ?>"></span></button>
     </span>
     <span id="clipboard-buttons">
-        <button id="copy-button" class="btn" style="float:left; padding:4px; width:31px" disabled title="<?php echo ctx_tr('dashboard_messages', 'Copy selected items (Ctrl+C)'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-copy.png'); ?>"></span></button>
-        <button id="cut-button" class="btn" style="float:left; padding:4px; width:31px" disabled title="<?php echo ctx_tr('dashboard_messages', 'Cut selected items (Ctrl+X)'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-cut.png'); ?>"></span></button>
-        <button id="paste-button" class="btn" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Paste copied items (Ctrl+V)'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-paste.png'); ?>"></span></button>
-        <button class="btn" style="float:left; padding:4px; width:31px; visibility:hidden" disabled><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-paste.png'); ?>"></span></button>
+        <button id="copy-button" class="btn btn-default" style="float:left; padding:4px; width:31px" disabled title="<?php echo ctx_tr('dashboard_messages', 'Copy selected items (Ctrl+C)'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-copy.png'); ?>"></span></button>
+        <button id="cut-button" class="btn btn-default" style="float:left; padding:4px; width:31px" disabled title="<?php echo ctx_tr('dashboard_messages', 'Cut selected items (Ctrl+X)'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-cut.png'); ?>"></span></button>
+        <button id="paste-button" class="btn btn-default" style="float:left; padding:4px; width:31px" title="<?php echo ctx_tr('dashboard_messages', 'Paste copied items (Ctrl+V)'); ?>"><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-paste.png'); ?>"></span></button>
+        <button class="btn btn-default" style="float:left; padding:4px; width:31px; visibility:hidden" disabled><span><img src="<?php echo ($path . 'Modules/dashboard/Views/icons/emon-icon-paste.png'); ?>"></span></button>
     </span>
     <span id="widget-buttons" ></span>
     <span><button id="save-dashboard" class="btn btn-success" style="float:left; padding:2px; width:125px" title="<?php echo ctx_tr('dashboard_messages', 'Nothing to save'); ?>" ><?php echo ctx_tr('dashboard_messages', 'Not modified'); ?></button></span>

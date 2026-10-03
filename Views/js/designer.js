@@ -567,7 +567,7 @@ var designer = {
         var title = widgets[widget]["title"] ? widgets[widget]["title"] : widget;
         $("#myModalLabel").text(_Tr("Configure") + " " + String(title).toLowerCase());
         if (widgets[widget]["description"]) {
-            options_html += '<p class="muted" style="font-size:12px;">'+designer_escape(widgets[widget]["description"])+"</p>";
+            options_html += '<p class="text-muted" style="font-size:12px;">'+designer_escape(widgets[widget]["description"])+"</p>";
         }
 
         // A widget whose settings do not fit in attributes holds them in one
@@ -577,10 +577,10 @@ var designer = {
         // before the options, which are the less used part of the form.
         if (widgets[widget]["config"]) {
             var config_value = selected_widget.config ? JSON.stringify(selected_widget.config) : "";
-            options_html += '<div class="control-group"><div class="controls">';
+            options_html += '<div class="option-row mb-2">';
             options_html += '<input type="hidden" class="options" id="config" value="'+designer_escape(config_value)+'">';
             options_html += '<div id="widget-config-editor"></div>';
-            options_html += "</div></div>";
+            options_html += "</div>";
             options_html += '<hr style="margin:10px 0;">';
         }
 
@@ -594,9 +594,9 @@ var designer = {
 
             if (val == undefined) val="";
 
-            options_html += '<div class="control-group"><div class="controls">';
-            options_html += '<div class="input-prepend" style="margin-bottom: 0px;">';
-            options_html += '<span class="add-on" style="width:100px; text-align: right; font-size:12px;">'+options_name[z]+"</span>";
+            options_html += '<div class="option-row mb-2">';
+            options_html += '<div class="input-group">';
+            options_html += '<span class="input-group-text justify-content-end" style="width:100px; box-sizing:content-box; text-align: right; font-size:12px;">'+options_name[z]+"</span>";
 
             // all feeds
 
@@ -606,18 +606,18 @@ var designer = {
 
             else if (options_type && options_type[z] == "html"){
                 val = selected_widget.html || "";
-                options_html += "<textarea class='options' id='"+box_options[z]+"' >"+designer_escape(val)+"</textarea>";
+                options_html += "<textarea class='options form-control input-220' id='"+box_options[z]+"' >"+designer_escape(val)+"</textarea>";
             }
 
             // Body of a text widget
             else if (options_type && options_type[z] == "text"){
                 val = selected_widget.text || "";
-                options_html += "<textarea class='options' id='"+box_options[z]+"' >"+designer_escape(val)+"</textarea>";
+                options_html += "<textarea class='options form-control input-220' id='"+box_options[z]+"' >"+designer_escape(val)+"</textarea>";
             }
 
             else if (options_type && options_type[z] == "number"){
                 var range = optionsdata && optionsdata[z] ? optionsdata[z] : {};
-                options_html += "<input class='options' id='"+box_options[z]+"' type='number'";
+                options_html += "<input class='options form-control input-220' id='"+box_options[z]+"' type='number'";
                 if (range.min !== undefined) options_html += " min='"+range.min+"'";
                 if (range.max !== undefined) options_html += " max='"+range.max+"'";
                 options_html += " value='"+designer_escape(val)+"'/ >";
@@ -625,7 +625,7 @@ var designer = {
 
             // Combobox for selecting options
             else if (options_type && options_type[z] == "dropbox" && optionsdata && optionsdata[z]){  // Check we have optionsdata before deciding to draw a combobox
-                options_html += "<select id='"+box_options[z]+"' class='options' >";
+                options_html += "<select id='"+box_options[z]+"' class='options form-select input-220' >";
                 for (var i in optionsdata[z])
                 {
                     var selected = "";
@@ -637,7 +637,7 @@ var designer = {
             }
             // Combobox for selecting options with "other" option
             else if (options_type && options_type[z] == "dropbox_other" && optionsdata && optionsdata[z]){  // Check we have optionsdata before deciding to draw a combobox
-                options_html += '<select id="' + box_options[z] + '_dropdown" class="options select-with-other">';
+                options_html += '<select id="' + box_options[z] + '_dropdown" class="options select-with-other form-select input-220">';
                 options_html += "<option value=''></option>";
                 var values = [];
                 for (var i in optionsdata[z])
@@ -655,12 +655,12 @@ var designer = {
                     other_selected = "selected";
                 }
 
-                var other_hidden = other_selected !== "selected" ? "hidden" : "";
+                var other_hidden = other_selected !== "selected" ? "hide" : "";
                 options_html += "<option " + other_selected + " value='__other'>"+_Tr("Other")+"</option>";
                 options_html += "</select>";
                 options_html += "</div>";
-                options_html += '<div class="input-prepend ' + other_hidden + ' other"><span class="add-on" style="width:100px; text-align: right; font-size:12px;background: none;border: none;margin-right: 1px;">' + _Tr("Other") + "</span>";
-                options_html += '<input id="' + box_options[z] + '" type="text" value="' + designer_escape(val) + '" data-last-value="' + designer_escape(val) + '" class="options input-is-other" style="border-radius:0 0 4px 4px;border-top:none">';
+                options_html += '<div class="input-group ' + other_hidden + ' other"><span class="input-group-text justify-content-end" style="width:100px; box-sizing:content-box; text-align: right; font-size:12px;background: none;border: none;margin-right: 1px;">' + _Tr("Other") + "</span>";
+                options_html += '<input id="' + box_options[z] + '" type="text" value="' + designer_escape(val) + '" data-last-value="' + designer_escape(val) + '" class="options input-is-other form-control input-220" style="border-radius:0 0 4px 4px;border-top:none">';
             }
 
             else if (options_type && options_type[z] == "colour_picker"){
@@ -672,8 +672,8 @@ var designer = {
                 if (optionsdata && optionsdata[z]!=undefined && val=="") {
                     val = optionsdata[z];
                 }
-                options_html += "<input  type='color' class='options' id='"+box_options[z]+"'  value='#"+designer_escape(val)+"'/ >";
-                options_html += " <label class='checkbox inline' style='margin-left:8px'><input type='checkbox' class='colour-none' data-for='"+box_options[z]+"'"+(none ? " checked" : "")+"> "+_Tr("None")+"</label>";
+                options_html += "<input type='color' class='options form-control form-control-color input-220' id='"+box_options[z]+"'  value='#"+designer_escape(val)+"'/ >";
+                options_html += " <label class='d-inline-block me-2 align-self-center' style='margin-left:8px'><input type='checkbox' class='colour-none' data-for='"+box_options[z]+"'"+(none ? " checked" : "")+"> "+_Tr("None")+"</label>";
             }
 
             else if (options_type && options_type[z] == "boolean"){
@@ -684,7 +684,7 @@ var designer = {
                 if ((val == undefined || val == "") && optionsdata && optionsdata[z] != undefined) {
                     val = optionsdata[z];
                 }
-                options_html += "<select class='options' id='"+box_options[z]+"'>";
+                options_html += "<select class='options form-select input-220' id='"+box_options[z]+"'>";
                 options_html += "<option value='0'" + (val == 0 ? " selected" : "") + ">"+_Tr("Off")+"</option>";
                 options_html += "<option value='1'" + (val == 1 ? " selected" : "") + ">"+_Tr("On")+"</option>";
                 options_html += "</select>";
@@ -692,27 +692,27 @@ var designer = {
 
 
             else{
-                options_html += "<input class='options' id='"+box_options[z]+"' type='text' value='"+designer_escape(val)+"'/ >";
+                options_html += "<input class='options form-control input-220' id='"+box_options[z]+"' type='text' value='"+designer_escape(val)+"'/ >";
             }
 
             options_html += "</div>";
-            options_html += '<span class="help-inline"><small class="muted">'+optionshint[z]+"</small></span>";
-            options_html +="</div></div>";
+            options_html += '<span class="option-hint form-text d-inline-block align-middle ms-1 mt-0">'+optionshint[z]+"</span>";
+            options_html +="</div>";
 
         }
 
         // Generic sizing options for all widgets (an hack so we dont add new options to all widgets)
         var selPixel = (designer.boxlist[selected_box]["styleUnitWidth"] == 0 ? "selected" : "");
         var selPercent = (designer.boxlist[selected_box]["styleUnitWidth"] == 1 ? "selected" : "");
-        options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:100px; text-align: right; font-size:12px;" class="add-on">'+_Tr("Width")+"</span>";
-        options_html += '<select class="options" id="styleUnitWidth"><option value="0" '+selPixel+">"+_Tr("Pixels")+'</option><option value="1" '+selPercent+">"+_Tr("Percentage")+"</option></select>";
-        options_html += '</div><span class="help-inline"><small class="muted">'+_Tr("Choose width unit")+"</small></span></div></div>";
+        options_html += '<div class="option-row mb-2"><div class="input-group"><span style="width:100px; box-sizing:content-box; text-align: right; font-size:12px;" class="input-group-text justify-content-end">'+_Tr("Width")+"</span>";
+        options_html += '<select class="options form-select input-220" id="styleUnitWidth"><option value="0" '+selPixel+">"+_Tr("Pixels")+'</option><option value="1" '+selPercent+">"+_Tr("Percentage")+"</option></select>";
+        options_html += '</div><span class="option-hint form-text d-inline-block align-middle ms-1 mt-0">'+_Tr("Choose width unit")+"</span></div>";
 
         var selPixel = (designer.boxlist[selected_box]["styleUnitHeight"] == 0 ? "selected" : "");
         var selPercent = (designer.boxlist[selected_box]["styleUnitHeight"] == 1 ? "selected" : "");
-        options_html += '<div class="control-group"><div class="controls"><div style="margin-bottom: 0px;" class="input-prepend"><span style="width:100px; text-align: right; font-size:12px;" class="add-on">'+_Tr("Height")+"</span>";
-        options_html += '<select class="options" id="styleUnitHeight"><option value="0" '+selPixel+">"+_Tr("Pixels")+'</option><option value="1" '+selPercent+">"+_Tr("Percentage")+"</option></select>";
-        options_html += '</div><span class="help-inline"><small class="muted">'+_Tr("Choose height unit")+"</small></span></div></div>";
+        options_html += '<div class="option-row mb-2"><div class="input-group"><span style="width:100px; box-sizing:content-box; text-align: right; font-size:12px;" class="input-group-text justify-content-end">'+_Tr("Height")+"</span>";
+        options_html += '<select class="options form-select input-220" id="styleUnitHeight"><option value="0" '+selPixel+">"+_Tr("Pixels")+'</option><option value="1" '+selPercent+">"+_Tr("Percentage")+"</option></select>";
+        options_html += '</div><span class="option-hint form-text d-inline-block align-middle ms-1 mt-0">'+_Tr("Choose height unit")+"</span></div>";
 
         // A widget with a config may put settings of its own under the
         // options too, rows that belong with them rather than with its form.
@@ -780,7 +780,7 @@ var designer = {
             }
             options += "</optgroup>";
         }
-        var out = "<select id='"+id+"' class='options'>";
+        var out = "<select id='"+id+"' class='options form-select input-220'>";
         // A value that names no feed, or no value, is kept on save rather than
         // replaced by the first feed in the list.
         if (!found) {
@@ -815,16 +815,16 @@ var designer = {
             var icon = "<img src='../Modules/dashboard/Views/icons/"+z+".png'>";
             if (select[z].length == 1) {
                 // A menu with one widget is a plain button that adds it
-                widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button data-widget='"+select[z][0]+"' class='btn widgetmenu widget-button' style='width:62px; padding:4px;' title='"+title+"'>"+icon+"</button></div>";
+                widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button data-widget='"+select[z][0]+"' class='btn btn-default widgetmenu widget-button' style='width:62px; padding:4px;' title='"+title+"'>"+icon+"</button></div>";
                 continue;
             }
             var items = "";
-            for (var i in select[z]) items += "<li><a data-widget='"+select[z][i]+"' class='widget-button'>"+select[z][i]+"</a></li>";
-            widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn dropdown-toggle widgetmenu' data-toggle='dropdown' style='width:62px; padding:4px;' title='"+title+"'>"+icon+"<span class='caret'></span></button>";
+            for (var i in select[z]) items += "<li><a data-widget='"+select[z][i]+"' class='dropdown-item widget-button'>"+select[z][i]+"</a></li>";
+            widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn btn-default dropdown-toggle widgetmenu' data-bs-toggle='dropdown' style='width:62px; padding:4px;' title='"+title+"'>"+icon+"</button>";
             widget_html += "<ul class='dropdown-menu scrollable-menu' style='min-width: auto; padding: 0px; text-align:left; top:initial' name='d'>"+items+"</ul></div>";
         }
         // Blank button so the toolbox rows are even
-        widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn widgetmenu' disabled style='width:62px; padding:4px; visibility:hidden;'><img src='../Modules/dashboard/Views/icons/Text.png'></button></div>";
+        widget_html += "<div class='widgetbuttons' style='display: inline-block; '><button class='btn btn-default widgetmenu' disabled style='width:62px; padding:4px; visibility:hidden;'><img src='../Modules/dashboard/Views/icons/Text.png'></button></div>";
         $("#widget-buttons").html(widget_html);
 
         $(".widget-button").click(function(event) {
@@ -910,8 +910,8 @@ var designer = {
     // reports a problem.
     "check_option": function(field){
         var rule = designer.option_rules[field.attr("id")];
-        var group = field.closest(".control-group");
-        var help = group.find(".help-inline").first();
+        var group = field.closest(".option-row");
+        var help = group.find(".option-hint").first();
 
         if (help.data("hint") === undefined) help.data("hint", help.html());
 
@@ -925,11 +925,11 @@ var designer = {
             problem = designer.option_problem(rule, field.val());
         }
         if (problem === ""){
-            group.removeClass("error");
-            help.html(help.data("hint"));
+            group.find(".options").removeClass("is-invalid");
+            help.removeClass("text-danger").html(help.data("hint"));
         } else {
-            group.addClass("error");
-            help.html("<small>" + problem + "</small>");
+            field.addClass("is-invalid");
+            help.addClass("text-danger").html(problem);
         }
 
         designer.update_options_save();
@@ -938,7 +938,7 @@ var designer = {
     // Save is disabled while any field has an error. Cancel still closes the
     // panel.
     "update_options_save": function(){
-        var bad = $("#widget_options_body").find(".control-group.error").length;
+        var bad = $("#widget_options_body").find(".option-row").has(".is-invalid").length;
         $("#options-save").prop("disabled", bad > 0);
         $("#options-problem").text(bad === 0 ? ""
             : bad + " " + (bad === 1 ? _Tr("error found, fix to save")
@@ -1587,7 +1587,7 @@ var designer = {
                 $("#widget_options_body").find(".options").each(function(){
                         designer.check_option($(this));
                     });
-                var first_bad = $("#widget_options_body").find(".control-group.error").first();
+                var first_bad = $("#widget_options_body").find(".option-row").has(".is-invalid").first();
                 if (first_bad.length) {
                     first_bad.find(".options").first().focus();
                     return;
@@ -1743,12 +1743,12 @@ var designer = {
                 var last_val = input.data("last-value");
                 // if user selected "Other" option, show text box
                 if (select.val() === "__other") {
-                    other.removeClass("hidden");
+                    other.removeClass("hide");
                     if (last_val) input.val(last_val);
                     input.focus();
                 } else {
                     input.val(select.val());
-                    other.addClass("hidden");
+                    other.addClass("hide");
                 }
             });
     }

@@ -6,69 +6,67 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 <?php load_css("Modules/dashboard/Views/dashboard_list.css"); ?>
 
 <div id="app" class="container-fluid" v-cloak>
-    <div class="alert mt-2" :class="{'alert-warning':true}" v-if="gridData.length === 0">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div class="alert alert-warning mt-2" :class="{'alert-warning':true}" v-if="gridData.length === 0">
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
         <h4 class="alert-heading" if="status.title"><?php echo tr('No dashboards created') ?></h4>
         <?php echo tr('Maybe you would like to add your first dashboard using the button below&hellip;') ?>
     </div>
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="page-header">
         <div class="d-flex align-items-center">
             <h3><?php echo tr('Dashboards') ?></h3>
-            <button class="btn btn-light ml-3" @click.prevent="addNew"><?php echo tr('New') ?>  <span class="svg-icon-plus"></span> </button>
+            <button class="btn btn-default ms-3" @click.prevent="addNew"><?php echo tr('New') ?>  <span class="svg-icon-plus"></span> </button>
         </div>
-        <form v-if="gridData.length > 0" id="search" class="form-inline position-relative mb-0">
+        <form v-if="gridData.length > 0" id="search" class="d-flex align-items-center position-relative">
             <div class="form-group">
-                <input id="search-box" name="query" v-model="searchQuery" type="search" class="form-control input-medium mb-0" aria-describedby="searchHelp" placeholder="<?php echo tr('Search') ?>" title="<?php echo tr('Search the data by any column') ?>">
+                <input id="search-box" name="query" v-model="searchQuery" type="search" class="form-control input-165" aria-describedby="searchHelp" placeholder="<?php echo tr('Search') ?>" title="<?php echo tr('Search the data by any column') ?>">
                 <button id="searchclear" @click.prevent="searchQuery = ''"style="right:0" class="btn btn-link position-absolute" :class="{'d-none':searchQuery.length===0}"><span class="svg-icon-close"></span></button>
             </div>
         </form>
     </div>
 
     <!-- Dashboard grid table -->
-    <table v-if="gridData.length > 0" class="table table-sm table-hover table-condensed">
-        <caption v-if="status" class="text-muted muted text-left mt-3">{{ status.title }}</caption>
+    <table v-if="gridData.length > 0" class="table table-sm table-hover">
+        <caption v-if="status" class="text-muted text-start mt-3">{{ status.title }}</caption>
         <thead>
             <tr>
                 <!-- ID Column -->
                 <th :class="{ active: sortKey == 'id' }" @click="sortBy('id')">
-                    <a href="#" class="text-body d-flex align-items-center">
+                    <a href="#" class="d-flex align-items-center">
                         <span>ID</span>
                         <span class="arrow" :class="sortOrders.id > 0 ? 'asc' : 'dsc'"></span>
                     </a>
                 </th>
                 <!-- Name Column -->
                 <th :class="{ active: sortKey == 'name' }" @click="sortBy('name')">
-                    <a href="#" class="text-body d-flex align-items-center pl-2">
+                    <a href="#" class="d-flex align-items-center ps-2">
                         <span>Name</span>
                         <span class="arrow" :class="sortOrders.name > 0 ? 'asc' : 'dsc'"></span>
                     </a>
                 </th>
                 <!-- Alias Column -->
                 <th :class="{ active: sortKey == 'alias' }" @click="sortBy('alias')">
-                    <a href="#" class="text-body d-flex align-items-center pl-2">
+                    <a href="#" class="d-flex align-items-center ps-2">
                         <span>Alias</span>
                         <span class="arrow" :class="sortOrders.alias > 0 ? 'asc' : 'dsc'"></span>
                     </a>
                 </th>
                 <!-- Default Column -->
                 <th :class="{ active: sortKey == 'main' }" @click="sortBy('main')">
-                    <a href="#" class="text-body d-flex align-items-center">
+                    <a href="#" class="d-flex align-items-center">
                         <span>{{ capitalize(translations['default']) }}</span>
                         <span class="arrow" :class="sortOrders.main > 0 ? 'asc' : 'dsc'"></span>
                     </a>
                 </th>
                 <!-- Public Column -->
                 <th :class="{ active: sortKey == 'public' }" @click="sortBy('public')">
-                    <a href="#" class="text-body d-flex align-items-center">
+                    <a href="#" class="d-flex align-items-center">
                         <span>Public</span>
                         <span class="arrow" :class="sortOrders.public > 0 ? 'asc' : 'dsc'"></span>
                     </a>
                 </th>
                 <!-- Published Column -->
                 <th :class="{ active: sortKey == 'published' }" @click="sortBy('published')">
-                    <a href="#" class="text-body d-flex align-items-center">
+                    <a href="#" class="d-flex align-items-center">
                         <span>Published</span>
                         <span class="arrow" :class="sortOrders.published > 0 ? 'asc' : 'dsc'"></span>
                     </a>
@@ -87,39 +85,35 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 
                 <!-- Name Column (Editable) -->
                 <td>
-                    <div class="control-group">
-                        <div class="controls">
-                            <input @input="updateName($event, entry)" 
-                                   :value="entry.name" 
-                                   type="text" 
-                                   class="form-control border-0 m-0" 
-                                   @keyup.enter="$event.target.blur()" 
-                                   :title="'#' + entry.id + ' NAME\n' + translations['Label this dashboard with a name']">
-                            <span class="help-inline d-none d-sm-block text-right"></span>
-                        </div>
+                    <div class="field-row">
+                        <input @input="updateName($event, entry)" 
+                               :value="entry.name" 
+                               type="text" 
+                               class="form-control border-0" 
+                               @keyup.enter="$event.target.blur()" 
+                               :title="'#' + entry.id + ' NAME\n' + translations['Label this dashboard with a name']">
+                        <span class="form-text field-hint mt-0 d-none d-sm-block text-end"></span>
                     </div>
                 </td>
                 
                 <!-- Alias Column (Editable) -->
                 <td>
-                    <div class="control-group">
-                        <div class="controls">
-                            <input @input="updateAlias($event, entry)" 
-                                   :value="entry.alias" 
-                                   type="text" 
-                                   class="form-control border-0 m-0" 
-                                   @keyup.enter="$event.target.blur()" 
-                                   :title="'#' + entry.id + ' ALIAS\n' + translations['Must be unique. Short title to use in URL.\neg roof-solar']">
-                            <span class="help-inline d-none d-sm-block text-right"></span>
-                        </div>
+                    <div class="field-row">
+                        <input @input="updateAlias($event, entry)" 
+                               :value="entry.alias" 
+                               type="text" 
+                               class="form-control border-0" 
+                               @keyup.enter="$event.target.blur()" 
+                               :title="'#' + entry.id + ' ALIAS\n' + translations['Must be unique. Short title to use in URL.\neg roof-solar']">
+                        <span class="form-text field-hint mt-0 d-none d-sm-block text-end"></span>
                     </div>
                 </td>
                 
                 <!-- Default Toggle -->
                 <td>
                     <button @click="toggleMain(entry)"
-                            class="btn btn-sm-md btn-small"
-                            :class="entry.main ? 'btn-primary active' : 'btn-light'"
+                            class="btn btn-sm-md btn-sm"
+                            :class="entry.main ? 'btn-primary active' : 'btn-default'"
                             :title="'#' + entry.id + ' MAIN\n' + translations['Adds a Default Dashboard bookmark in the sidebar.\nAlso visible at dashboard/view']">
                         <span class="svg-icon-star_border"></span>
                     </button>
@@ -128,8 +122,8 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 <!-- Public Toggle -->
                 <td>
                     <button @click="togglePublic(entry)"
-                            class="btn btn-sm-md btn-small"
-                            :class="entry.public ? 'btn-primary active' : 'btn-light'"
+                            class="btn btn-sm-md btn-sm"
+                            :class="entry.public ? 'btn-primary active' : 'btn-default'"
                             :title="'#' + entry.id + ' PUBLIC\n' + translations['Allow this Dashboard to be viewed by anyone']">
                         <span class="svg-icon-earth"></span>
                     </button>
@@ -138,8 +132,8 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 <!-- Published Toggle -->
                 <td>
                     <button @click="togglePublished(entry)"
-                            class="btn btn-sm-md btn-small"
-                            :class="entry.published ? 'btn-primary active' : 'btn-light'"
+                            class="btn btn-sm-md btn-sm"
+                            :class="entry.published ? 'btn-primary active' : 'btn-default'"
                             :title="'#' + entry.id + ' PUBLISHED\n' + translations['Allow this Dashboard on the menu']">
                         <span class="svg-icon-dashboard"></span>
                     </button>
@@ -148,7 +142,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 <!-- Clone Button -->
                 <td>
                     <button @click="cloneDashboard(entry)"
-                            class="btn btn-light btn-sm-md btn-small"
+                            class="btn btn-default btn-sm-md btn-sm"
                             :title="'#' + entry.id + ' CLONE\n' + translations['Clone the layout of this dashboard to a new Dashboard']">
                         <span class="svg-icon-content_copy"></span>
                     </button>
@@ -156,7 +150,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 
                 <!-- Edit Link -->
                 <td class="d-none d-sm-table-cell">
-                    <a class="btn btn-light btn-sm-md btn-small"
+                    <a class="btn btn-default btn-sm-md btn-sm"
                        :title="'#' + entry.id + ' EDIT\n' + translations['Edit this dashboard layout']"
                        :href="entry.edit">
                         <span class="svg-icon-cog"></span>
@@ -166,7 +160,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 <!-- Delete Button -->
                 <td>
                     <button @click="deleteDashboard(entry)"
-                            class="btn btn-light btn-sm-md btn-small"
+                            class="btn btn-default btn-sm-md btn-sm"
                             :title="'#' + entry.id + ' DELETE\n' + translations['Delete this dashboard']">
                         <span class="svg-icon-bin"></span>
                     </button>
@@ -174,7 +168,7 @@ defined('EMONCMS_EXEC') or die('Restricted access');
                 
                 <!-- View Link -->
                 <td class="d-none d-sm-table-cell">
-                    <a class="btn btn-light btn-sm-md btn-small"
+                    <a class="btn btn-default btn-sm-md btn-sm"
                        :title="'#' + entry.id + ' VIEW\n' + translations['View this dashboard']"
                        :href="entry.view">
                         <span class="svg-icon-arrow_forward"></span>
@@ -333,23 +327,26 @@ defined('EMONCMS_EXEC') or die('Restricted access');
 
             // Input field feedback helper
             showInputFeedback: function(input, message, type = 'success') {
-                const container = input.parentNode.parentNode;
-                const feedback = input.parentNode.querySelector('.help-inline');
-                if (feedback) {
-                    // Reset classes
-                    container.classList.remove('success', 'error', 'warning');
+                const feedback = input.parentNode.querySelector('.field-hint');
+                const colours = { success: 'text-success', error: 'text-danger', warning: 'text-warning' };
+                const clear = () => {
+                    input.classList.remove('is-invalid');
+                    feedback.classList.remove('text-success', 'text-danger', 'text-warning');
                     feedback.innerText = '';
+                };
+                if (feedback) {
+                    clear();
                     
                     // Add feedback
                     if (message) {
-                        container.classList.add(type);
+                        if (type === 'error') input.classList.add('is-invalid');
+                        feedback.classList.add(colours[type]);
                         feedback.innerText = message;
                         feedback.classList.add('fade');
                         
                         // Auto-clear after delay
                         setTimeout(() => {
-                            container.classList.remove('success', 'error', 'warning');
-                            feedback.innerText = '';
+                            clear();
                             feedback.classList.remove('fade');
                         }, this.wait * 2.3);
                     }

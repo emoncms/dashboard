@@ -45,6 +45,7 @@
    panel the width of its text to read against them. A handle at its left
    edge slides the text away and back. */
 .chart-widget .chart-readout-bottom {
+    box-sizing: content-box;
     bottom: 4px; right: auto; max-width: calc(100% - 20px);
     display: flex; align-items: center;
     padding: 1px 6px 1px 0; border-radius: 3px;
