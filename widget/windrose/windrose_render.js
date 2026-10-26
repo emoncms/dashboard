@@ -125,7 +125,8 @@ var windrose_widget = {
             if (curve_val!=val || curve_val2!=val2 || force) {
                 var scale = 1*config.scale || 1;
                 draw_windrose(canvas.context,el.clientWidth,el.clientHeight,curve_val,curve_val2*scale,config.units);
-                force = false;
+                // Redraw until images have loaded
+                force = !(windrose_needle.complete && windrose_windrose.complete);
             }
         };
 

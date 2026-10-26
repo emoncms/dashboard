@@ -60,20 +60,22 @@ var sun_widget = {
         // Reading eases towards its value over several frames.
         var curve = 0;
         var force = true;
+        var last_code = null;
 
         var draw = function(){
             var feed = feeds.get(config.feedid);
-            if (!feed) return;
-            curve = render_curve(curve, feed.value);
+            // Blank until the first poll, then a face with No feed
+            if (!feed && !feeds.polled) return;
+            var target = feed ? feed.value : 0;
+            curve = render_curve(curve, target);
             var val = curve.toFixed(3);
 
-            var timeout = widget_timeout(config, feed);
+            var timeout = widget_feed_status(config, feeds, feed);
             var errorCode = timeout.code;
             var errorMessage = timeout.message;
-            var errorTimeout = parseFloat(config.timeout) || 0;
 
             // ONLY UPDATE ON CHANGE
-            if (val != (feed.value * 1).toFixed(3) || force || errorTimeout != 0)
+            if (val != (target * 1).toFixed(3) || force || timeout.code !== last_code)
             {
                 var scale = 1*config.scale || 1;
                 var offset = 1*config.offset || 0;
@@ -170,6 +172,7 @@ var sun_widget = {
                 }
                 force = false;
             }
+            last_code = timeout.code;
         };
 
         return {

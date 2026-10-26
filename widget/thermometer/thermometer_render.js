@@ -281,20 +281,22 @@ var thermometer_widget = {
         // Each reading eases towards its value over several frames.
         var curve = { val: 0, minval: 0, maxval: 0 };
         var force = true;
+        var last_code = null;
 
         var draw = function(){
             var feed = feeds.get(config.feedid);
             var minfeed = feeds.get(config.minvaluefeed || "0");
             var maxfeed = feeds.get(config.maxvaluefeed || "0");
 
-            if (!feed) return;
+            // Blank until the first poll, then a face with No feed
+            if (!feed && !feeds.polled) return;
 
-            var val = (feed.value * 1).toFixed(3);
-            curve.val = render_curve(curve.val, feed.value);
+            var target = feed ? feed.value : 0;
+            var val = (target * 1).toFixed(3);
+            curve.val = render_curve(curve.val, target);
             var val_curve = curve.val.toFixed(3);
 
-            var timeout = widget_timeout(config, feed);
-            var errorTimeout = parseFloat(config.timeout) || 0;
+            var timeout = widget_feed_status(config, feeds, feed);
 
             // The minval and maxval feed settings default to the first feed in the feedlist
             // which may not be public for use in public dashboards, which will then result in
@@ -321,7 +323,7 @@ var thermometer_widget = {
             }
 
             // ONLY UPDATE ON CHANGE
-            if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval || force || errorTimeout != 0)
+            if (val_curve!=val || minval_curve!=minval || maxval_curve!=maxval || force || timeout.code !== last_code)
             {
                 var scale = 1*config.scale || 1;
                 tips.set(draw_thermometer(canvas.canvas, config, {
@@ -334,6 +336,7 @@ var thermometer_widget = {
                 }));
                 force = false;
             }
+            last_code = timeout.code;
         };
 
         return {

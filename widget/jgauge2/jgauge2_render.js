@@ -105,7 +105,7 @@ var jgauge2_widget = {
             }
 
             // Timeout on feed 1 only
-            var timeout = widget_timeout(config, feed);
+            var timeout = widget_feed_status(config, feeds, feed);
             var errorCode = timeout.code;
             if (last_errorCode==null) last_errorCode = errorCode;
 
@@ -114,7 +114,8 @@ var jgauge2_widget = {
             {
                 var scale = 1*config.scale || 1;
                 draw_jgauge2(canvas.context,el.clientWidth,el.clientHeight,curve_val*scale,curve_val2*scale,config.max,config.min,config.units,errorCode,timeout.message);
-                force = false;
+                // Redraw until images have loaded
+                force = !jgauge_images_complete();
             }
 
             last_errorCode = errorCode;

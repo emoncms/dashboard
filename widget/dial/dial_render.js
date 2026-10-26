@@ -381,7 +381,7 @@ var dial_widget = {
             }
             var val_curve = curve.val.toFixed(3);
 
-            var timeout = widget_timeout(config, feed);
+            var timeout = widget_feed_status(config, feeds, feed);
             var errorCode = timeout.code;
 
             // The minval and maxval feed settings default to the first feed in the

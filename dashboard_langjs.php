@@ -73,6 +73,7 @@ LANG_JS["Center"] = <?php echo json_encode(tr("Center")); ?>;
 LANG_JS["Front"] = <?php echo json_encode(tr("Front")); ?>;
 LANG_JS["Italic"] = <?php echo json_encode(tr("Italic")); ?>;
 LANG_JS["Left"] = <?php echo json_encode(tr("Left")); ?>;
+LANG_JS["No feed"] = <?php echo json_encode(tr("No feed")); ?>;
 LANG_JS["Normal"] = <?php echo json_encode(tr("Normal")); ?>;
 LANG_JS["Oblique"] = <?php echo json_encode(tr("Oblique")); ?>;
 LANG_JS["Right"] = <?php echo json_encode(tr("Right")); ?>;
