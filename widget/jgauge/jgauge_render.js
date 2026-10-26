@@ -37,6 +37,14 @@ function jgauge_image(file){
     return jgauge_images[file];
 }
 
+// True once every gauge image has loaded or failed.
+function jgauge_images_complete(){
+    for (var file in jgauge_images) {
+        if (!jgauge_images[file].complete) return false;
+    }
+    return true;
+}
+
 // Side of the square the gauge is drawn in, 120 to 170px.
 function jgauge_size(width, height){
     var size = width > height ? height : width;
@@ -145,7 +153,7 @@ var jgauge_widget = {
                 curve_val = curve.toFixed(3);
             }
 
-            var timeout = widget_timeout(config, feed);
+            var timeout = widget_feed_status(config, feeds, feed);
             var errorCode = timeout.code;
             if (last_errorCode==null) last_errorCode = errorCode;
 
@@ -154,7 +162,8 @@ var jgauge_widget = {
             {
                 var scale = 1*config.scale || 1;
                 draw_jgauge(canvas.context,el.clientWidth,el.clientHeight,curve_val*scale,config.max,config.min,config.units,errorCode,timeout.message);
-                force = false;
+                // Redraw until images have loaded
+                force = !jgauge_images_complete();
             }
 
             last_errorCode = errorCode;

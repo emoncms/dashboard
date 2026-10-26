@@ -36,6 +36,8 @@ var RENDER_CURVE_RATE = 0.15;
 
 var render_feeds = {
     online: true,
+    // Set by the first poll that answers, before which no feed is known.
+    polled: false,
 
     // Feed id as a string from an option value, which may be an id or a
     // tag:name pair. Empty when the pair names no feed the viewer can see.
@@ -234,6 +236,7 @@ function render_poll(){
                 render_live = live;
                 render_assoc = assoc;
                 render_feeds.online = true;
+                render_feeds.polled = true;
                 render_update();
             },
             error: function(){

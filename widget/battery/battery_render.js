@@ -71,15 +71,17 @@ var battery_widget = {
 
         var draw = function(){
             var feed = feeds.get(config.feedid);
-            if (!feed) return;
-            curve = render_curve(curve, feed.value);
+            // Blank until the first poll, then a face with No feed
+            if (!feed && !feeds.polled) return;
+            var target = feed ? feed.value : 0;
+            curve = render_curve(curve, target);
             var val = curve.toFixed(3);
 
-            var timeout = widget_timeout(config, feed);
+            var timeout = widget_feed_status(config, feeds, feed);
             var errorCode = timeout.code;
 
             // Only drawn on change
-            if (val != (feed.value * 1).toFixed(3) || force || errorCode !== last_code)
+            if (val != (target * 1).toFixed(3) || force || errorCode !== last_code)
             {
                 var scale = 1*config.scale || 1;
                 var offset = 1*config.offset || 0;

@@ -274,9 +274,11 @@ var bar_widget = {
             var minfeed = feeds.get(config.minvaluefeed || "0");
             var maxfeed = feeds.get(config.maxvaluefeed || "0");
 
-            if (!feed) return;
-            var val = (feed.value * 1).toFixed(3);
-            curve.val = render_curve(curve.val, feed.value);
+            // Blank until the first poll, then a face with No feed
+            if (!feed && !feeds.polled) return;
+            var target = feed ? feed.value : 0;
+            var val = (target * 1).toFixed(3);
+            curve.val = render_curve(curve.val, target);
             var val_curve = curve.val.toFixed(3);
 
             // Min and max feed settings default to the first feed in the feed
@@ -302,7 +304,7 @@ var bar_widget = {
                 displayminmax = "0";
             }
 
-            var timeout = widget_timeout(config, feed);
+            var timeout = widget_feed_status(config, feeds, feed);
             if (timeout.code === "1") val = 0;
 
             // Only drawn on change

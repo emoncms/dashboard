@@ -173,3 +173,10 @@ function widget_timeout(config, feed){
     var code = (now - offset - feed.time * 1) > timeout ? "1" : "0";
     return { code: code, message: message };
 }
+
+// As widget_timeout, with "No feed" as the error once the poll has answered
+// without the feed (unset, deleted or not public).
+function widget_feed_status(config, feeds, feed){
+    if (!feed && feeds.polled) return { code: "1", message: _Tr("No feed") };
+    return widget_timeout(config, feed);
+}
